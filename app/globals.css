@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Overridden per consultancy at /c/[slug] so branding is data, not code. */
+  --brand: #0d1b2a;
+  --brand-dark: #06101c;
+  --brand-light: #1b3a5c;
+}
+
+html,
+body {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  @apply bg-paper text-ink antialiased;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* 16px minimum. The target user has weak English and needs readable text. */
+  font-size: 16px;
+}
+
+/* Every tappable control clears 48px, per AGENT_BUILDER.md. */
+button,
+a[role='button'] {
+  min-height: 48px;
+  touch-action: manipulation;
+}
+
+*:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

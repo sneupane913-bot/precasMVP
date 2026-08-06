@@ -1,0 +1,19 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Netlify synchronous functions time out at 10s on the free tier.
+# Every AI call in this app is deliberately scoped to a single answer so it
+# stays well inside that budget. Do not add a whole-transcript evaluation call.
+[functions]
+  node_bundler = "esbuild"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Permissions-Policy = "camera=(self), microphone=(self)"
