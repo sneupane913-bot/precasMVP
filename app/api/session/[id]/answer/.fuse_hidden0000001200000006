@@ -20,14 +20,13 @@ export const maxDuration = 26;
  * awards 43% to silence. We refuse, and we tell the student why.
  */
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
   // Owner switch, before any paid call.
   const down = await platformDown();
   if (down) {
     return NextResponse.json(apiError(down.code, down.message, down.userMessage), { status: 503 });
   }
 
-  const session = await store.get(id);
+  const session = await store.get(params.id);
   // Ownership before any paid call: otherwise a stranger with a session id
   // could spend our transcription budget. QA finding LIVE-002.
   if (!session || !(await ownsSession(session.ownerId))) {

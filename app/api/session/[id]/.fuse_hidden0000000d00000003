@@ -12,8 +12,7 @@ export const runtime = 'nodejs';
 
 /** Resume state. A closed tab must never cost a student their session. */
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const session = await store.get(id);
+  const session = await store.get(params.id);
 
   // QA finding LIVE-002. A transcript contains the student's finances, family
   // and visa history. Reads are bound to the anonymous owner cookie issued at

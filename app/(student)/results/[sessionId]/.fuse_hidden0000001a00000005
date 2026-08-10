@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { store } from '@/lib/store';
+import { ownsSession } from '@/lib/owner-session';
 import { buildSummary } from '@/lib/summary';
 import { getInstitution } from '@/lib/data/institutions';
 import { getQuestion, resolvedQuestion } from '@/lib/data/questions';
@@ -10,7 +11,12 @@ export const dynamic = 'force-dynamic';
 
 export default async function ResultsPage({ params }: { params: { sessionId: string } }) {
   const session = await store.get(params.sessionId);
-  if (!session) notFound();
+
+  // QA finding LIVE-002: this page was fully public. A results page carries the
+  // student's own words about their family's income, their visa refusals and
+  // their finances. It is now bound to the anonymous owner cookie, and a
+  // non-owner gets an ordinary 404 rather than a hint that the session exists.
+  if (!session || !ownsSession(session.ownerId)) notFound();
 
   const institution = getInstitution(session.institutionId);
   if (!institution) notFound();
@@ -68,23 +74,29 @@ export default async function ResultsPage({ params }: { params: { sessionId: str
           )}
         </section>
 
-        {/* ---------- Sub-scores ---------- */}
-        {scored.length > 0 && (
-          <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {[
+        {/* ---------- Sub-scores. null means not assessed, never zero. ---------- */}
+        <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {(
+            [
               ['English clarity', summary.subScores.englishClarity, 'How clearly you spoke'],
               ['Real detail', summary.subScores.specificity, 'Names, numbers and examples'],
               ['Genuine student', summary.subScores.genuineIntent, 'How real your answers sounded'],
               ['Behaviour', summary.subScores.interviewBehaviour, 'How you followed the rules'],
-            ].map(([label, value, hint]) => (
-              <div key={label as string} className="rounded-xl border border-slate-200 bg-white p-4">
-                <p className="text-2xl font-black text-ink">{value as number}%</p>
-                <p className="text-sm font-semibold text-ink">{label as string}</p>
-                <p className="mt-0.5 text-xs leading-snug text-slate-500">{hint as string}</p>
-              </div>
-            ))}
-          </section>
-        )}
+            ] as [string, number | null, string][]
+          ).map(([label, value, hint]) => (
+            <div key={label} className="rounded-xl border border-slate-200 bg-white p-4">
+              {value === null ? (
+                <p className="text-base font-bold leading-tight text-slate-400">Not assessed</p>
+              ) : (
+                <p className="text-2xl font-black text-ink">{value}%</p>
+              )}
+              <p className="text-sm font-semibold text-ink">{label}</p>
+              <p className="mt-0.5 text-xs leading-snug text-slate-500">
+                {value === null ? 'We could not hear you' : hint}
+              </p>
+            </div>
+          ))}
+        </section>
 
         {/* ---------- Behaviour table ---------- */}
         <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">

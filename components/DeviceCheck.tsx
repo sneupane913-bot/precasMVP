@@ -394,10 +394,27 @@ export function DeviceCheck({ onReady }: { onReady: () => void }) {
           and is meant to happen: it is the only way to know what the interviewer will hear.
         </p>
 
+        {/*
+          QA finding LIVE-007: this meter said "Loud and clear" at the same
+          moment the verdict said "We heard nothing", because the meter reads
+          the live microphone while the verdict reads the finished recording.
+          Two truths on one screen is worse than either being wrong. Once a
+          verdict exists, the verdict is the only voice.
+        */}
         <div className="mb-1 flex items-center justify-between text-xs font-medium text-slate-500">
           <span>{echoState === 'recording' ? 'Speak now' : 'Microphone level'}</span>
           <span>
-            {level > 0.05 ? 'Loud and clear' : level > 0.012 ? 'Hearing you' : 'Very quiet'}
+            {echoVerdict
+              ? echoVerdict.tone === 'fail'
+                ? 'Test failed'
+                : echoVerdict.tone === 'warn'
+                  ? 'Usable, see below'
+                  : 'Test passed'
+              : level > 0.05
+                ? 'Loud and clear'
+                : level > 0.012
+                  ? 'Hearing you'
+                  : 'Very quiet'}
           </span>
         </div>
         <div className="mb-4 h-3 w-full overflow-hidden rounded-full bg-slate-100">

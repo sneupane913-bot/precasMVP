@@ -58,7 +58,7 @@ const NOISE_FLOOR_THRESHOLD = 0.085;
  */
 export function useMonitor(args: {
   sessionId: string;
-  videoRef: React.RefObject<HTMLVideoElement | null>;
+  videoRef: React.RefObject<HTMLVideoElement>;
   audioStream: MediaStream | null;
   currentQuestionId: string | null;
   enabled: boolean;

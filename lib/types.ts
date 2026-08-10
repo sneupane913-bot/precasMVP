@@ -214,6 +214,12 @@ export interface InterviewSession {
   flags: SessionFlag[];
   /** Trial sessions are capped below the institution's full question count. */
   isTrial: boolean;
+  /**
+   * Anonymous owner id from the HTTP-only cookie. Required to read this
+   * session. Null only on sessions created before QA finding LIVE-002 was
+   * fixed, and those are deliberately unreadable.
+   */
+  ownerId: string | null;
   createdAt: string;
   completedAt: string | null;
   summary: SessionSummary | null;
@@ -223,10 +229,15 @@ export interface SessionSummary {
   overallScore: number;
   band: Band;
   headline: string;
+  /**
+   * null means NOT ASSESSED, not zero. Any dimension that depends on hearing
+   * the student is null when nothing was transcribed. QA finding LIVE-009.
+   */
   subScores: {
-    englishClarity: number;
-    specificity: number;
-    genuineIntent: number;
+    englishClarity: number | null;
+    specificity: number | null;
+    genuineIntent: number | null;
+    /** Observed rather than heard, so this is always available. */
     interviewBehaviour: number;
   };
   answeredCount: number;

@@ -5,7 +5,7 @@ export interface TranscriptionResult {
   transcript: string;
   confidence: number;
   wordCount: number;
-  provider: 'deepgram' | 'mock';
+  provider: 'groq' | 'deepgram' | 'mock';
 }
 
 /** Below this, we treat the answer as unusable and refuse to score it. */
@@ -22,23 +22,112 @@ export async function transcribe(
   audio: ArrayBuffer,
   mimeType: string
 ): Promise<TranscriptionResult> {
-  const key = process.env.DEEPGRAM_API_KEY;
+  const groqKey = process.env.GROQ_API_KEY;
+  const deepgramKey = process.env.DEEPGRAM_API_KEY;
 
-  if (!key) {
-    if (process.env.NODE_ENV === 'production') {
-      // Never silently fake a transcript in production. Fail loudly.
-      return { status: 'failed', transcript: '', confidence: 0, wordCount: 0, provider: 'mock' };
-    }
-    return mockTranscribe(audio);
+  if (groqKey) return transcribeGroq(audio, mimeType, groqKey);
+  if (deepgramKey) return transcribeDeepgram(audio, mimeType, deepgramKey);
+
+  if (process.env.NODE_ENV === 'production') {
+    // Never silently fake a transcript in production. Fail loudly.
+    return { status: 'failed', transcript: '', confidence: 0, wordCount: 0, provider: 'mock' };
   }
+  return mockTranscribe(audio);
+}
 
+/**
+ * Groq, running Whisper Large v3. Our default.
+ *
+ * $0.111 per hour against Deepgram's $0.258, so it more than halves our single
+ * largest cost line. The price is verified.
+ *
+ * NOT VERIFIED: that Whisper is more accurate than Deepgram on Nepali-accented
+ * English. That was asserted without evidence and QA was right to challenge it.
+ * It must be benchmarked on real Nepali student audio, on a real mid-range
+ * Android and an iPhone, before it is treated as a quality decision rather
+ * than purely a cost decision. Deepgram remains one environment variable away.
+ *
+ * We deliberately do NOT use whisper-large-v3-turbo at $0.04/hr. The saving is
+ * about four rupees per interview and it is less accurate. Mis-hearing a
+ * nervous student is not worth four rupees.
+ */
+async function transcribeGroq(
+  audio: ArrayBuffer,
+  mimeType: string,
+  key: string
+): Promise<TranscriptionResult> {
+  try {
+    const form = new FormData();
+    form.append('file', new Blob([audio], { type: mimeType }), 'answer.webm');
+    form.append('model', 'whisper-large-v3');
+    form.append('language', 'en');
+    form.append('response_format', 'verbose_json');
+    // Nudges Whisper toward the vocabulary of this exam rather than guessing.
+    form.append(
+      'prompt',
+      'A Nepali student answering a UK university pre-CAS credibility interview about their course, university, tuition fees, sponsor, accommodation and career plans.'
+    );
+
+    const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}` },
+      body: form,
+    });
+
+    if (!res.ok) {
+      return { status: 'failed', transcript: '', confidence: 0, wordCount: 0, provider: 'groq' };
+    }
+
+    const json = (await res.json()) as GroqResponse;
+    const transcript = (json.text ?? '').trim();
+    const wordCount = transcript ? transcript.split(/\s+/).length : 0;
+
+    // Whisper hallucinates stock phrases on silence. Catch the common ones.
+    if (isWhisperHallucination(transcript)) {
+      return { status: 'silent', transcript: '', confidence: 0, wordCount: 0, provider: 'groq' };
+    }
+
+    return { ...classify(transcript, wordCount), confidence: 0.9, provider: 'groq' };
+  } catch {
+    return { status: 'failed', transcript: '', confidence: 0, wordCount: 0, provider: 'groq' };
+  }
+}
+
+/**
+ * Whisper invents text when given silence, almost always from a small set of
+ * stock phrases learned from subtitle training data. Left unchecked this would
+ * put words in a student's mouth, which is the one thing this product must
+ * never do.
+ */
+function isWhisperHallucination(text: string): boolean {
+  const t = text.toLowerCase().replace(/[^a-z\s]/g, '').trim();
+  if (!t) return true;
+  const stock = [
+    'thank you',
+    'thanks for watching',
+    'thank you for watching',
+    'you',
+    'bye',
+    'subtitles by the amaracom community',
+    'please subscribe',
+    'transcription by castingwordscom',
+    'copyright',
+  ];
+  return stock.some((s) => t === s || (t.length < 30 && t.includes(s)));
+}
+
+/** Kept as a drop-in fallback. Set DEEPGRAM_API_KEY and leave GROQ_API_KEY empty. */
+async function transcribeDeepgram(
+  audio: ArrayBuffer,
+  mimeType: string,
+  key: string
+): Promise<TranscriptionResult> {
   const params = new URLSearchParams({
     model: 'nova-3',
     language: 'en',
     smart_format: 'true',
     punctuate: 'true',
-    filler_words: 'true', // we want "um" and "uh": they reveal hesitation
-    detect_language: 'false',
+    filler_words: 'true',
   });
 
   try {
@@ -47,18 +136,18 @@ export async function transcribe(
       headers: { Authorization: `Token ${key}`, 'Content-Type': mimeType },
       body: audio,
     });
-
     if (!res.ok) {
       return { status: 'failed', transcript: '', confidence: 0, wordCount: 0, provider: 'deepgram' };
     }
-
     const json = (await res.json()) as DeepgramResponse;
     const alt = json.results?.channels?.[0]?.alternatives?.[0];
     const transcript = (alt?.transcript ?? '').trim();
-    const confidence = alt?.confidence ?? 0;
     const wordCount = transcript ? transcript.split(/\s+/).length : 0;
-
-    return { ...classify(transcript, wordCount), confidence, provider: 'deepgram' };
+    return {
+      ...classify(transcript, wordCount),
+      confidence: alt?.confidence ?? 0,
+      provider: 'deepgram',
+    };
   } catch {
     return { status: 'failed', transcript: '', confidence: 0, wordCount: 0, provider: 'deepgram' };
   }
@@ -108,6 +197,10 @@ function mockTranscribe(audio: ArrayBuffer): TranscriptionResult {
   };
 }
 
+interface GroqResponse {
+  text?: string;
+}
+
 interface DeepgramResponse {
   results?: {
     channels?: Array<{
@@ -128,7 +221,7 @@ interface DeepgramResponse {
  * competitor for, and it is not excused by being a development convenience.
  */
 export function sttIsMocked(): boolean {
-  return !process.env.DEEPGRAM_API_KEY;
+  return !process.env.GROQ_API_KEY && !process.env.DEEPGRAM_API_KEY;
 }
 
 export function redact(text: string): string {

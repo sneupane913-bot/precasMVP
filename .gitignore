@@ -10,3 +10,18 @@ build/
 next-env.d.ts
 .netlify/
 .vercel/
+
+# iCloud conflict copies. These appear as "File 2.tsx" when iCloud cannot
+# merge a change, and they WILL be compiled and deployed if committed.
+# One of these ("components/InterviewRoom 2.tsx") already exists locally and
+# must be deleted by hand: the folder denies programmatic deletion.
+* 2.ts
+* 2.tsx
+* 2.js
+* 3.ts
+* 3.tsx
+*\ [0-9].ts
+*\ [0-9].tsx
+diagnose-log.txt
+push-log.txt
+dev-output.txt

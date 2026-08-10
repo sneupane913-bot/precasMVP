@@ -19,18 +19,17 @@ export const maxDuration = 26;
  * function that produces a score from an empty transcript. The competitor
  * awards 43% to silence. We refuse, and we tell the student why.
  */
-export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export async function POST(req: Request, { params }: { params: { id: string } }) {
   // Owner switch, before any paid call.
   const down = await platformDown();
   if (down) {
     return NextResponse.json(apiError(down.code, down.message, down.userMessage), { status: 503 });
   }
 
-  const session = await store.get(id);
+  const session = await store.get(params.id);
   // Ownership before any paid call: otherwise a stranger with a session id
   // could spend our transcription budget. QA finding LIVE-002.
-  if (!session || !(await ownsSession(session.ownerId))) {
+  if (!session || !ownsSession(session.ownerId)) {
     return NextResponse.json(
       apiError('SESSION_NOT_FOUND', 'no session or not owner', 'Your interview session has expired. Please start again.'),
       { status: 404 }

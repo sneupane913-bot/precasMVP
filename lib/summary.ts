@@ -66,26 +66,50 @@ export function buildSummary(session: InterviewSession): SessionSummary {
     .slice(0, 3)
     .map((x) => x.cat);
 
+  // QA finding LIVE-009. With zero audible answers the old version still told
+  // the student to "add specifics" and not to "sound memorised". We had heard
+  // nothing. That is exactly the fabrication we criticise the competitor for,
+  // arriving through the back door of the summary instead of the scorer.
+  //
+  // Rule: coaching may only be derived from successfully transcribed answers,
+  // or from events we genuinely observed (flags, completion). Everything else
+  // is reported as not assessed.
+  const heardNothing = scored.length === 0;
+
   const strengths: string[] = [];
-  if (completionRate === 1) strengths.push('You answered every question and did not give up.');
-  if (avg(wordCounts) > 70) strengths.push('Your answers were a good length, not too short.');
-  if (criticalFlags === 0) strengths.push('You stayed on screen the whole time, exactly as required.');
-  if (scored.some((a) => /\d/.test(a.transcript)))
-    strengths.push('You used real numbers, which is what the interviewer wants to hear.');
-  if (strengths.length === 0)
-    strengths.push('You sat the full mock interview. That is more preparation than most students do.');
+  if (heardNothing) {
+    // The only honest positives are things that did not depend on hearing them.
+    if (criticalFlags === 0)
+      strengths.push('You stayed on the interview screen the whole time, which is exactly right.');
+    strengths.push('You sat down and started. Sorting out the microphone is the easy part.');
+  } else {
+    if (completionRate === 1) strengths.push('You answered every question and did not give up.');
+    if (avg(wordCounts) > 70) strengths.push('Your answers were a good length, not too short.');
+    if (criticalFlags === 0)
+      strengths.push('You stayed on screen the whole time, exactly as required.');
+    if (scored.some((a) => /\d/.test(a.transcript)))
+      strengths.push('You used real numbers, which is what the interviewer wants to hear.');
+    if (strengths.length === 0)
+      strengths.push('You sat the full mock interview. That is more preparation than most students do.');
+  }
 
   const nextSteps: string[] = [];
-  if (specificity < 55)
-    nextSteps.push('Add real details to your answers: names, numbers, dates, module titles.');
-  if (genuineIntent < 55)
-    nextSteps.push('Practise saying your answers in different words, so they do not sound learned by heart.');
-  if (criticalFlags > 0)
-    nextSteps.push('Stay on the interview screen and keep your face in the camera the whole time.');
-  if (completionRate < 1)
-    nextSteps.push('Finish every question next time, even if you are not sure of the answer.');
-  if (nextSteps.length === 0)
-    nextSteps.push('Sit the mock again in two days and try to beat this score.');
+  if (heardNothing) {
+    nextSteps.push('We could not hear any of your answers, so there is nothing to judge yet.');
+    nextSteps.push('Check your microphone is not muted and that your browser is allowed to use it.');
+    nextSteps.push('Do the sound check before you start, and only continue once you hear yourself.');
+  } else {
+    if (specificity < 55)
+      nextSteps.push('Add real details to your answers: names, numbers, dates, module titles.');
+    if (genuineIntent < 55)
+      nextSteps.push('Practise saying your answers in different words, so they do not sound learned by heart.');
+    if (criticalFlags > 0)
+      nextSteps.push('Stay on the interview screen and keep your face in the camera the whole time.');
+    if (completionRate < 1)
+      nextSteps.push('Finish every question next time, even if you are not sure of the answer.');
+    if (nextSteps.length === 0)
+      nextSteps.push('Sit the mock again in two days and try to beat this score.');
+  }
 
   const band = bandFor(overallScore);
   const headline =
@@ -103,10 +127,13 @@ export function buildSummary(session: InterviewSession): SessionSummary {
     overallScore,
     band,
     headline,
+    // Every dimension that depends on hearing the student is null when we did
+    // not hear them. The results page renders "not assessed", never a number.
     subScores: {
-      englishClarity: Math.max(0, Math.min(100, englishClarity)),
-      specificity: Math.max(0, Math.min(100, specificity)),
-      genuineIntent: Math.max(0, Math.min(100, genuineIntent)),
+      englishClarity: heardNothing ? null : Math.max(0, Math.min(100, englishClarity)),
+      specificity: heardNothing ? null : Math.max(0, Math.min(100, specificity)),
+      genuineIntent: heardNothing ? null : Math.max(0, Math.min(100, genuineIntent)),
+      // Behaviour is observed, not heard, so it stays valid.
       interviewBehaviour,
     },
     answeredCount: scored.length,

@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { INSTITUTIONS } from '@/lib/data/institutions';
 
 /**
@@ -10,8 +10,20 @@ import { INSTITUTIONS } from '@/lib/data/institutions';
  * far better entry point than a profile form.
  */
 export default function UniversitiesPage() {
+  return (
+    <Suspense fallback={<main className="p-6 text-slate-500">Loading universities...</main>}>
+      <UniversityBrowser />
+    </Suspense>
+  );
+}
+
+function UniversityBrowser() {
   const router = useRouter();
-  const [q, setQ] = useState('');
+  // QA finding LIVE-006: the home page links here with ?q=BPP but the field
+  // came up blank and every card was shown, so the link promised a filter it
+  // never applied.
+  const searchParams = useSearchParams();
+  const [q, setQ] = useState(searchParams.get('q') ?? '');
   const [type, setType] = useState<'all' | 'Pre-CAS' | 'CAS' | 'Pre-Admission'>('all');
   const [starting, setStarting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +48,8 @@ export default function UniversitiesPage() {
       const res = await fetch('/api/session/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ institution: slug, mode: 'test', isTrial: true }),
+        // No entitlement fields. The server decides trial length. LIVE-003.
+        body: JSON.stringify({ institution: slug, mode: 'test' }),
       });
       const json = (await res.json()) as
         | { ok: true; data: { sessionId: string } }
