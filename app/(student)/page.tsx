@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { INSTITUTIONS } from '@/lib/data/institutions';
+import { publicInstitutions } from '@/lib/data/institutions';
+import { publicPlans, perMockNpr, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
 
 /**
  * Home page.
@@ -46,7 +47,7 @@ export default function HomePage() {
             Practise for your university
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            {INSTITUTIONS.map((i) => (
+            {publicInstitutions().map((i) => (
               <Link
                 key={i.id}
                 href={`/universities?q=${encodeURIComponent(i.shortName)}`}
@@ -69,7 +70,7 @@ export default function HomePage() {
       <section className="px-5 py-12">
         <div className="mx-auto grid max-w-4xl gap-6 sm:grid-cols-3">
           {[
-            { n: '1', t: 'Pick your university', d: 'We ask the questions that university asks.' },
+            { n: '1', t: 'Pick your university', d: 'Based on the credibility themes universities publish.' },
             { n: '2', t: 'Answer out loud', d: 'Camera on, timer running, just like the real one.' },
             { n: '3', t: 'Get real feedback', d: 'We tell you what you said and how to say it better.' },
           ].map((s) => (
@@ -106,19 +107,42 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ---------------- Price ---------------- */}
+      {/* ---------------- Price ----------------
+          QA-205: this advertised "Rs 500 / month", a plan we do not sell, and
+          an undated competitor comparison. Home and /pricing must agree, and
+          both are driven from lib/data/plans.ts. */}
       <section className="px-5 py-12">
-        <div className="mx-auto max-w-md rounded-2xl border-2 border-ink bg-white p-7 text-center">
-          <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-slate-500">
-            After your free try
+        <div className="mx-auto max-w-2xl">
+          <p className="mb-1 text-center text-sm font-semibold uppercase tracking-wide text-slate-500">
+            After your free questions
           </p>
-          <p className="mb-1 text-4xl font-black text-ink">
-            Rs 500<span className="text-lg font-medium text-slate-500"> / month</span>
-          </p>
-          <p className="mb-5 text-slate-600">10 full mock interviews and 100 practice questions.</p>
-          <p className="rounded-lg bg-paper px-4 py-3 text-sm leading-relaxed text-slate-600">
-            That is about Rs 50 for each interview. Other sites charge around Rs 175 for one.
-          </p>
+          <h2 className="mb-6 text-center font-serif text-2xl text-ink">Pay once, not monthly</h2>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {publicPlans().map((p) => (
+              <div
+                key={p.code}
+                className={`rounded-2xl border-2 bg-white p-6 text-center ${
+                  p.badge === 'MOST POPULAR' ? 'border-ink' : 'border-slate-200'
+                }`}
+              >
+                <p className="text-3xl font-black text-ink">NPR {p.priceNpr.toLocaleString()}</p>
+                <p className="mb-3 text-sm text-slate-500">one time</p>
+                <p className="font-semibold text-ink">
+                  {p.mockInterviews} mocks + {p.practiceSessions} practice
+                </p>
+                <p className="text-sm text-slate-500">
+                  {FULL_MOCK_QUESTION_COUNT} questions per mock, about NPR {perMockNpr(p)} each
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 text-center">
+            <Link href="/pricing" className="text-sm font-semibold text-ink underline">
+              See how this compares with other Nepali platforms
+            </Link>
+          </div>
         </div>
       </section>
 

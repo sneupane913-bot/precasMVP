@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { store } from '@/lib/store';
 import { ownsSession } from '@/lib/owner-session';
+import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
 import { apiError, type ApiResult, type FlagType } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -33,6 +34,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json(apiError('BAD_REQUEST', 'invalid flag', 'Something went wrong.'), {
       status: 400,
     });
+  }
+
+  const rl = rateLimit(`flag:${clientIp(req)}`, RL.flag);
+  if (!rl.allowed) {
+    return NextResponse.json({ ok: true, data: { count: -1 } });
   }
 
   const session = await store.get(id);

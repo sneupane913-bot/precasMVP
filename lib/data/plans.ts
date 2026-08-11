@@ -15,6 +15,8 @@
 
 export interface Plan {
   code: string;
+  /** Public packs only. Starter and Pro are hidden by client decision. */
+  isPublic: boolean;
   name: string;
   tagline: string;
   priceNpr: number;
@@ -30,6 +32,7 @@ export interface Plan {
 export const PLANS: Plan[] = [
   {
     code: 'trial',
+    isPublic: true,
     name: 'Free trial',
     tagline: 'See if it is any good, first',
     priceNpr: 0,
@@ -40,44 +43,48 @@ export const PLANS: Plan[] = [
   },
   {
     code: 'starter',
+    isPublic: false,
     name: 'Starter',
     tagline: 'Just before your interview',
     priceNpr: 149,
     mockInterviews: 2,
     practiceSessions: 5,
-    maxQuestionsPerMock: 22,
+    maxQuestionsPerMock: 17,
     costNpr: 20,
   },
   {
     code: 'prep',
+    isPublic: true,
     name: 'Prep',
     tagline: 'Get comfortable',
     priceNpr: 449,
     mockInterviews: 6,
     practiceSessions: 15,
-    maxQuestionsPerMock: 22,
+    maxQuestionsPerMock: 17,
     badge: 'MOST POPULAR',
     costNpr: 59,
   },
   {
     code: 'serious',
+    isPublic: true,
     name: 'Serious',
     tagline: 'Build real confidence',
     priceNpr: 799,
     mockInterviews: 12,
     practiceSessions: 30,
-    maxQuestionsPerMock: 22,
+    maxQuestionsPerMock: 17,
     badge: 'BEST VALUE',
     costNpr: 118,
   },
   {
     code: 'pro',
+    isPublic: false,
     name: 'Pro',
     tagline: 'Until you are ready',
     priceNpr: 1299,
     mockInterviews: 25,
     practiceSessions: 60,
-    maxQuestionsPerMock: 22,
+    maxQuestionsPerMock: 17,
     costNpr: 241,
   },
 ];
@@ -99,6 +106,19 @@ export const BUNDLES: Bundle[] = [
 
 /** What the competition charges, so our page can show the comparison honestly. */
 export const COMPETITOR_PER_MOCK_NPR = { best: 143, typical: 175, worst: 199 };
+
+/**
+ * The only packs a student may see or buy. QA-207: Starter and Pro were
+ * displayed despite the client hiding them. Public pages MUST use this, never
+ * PLANS directly.
+ */
+export function publicPlans(): Plan[] {
+  return PLANS.filter((p) => p.isPublic && p.priceNpr > 0);
+}
+
+/** The trial: first 10 questions of the same 17-question sitting. */
+export const TRIAL_QUESTION_COUNT = 10;
+export const FULL_MOCK_QUESTION_COUNT = 17;
 
 export function getPlan(code: string): Plan | undefined {
   return PLANS.find((p) => p.code === code);

@@ -147,6 +147,23 @@ The purple "demo mode" banner disappears on its own once the keys are live, beca
 
 ---
 
+## 8. What the pilot actually costs to start (updated 2026-08-10, incl. auth)
+
+The client asked for one clean number including authentication. Good news: **the new verification model adds almost nothing.**
+
+| Service | What it does | Pilot cost | Note |
+|---|---|---|---|
+| **Groq (STT)** | speech → text | **$25** | ~600 mocks; the phase-2 API |
+| **Google AI Studio (feedback)** | writes feedback | **$10** | ~2,500 reports; the phase-2 API |
+| **Auth & verification buffer (Firebase + WhatsApp OTP)** | Google sign-in + phone OTP at pay | **$5 reserved** | Google/social sign-in is **free to 50,000 MAU** and WhatsApp OTP is a few cents per converting student, so real spend is near $0 — but per the client we **earmark a conservative $5 buffer** so nothing surprises us. Firebase phone-SMS auth (the part that costs) is **not** used. |
+| **Netlify** | hosting | **$0** | free tier ≈ 4,000 mocks/month |
+| **Supabase** | database/accounts | **$0** | free tier to 50,000 MAU |
+| **Total to start** | | **≈ $40** | STT $25 + feedback $10 + $5 auth/verification buffer |
+
+**So the number to load is about $40 (~NPR 5,600):** STT + feedback + a conservative **$5 earmarked for Firebase Auth + WhatsApp OTP** (real auth spend is near $0 at pilot scale; the $5 is deliberate headroom the client asked to keep). Set spend caps on Groq and Google AI on day one. The only new *operational* task (not a cost) is standing up a WhatsApp Business API sender via a BSP for the payment-step OTP; until that is live, Google sign-in alone runs the trial and the STT key stays off.
+
+Sources: [Firebase Auth 2026 pricing — social/Google free to 50k MAU](https://blog.logto.io/firebase-authentication-pricing); [Firebase Auth cost guide](https://www.metacto.com/blogs/the-complete-guide-to-firebase-auth-costs-setup-integration-and-maintenance); [WhatsApp Business API 2026 pricing](https://eazybe.com/blog/whatsapp-business-api-pricing); [Nepal WhatsApp standalone rate card from Oct 2026](https://amanmishra.com.np/whatsapp-business-api-pricing-2026/).
+
 ## Sources
 
 - [Groq pricing: Whisper Large v3 at $0.111/hr, Turbo at $0.04/hr](https://www.eesel.ai/blog/groq-pricing)

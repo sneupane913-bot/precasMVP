@@ -2,7 +2,7 @@
 
 import { Suspense, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { INSTITUTIONS } from '@/lib/data/institutions';
+import { publicInstitutions } from '@/lib/data/institutions';
 
 /**
  * University-first browsing. The competitor's single best idea: a student who
@@ -30,7 +30,7 @@ function UniversityBrowser() {
 
   const results = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    return INSTITUTIONS.filter((i) => {
+    return publicInstitutions().filter((i) => {
       const matchQ =
         !needle ||
         i.name.toLowerCase().includes(needle) ||
@@ -72,7 +72,7 @@ function UniversityBrowser() {
       <div className="mx-auto max-w-4xl">
         <h1 className="mb-1 text-2xl font-bold text-ink">Choose your university</h1>
         <p className="mb-5 text-slate-600">
-          We will ask you the questions this university asks in its interview.
+          Questions are built from the credibility themes universities publish, not from any leaked question list.
         </p>
 
         <input

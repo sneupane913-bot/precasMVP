@@ -48,6 +48,17 @@ export interface Institution {
   /** Two-letter initials used in place of a logo file. */
   monogram: string;
   accent: string;
+  /** Path to the official SVG. Recorded even when not yet displayed. */
+  logoUrl: string | null;
+  /**
+   * False until the business confirms permitted nominative use. While false
+   * the monogram renders instead. See public/university-logos/README.md.
+   */
+  logoApproved: boolean;
+  /** Some official marks are white and need a dark background. */
+  logoNeedsDarkBackground: boolean;
+  /** Hidden from public listings, usable in the pilot. */
+  pilotOnly: boolean;
 }
 
 export interface Question {
@@ -220,6 +231,13 @@ export interface InterviewSession {
    * fixed, and those are deliberately unreadable.
    */
   ownerId: string | null;
+  /**
+   * QA-208: the consent screen was shown but nothing was recorded, so we could
+   * not later prove what a student agreed to or when. Recorded per session
+   * until accounts exist, then it moves onto the student record.
+   */
+  consentVersion: string | null;
+  consentAt: string | null;
   createdAt: string;
   completedAt: string | null;
   summary: SessionSummary | null;

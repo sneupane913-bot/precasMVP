@@ -7,6 +7,7 @@ import { evaluateAnswer } from '@/lib/ai/evaluate';
 import { checkAudio, checkCredits, LIMITS } from '@/lib/credits';
 import { platformDown } from '@/lib/platform';
 import { ownsSession } from '@/lib/owner-session';
+import { rateLimit, clientIp, LIMITS as RL, spendBreakerTripped, recordPaidCall } from '@/lib/rate-limit';
 import { apiError, type Answer, type ApiResult } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -27,6 +28,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json(apiError(down.code, down.message, down.userMessage), { status: 503 });
   }
 
+  const rl = rateLimit(`answer:${clientIp(req)}`, RL.answer);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      apiError('RATE_LIMITED', 'too many answers', 'Please slow down and try again in a minute.'),
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfterSec) } }
+    );
+  }
+
   const session = await store.get(id);
   // Ownership before any paid call: otherwise a stranger with a session id
   // could spend our transcription budget. QA finding LIVE-002.
@@ -43,7 +52,18 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     );
   }
 
-  const form = await req.formData();
+  let form: FormData;
+  try {
+    form = await req.formData();
+  } catch {
+    // QA-210: an empty or non-multipart body threw and surfaced as a 500.
+    // A malformed request is the caller's error, and it must never look like
+    // our server fell over.
+    return NextResponse.json(
+      apiError('BAD_REQUEST', 'body was not multipart form data', 'Something went wrong sending your answer. Please record it again.'),
+      { status: 400 }
+    );
+  }
   const file = form.get('audio');
   const questionId = String(form.get('questionId') ?? '');
   const durationSeconds = Number(form.get('durationSeconds') ?? 0);
@@ -97,7 +117,20 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     });
   }
 
+  // Global breaker. The last thing between a runaway and a real bill.
+  if (spendBreakerTripped()) {
+    return NextResponse.json(
+      apiError(
+        'SPEND_LIMIT',
+        'monthly provider cap reached',
+        'Practice is paused for today while we check our systems. Your credits are safe. Please try again later.'
+      ),
+      { status: 503 }
+    );
+  }
+
   const buffer = await file.arrayBuffer();
+  recordPaidCall();
   const stt = await transcribe(buffer, file.type || 'audio/webm');
 
   // === The guard. No transcript, no score. Ever. ===

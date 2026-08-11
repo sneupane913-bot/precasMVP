@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { store } from '@/lib/store';
 import { ownsSession } from '@/lib/owner-session';
+import { InstallPrompt } from '@/components/InstallPrompt';
+import { BUILD_INFO } from '@/lib/build-info';
 import { buildSummary } from '@/lib/summary';
 import { getInstitution } from '@/lib/data/institutions';
 import { getQuestion, resolvedQuestion } from '@/lib/data/questions';
@@ -368,10 +370,16 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
           </Link>
         </section>
 
+        {/* Asked only after the student has seen their results, never on arrival. */}
+        <InstallPrompt show />
+
         <p className="px-2 text-center text-xs leading-relaxed text-slate-400">
           This is practice feedback only. It is not immigration advice and it does not predict your
           real result. Always check official facts with your university and a licensed adviser.
         </p>
+        {/* LIVE-004: a whole audit round was spent on a stale deployment
+            because nothing proved which revision was live. */}
+        <p className="px-2 text-center text-[10px] text-slate-300">build {BUILD_INFO.shortSha}</p>
       </div>
     </main>
   );

@@ -1,11 +1,13 @@
 import Link from 'next/link';
-import { PLANS, COMPETITOR_PER_MOCK_NPR, perMockNpr } from '@/lib/data/plans';
+import { publicPlans, getPlan, perMockNpr, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
 
 export const metadata = { title: 'Price | PreCAS Practice' };
 
 export default function PricingPage() {
-  const paid = PLANS.filter((p) => p.priceNpr > 0);
-  const trial = PLANS.find((p) => p.priceNpr === 0)!;
+  // QA-207: Starter and Pro were rendered despite being hidden by the client.
+  // publicPlans() is the only permitted source for public pages.
+  const paid = publicPlans();
+  const trial = getPlan('trial')!;
 
   return (
     <main className="px-4 py-8 sm:px-6">
@@ -81,7 +83,9 @@ export default function PricingPage() {
                   <span className="text-slate-700">
                     <strong>{p.mockInterviews} full mock interviews</strong>
                     <br />
-                    <span className="text-slate-500">camera on, real exam conditions</span>
+                    <span className="text-slate-500">
+                      {FULL_MOCK_QUESTION_COUNT} questions each, camera on, real exam conditions
+                    </span>
                   </span>
                 </li>
                 <li className="flex gap-2">

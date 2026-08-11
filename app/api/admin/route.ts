@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { platform, type Consultancy } from '@/lib/platform';
 import { store } from '@/lib/store';
+import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
 import { apiError } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -37,6 +38,17 @@ export async function POST(req: Request) {
     return NextResponse.json(apiError('BAD_REQUEST', 'invalid body', 'Something went wrong.'), {
       status: 400,
     });
+  }
+
+  // Passcodes are compared with a plain equality check and are not hashed.
+  // Rate limiting is therefore the ONLY thing standing between a script and a
+  // consultancy's student list. 5 attempts per 5 minutes per IP.
+  const rl = rateLimit(`admin-auth:${clientIp(req)}`, RL.auth);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      apiError('RATE_LIMITED', 'auth attempts', 'Too many attempts. Please wait five minutes and try again.'),
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfterSec) } }
+    );
   }
 
   const c = await platform.getConsultancy(body.slug);

@@ -39,15 +39,20 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     .filter((q): q is NonNullable<typeof q> => Boolean(q))
     .map((q) => publicQuestion(q, institution));
 
+  // QA-201: the whole session object was returned, ownerId included. That is
+  // the secret binding the session to this browser; echoing it hands an
+  // attacker the value they would otherwise have to guess. Strip it.
+  const { ownerId: _secret, ...safeSession } = session;
+
   const result: ApiResult<{
-    session: InterviewSession;
+    session: Omit<InterviewSession, 'ownerId'>;
     questions: PublicQuestion[];
     institution: typeof institution;
     demo: { stt: boolean; evaluator: boolean; storage: boolean };
   }> = {
     ok: true,
     data: {
-      session,
+      session: safeSession,
       questions,
       institution,
       // Surfaced so the UI can say plainly that transcripts are sample text.

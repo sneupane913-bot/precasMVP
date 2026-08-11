@@ -46,9 +46,22 @@ export function buildSummary(session: InterviewSession): SessionSummary {
     (f) => FLAG_META[f.type].severity === 'critical'
   ).length;
   const completionRate = total ? scored.length / total : 0;
+
+  /**
+   * QA-204: a student who behaved perfectly but whose microphone failed was
+   * shown "Behaviour 0%". That reads as an accusation, and it is false: they
+   * broke no rules. The old formula multiplied completion by 100, and
+   * completion is zero when nothing transcribes, so good behaviour scored zero.
+   *
+   * Behaviour is now measured only by what we OBSERVED. Rule-following is the
+   * baseline and violations subtract from it. Failing to be heard is a
+   * microphone problem, not misconduct, so it no longer costs behaviour marks.
+   * Abandoning the interview still does, because that is a real observation.
+   */
+  const abandoned = session.status === 'abandoned';
   const interviewBehaviour = Math.max(
     0,
-    Math.round(100 * completionRate - criticalFlags * 6)
+    Math.min(100, 100 - criticalFlags * 8 - (abandoned ? 25 : 0))
   );
 
   // Weakest categories, used to drive the practice buttons on the results page.

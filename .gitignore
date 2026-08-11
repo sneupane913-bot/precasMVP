@@ -25,3 +25,6 @@ next-env.d.ts
 diagnose-log.txt
 push-log.txt
 dev-output.txt
+
+# FUSE/iCloud artefacts left behind when a synced file is replaced
+.fuse_hidden*

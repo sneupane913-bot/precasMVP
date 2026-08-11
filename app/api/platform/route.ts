@@ -8,17 +8,28 @@ import {
   DEFAULT_SETTINGS,
   type Consultancy,
 } from '@/lib/platform';
+import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
 import { apiError } from '@/lib/types';
 
 export const runtime = 'nodejs';
 
-/** Public read: only whether the platform is up, and who to call if it is not. */
+/**
+ * QA-209: this returned the full settings object to anyone, including fields
+ * that describe our internal state. It now returns ONLY what a student staring
+ * at a maintenance screen needs, and only while maintenance is actually on.
+ * When the platform is up it says so and nothing else.
+ */
 export async function GET() {
   const s = await platform.getSettings();
+
+  if (!s.maintenanceMode) {
+    return NextResponse.json({ ok: true, data: { maintenanceMode: false } });
+  }
+
   return NextResponse.json({
     ok: true,
     data: {
-      maintenanceMode: s.maintenanceMode,
+      maintenanceMode: true,
       maintenanceTitle: s.maintenanceTitle,
       maintenanceMessage: s.maintenanceMessage,
       contactName: s.contactName,
@@ -61,6 +72,14 @@ const Body = z.discriminatedUnion('action', [
 ]);
 
 export async function POST(req: Request) {
+  const rl = rateLimit(`platform-auth:${clientIp(req)}`, RL.auth);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      apiError('RATE_LIMITED', 'auth attempts', 'Too many attempts. Please wait five minutes and try again.'),
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfterSec) } }
+    );
+  }
+
   let body: z.infer<typeof Body>;
   try {
     body = Body.parse(await req.json());

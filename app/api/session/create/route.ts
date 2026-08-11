@@ -6,6 +6,7 @@ import { getPlan } from '@/lib/data/plans';
 import { store } from '@/lib/store';
 import { checkCredits } from '@/lib/credits';
 import { platformDown } from '@/lib/platform';
+import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
 import { ensureOwnerId } from '@/lib/owner-session';
 import { apiError, type ApiResult, type InterviewSession } from '@/lib/types';
 
@@ -29,6 +30,20 @@ export async function POST(req: Request) {
   const down = await platformDown();
   if (down) {
     return NextResponse.json(apiError(down.code, down.message, down.userMessage), { status: 503 });
+  }
+
+  // QA measured 600-4,300 req/min against this endpoint with nothing stopping
+  // it. Every session started is money we may spend on transcription.
+  const rl = rateLimit(`create:${clientIp(req)}`, RL.sessionCreate);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      apiError(
+        'RATE_LIMITED',
+        'too many session creates',
+        'You are starting interviews very quickly. Please wait a minute and try again.'
+      ),
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfterSec) } }
+    );
   }
 
   let parsed: z.infer<typeof Body>;
@@ -84,6 +99,8 @@ export async function POST(req: Request) {
     flags: [],
     isTrial: true,
     ownerId,
+    consentVersion: null,
+    consentAt: null,
     createdAt: new Date().toISOString(),
     completedAt: null,
     summary: null,
