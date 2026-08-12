@@ -38,6 +38,7 @@ interface Overview {
   }[];
   attribution: { name: string; count: number }[];
   referralLeaderboard: { code: string; name: string | null; paid: number }[];
+  build?: { shortSha: string; context: string; builtAt: string; branch: string };
 }
 
 interface Order {
@@ -221,6 +222,10 @@ export default function SuperAdminPage() {
   const direct = data.students.filter((s) => !s.consultancyId).length;
   const viaConsultancy = data.students.length - direct;
   const awaiting = orders.filter((o) => o.state === 'submitted');
+  // G4: a running tally, so the super admin can see what they have decided
+  // rather than only what is still waiting.
+  const approvedCount = orders.filter((o) => o.state === 'verified').length;
+  const rejectedCount = orders.filter((o) => o.state === 'rejected').length;
 
   const nav: { id: Tab; label: string }[] = [
     { id: 'dashboard', label: 'Dashboard' },
@@ -450,10 +455,21 @@ export default function SuperAdminPage() {
           <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
             <div className="border-b border-slate-200 p-5">
               <h2 className="font-serif text-lg font-bold text-ink">Payments</h2>
-              <p className="text-sm text-slate-600">
+              <p className="mb-3 text-sm text-slate-600">
                 Check the transaction id in the receiver&apos;s own wallet ledger before approving. A
                 screenshot is evidence, never proof.
               </p>
+              <div className="flex flex-wrap gap-2 text-xs font-bold">
+                <span className="rounded-full bg-amber-100 px-3 py-1 text-amber-800">
+                  {awaiting.length} waiting
+                </span>
+                <span className="rounded-full bg-emerald-100 px-3 py-1 text-emerald-800">
+                  {approvedCount} approved
+                </span>
+                <span className="rounded-full bg-red-100 px-3 py-1 text-red-800">
+                  {rejectedCount} rejected
+                </span>
+              </div>
             </div>
             {orders.length === 0 ? (
               <p className="p-10 text-center text-slate-500">No payments yet.</p>
@@ -570,6 +586,15 @@ export default function SuperAdminPage() {
               </ul>
             )}
           </section>
+        )}
+
+        {/* A12 / LIVE-004: prove which revision is live, so an audit is never
+            run against a stale deploy again. */}
+        {data.build && (
+          <p className="mt-10 text-center text-xs text-slate-400">
+            Build {data.build.shortSha} · {data.build.context} · {data.build.branch} · built{' '}
+            {new Date(data.build.builtAt).toLocaleString()}
+          </p>
         )}
       </main>
     </div>

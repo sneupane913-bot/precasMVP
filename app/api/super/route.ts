@@ -6,6 +6,7 @@ import { grantPack, rewardReferral, adminGrant } from '@/lib/entitlement';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
 import { approvePayment } from '@/lib/payments';
 import { apiError } from '@/lib/types';
+import { BUILD_INFO } from '@/lib/build-info';
 
 export const runtime = 'nodejs';
 
@@ -141,6 +142,9 @@ export async function POST(req: Request) {
           createdAt: s.createdAt,
           lastSeenAt: s.lastSeenAt,
         })),
+        // A12 / LIVE-004: an entire audit round was wasted on a stale deploy.
+        // QA can now read the live revision straight off this dashboard.
+        build: BUILD_INFO,
         attribution: [...attribution.entries()]
           .map(([name, count]) => ({ name, count }))
           .sort((a, b) => b.count - a.count),

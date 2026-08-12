@@ -176,6 +176,54 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ---------------- FAQ (B18) ----------------
+          The four questions a nervous student actually asks before starting.
+          Native details/summary so it works with no JavaScript. */}
+      <section className="bg-white px-5 py-16">
+        <div className="mx-auto max-w-2xl">
+          <h2 className="mb-8 text-center font-serif text-3xl font-bold text-ink">
+            Questions students ask
+          </h2>
+          <div className="space-y-3">
+            {[
+              {
+                q: 'Is it really free to try?',
+                a: 'Yes. You get 10 real questions with real feedback, with no card and no payment. You only pay if you want to carry on after that.',
+              },
+              {
+                q: 'Are these the exact questions my university will ask?',
+                a: 'No, and anyone who promises that is not being honest with you. Our questions are built from the credibility themes universities publish, so you practise the right subjects in the right way.',
+              },
+              {
+                q: 'Who can see my answers?',
+                a: 'Only you. Your answers cover family income, visa history and personal circumstances, so we never show them to a consultancy. They can see that you are practising, never what you said.',
+              },
+              {
+                q: 'Can you get me a visa or a CAS?',
+                a: 'No. We are not immigration advisers and nobody can promise that. This is practice, so you walk in able to explain your own true situation clearly.',
+              },
+            ].map((f) => (
+              <details
+                key={f.q}
+                className="group rounded-2xl border border-slate-200 bg-white p-5 open:bg-[#eff4ff]"
+              >
+                <summary className="cursor-pointer list-none font-semibold text-ink marker:hidden">
+                  <span className="flex items-center justify-between gap-4">
+                    {f.q}
+                    <span
+                      className="shrink-0 text-slate-400 transition group-open:rotate-45"
+                      aria-hidden
+                    >
+                      +
+                    </span>
+                  </span>
+                </summary>
+                <p className="mt-3 leading-relaxed text-slate-700">{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
       </main>
       <SiteFooter />
     </>

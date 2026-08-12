@@ -104,29 +104,36 @@ function UniversityBrowser() {
       <SiteHeader />
       <main className="min-h-screen px-4 py-6 sm:px-6">
       <div className="mx-auto max-w-4xl">
-        <h1 className="mb-1 text-2xl font-bold text-ink">Choose your university</h1>
-        <p className="mb-5 text-slate-600">
-          Questions are built from the credibility themes universities publish, not from any leaked question list.
+        {/* B19: centred header, prominent search and chips, per
+            docs/design-reference/universities_catalogue. */}
+        <h1 className="mb-2 text-center font-serif text-3xl font-bold text-ink sm:text-4xl">
+          Choose your university
+        </h1>
+        <p className="mx-auto mb-8 max-w-xl text-center text-slate-600">
+          Questions are built from the credibility themes universities publish, not from any leaked
+          question list.
         </p>
 
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Type your university name..."
+          placeholder="Search for universities, cities..."
           aria-label="Search universities"
-          className="mb-3 w-full rounded-xl border-2 border-slate-200 px-4 py-3.5 text-base outline-none focus:border-ink"
+          className="mx-auto mb-4 block w-full max-w-xl rounded-xl border-2 border-slate-200 px-4 py-3.5 text-base outline-none focus:border-ink"
         />
 
-        <div className="mb-5 flex flex-wrap gap-2">
+        <div className="mb-8 flex flex-wrap justify-center gap-2">
           {(['all', 'Pre-CAS', 'CAS', 'Pre-Admission'] as const).map((t) => (
             <button
               key={t}
               onClick={() => setType(t)}
               className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                type === t ? 'bg-ink text-white' : 'border border-slate-200 bg-white text-slate-600'
+                type === t
+                  ? 'bg-emerald-400 text-ink'
+                  : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-400'
               }`}
             >
-              {t === 'all' ? 'All types' : t}
+              {t === 'all' ? 'All' : t}
             </button>
           ))}
         </div>
@@ -146,7 +153,19 @@ function UniversityBrowser() {
             </p>
           </div>
         ) : (
-          <ul className="grid gap-3 sm:grid-cols-2">
+          <>
+          {/* "Most applied" label: these six are the ones our students actually
+              apply to. When the full UK list lands (B20) these stay pinned and
+              the rest become searchable below. */}
+          {!q.trim() && type === 'all' && (
+            <h2 className="mb-4 flex items-center gap-2 font-serif text-xl font-bold text-ink">
+              <span className="text-emerald-500" aria-hidden>
+                ★
+              </span>
+              Most applied
+            </h2>
+          )}
+          <ul className="grid gap-4 sm:grid-cols-2">
             {results.map((i) => (
               <li
                 key={i.id}
@@ -213,6 +232,7 @@ function UniversityBrowser() {
               </li>
             ))}
           </ul>
+          </>
         )}
       </div>
       </main>

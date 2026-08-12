@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
 interface CreatedOrder {
@@ -181,6 +182,21 @@ function Checkout() {
 
   return (
     <main className="mx-auto max-w-md px-5 py-8">
+      {/* B22: a student paying money had no branding and no way out of this
+          page. Both matter most exactly here, at the moment they part with
+          cash. Deliberately minimal so nothing competes with paying. */}
+      <div className="mb-8 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2">
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-500 font-black text-white">
+            P
+          </span>
+          <span className="font-serif text-base text-ink">PreCAS Practice</span>
+        </Link>
+        <Link href="/pricing" className="text-sm font-semibold text-slate-500 hover:text-ink">
+          Back to packs
+        </Link>
+      </div>
+
       <h1 className="mb-1 font-serif text-2xl text-ink">Pay to continue</h1>
       {order && (
         <p className="mb-6 text-slate-600">

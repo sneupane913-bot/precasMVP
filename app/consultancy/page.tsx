@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { BUNDLES } from '@/lib/data/plans';
+import { SiteFooter } from '@/components/SiteFooter';
 
 export const metadata = {
   title: 'Partner pricing',
@@ -20,7 +21,25 @@ export const metadata = {
  */
 export default function ConsultancyPage() {
   return (
-    <main className="mx-auto max-w-3xl px-5 py-10">
+    <>
+      {/* B21: this page had no shell at all, so a partner who landed here could
+          not get anywhere. It deliberately does NOT use SiteHeader, because that
+          header sells to students; this one is for a business buyer. */}
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
+          <Link href="/" className="flex items-center gap-2.5">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-500 font-black text-white">
+              P
+            </span>
+            <span className="font-serif text-lg text-ink">PreCAS Practice</span>
+          </Link>
+          <Link href="/admin" className="text-sm font-semibold text-ink hover:opacity-70">
+            Partner sign in
+          </Link>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-3xl px-5 py-10">
       <p className="mb-2 inline-block rounded-full bg-slate-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-slate-600">
         For consultancies
       </p>
@@ -81,6 +100,8 @@ export default function ConsultancyPage() {
           I already have an account
         </Link>
       </div>
-    </main>
+      </main>
+      <SiteFooter />
+    </>
   );
 }
