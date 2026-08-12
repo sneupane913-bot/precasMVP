@@ -31,15 +31,25 @@ export default function HomePage() {
             tell you exactly what to fix.
           </p>
 
-          <Link
-            href="/universities"
-            className="inline-flex w-full items-center justify-center rounded-2xl bg-emerald-500 px-8 py-5 text-xl font-bold text-white shadow-lg transition active:scale-[0.98] sm:w-auto sm:px-14"
-          >
-            Start your free mock interview
-          </Link>
+          {/* QA B1: this pointed straight at /universities, which skipped the
+              sign-in gate entirely. Sign-in comes first, then the catalogue. */}
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/start?next=/universities"
+              className="inline-flex w-full items-center justify-center rounded-xl bg-emerald-500 px-8 py-4 text-lg font-bold text-white shadow-lg transition hover:bg-emerald-400 active:scale-[0.98] sm:w-auto sm:px-10"
+            >
+              Start free practice
+            </Link>
+            <Link
+              href="#how-it-works"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-lg font-semibold text-white/90 transition hover:text-white sm:w-auto"
+            >
+              <span aria-hidden>▸</span> See how it works
+            </Link>
+          </div>
 
           <p className="mt-4 text-sm text-white/60">
-            No account needed. Takes about 15 minutes. Free for your first try.
+            No card, no payment. 10 real questions free.
           </p>
         </div>
       </section>
@@ -47,43 +57,102 @@ export default function HomePage() {
       {/* ---------------- Trust strip: self-moving university slider ---------------- */}
       <TrustedBy />
 
-      {/* ---------------- How it works ---------------- */}
-      <section id="how-it-works" className="px-5 py-12">
-        <div className="mx-auto grid max-w-4xl gap-6 sm:grid-cols-3">
-          {[
-            { n: '1', t: 'Pick your university', d: 'Based on the credibility themes universities publish.' },
-            { n: '2', t: 'Answer out loud', d: 'Camera on, timer running, just like the real one.' },
-            { n: '3', t: 'Get real feedback', d: 'We tell you what you said and how to say it better.' },
-          ].map((s) => (
-            <div key={s.n} className="text-center">
-              <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-full bg-ink text-lg font-bold text-white">
-                {s.n}
+      {/* ---------------- Three steps (design-reference/landing_page) ---------------- */}
+      <section id="how-it-works" className="bg-white px-5 py-16">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="mb-2 text-center font-serif text-3xl font-bold text-ink">
+            Three steps to interview readiness
+          </h2>
+          <p className="mb-10 text-center text-slate-600">
+            Built to calm your nerves and build real speaking habits.
+          </p>
+          <div className="grid gap-5 sm:grid-cols-3">
+            {[
+              {
+                n: '1',
+                t: 'Pick your university',
+                d: 'Questions come from the credibility themes universities publish.',
+              },
+              {
+                n: '2',
+                t: 'Answer out loud',
+                d: 'Camera on and timer running, exactly like the real interview.',
+              },
+              {
+                n: '3',
+                t: 'Get real feedback',
+                d: 'We tell you what you actually said and how to say it better.',
+              },
+            ].map((s) => (
+              <div key={s.n} className="rounded-2xl border border-slate-200 bg-white p-6">
+                <div className="mb-4 grid h-10 w-10 place-items-center rounded-xl bg-[#eff4ff] font-bold text-ink">
+                  {s.n}
+                </div>
+                <h3 className="mb-2 font-serif text-lg font-bold text-ink">{s.t}</h3>
+                <p className="text-sm leading-relaxed text-slate-600">{s.d}</p>
               </div>
-              <h3 className="mb-1 text-lg font-bold text-ink">{s.t}</h3>
-              <p className="text-slate-600">{s.d}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ---------------- The wedge, stated plainly ---------------- */}
-      <section className="bg-white px-5 py-12">
-        <div className="mx-auto max-w-2xl">
-          <h2 className="mb-6 text-center font-serif text-2xl text-ink sm:text-3xl">
-            Feedback on what you actually said
-          </h2>
-          <div className="space-y-3">
-            {[
-              'We quote your own words back to you, so you know we listened.',
-              'If we cannot hear you, we say so and let you try again. We never give you a score for an answer we did not hear.',
-              'We show you a better answer written in simple English you can actually say, not a paragraph to memorise.',
-              'We tell you the one most important fix in Nepali, so nothing is lost.',
-            ].map((line) => (
-              <div key={line} className="flex gap-3 rounded-xl bg-paper p-4">
-                <span className="mt-0.5 font-bold text-emerald-600">✓</span>
-                <p className="leading-relaxed text-slate-700">{line}</p>
-              </div>
-            ))}
+      {/* ---------------- The wedge, with the sample report card ----------------
+          design-reference/landing_page pairs the claim with a visible example,
+          because "feedback on what you said" means nothing until it is shown. */}
+      <section className="bg-[#eff4ff] px-5 py-16">
+        <div className="mx-auto grid max-w-5xl items-center gap-10 lg:grid-cols-2">
+          <div>
+            <h2 className="mb-4 font-serif text-3xl font-bold leading-tight text-ink">
+              Feedback in simple English, on what you actually said
+            </h2>
+            <p className="mb-6 leading-relaxed text-slate-700">
+              We do not just hand you a score. We show you your own words, tell you what to fix,
+              and give you a better way to say it that you can actually use.
+            </p>
+            <ul className="space-y-3">
+              {[
+                'We quote your own words back to you, so you know we listened.',
+                'If we cannot hear you, we say so and let you try again. We never score an answer we did not hear.',
+                'A better answer in simple English you can say, not a paragraph to memorise.',
+                'The one most important fix, explained in Nepali.',
+              ].map((line) => (
+                <li key={line} className="flex gap-3">
+                  <span className="mt-0.5 shrink-0 font-bold text-emerald-600" aria-hidden>
+                    ✓
+                  </span>
+                  <span className="leading-relaxed text-slate-700">{line}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Illustrative example of the report, clearly labelled as a sample. */}
+          <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Question analysis
+              </p>
+              <span className="rounded-md bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-800">
+                Sample
+              </span>
+            </div>
+            <p className="mb-4 font-serif text-lg font-bold text-ink">
+              Why did you choose to study in the UK?
+            </p>
+            <div className="mb-4 rounded-xl bg-slate-50 p-4">
+              <p className="mb-1 text-xs font-semibold text-slate-500">What we heard you say</p>
+              <p className="text-sm italic leading-relaxed text-slate-700">
+                I choose UK because it have very good education and the degree is recognize
+                everywhere.
+              </p>
+            </div>
+            <div className="rounded-xl border-l-4 border-emerald-500 bg-emerald-50/50 p-4">
+              <p className="mb-1 text-xs font-semibold text-emerald-800">A better way to say it</p>
+              <p className="text-sm leading-relaxed text-slate-700">
+                I chose the UK because it offers a world class education and the degree is
+                recognised everywhere.
+              </p>
+            </div>
           </div>
         </div>
       </section>

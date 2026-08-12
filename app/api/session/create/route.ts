@@ -8,6 +8,7 @@ import { checkCredits } from '@/lib/credits';
 import { platformDown } from '@/lib/platform';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
 import { ensureOwnerId } from '@/lib/owner-session';
+import { currentStudent } from '@/lib/auth/session';
 import { apiError, type ApiResult, type InterviewSession } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -43,6 +44,24 @@ export async function POST(req: Request) {
         'You are starting interviews very quickly. Please wait a minute and try again.'
       ),
       { status: 429, headers: { 'Retry-After': String(rl.retryAfterSec) } }
+    );
+  }
+
+  // QA round 2, defect B1: this endpoint created a full session with NO
+  // authentication at all, so the entire sign-in gate could be skipped by
+  // posting straight to it, and the home page even linked past it. Every
+  // session started is money we may spend on transcription, and an anonymous
+  // session cannot be attributed, rate limited per student, or counted against
+  // a trial. Sign-in is now required before any session exists.
+  const student = await currentStudent();
+  if (!student) {
+    return NextResponse.json(
+      apiError(
+        'NOT_SIGNED_IN',
+        'no student session',
+        'Please sign in first so we can save your practice.'
+      ),
+      { status: 401 }
     );
   }
 

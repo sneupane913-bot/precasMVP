@@ -30,7 +30,12 @@ export function TrustedBy() {
               key={`${l.name}-${i}`}
               src={l.src}
               alt={l.name}
-              className="h-8 w-auto opacity-60 grayscale transition hover:opacity-100 hover:grayscale-0 sm:h-9"
+              /* QA B2: bpp.svg and uel.svg are white artwork (fill:#fff), so on
+                 a light background they were completely invisible. The set is
+                 also inconsistent (blue, grey, gradients, dark). brightness(0)
+                 flattens every mark to solid ink, which makes them all visible
+                 and consistent. This is the standard monochrome logo wall. */
+              className="h-8 w-auto opacity-45 transition hover:opacity-70 sm:h-9 [filter:brightness(0)]"
             />
           ))}
         </div>

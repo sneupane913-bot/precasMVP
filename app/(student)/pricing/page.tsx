@@ -46,26 +46,38 @@ export default function PricingPage() {
           </p>
         </section>
 
-        {/* Paid packs */}
-        <div className="mb-8 grid gap-4 sm:grid-cols-2">
-          {paid.map((p) => (
+        {/* Paid packs.
+            Client direction (higgsfield.ai reference): the packs must not look
+            flat. NPR 799 is the focal card, larger, lifted, dark, with the
+            brightest badge. NPR 449 sits smaller and lighter beside it, so the
+            eye lands on 799 first. */}
+        <div className="mb-8 grid items-center gap-4 sm:grid-cols-2 lg:gap-6">
+          {paid.map((p) => {
+            const hero = p.code === 'serious';
+            return (
             <div
               key={p.code}
-              className={`flex flex-col rounded-2xl border-2 bg-white p-6 ${
-                p.badge === 'MOST POPULAR' ? 'border-ink' : 'border-slate-200'
-              }`}
+              className={
+                hero
+                  ? 'relative flex flex-col rounded-2xl bg-ink p-7 text-white shadow-2xl ring-1 ring-ink sm:p-8 lg:scale-[1.04]'
+                  : 'flex flex-col rounded-2xl border-2 border-slate-200 bg-white p-6'
+              }
             >
               <div className="mb-3 flex items-start justify-between gap-2">
                 <div>
-                  <h3 className="text-lg font-bold uppercase tracking-wide text-ink">{p.name}</h3>
-                  <p className="text-sm text-slate-500">{p.tagline}</p>
+                  <h3
+                    className={`text-lg font-bold uppercase tracking-wide ${hero ? 'text-white' : 'text-ink'}`}
+                  >
+                    {p.name}
+                  </h3>
+                  <p className={`text-sm ${hero ? 'text-white/60' : 'text-slate-500'}`}>
+                    {p.tagline}
+                  </p>
                 </div>
                 {p.badge && (
                   <span
                     className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold ${
-                      p.badge === 'MOST POPULAR'
-                        ? 'bg-ink text-white'
-                        : 'bg-emerald-100 text-emerald-800'
+                      hero ? 'bg-emerald-400 text-ink' : 'bg-slate-100 text-slate-700'
                     }`}
                   >
                     {p.badge}
@@ -73,51 +85,69 @@ export default function PricingPage() {
                 )}
               </div>
 
-              <p className="text-3xl font-black text-ink">
+              <p
+                className={`font-black ${hero ? 'text-5xl text-white' : 'text-3xl text-ink'}`}
+              >
                 NPR {p.priceNpr.toLocaleString()}
-                <span className="text-sm font-medium text-slate-500"> one time</span>
+                <span
+                  className={`text-sm font-medium ${hero ? 'text-white/60' : 'text-slate-500'}`}
+                >
+                  {' '}
+                  one time
+                </span>
               </p>
-              <p className="mb-4 text-sm text-slate-500">
+              <p className={`mb-5 text-sm ${hero ? 'text-emerald-300' : 'text-slate-500'}`}>
                 about NPR {perMockNpr(p)} per mock interview
               </p>
 
-              <ul className="mb-5 flex-1 space-y-2 text-sm">
+              <ul className="mb-6 flex-1 space-y-3 text-sm">
                 <li className="flex gap-2">
-                  <span className="font-bold text-emerald-600">✓</span>
-                  <span className="text-slate-700">
+                  <span className={hero ? 'font-bold text-emerald-400' : 'font-bold text-emerald-600'}>
+                    ✓
+                  </span>
+                  <span className={hero ? 'text-white/90' : 'text-slate-700'}>
                     <strong>{p.mockInterviews} full mock interviews</strong>
                     <br />
-                    <span className="text-slate-500">
+                    <span className={hero ? 'text-white/50' : 'text-slate-500'}>
                       {FULL_MOCK_QUESTION_COUNT} questions each, camera on, real exam conditions
                     </span>
                   </span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="font-bold text-emerald-600">✓</span>
-                  <span className="text-slate-700">
+                  <span className={hero ? 'font-bold text-emerald-400' : 'font-bold text-emerald-600'}>
+                    ✓
+                  </span>
+                  <span className={hero ? 'text-white/90' : 'text-slate-700'}>
                     <strong>{p.practiceSessions} practice sessions</strong>
                     <br />
-                    <span className="text-slate-500">drill one question at a time</span>
+                    <span className={hero ? 'text-white/50' : 'text-slate-500'}>
+                      drill one question at a time
+                    </span>
                   </span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="font-bold text-emerald-600">✓</span>
-                  <span className="text-slate-700">Feedback in English and Nepali</span>
+                  <span className={hero ? 'font-bold text-emerald-400' : 'font-bold text-emerald-600'}>
+                    ✓
+                  </span>
+                  <span className={hero ? 'text-white/90' : 'text-slate-700'}>
+                    Feedback in English and Nepali
+                  </span>
                 </li>
               </ul>
 
               <Link
                 href="/start"
-                className={`inline-flex w-full items-center justify-center rounded-xl px-5 py-3.5 font-bold transition active:scale-[0.98] ${
-                  p.badge === 'MOST POPULAR'
-                    ? 'bg-ink text-white'
-                    : 'border-2 border-ink text-ink hover:bg-ink hover:text-white'
+                className={`inline-flex w-full items-center justify-center rounded-xl px-5 font-bold transition active:scale-[0.98] ${
+                  hero
+                    ? 'bg-emerald-400 py-4 text-base text-ink hover:bg-emerald-300'
+                    : 'border-2 border-ink py-3.5 text-ink hover:bg-ink hover:text-white'
                 }`}
               >
                 Choose {p.name}
               </Link>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/*

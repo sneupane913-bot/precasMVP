@@ -82,7 +82,8 @@ function StartInner() {
                 key={slug}
                 src={`/university-logos/${slug}.svg`}
                 alt=""
-                className="h-7 w-auto opacity-50 grayscale"
+                /* QA B2: white-artwork logos were invisible here. */
+                className="h-7 w-auto opacity-45 [filter:brightness(0)]"
               />
             ))}
           </div>
