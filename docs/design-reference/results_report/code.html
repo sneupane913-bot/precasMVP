@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PreCAS Practice - Results</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&amp;family=Noto+Serif:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed": "#dae2fd",
+                        "surface-container": "#e5eeff",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#213145",
+                        "on-primary-container": "#7c839b",
+                        "surface-tint": "#565e74",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "on-surface": "#0b1c30",
+                        "on-secondary-fixed": "#002113",
+                        "surface-container-low": "#eff4ff",
+                        "secondary-container": "#6cf8bb",
+                        "on-secondary-fixed-variant": "#005236",
+                        "on-tertiary-fixed": "#191c1e",
+                        "tertiary-container": "#191c1e",
+                        "secondary-fixed-dim": "#4edea3",
+                        "surface": "#f8f9ff",
+                        "secondary-fixed": "#6ffbbe",
+                        "surface-container-highest": "#d3e4fe",
+                        "outline-variant": "#c6c6cd",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#bec6e0",
+                        "on-tertiary-container": "#818486",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "surface-container-high": "#dce9ff",
+                        "tertiary-fixed": "#e0e3e5",
+                        "error-container": "#ffdad6",
+                        "background": "#f8f9ff",
+                        "primary": "#000000",
+                        "surface-dim": "#cbdbf5",
+                        "on-primary-fixed": "#131b2e",
+                        "surface-variant": "#d3e4fe",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#bec6e0",
+                        "outline": "#76777d",
+                        "inverse-on-surface": "#eaf1ff",
+                        "secondary": "#006c49",
+                        "on-surface-variant": "#45464d",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "on-background": "#0b1c30",
+                        "on-secondary-container": "#00714d",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "primary-container": "#131b2e",
+                        "tertiary": "#000000",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "lg": "48px",
+                        "gutter": "20px",
+                        "md": "24px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "xl": "80px",
+                        "container-max": "1140px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Noto Serif"],
+                        "display-lg": ["Noto Serif"],
+                        "headline-md": ["Noto Serif"],
+                        "label-sm": ["Hanken Grotesk"],
+                        "headline-lg": ["Noto Serif"],
+                        "label-md": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "1.2", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(248, 250, 252, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- TopNavBar (Hidden on md for this specific layout to focus on SideNav/Canvas, but included for structure if needed, suppressing here per rules as SideNav/BottomNav handle destionations. Wait, results is a top-level dest in BottomNav. We'll show top nav on desktop, bottom on mobile). -->
+<nav class="hidden md:flex justify-between items-center w-full px-gutter h-16 max-w-container-max mx-auto fixed top-0 w-full z-50 bg-surface-container-lowest dark:bg-surface-container-lowest border-b border-outline-variant dark:border-outline-variant">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary">PreCAS Practice</div>
+<div class="flex gap-md">
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-secondary dark:hover:text-secondary transition-colors duration-200" href="#">Universities</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-secondary dark:hover:text-secondary transition-colors duration-200" href="#">How it works</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-secondary dark:hover:text-secondary transition-colors duration-200" href="#">Pricing</a>
+<a class="font-label-md text-label-md text-secondary dark:text-secondary font-bold hover:text-secondary dark:hover:text-secondary transition-colors duration-200" href="#">Results</a>
+</div>
+<div class="flex gap-sm">
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors">Sign In</button>
+<button class="bg-secondary text-on-secondary px-sm py-xs rounded font-label-md text-label-md">Start free</button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="pt-20 pb-24 md:pt-24 md:pb-xl max-w-container-max mx-auto px-gutter">
+<!-- Header Section -->
+<header class="mb-xl text-center md:text-left flex flex-col md:flex-row md:justify-between md:items-end gap-md">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-xs">Mock Interview • 24 Oct 2024</p>
+<h1 class="font-display-lg text-display-lg text-primary">Interview Results</h1>
+</div>
+<div class="flex gap-sm justify-center">
+<button class="bg-surface-container-high text-on-surface px-md py-sm rounded-lg font-label-md text-label-md border border-outline flex items-center gap-xs hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">download</span>
+                    Download Report
+                </button>
+<button class="bg-secondary text-on-secondary px-md py-sm rounded-lg font-label-md text-label-md shadow-[0_4px_20px_rgba(0,108,73,0.15)] hover:bg-secondary-fixed-dim transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">mic</span>
+                    Practise Weakest
+                </button>
+</div>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-md mb-xl">
+<!-- Verdict Card (Main Focus) -->
+<div class="md:col-span-8 bg-surface-container-low rounded-xl p-lg flex flex-col justify-center items-center md:items-start relative overflow-hidden group">
+<div class="absolute -right-20 -top-20 w-64 h-64 bg-secondary-container rounded-full blur-3xl opacity-20"></div>
+<h2 class="font-label-md text-label-md text-on-surface-variant mb-md uppercase tracking-widest">Overall Assessment</h2>
+<div class="flex items-baseline gap-sm mb-xs">
+<span class="font-display-lg text-display-lg text-secondary">Band 6.5</span>
+<span class="font-headline-md text-headline-md text-on-surface-variant">/ 9.0</span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface mb-md">Good capability, but deeper detail needed on financial plans.</p>
+<div class="inline-flex items-center gap-xs bg-surface-container-high px-sm py-xs rounded font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+                    72% Overall Match
+                </div>
+</div>
+<!-- Sub Score Tiles (Grid within Grid) -->
+<div class="md:col-span-4 grid grid-cols-2 gap-sm">
+<!-- Fluency -->
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-lg p-md flex flex-col justify-between">
+<div class="flex justify-between items-start mb-sm">
+<span class="font-label-md text-label-md text-on-surface-variant">Fluency</span>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md text-primary mb-xs">7.0</div>
+<div class="w-full bg-surface-variant h-1 rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 78%"></div>
+</div>
+</div>
+</div>
+<!-- Relevance -->
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-lg p-md flex flex-col justify-between">
+<div class="flex justify-between items-start mb-sm">
+<span class="font-label-md text-label-md text-on-surface-variant">Relevance</span>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">track_changes</span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md text-primary mb-xs">6.5</div>
+<div class="w-full bg-surface-variant h-1 rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 72%"></div>
+</div>
+</div>
+</div>
+<!-- Vocabulary -->
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-lg p-md flex flex-col justify-between">
+<div class="flex justify-between items-start mb-sm">
+<span class="font-label-md text-label-md text-on-surface-variant">Vocabulary</span>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md text-primary mb-xs">6.0</div>
+<div class="w-full bg-surface-variant h-1 rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 66%"></div>
+</div>
+</div>
+</div>
+<!-- Confidence -->
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-lg p-md flex flex-col justify-between">
+<div class="flex justify-between items-start mb-sm">
+<span class="font-label-md text-label-md text-on-surface-variant">Pronunciation</span>
+<span class="material-symbols-outlined text-surface-tint" style="font-variation-settings: 'FILL' 1;">volume_off</span>
+</div>
+<div>
+<div class="font-label-md text-label-md text-surface-tint mb-xs">Not assessed</div>
+<div class="w-full bg-surface-variant h-1 rounded-full overflow-hidden">
+<div class="bg-surface-tint h-full" style="width: 0%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Behaviour Table (Plain English) -->
+<section class="mb-xl">
+<h3 class="font-headline-md text-headline-md text-primary mb-md">Communication Behaviours</h3>
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-xl overflow-hidden">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low border-b border-surface-container-high">
+<tr>
+<th class="p-md font-label-md text-label-md text-on-surface-variant w-1/3">Observed Pattern</th>
+<th class="p-md font-label-md text-label-md text-on-surface-variant w-2/3">What this means for the assessor</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-on-surface divide-y divide-surface-container-high">
+<tr>
+<td class="p-md flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+                                Clear course intent
+                            </td>
+<td class="p-md text-on-surface-variant">You clearly stated why you chose this specific university, making your motivation believable.</td>
+</tr>
+<tr>
+<td class="p-md flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-surface-tint"></span>
+                                Vague funding details
+                            </td>
+<td class="p-md text-on-surface-variant">You mentioned family support but didn't specify exactly who or how the funds are held. Assessor needs exact sources.</td>
+</tr>
+<tr>
+<td class="p-md flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+                                Frequent pauses (Um/Ah)
+                            </td>
+<td class="p-md text-on-surface-variant">Hesitations broke the flow when discussing your previous studies, suggesting uncertainty.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Detailed Per Question Breakdown -->
+<section>
+<div class="flex items-center justify-between mb-md">
+<h3 class="font-headline-md text-headline-md text-primary">Question Analysis</h3>
+<span class="font-label-md text-label-md text-on-surface-variant">4 Questions Answered</span>
+</div>
+<div class="space-y-lg">
+<!-- Question Block 1 -->
+<div class="glass-panel rounded-xl p-md md:p-lg">
+<div class="flex gap-sm items-start mb-md">
+<div class="bg-primary text-on-primary w-8 h-8 rounded flex items-center justify-center font-label-md shrink-0">Q1</div>
+<h4 class="font-headline-md text-headline-md text-primary mt-1">Why did you choose to study at this specific university rather than others in the UK?</h4>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md relative">
+<!-- Divider on desktop -->
+<div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-surface-container-high -translate-x-1/2"></div>
+<!-- Student Answer -->
+<div class="space-y-sm">
+<h5 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">record_voice_over</span>
+                                You said
+                            </h5>
+<div class="bg-surface-container-lowest p-md rounded-lg border border-surface-container-high h-full">
+<p class="font-body-md text-body-md text-on-surface italic">"I choose this university because it is very good and the fees are quite low. Also, my friend is studying there so it will be easy for me to adjust. The course modules look interesting to me."</p>
+<div class="mt-md pt-md border-t border-surface-container-high">
+<p class="font-label-sm text-label-sm text-error mb-xs">Weakness identified:</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Overly generic reasons. Mentioning a friend lowers perceived academic intent.</p>
+</div>
+</div>
+</div>
+<!-- Better Way -->
+<div class="space-y-sm">
+<h5 class="font-label-sm text-label-sm text-secondary uppercase tracking-wide flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">model_training</span>
+                                A better structure
+                            </h5>
+<div class="bg-surface-container-low p-md rounded-lg border border-secondary-container h-full relative overflow-hidden">
+<!-- Subtle accent -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary"></div>
+<p class="font-body-md text-body-md text-on-surface mb-sm">Focus strictly on academic and career merits. Use specific module names.</p>
+<div class="bg-surface-container-lowest p-sm rounded border border-surface-container-high mb-sm">
+<p class="font-body-md text-body-md text-primary font-medium">"I selected [University Name] primarily because of its strong reputation in [Subject Area]. Specifically, the [Module Name] aligns perfectly with my career goal of becoming a [Profession]."</p>
+</div>
+<p class="font-body-md text-body-md text-surface-tint text-sm">नेपालीमा: यो विश्वविद्यालयको पढाई राम्रो छ र मेरो भविष्यको लक्ष्यसँग मेल खान्छ भनेर जोड दिनुहोस्। साथीको कुरा नगर्नुहोस्।</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Question Block 2 (Not Assessed Example) -->
+<div class="glass-panel rounded-xl p-md md:p-lg opacity-75">
+<div class="flex gap-sm items-start mb-md">
+<div class="bg-surface-tint text-on-primary w-8 h-8 rounded flex items-center justify-center font-label-md shrink-0">Q2</div>
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface mt-1">Can you explain your financial arrangements for this course?</h4>
+<span class="inline-block mt-sm bg-surface-container-high px-sm py-xs rounded font-label-sm text-label-sm text-surface-tint">Audio unclear - Not assessed</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-16 px-4 md:hidden fixed bottom-0 w-full z-50 rounded-t-full border-t border-outline-variant bg-surface dark:bg-surface shadow-sm">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high w-full h-full rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high w-full h-full rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined">record_voice_over</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Practice</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary font-bold hover:bg-surface-container-high dark:hover:bg-surface-container-high w-full h-full rounded-full transition-colors scale-95 duration-100" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Results</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high w-full h-full rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

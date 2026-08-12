@@ -1,6 +1,18 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
+/**
+ * Fonts: Stitch "Academic Clarity" pairs Noto Serif (display) with Hanken
+ * Grotesk (body). They are loaded with plain <link> tags rather than
+ * next/font/google on purpose.
+ *
+ * next/font downloads the font at BUILD time, which makes every deploy depend
+ * on fonts.googleapis.com being reachable. A Google Fonts blip then fails the
+ * Netlify build for a purely cosmetic asset. Link tags fetch at runtime with
+ * display=swap, so the build never depends on the network and text is always
+ * readable in the fallback while the font arrives.
+ */
+
 export const metadata: Metadata = {
   title: 'PreCAS Practice | Practise your UK interview',
   description:
@@ -28,6 +40,14 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@600;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body>{children}</body>
     </html>
   );

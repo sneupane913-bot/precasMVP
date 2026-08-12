@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { publicPlans, getPlan, perMockNpr, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
+import { SiteHeader } from '@/components/SiteHeader';
+import { SiteFooter } from '@/components/SiteFooter';
 
 export const metadata = { title: 'Price | PreCAS Practice' };
 
@@ -10,7 +12,9 @@ export default function PricingPage() {
   const trial = getPlan('trial')!;
 
   return (
-    <main className="px-4 py-8 sm:px-6">
+    <>
+      <SiteHeader />
+      <main className="px-4 py-8 sm:px-6">
       <div className="mx-auto max-w-4xl">
         <h1 className="mb-2 text-center font-serif text-3xl text-ink">Price</h1>
         <p className="mx-auto mb-8 max-w-lg text-center leading-relaxed text-slate-600">
@@ -102,12 +106,16 @@ export default function PricingPage() {
                 </li>
               </ul>
 
-              <button
-                className="w-full rounded-xl border-2 border-slate-300 px-5 py-3.5 font-bold text-slate-700"
-                disabled
+              <Link
+                href="/start"
+                className={`inline-flex w-full items-center justify-center rounded-xl px-5 py-3.5 font-bold transition active:scale-[0.98] ${
+                  p.badge === 'MOST POPULAR'
+                    ? 'bg-ink text-white'
+                    : 'border-2 border-ink text-ink hover:bg-ink hover:text-white'
+                }`}
               >
                 Choose {p.name}
-              </button>
+              </Link>
             </div>
           ))}
         </div>
@@ -164,20 +172,15 @@ export default function PricingPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl bg-white p-6">
-          <h2 className="mb-3 font-bold text-ink">Are you a consultancy?</h2>
-          <p className="mb-4 leading-relaxed text-slate-600">
-            Buy seats in bulk from NPR 240 each, put your own logo on it, and give your students
-            their own link. You keep the difference.
-          </p>
-          <Link
-            href="/admin"
-            className="inline-flex items-center justify-center rounded-xl border-2 border-ink px-6 py-3 font-bold text-ink"
-          >
-            Consultancy portal
-          </Link>
-        </section>
+        {/*
+          QA-G7 / spec §17: the consultancy wholesale block (NPR 240 per seat)
+          was removed from this public student page. A student must never see a
+          lower per-seat price and feel overcharged. B2B pricing now lives only
+          on the unlisted /consultancy page, reached by typing the URL.
+        */}
       </div>
     </main>
+      <SiteFooter />
+    </>
   );
 }

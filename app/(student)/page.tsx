@@ -1,6 +1,8 @@
 import Link from 'next/link';
-import { publicInstitutions } from '@/lib/data/institutions';
 import { publicPlans, perMockNpr, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
+import { SiteHeader } from '@/components/SiteHeader';
+import { SiteFooter } from '@/components/SiteFooter';
+import { TrustedBy } from '@/components/TrustedBy';
 
 /**
  * Home page.
@@ -12,7 +14,9 @@ import { publicPlans, perMockNpr, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/pl
  */
 export default function HomePage() {
   return (
-    <main>
+    <>
+      <SiteHeader />
+      <main>
       {/* ---------------- Above the fold: one action ---------------- */}
       <section className="bg-ink px-5 pb-14 pt-12 text-white sm:pt-20">
         <div className="mx-auto max-w-2xl text-center">
@@ -40,34 +44,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ---------------- Their own university ---------------- */}
-      <section className="border-b border-slate-200 bg-white px-5 py-10">
-        <div className="mx-auto max-w-4xl">
-          <p className="mb-5 text-center text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Practise for your university
-          </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            {publicInstitutions().map((i) => (
-              <Link
-                key={i.id}
-                href={`/universities?q=${encodeURIComponent(i.shortName)}`}
-                className="flex items-center gap-2.5 rounded-xl border border-slate-200 px-4 py-2.5 transition hover:border-slate-400"
-              >
-                <span
-                  className="grid h-8 w-8 place-items-center rounded-md text-xs font-black text-white"
-                  style={{ backgroundColor: i.accent }}
-                >
-                  {i.monogram}
-                </span>
-                <span className="text-sm font-semibold text-ink">{i.shortName}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ---------------- Trust strip: self-moving university slider ---------------- */}
+      <TrustedBy />
 
       {/* ---------------- How it works ---------------- */}
-      <section className="px-5 py-12">
+      <section id="how-it-works" className="px-5 py-12">
         <div className="mx-auto grid max-w-4xl gap-6 sm:grid-cols-3">
           {[
             { n: '1', t: 'Pick your university', d: 'Based on the credibility themes universities publish.' },
@@ -146,19 +127,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ---------------- Guardrail footer ---------------- */}
-      <footer className="border-t border-slate-200 bg-white px-5 py-8">
-        <div className="mx-auto max-w-2xl text-center text-sm leading-relaxed text-slate-500">
-          <p className="mb-2">
-            This is practice only. We help you explain your own true situation clearly. We do not
-            write answers for you and we never suggest saying anything untrue.
-          </p>
-          <p>
-            We are not immigration advisers and we cannot guarantee any CAS or visa outcome. Always
-            check official facts with your university and a licensed adviser.
-          </p>
-        </div>
-      </footer>
-    </main>
+      </main>
+      <SiteFooter />
+    </>
   );
 }

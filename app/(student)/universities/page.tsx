@@ -3,6 +3,8 @@
 import { Suspense, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { publicInstitutions } from '@/lib/data/institutions';
+import { SiteHeader } from '@/components/SiteHeader';
+import { SiteFooter } from '@/components/SiteFooter';
 
 /**
  * University-first browsing. The competitor's single best idea: a student who
@@ -68,7 +70,9 @@ function UniversityBrowser() {
   }
 
   return (
-    <main className="min-h-screen px-4 py-6 sm:px-6">
+    <>
+      <SiteHeader />
+      <main className="min-h-screen px-4 py-6 sm:px-6">
       <div className="mx-auto max-w-4xl">
         <h1 className="mb-1 text-2xl font-bold text-ink">Choose your university</h1>
         <p className="mb-5 text-slate-600">
@@ -119,12 +123,24 @@ function UniversityBrowser() {
                 className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5"
               >
                 <div className="mb-3 flex items-start gap-3">
-                  <span
-                    className="grid h-12 w-12 shrink-0 place-items-center rounded-xl text-base font-black text-white"
-                    style={{ backgroundColor: i.accent }}
-                  >
-                    {i.monogram}
-                  </span>
+                  {/* Real university mark when we have one, monogram as the
+                      fallback. Seeing their own university is the strongest
+                      trust cue on this page (docs/UX_AUDIT.md G5). Marks are
+                      third-party trademarks: never recoloured, never implying
+                      endorsement. */}
+                  {i.logoUrl ? (
+                    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-slate-200 bg-white p-1.5">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={i.logoUrl} alt="" className="max-h-full max-w-full object-contain" />
+                    </span>
+                  ) : (
+                    <span
+                      className="grid h-12 w-12 shrink-0 place-items-center rounded-xl text-base font-black text-white"
+                      style={{ backgroundColor: i.accent }}
+                    >
+                      {i.monogram}
+                    </span>
+                  )}
                   <div className="min-w-0">
                     <h2 className="font-bold leading-tight text-ink">{i.name}</h2>
                     <p className="text-sm text-slate-500">
@@ -156,6 +172,8 @@ function UniversityBrowser() {
           </ul>
         )}
       </div>
-    </main>
+      </main>
+      <SiteFooter />
+    </>
   );
 }

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PreCAS Practice | Academic Clarity</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&amp;family=Noto+Serif:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed": "#dae2fd",
+                    "surface-container": "#e5eeff",
+                    "on-error-container": "#93000a",
+                    "inverse-surface": "#213145",
+                    "on-primary-container": "#7c839b",
+                    "surface-tint": "#565e74",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed-dim": "#c4c7c9",
+                    "on-surface": "#0b1c30",
+                    "on-secondary-fixed": "#002113",
+                    "surface-container-low": "#eff4ff",
+                    "secondary-container": "#6cf8bb",
+                    "on-secondary-fixed-variant": "#005236",
+                    "on-tertiary-fixed": "#191c1e",
+                    "tertiary-container": "#191c1e",
+                    "secondary-fixed-dim": "#4edea3",
+                    "surface": "#f8f9ff",
+                    "secondary-fixed": "#6ffbbe",
+                    "surface-container-highest": "#d3e4fe",
+                    "outline-variant": "#c6c6cd",
+                    "on-tertiary": "#ffffff",
+                    "inverse-primary": "#bec6e0",
+                    "on-tertiary-container": "#818486",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "surface-container-high": "#dce9ff",
+                    "tertiary-fixed": "#e0e3e5",
+                    "error-container": "#ffdad6",
+                    "background": "#f8f9ff",
+                    "primary": "#000000",
+                    "surface-dim": "#cbdbf5",
+                    "on-primary-fixed": "#131b2e",
+                    "surface-variant": "#d3e4fe",
+                    "error": "#ba1a1a",
+                    "primary-fixed-dim": "#bec6e0",
+                    "outline": "#76777d",
+                    "inverse-on-surface": "#eaf1ff",
+                    "secondary": "#006c49",
+                    "on-surface-variant": "#45464d",
+                    "on-tertiary-fixed-variant": "#444749",
+                    "on-background": "#0b1c30",
+                    "on-secondary-container": "#00714d",
+                    "on-secondary": "#ffffff",
+                    "surface-bright": "#f8f9ff",
+                    "primary-container": "#131b2e",
+                    "tertiary": "#000000",
+                    "on-primary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "lg": "48px",
+                    "gutter": "20px",
+                    "md": "24px",
+                    "xs": "4px",
+                    "sm": "12px",
+                    "xl": "80px",
+                    "container-max": "1140px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Hanken Grotesk"],
+                    "body-md": ["Hanken Grotesk"],
+                    "headline-lg-mobile": ["Noto Serif"],
+                    "display-lg": ["Noto Serif"],
+                    "headline-md": ["Noto Serif"],
+                    "label-sm": ["Hanken Grotesk"],
+                    "headline-lg": ["Noto Serif"],
+                    "label-md": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.surface');
+            color: theme('colors.on-surface');
+            -webkit-font-smoothing: antialiased;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md antialiased min-h-screen flex flex-col">
+<!-- TopNavBar (Shared Component) -->
+<header class="bg-surface-container-lowest dark:bg-surface-container-lowest fixed top-0 w-full z-50 border-b border-outline-variant dark:border-outline-variant flat no shadows">
+<div class="flex justify-between items-center w-full px-gutter h-16 max-w-container-max mx-auto">
+<!-- Brand -->
+<div class="flex items-center gap-sm">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary">PreCAS Practice</span>
+</div>
+<!-- Navigation Links (Desktop) -->
+<nav class="hidden md:flex gap-md">
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-secondary dark:hover:text-secondary transition-colors duration-200" href="#">Universities</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-secondary dark:hover:text-secondary transition-colors duration-200" href="#">How it works</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-secondary dark:hover:text-secondary transition-colors duration-200" href="#">Pricing</a>
+</nav>
+<!-- Actions -->
+<div class="flex items-center gap-sm">
+<a class="hidden md:inline-flex font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Sign In</a>
+<a class="inline-flex items-center justify-center bg-secondary text-on-secondary font-label-md text-label-md rounded-full px-[24px] py-[10px] hover:opacity-90 transition-opacity" href="#">Start free</a>
+</div>
+</div>
+</header>
+<main class="flex-grow pt-[80px]">
+<!-- Hero Section -->
+<section class="px-gutter py-xl md:py-[120px] max-w-container-max mx-auto text-center flex flex-col items-center">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-display-lg md:text-display-lg text-on-surface max-w-[800px] mb-md leading-tight">
+                Master your Pre-CAS interview with absolute clarity and confidence.
+            </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-[600px] mb-lg">
+                Practice with real university questions, get instant actionable feedback in simple English, and walk into your interview knowing exactly what to say.
+            </p>
+<div class="flex flex-col sm:flex-row items-center gap-md mb-sm">
+<a class="inline-flex items-center justify-center bg-secondary text-on-secondary font-label-md text-label-md rounded-full px-lg py-[16px] hover:opacity-90 transition-opacity w-full sm:w-auto shadow-sm" href="#">
+                    Start free practice
+                </a>
+<a class="inline-flex items-center justify-center text-secondary font-label-md text-label-md px-md py-[16px] hover:bg-surface-container-low rounded-full transition-colors w-full sm:w-auto" href="#">
+<span class="material-symbols-outlined mr-xs" style="font-size: 20px;">play_circle</span>
+                    See how it works
+                </a>
+</div>
+<p class="font-label-sm text-label-sm text-outline">No card, no account, 10 real questions free.</p>
+</section>
+<!-- University Logos Strip -->
+<section class="border-y border-outline-variant bg-surface-container-lowest py-lg overflow-hidden">
+<div class="max-w-container-max mx-auto px-gutter">
+<p class="text-center font-label-sm text-label-sm text-outline mb-md uppercase tracking-wider">Trusted by students applying to top UK Universities</p>
+<div class="flex flex-wrap justify-center items-center gap-xl opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+<img class="h-10 object-contain" data-alt="A clean, minimalist crest logo representing a prestigious UK university, rendered in deep navy blue on a pure white background. The design is authoritative and historic, yet simplified for modern digital use. High contrast, sharp edges, academic aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDp2yD16kR9ZFVzWDj7vTWjpVaBo_FL65QoVVfHldvMPJ3tdUO7jt0zNa1DNl6p-ts20x8J9pa9YP5EHE9EXpX-w9FbCCZvejYfKSDbBMWAjzPgBJJBjzAnipJjRtEm7oEYhmlAvxvmVwBu0wDTTHtY5u5xi1C-tnkv9vWzNtXFJfUskfP5WxAI0h7v-15v5FU4FcpXsnq6K-Jyc4JpVqwblcMj_zZELI5ypi1Xb6ywnR4btVx6AVW8"/>
+<img class="h-10 object-contain" data-alt="An elegant, modern university typographic logo featuring a serif typeface and a subtle abstract shield emblem. Rendered in monochromatic deep slate. The style is sophisticated, clean, and representative of modern higher education institutions in the UK." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAptHdFSVcjoS4S9ehgYqmptVr3IXJ9nF9eIigXE8iDSR6KQDMDL9P9R2u6bUkyZcABubYKKgkBDTfwnPZS2Yx8I5qyAPIBWlZ_jVMlKLtJCIH2j5ROLYaYqxngjmgAr8i3ZpDVryQeNPR6exzsx3EcxkDcAw-w2ze4Sp5-pe0Klj1s36Q6r6Xj3Y-FdiATNrlqrTJd3G5F4fYw0oCSWZoY6DiOTjZhtIUE7tKRkimxZhl8W6_HYXh8"/>
+<img class="h-10 object-contain" data-alt="A classic academic emblem featuring an open book and a laurel wreath, designed as a minimalist vector icon. Dark grey on a transparent background, ensuring a professional and structured appearance suitable for an educational platform footer or partner strip." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtCzKlmx0dl8umxNpZh5ECU9O4oWfEEOHiKEz-DH-SYH8ubLIhlekpOUT-TRHg0UdLSNJ9p0OuGakKCT3Rno_I_QkqwGzKiAMksHjWGgrmcDOw8Yt4qoooYawfzdUV6Ypt8kKtIp8kf-1MQgEjnOGGXH0v3iy2sqcFf1Fne5mjIzSyD9FaDHKeNvGo3Lza0iF_2HBWl4sIPl7NNoqE67nEGWTAoUxo7XY0_unwr_WZWUzjD8OAPWv8"/>
+<img class="h-10 object-contain" data-alt="A stylized geometric logo representing a modern campus building or architectural feature of a university. Monochromatic navy blue, clean lines, balanced proportions, evoking a sense of forward-thinking education and structure." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3bXkSPQAVpS_2cwuntcA9OSjJ075686cbEs-3gtuSgxicSFlulHZ9idClx8COpq1IYH9GUxtsZ7IA8rwm1JOe8GPflFWdhSGAm6Lx-cNt0d_6O0E9GIWphwJZHMq_TNT1PTQyYJIV6eVXxb1EZFXI9FodFvtCX4hEW77bIKNqYS9eW97IBbONz99sawYE_UAAtabd_CTwYHb89Ep7gf5BJ-IVPS17FSZqCuNGrdK76ZLaIOh6xKBz"/>
+</div>
+</div>
+</section>
+<!-- How It Works (Bento-ish Grid) -->
+<section class="px-gutter py-xl max-w-container-max mx-auto">
+<div class="text-center mb-xl">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-sm">Three steps to interview readiness.</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">Structured practice designed to reduce anxiety and build natural speaking habits.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Step 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-start relative overflow-hidden transition-transform hover:-translate-y-1 duration-300 shadow-sm hover:shadow-md">
+<div class="bg-surface-container-low rounded-full w-12 h-12 flex items-center justify-center mb-md text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">mic</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">1. Speak naturally</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Listen to real Pre-CAS questions recorded by native speakers and record your genuine, unscripted answers.</p>
+</div>
+<!-- Step 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-start relative overflow-hidden transition-transform hover:-translate-y-1 duration-300 shadow-sm hover:shadow-md">
+<div class="bg-surface-container-low rounded-full w-12 h-12 flex items-center justify-center mb-md text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">2. Get instant feedback</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Our system analyzes your speech for clarity, relevance, and English proficiency within seconds.</p>
+</div>
+<!-- Step 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-start relative overflow-hidden transition-transform hover:-translate-y-1 duration-300 shadow-sm hover:shadow-md">
+<div class="bg-surface-container-low rounded-full w-12 h-12 flex items-center justify-center mb-md text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">3. Improve and repeat</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Review simplified suggestions on what you *actually* said, learn better phrasing, and try again until perfect.</p>
+</div>
+</div>
+</section>
+<!-- Benefit & Preview Section (Asymmetric) -->
+<section class="bg-surface-container-low py-xl px-gutter">
+<div class="max-w-container-max mx-auto grid grid-cols-1 lg:grid-cols-2 gap-xl items-center">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-md">Feedback in simple English, on what you actually said.</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-md">
+                        We don't just give you a score. We break down your exact answer, highlight areas for improvement, and suggest natural, academic phrasing that universities expect.
+                    </p>
+<ul class="space-y-sm mb-lg">
+<li class="flex items-start">
+<span class="material-symbols-outlined text-secondary mr-sm mt-[2px]">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Grammar and vocabulary corrections.</span>
+</li>
+<li class="flex items-start">
+<span class="material-symbols-outlined text-secondary mr-sm mt-[2px]">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Relevance to the specific university question.</span>
+</li>
+<li class="flex items-start">
+<span class="material-symbols-outlined text-secondary mr-sm mt-[2px]">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Pacing and pronunciation markers.</span>
+</li>
+</ul>
+<button class="bg-surface-container-lowest border border-outline-variant text-on-surface font-label-md text-label-md rounded-full px-md py-[12px] hover:bg-surface-variant transition-colors">
+                        View a sample report
+                    </button>
+</div>
+<!-- Simulated UI Card -->
+<div class="bg-surface-container-lowest rounded-xl p-lg shadow-sm border border-outline-variant relative">
+<!-- Decorative elements -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-secondary opacity-5 rounded-bl-full"></div>
+<div class="flex justify-between items-center mb-md border-b border-outline-variant pb-sm">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wide">Question Analysis</span>
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-2 py-1 rounded">Score: Good</span>
+</div>
+<p class="font-headline-md text-headline-md text-on-surface mb-xs">"Why did you choose to study in the UK?"</p>
+<div class="mt-md bg-surface-container-low p-sm rounded-lg border border-outline-variant">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-xs">Your Answer Transcript</p>
+<p class="font-body-md text-body-md text-on-surface italic">
+                            "I choose UK because it have very good education and the degree is recognize everywhere."
+                        </p>
+</div>
+<div class="mt-md">
+<p class="font-label-md text-label-md text-secondary mb-xs flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-xs">lightbulb</span> Suggested Phrasing
+                        </p>
+<p class="font-body-md text-body-md text-on-surface bg-surface p-sm rounded-lg border-l-4 border-secondary">
+                            "I <span class="font-semibold text-secondary">chose the</span> UK because it <span class="font-semibold text-secondary">offers a world-class</span> education and the degree is <span class="font-semibold text-secondary">globally recognized</span>."
+                        </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Pricing Teaser -->
+<section class="px-gutter py-xl max-w-container-max mx-auto text-center">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-sm">Simple, transparent pricing.</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-xl">Invest in your future with focused practice.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md max-w-3xl mx-auto text-left">
+<!-- Free Tier -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Starter</h3>
+<p class="font-display-lg text-display-lg text-on-surface mb-xs">Free</p>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md border-b border-outline-variant pb-md">Perfect to try the system.</p>
+<ul class="space-y-sm mb-lg flex-grow">
+<li class="flex items-center text-on-surface font-body-md text-body-md">
+<span class="material-symbols-outlined text-secondary mr-sm text-[20px]">check</span> 10 Practice Questions
+                        </li>
+<li class="flex items-center text-on-surface font-body-md text-body-md">
+<span class="material-symbols-outlined text-secondary mr-sm text-[20px]">check</span> Basic Feedback
+                        </li>
+<li class="flex items-center text-on-surface font-body-md text-body-md">
+<span class="material-symbols-outlined text-secondary mr-sm text-[20px]">check</span> No account required
+                        </li>
+</ul>
+<button class="w-full bg-surface-container-high text-on-surface font-label-md text-label-md rounded-full py-[12px] hover:bg-surface-variant transition-colors">
+                        Start Now
+                    </button>
+</div>
+<!-- Premium Tier -->
+<div class="bg-surface-container-lowest border-2 border-secondary rounded-xl p-lg flex flex-col relative shadow-sm">
+<div class="absolute top-0 right-0 bg-secondary text-on-secondary font-label-sm text-label-sm px-3 py-1 rounded-bl-xl rounded-tr-lg">Most Popular</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Full Mastery</h3>
+<p class="font-display-lg text-display-lg text-on-surface mb-xs">£29</p>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md border-b border-outline-variant pb-md">Complete preparation suite.</p>
+<ul class="space-y-sm mb-lg flex-grow">
+<li class="flex items-center text-on-surface font-body-md text-body-md">
+<span class="material-symbols-outlined text-secondary mr-sm text-[20px]">check</span> Unlimited Questions
+                        </li>
+<li class="flex items-center text-on-surface font-body-md text-body-md">
+<span class="material-symbols-outlined text-secondary mr-sm text-[20px]">check</span> Deep AI Analysis &amp; Corrections
+                        </li>
+<li class="flex items-center text-on-surface font-body-md text-body-md">
+<span class="material-symbols-outlined text-secondary mr-sm text-[20px]">check</span> University-Specific Mocks
+                        </li>
+</ul>
+<button class="w-full bg-secondary text-on-secondary font-label-md text-label-md rounded-full py-[12px] hover:opacity-90 transition-opacity">
+                        Get Full Access
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-surface-container-highest dark:bg-surface-container-highest w-full py-xl mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-gutter max-w-container-max mx-auto gap-md">
+<div class="text-center md:text-left">
+<p class="font-headline-md text-headline-md text-primary mb-xs">PreCAS Practice</p>
+<p class="font-body-md text-body-md text-on-surface dark:text-on-surface">© 2024 PreCAS Practice. Empowering Nepali students for UK success.</p>
+</div>
+<div class="flex flex-wrap justify-center md:justify-end gap-md">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Privacy Policy</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Terms of Service</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Contact Support</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors" href="#">UK University Partners</a>
+</div>
+</div>
+<div class="max-w-container-max mx-auto px-gutter mt-lg border-t border-outline-variant pt-md text-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant opacity-70">
+                Disclaimer: PreCAS Practice is an educational tool designed to help students improve their interview skills. We do not provide immigration advice, guarantee visa approval, or represent any UK university or government body.
+            </p>
+</div>
+</footer>
+</body></html>

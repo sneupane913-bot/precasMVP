@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PreCAS Nepal - Super Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&amp;family=Noto+Serif:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed": "#dae2fd",
+                        "surface-container": "#e5eeff",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#213145",
+                        "on-primary-container": "#7c839b",
+                        "surface-tint": "#565e74",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "on-surface": "#0b1c30",
+                        "on-secondary-fixed": "#002113",
+                        "surface-container-low": "#eff4ff",
+                        "secondary-container": "#6cf8bb",
+                        "on-secondary-fixed-variant": "#005236",
+                        "on-tertiary-fixed": "#191c1e",
+                        "tertiary-container": "#191c1e",
+                        "secondary-fixed-dim": "#4edea3",
+                        "surface": "#f8f9ff",
+                        "secondary-fixed": "#6ffbbe",
+                        "surface-container-highest": "#d3e4fe",
+                        "outline-variant": "#c6c6cd",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#bec6e0",
+                        "on-tertiary-container": "#818486",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "surface-container-high": "#dce9ff",
+                        "tertiary-fixed": "#e0e3e5",
+                        "error-container": "#ffdad6",
+                        "background": "#f8f9ff",
+                        "primary": "#000000",
+                        "surface-dim": "#cbdbf5",
+                        "on-primary-fixed": "#131b2e",
+                        "surface-variant": "#d3e4fe",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#bec6e0",
+                        "outline": "#76777d",
+                        "inverse-on-surface": "#eaf1ff",
+                        "secondary": "#006c49",
+                        "on-surface-variant": "#45464d",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "on-background": "#0b1c30",
+                        "on-secondary-container": "#00714d",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "primary-container": "#131b2e",
+                        "tertiary": "#000000",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "lg": "48px",
+                        "gutter": "20px",
+                        "md": "24px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "xl": "80px",
+                        "container-max": "1140px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Noto Serif"],
+                        "display-lg": ["Noto Serif"],
+                        "headline-md": ["Noto Serif"],
+                        "label-sm": ["Hanken Grotesk"],
+                        "headline-lg": ["Noto Serif"],
+                        "label-md": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "1.2", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen flex">
+<!-- SideNavBar -->
+<nav class="h-screen w-64 fixed left-0 top-0 bg-surface-container-low dark:bg-surface-container-low hidden md:flex flex-col p-md space-y-sm z-40">
+<div class="mb-lg">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Admin Portal</h1>
+<p class="font-label-md text-label-md text-on-surface-variant mt-xs">PreCAS Nepal</p>
+</div>
+<button class="bg-secondary text-on-secondary font-label-md text-label-md py-sm px-md rounded-lg flex items-center justify-center gap-base mb-md w-full shadow-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined">add</span>
+            New Assessment
+        </button>
+<div class="flex-1 flex flex-col gap-xs">
+<a class="flex items-center gap-sm p-sm rounded-xl bg-secondary-container dark:bg-secondary-container text-on-secondary-container font-bold scale-[0.98] transition-transform" href="#">
+<span class="material-symbols-outlined fill">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm p-sm rounded-xl text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Students</span>
+</a>
+<a class="flex items-center gap-sm p-sm rounded-xl text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-md text-label-md">Universities</span>
+</a>
+<a class="flex items-center gap-sm p-sm rounded-xl text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+<a class="flex items-center gap-sm p-sm rounded-xl text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+<div class="mt-auto flex flex-col gap-xs pt-md border-t border-outline-variant">
+<a class="flex items-center gap-sm p-sm rounded-xl text-on-surface-variant hover:bg-surface-variant transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="flex items-center gap-sm p-sm rounded-xl text-on-surface-variant hover:bg-surface-variant transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 md:ml-64 flex flex-col min-h-screen">
+<!-- TopNavBar (Mobile Only) -->
+<header class="md:hidden bg-surface-container-lowest dark:bg-surface-container-lowest fixed top-0 w-full z-50 border-b border-outline-variant dark:border-outline-variant flex justify-between items-center px-gutter h-16">
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary">PreCAS Practice</h1>
+<button class="text-on-surface">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</header>
+<!-- Dashboard Canvas -->
+<main class="flex-1 p-gutter pt-[calc(64px+20px)] md:pt-gutter max-w-container-max mx-auto w-full flex flex-col gap-xl">
+<!-- Page Header & Actions -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md">
+<div>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">System Overview</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Super Admin Analytics &amp; Approvals</p>
+</div>
+<button class="flex items-center gap-base px-md py-sm border border-outline rounded-lg text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">download</span>
+                    Export to CSV
+                </button>
+</div>
+<!-- Bento Grid: Key Metrics -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-md">
+<!-- Metric 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-md border border-surface-variant relative overflow-hidden">
+<div class="flex justify-between items-start mb-sm relative z-10">
+<span class="font-label-md text-label-md text-on-surface-variant">Total Students</span>
+<span class="material-symbols-outlined text-secondary">group</span>
+</div>
+<div class="font-display-lg text-display-lg text-primary relative z-10">4,289</div>
+<div class="flex items-center gap-xs mt-sm text-secondary relative z-10">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span class="font-label-sm text-label-sm">+12% this month</span>
+</div>
+</div>
+<!-- Metric 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-md border border-surface-variant relative overflow-hidden">
+<div class="flex justify-between items-start mb-sm relative z-10">
+<span class="font-label-md text-label-md text-on-surface-variant">Active Consultancies</span>
+<span class="material-symbols-outlined text-secondary">corporate_fare</span>
+</div>
+<div class="font-display-lg text-display-lg text-primary relative z-10">142</div>
+<div class="flex items-center gap-xs mt-sm text-secondary relative z-10">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span class="font-label-sm text-label-sm">+3 new</span>
+</div>
+</div>
+<!-- Metric 3 -->
+<div class="bg-surface-container-lowest rounded-xl p-md border border-surface-variant relative overflow-hidden">
+<div class="flex justify-between items-start mb-sm relative z-10">
+<span class="font-label-md text-label-md text-on-surface-variant">Total Revenue</span>
+<span class="material-symbols-outlined text-secondary">payments</span>
+</div>
+<div class="font-display-lg text-display-lg text-primary relative z-10">$128k</div>
+<div class="flex items-center gap-xs mt-sm text-on-surface-variant relative z-10">
+<span class="material-symbols-outlined text-[16px]">trending_flat</span>
+<span class="font-label-sm text-label-sm">Consistent</span>
+</div>
+</div>
+<!-- Metric 4 (Highlight) -->
+<div class="bg-secondary-container rounded-xl p-md border border-secondary relative overflow-hidden shadow-[0px_4px_20px_rgba(0,108,73,0.04)]">
+<div class="flex justify-between items-start mb-sm relative z-10">
+<span class="font-label-md text-label-md text-on-secondary-container">Pending Approvals</span>
+<span class="material-symbols-outlined text-on-secondary-container">pending_actions</span>
+</div>
+<div class="font-display-lg text-display-lg text-on-secondary-container relative z-10">34</div>
+<div class="flex items-center gap-xs mt-sm text-on-secondary-container relative z-10">
+<span class="material-symbols-outlined text-[16px]">priority_high</span>
+<span class="font-label-sm text-label-sm">Requires attention</span>
+</div>
+</div>
+</section>
+<!-- Main Layout: 2 Columns on Desktop -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-md">
+<!-- Left Column (Wider) -->
+<div class="lg:col-span-2 flex flex-col gap-md">
+<!-- Approvals Queue -->
+<section class="bg-surface-container-lowest rounded-xl border border-surface-variant overflow-hidden">
+<div class="p-md border-b border-surface-variant flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-primary">Pending Approvals</h3>
+<button class="font-label-sm text-label-sm text-secondary hover:underline">View All</button>
+</div>
+<div class="divide-y divide-surface-variant">
+<!-- Item 1 -->
+<div class="p-md flex flex-col sm:flex-row justify-between sm:items-center gap-md hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-primary font-bold">K</div>
+<div>
+<p class="font-label-md text-label-md text-primary">Kathmandu Education Hub</p>
+<p class="font-body-md text-[14px] text-on-surface-variant">New Consultancy Registration</p>
+</div>
+</div>
+<div class="flex gap-sm">
+<button class="px-sm py-xs border border-error text-error rounded-lg font-label-sm text-label-sm hover:bg-error-container transition-colors">Reject</button>
+<button class="px-sm py-xs bg-secondary text-on-secondary rounded-lg font-label-sm text-label-sm hover:opacity-90 transition-opacity shadow-[0px_4px_20px_rgba(0,108,73,0.04)]">Approve</button>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="p-md flex flex-col sm:flex-row justify-between sm:items-center gap-md hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-primary font-bold">P</div>
+<div>
+<p class="font-label-md text-label-md text-primary">Pratik Shrestha</p>
+<p class="font-body-md text-[14px] text-on-surface-variant">Direct Student - Tier 2 Upgrade</p>
+</div>
+</div>
+<div class="flex gap-sm">
+<button class="px-sm py-xs border border-error text-error rounded-lg font-label-sm text-label-sm hover:bg-error-container transition-colors">Reject</button>
+<button class="px-sm py-xs bg-secondary text-on-secondary rounded-lg font-label-sm text-label-sm hover:opacity-90 transition-opacity shadow-[0px_4px_20px_rgba(0,108,73,0.04)]">Approve</button>
+</div>
+</div>
+</div>
+</section>
+<!-- User Distribution -->
+<section class="bg-surface-container-lowest rounded-xl border border-surface-variant p-md">
+<h3 class="font-headline-md text-headline-md text-primary mb-md">User Distribution</h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+<div class="p-sm bg-surface-container-low rounded-lg flex justify-between items-center">
+<span class="font-label-md text-label-md text-on-surface-variant">Direct Students</span>
+<span class="font-headline-md text-[20px] text-primary">1,842</span>
+</div>
+<div class="p-sm bg-surface-container-low rounded-lg flex justify-between items-center">
+<span class="font-label-md text-label-md text-on-surface-variant">Consultancy Students</span>
+<span class="font-headline-md text-[20px] text-primary">2,447</span>
+</div>
+</div>
+<!-- Mini Consultancy List -->
+<div class="mt-md space-y-xs">
+<h4 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-sm">Top Consultancies</h4>
+<div class="flex justify-between items-center p-sm hover:bg-surface-container-low rounded-lg">
+<span class="font-body-md text-body-md text-primary">Global Reach Nepal</span>
+<span class="font-label-md text-label-md text-secondary">420 students</span>
+</div>
+<div class="flex justify-between items-center p-sm hover:bg-surface-container-low rounded-lg">
+<span class="font-body-md text-body-md text-primary">KIEC</span>
+<span class="font-label-md text-label-md text-secondary">385 students</span>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column (Narrower) -->
+<div class="flex flex-col gap-md">
+<!-- Flagged Trials -->
+<section class="bg-error-container rounded-xl border border-[#ffb4ab] p-md">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-error">flag</span>
+<h3 class="font-headline-md text-[20px] text-on-error-container">Flagged Trials</h3>
+</div>
+<div class="space-y-sm">
+<div class="bg-white/50 rounded-lg p-sm">
+<p class="font-label-md text-label-md text-on-error-container">Sujan Thapa</p>
+<p class="font-body-md text-[14px] text-on-error-container/80">Suspicious IP activity during trial</p>
+</div>
+<div class="bg-white/50 rounded-lg p-sm">
+<p class="font-label-md text-label-md text-on-error-container">Alisha Karki</p>
+<p class="font-body-md text-[14px] text-on-error-container/80">Multiple failed mock tests rapidly</p>
+</div>
+</div>
+</section>
+<!-- Referral Leaderboard -->
+<section class="bg-surface-container-lowest rounded-xl border border-surface-variant p-md flex-1">
+<h3 class="font-headline-md text-[20px] text-primary mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary">emoji_events</span>
+                            Referral Leaders
+                        </h3>
+<div class="space-y-sm">
+<div class="flex items-center justify-between p-sm bg-surface-container-low rounded-lg">
+<div class="flex items-center gap-sm">
+<span class="font-bold text-secondary">#1</span>
+<span class="font-body-md text-body-md">EduConsult Kathmandu</span>
+</div>
+<span class="font-label-md text-label-md">84</span>
+</div>
+<div class="flex items-center justify-between p-sm bg-surface-container-low rounded-lg">
+<div class="flex items-center gap-sm">
+<span class="font-bold text-on-surface-variant">#2</span>
+<span class="font-body-md text-body-md">Pokhara Study Center</span>
+</div>
+<span class="font-label-md text-label-md">62</span>
+</div>
+<div class="flex items-center justify-between p-sm bg-surface-container-low rounded-lg">
+<div class="flex items-center gap-sm">
+<span class="font-bold text-on-surface-variant">#3</span>
+<span class="font-body-md text-body-md">Future Scholars</span>
+</div>
+<span class="font-label-md text-label-md">45</span>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-16 px-4 bg-surface dark:bg-surface border-t border-outline-variant z-50 shadow-sm rounded-t-full">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary font-bold scale-95 duration-100 p-2" href="#">
+<span class="material-symbols-outlined fill">home</span>
+<span class="font-label-sm text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high rounded-lg p-2" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-sm text-[10px]">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high rounded-lg p-2" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-sm text-[10px]">Univs</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-high rounded-lg p-2" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-sm text-[10px]">Settings</span>
+</a>
+</nav>
+</div>
+</body></html>

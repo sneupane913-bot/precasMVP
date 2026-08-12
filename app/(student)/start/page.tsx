@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FirebaseSignIn, type FirebaseWebConfig } from '@/components/FirebaseSignIn';
 
@@ -40,31 +41,89 @@ function StartInner() {
   }, []);
 
   return (
-    <main className="mx-auto max-w-md px-5 py-10">
-      <h1 className="mb-2 text-center font-serif text-2xl text-ink">
-        Sign in to start your free questions
-      </h1>
-      <p className="mx-auto mb-8 max-w-sm text-center leading-relaxed text-slate-600">
-        One tap with Google. No password, no form, no payment.
-      </p>
+    <main className="grid min-h-screen lg:grid-cols-2">
+      {/* ---------------- Left: why you are here ----------------
+          Stitch "sign_in": the value proposition sits beside the button so the
+          page never reads as a bare gate. Hidden on small screens, where the
+          button must stay in the thumb zone. */}
+      <aside className="hidden flex-col justify-between bg-[#eff4ff] px-12 py-12 lg:flex">
+        <Link href="/" className="font-serif text-xl font-bold text-ink">
+          PreCAS Practice
+        </Link>
 
-      {loading ? (
-        <p className="text-center text-slate-400">Loading...</p>
-      ) : (
-        <FirebaseSignIn
-          config={config}
-          referralCode={ref}
-          via={via}
-          onSignedIn={(r) => {
-            // Soft deny is never a dead end: they keep browsing and can buy.
-            if (r.trial.outcome === 'soft_denied' && r.trial.message) {
-              setSoftDenied(r.trial.message);
-              return;
-            }
-            router.push(next);
-          }}
-        />
-      )}
+        <div className="max-w-md">
+          <h2 className="mb-8 font-serif text-4xl font-bold leading-tight text-ink">
+            Practise your UK interview
+          </h2>
+          <ul className="space-y-5">
+            {[
+              'Practise the themes universities really ask about.',
+              'Record your answers and hear how you sound.',
+              'See exactly what to fix, in simple English.',
+            ].map((line) => (
+              <li key={line} className="flex gap-3">
+                <span className="mt-0.5 shrink-0 text-emerald-600" aria-hidden>
+                  ✓
+                </span>
+                <span className="leading-relaxed text-slate-700">{line}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-slate-400">
+            Trusted by students applying to
+          </p>
+          <div className="flex items-center gap-6">
+            {['bpp', 'coventry', 'uel'].map((slug) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={slug}
+                src={`/university-logos/${slug}.svg`}
+                alt=""
+                className="h-7 w-auto opacity-50 grayscale"
+              />
+            ))}
+          </div>
+        </div>
+      </aside>
+
+      {/* ---------------- Right: the single action ---------------- */}
+      <div className="flex flex-col items-center justify-center px-5 py-12">
+        <div className="w-full max-w-sm">
+          {/* Brand shows on mobile, where the left panel is hidden. */}
+          <Link
+            href="/"
+            className="mb-10 block text-center font-serif text-xl font-bold text-ink lg:hidden"
+          >
+            PreCAS Practice
+          </Link>
+
+          <h1 className="mb-2 text-center font-serif text-3xl font-bold text-ink">
+            Sign in to start
+          </h1>
+          <p className="mb-10 text-center leading-relaxed text-slate-600">
+            One tap with Google. No password, no form, no payment.
+          </p>
+
+          {loading ? (
+            <div className="h-14 animate-pulse rounded-xl bg-slate-100" />
+          ) : (
+            <FirebaseSignIn
+              config={config}
+              referralCode={ref}
+              via={via}
+              onSignedIn={(r) => {
+                // Soft deny is never a dead end: they keep browsing and can buy.
+                if (r.trial.outcome === 'soft_denied' && r.trial.message) {
+                  setSoftDenied(r.trial.message);
+                  return;
+                }
+                router.push(next);
+              }}
+            />
+          )}
 
       {softDenied && (
         <div className="mt-6 rounded-2xl border-2 border-amber-300 bg-amber-50 p-5">
@@ -93,10 +152,21 @@ function StartInner() {
         </p>
       )}
 
-      <p className="mt-8 text-center text-xs leading-relaxed text-slate-400">
-        We use your Google account only to know it is you and to keep your practice history. We
-        never post anything, and we never see your password.
-      </p>
+          <p className="mt-6 text-center text-xs leading-relaxed text-slate-400">
+            We use your Google account only to know it is you and to keep your practice history. We
+            never post anything, and we never see your password.
+          </p>
+
+          <div className="mt-10 flex justify-center gap-6 text-xs text-slate-400">
+            <Link href="/privacy" className="hover:text-ink">
+              Privacy policy
+            </Link>
+            <Link href="/terms" className="hover:text-ink">
+              Terms of use
+            </Link>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }

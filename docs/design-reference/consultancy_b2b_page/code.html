@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PreCAS Practice for Consultancies</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&amp;family=Noto+Serif:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-fixed": "#dae2fd",
+                      "surface-container": "#e5eeff",
+                      "on-error-container": "#93000a",
+                      "inverse-surface": "#213145",
+                      "on-primary-container": "#7c839b",
+                      "surface-tint": "#565e74",
+                      "on-error": "#ffffff",
+                      "tertiary-fixed-dim": "#c4c7c9",
+                      "on-surface": "#0b1c30",
+                      "on-secondary-fixed": "#002113",
+                      "surface-container-low": "#eff4ff",
+                      "secondary-container": "#6cf8bb",
+                      "on-secondary-fixed-variant": "#005236",
+                      "on-tertiary-fixed": "#191c1e",
+                      "tertiary-container": "#191c1e",
+                      "secondary-fixed-dim": "#4edea3",
+                      "surface": "#f8f9ff",
+                      "secondary-fixed": "#6ffbbe",
+                      "surface-container-highest": "#d3e4fe",
+                      "outline-variant": "#c6c6cd",
+                      "on-tertiary": "#ffffff",
+                      "inverse-primary": "#bec6e0",
+                      "on-tertiary-container": "#818486",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed-variant": "#3f465c",
+                      "surface-container-high": "#dce9ff",
+                      "tertiary-fixed": "#e0e3e5",
+                      "error-container": "#ffdad6",
+                      "background": "#f8f9ff",
+                      "primary": "#000000",
+                      "surface-dim": "#cbdbf5",
+                      "on-primary-fixed": "#131b2e",
+                      "surface-variant": "#d3e4fe",
+                      "error": "#ba1a1a",
+                      "primary-fixed-dim": "#bec6e0",
+                      "outline": "#76777d",
+                      "inverse-on-surface": "#eaf1ff",
+                      "secondary": "#006c49",
+                      "on-surface-variant": "#45464d",
+                      "on-tertiary-fixed-variant": "#444749",
+                      "on-background": "#0b1c30",
+                      "on-secondary-container": "#00714d",
+                      "on-secondary": "#ffffff",
+                      "surface-bright": "#f8f9ff",
+                      "primary-container": "#131b2e",
+                      "tertiary": "#000000",
+                      "on-primary": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "lg": "48px",
+                      "gutter": "20px",
+                      "md": "24px",
+                      "xs": "4px",
+                      "sm": "12px",
+                      "xl": "80px",
+                      "container-max": "1140px",
+                      "base": "8px"
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-lg-mobile": [
+                              "Noto Serif"
+                      ],
+                      "display-lg": [
+                              "Noto Serif"
+                      ],
+                      "headline-md": [
+                              "Noto Serif"
+                      ],
+                      "label-sm": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-lg": [
+                              "Noto Serif"
+                      ],
+                      "label-md": [
+                              "Hanken Grotesk"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col pt-16">
+<!-- TopNavBar -->
+<nav class="bg-surface-container-lowest dark:bg-surface-container-lowest fixed top-0 w-full z-50 border-b border-outline-variant dark:border-outline-variant">
+<div class="flex justify-between items-center w-full px-gutter h-16 max-w-container-max mx-auto">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary">
+                PreCAS Practice
+            </div>
+<div class="hidden md:flex items-center space-x-md">
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-secondary dark:hover:text-secondary transition-colors duration-200" href="#">Universities</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-secondary dark:hover:text-secondary transition-colors duration-200" href="#">How it works</a>
+<a class="font-label-md text-label-md text-secondary dark:text-secondary font-bold hover:text-secondary dark:hover:text-secondary transition-colors duration-200" href="#">Pricing</a>
+</div>
+<div class="hidden md:flex items-center space-x-sm">
+<button class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant px-md py-sm rounded-DEFAULT border border-outline-variant hover:bg-surface-variant transition-colors">Sign In</button>
+<button class="font-label-md text-label-md bg-secondary text-on-secondary px-md py-sm rounded-DEFAULT hover:bg-on-secondary-container transition-colors">Start free</button>
+</div>
+<button class="md:hidden p-xs">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow">
+<!-- Hero Section -->
+<section class="py-xl px-gutter max-w-container-max mx-auto flex flex-col md:flex-row items-center gap-lg">
+<div class="w-full md:w-1/2 flex flex-col space-y-md">
+<h1 class="font-display-lg text-display-lg text-primary">Empower Your Students, <span class="text-secondary">Elevate Your Brand</span>.</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">PreCAS Practice offers education consultancies a premium, white-labeled solution. Purchase seats in bulk, provide students with a seamless practice experience under your own brand, and retain significant margins.</p>
+<div class="pt-sm flex flex-col sm:flex-row gap-sm">
+<button class="bg-secondary text-on-secondary font-label-md text-label-md px-md py-sm rounded-DEFAULT flex items-center justify-center gap-xs hover:bg-on-secondary-container transition-colors">
+<span class="material-symbols-outlined icon-fill" data-icon="chat">chat</span>
+                        Contact us on WhatsApp
+                    </button>
+</div>
+</div>
+<div class="w-full md:w-1/2 rounded-xl overflow-hidden shadow-sm">
+<div class="bg-cover bg-center w-full aspect-[4/3] rounded-xl" data-alt="A professional, high-key brightly lit office setting with a diverse group of education consultants looking at a clean, modern dashboard on a laptop screen. The aesthetic is crisp, minimalistic, with deep navy and subtle emerald green accents, projecting a trustworthy business environment." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAdavFUgNves-pwoqQpf3Ub2_qH2CG4ulaN1VjNbRBSTAPwAwn8-NNtbuuWWGjWWoIw91k9HnuqRJPqsx-1WwnSpiblYmsTAdDNmfa1RVq8brxVm7ol9SPSTMVhIndBW0I6GBkAmCvd9WE7gquugXZptLBY7rG5bV2DQu2KcR4_MhzG64kCaXHuHZeHEQhd9OhqgL3fJg_8dWu899qLFE43RINP1kWK-zw9d0EQBsCEMvoRwfFe5rrE')"></div>
+</div>
+</section>
+<!-- Value Prop Bento Grid -->
+<section class="bg-surface-container-low py-xl">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="text-center mb-lg">
+<h2 class="font-headline-lg text-headline-lg text-primary">Why Partner With Us?</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Card 1 -->
+<div class="bg-surface rounded-xl p-md shadow-sm border border-outline-variant flex flex-col items-start gap-sm">
+<div class="bg-primary-fixed text-on-primary-fixed p-xs rounded-full w-12 h-12 flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary">Bulk Purchasing</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Buy student practice seats in scalable bundles at significantly discounted rates to maximize your profit margin.</p>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface rounded-xl p-md shadow-sm border border-outline-variant flex flex-col items-start gap-sm">
+<div class="bg-secondary-container text-on-secondary-container p-xs rounded-full w-12 h-12 flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined" data-icon="branding_watermark">branding_watermark</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary">White-Labeled Experience</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Your logo, your brand. Give your students a customized link that reinforces your consultancy's authority.</p>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface rounded-xl p-md shadow-sm border border-outline-variant flex flex-col items-start gap-sm">
+<div class="bg-surface-dim text-on-surface p-xs rounded-full w-12 h-12 flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined" data-icon="trending_up">trending_up</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary">Keep the Margin</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Our simple pricing structure ensures that the value you provide directly translates to business growth for your agency.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-highest dark:bg-surface-container-highest w-full py-xl">
+<div class="flex flex-col md:flex-row justify-between items-center px-gutter max-w-container-max mx-auto gap-md">
+<div class="font-headline-md text-headline-md text-primary">
+                PreCAS Practice
+            </div>
+<div class="flex flex-wrap justify-center gap-md font-label-md text-label-md">
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Contact Support</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">UK University Partners</a>
+</div>
+<div class="font-body-md text-body-md text-on-surface">
+                © 2024 PreCAS Practice. Empowering Nepali students for UK success.
+            </div>
+</div>
+</footer>
+</body></html>

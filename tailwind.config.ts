@@ -14,8 +14,8 @@ const config: Config = {
         paper: '#f7f8fb',
       },
       fontFamily: {
-        serif: ['Georgia', 'Cambria', 'Times New Roman', 'serif'],
-        sans: ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        serif: ['"Noto Serif"', 'Georgia', 'Cambria', 'serif'],
+        sans: ['"Hanken Grotesk"', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
       },
       keyframes: {
         pulseRing: {
@@ -27,10 +27,15 @@ const config: Config = {
           from: { transform: 'translateY(8px)', opacity: '0' },
           to: { transform: 'translateY(0)', opacity: '1' },
         },
+        marquee: {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(-50%)' },
+        },
       },
       animation: {
         pulseRing: 'pulseRing 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         slideUp: 'slideUp 0.22s ease-out',
+        marquee: 'marquee 28s linear infinite',
       },
     },
   },
