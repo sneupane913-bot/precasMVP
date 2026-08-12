@@ -5,7 +5,7 @@ Statuses: `[x]` done and verified · `[~]` partly done · `[ ]` not started · `
 
 Rules: nothing is `[x]` until it has been built, typechecked, built, and seen working. When you add scope, add it to the right section here in order, never at the end.
 
-Last updated: 2026-08-12.
+Last updated: 2026-08-12 (session 3).
 
 ---
 
@@ -39,6 +39,7 @@ Last updated: 2026-08-12.
 - [x] B11 Sign-in page rebuilt to the approved two-column design
 - [x] B12 University cards: logo chip, Duration and Questions boxes, Free first try badge
 - [x] B13 Pricing hierarchy: free card, NPR 449 smaller, NPR 799 large focal card
+- [x] B13a Home pricing replaced with the approved /pricing block, shared as one component so the two can never drift
 - [x] B14 Honest pricing content: real packs, dated per-mock comparison, no invented plan
 - [x] B15 Consultancy wholesale price removed from the public student pricing page
 - [x] B16 Legal pages exist and are linked: `/privacy`, `/terms`, `/refund`
@@ -180,7 +181,7 @@ Last updated: 2026-08-12.
 | Section | Done | Total | Notes |
 |---|---|---|---|
 | A Foundation and pipeline | 11 / 12 | 12 | only the build SHA surface left |
-| B Student UI | 17 / 27 | 27 | core pages done, secondary pages left |
+| B Student UI | 18 / 28 | 28 | core pages done, secondary pages left |
 | C Back office UI | 4 / 4 | 4 | done |
 | D Student lifecycle | 9 / 20 | 20 | plumbing exists, the paid half is missing |
 | E Payment and approval | 4 / 11 | 11 | model exists, screens and guarantees missing |
@@ -190,7 +191,7 @@ Last updated: 2026-08-12.
 | I Money and abuse | 4 / 10 | 10 | limits and referrals missing |
 | J Data and privacy | 1 / 5 | 5 | Supabase not provisioned |
 | K Open defects | 6 / 12 | 12 | 6 still open |
-| **Total (excluding phase 2)** | **74 / 124** | **124** | **about 60 percent** |
+| **Total (excluding phase 2)** | **75 / 125** | **125** | **about 60 percent** |
 
 Phase 2 (the AI connection) is 0 of 4 and is deliberately last.
 

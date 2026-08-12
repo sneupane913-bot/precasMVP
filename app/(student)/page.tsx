@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { publicPlans, perMockNpr, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
+import { PricingPacks } from '@/components/PricingPacks';
 import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
 import { TrustedBy } from '@/components/TrustedBy';
@@ -158,41 +158,21 @@ export default function HomePage() {
       </section>
 
       {/* ---------------- Price ----------------
-          QA-205: this advertised "Rs 500 / month", a plan we do not sell, and
-          an undated competitor comparison. Home and /pricing must agree, and
-          both are driven from lib/data/plans.ts. */}
-      <section className="px-5 py-12">
-        <div className="mx-auto max-w-2xl">
-          <p className="mb-1 text-center text-sm font-semibold uppercase tracking-wide text-slate-500">
-            After your free questions
+          Client direction 2026-08-12: the home pricing block must be the SAME
+          block as /pricing, which he approved. It is one shared component now
+          (components/PricingPacks.tsx), so the two pages cannot drift apart.
+          They did once: home advertised a monthly plan we never sold (QA-205). */}
+      <section className="bg-white px-5 py-14">
+        <div className="mx-auto max-w-4xl">
+          <h2 className="mb-2 text-center font-serif text-3xl text-ink">
+            Pay once, not monthly
+          </h2>
+          <p className="mx-auto mb-8 max-w-lg text-center leading-relaxed text-slate-600">
+            Start with ten free questions. If it helps, buy a pack. Your credits do not expire and
+            there is nothing to cancel.
           </p>
-          <h2 className="mb-6 text-center font-serif text-2xl text-ink">Pay once, not monthly</h2>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            {publicPlans().map((p) => (
-              <div
-                key={p.code}
-                className={`rounded-2xl border-2 bg-white p-6 text-center ${
-                  p.badge === 'MOST POPULAR' ? 'border-ink' : 'border-slate-200'
-                }`}
-              >
-                <p className="text-3xl font-black text-ink">NPR {p.priceNpr.toLocaleString()}</p>
-                <p className="mb-3 text-sm text-slate-500">one time</p>
-                <p className="font-semibold text-ink">
-                  {p.mockInterviews} mocks + {p.practiceSessions} practice
-                </p>
-                <p className="text-sm text-slate-500">
-                  {FULL_MOCK_QUESTION_COUNT} questions per mock, about NPR {perMockNpr(p)} each
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4 text-center">
-            <Link href="/pricing" className="text-sm font-semibold text-ink underline">
-              See how this compares with other Nepali platforms
-            </Link>
-          </div>
+          <PricingPacks compact />
         </div>
       </section>
 
