@@ -4,7 +4,7 @@ import { verifyFirebaseIdToken } from '@/lib/auth/firebase';
 import { setStudentSession, newReferralCode } from '@/lib/auth/session';
 import { repo, type Student } from '@/lib/db';
 import { evaluateTrial } from '@/lib/trial-gate';
-import { grantTrial } from '@/lib/entitlement';
+import { grantTrial, grantSeat } from '@/lib/entitlement';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
 import { platformDown, platform } from '@/lib/platform';
 import { apiError, type ApiResult } from '@/lib/types';
@@ -80,9 +80,13 @@ export async function POST(req: Request) {
     // Resolve the consultancy link, if there is one. Server side, so the slug
     // is checked rather than trusted.
     let viaConsultancyId: string | null = null;
+    let viaConsultancySeats = 0;
     if (body.via) {
       const c = await platform.getConsultancy(body.via);
-      if (c && c.status === 'approved') viaConsultancyId = c.id;
+      if (c && c.status === 'approved') {
+        viaConsultancyId = c.id;
+        viaConsultancySeats = c.seatsTotal;
+      }
     }
 
     const fresh: Student = {
@@ -116,6 +120,16 @@ export async function POST(req: Request) {
       lastSeenAt: now,
     };
     student = await r.createStudent(fresh);
+
+    // F7. Take a seat if this student came through an approved consultancy
+    // link and that consultancy still has one. Deliberately AFTER the student
+    // row exists, so a seat is never claimed for an account that failed to
+    // create. If the seats are gone the signup carries on exactly as normal:
+    // the student keeps their free trial and can buy a pack, because being the
+    // fifty-first student through a fifty-seat link is not their fault.
+    if (viaConsultancyId) {
+      await grantSeat(student.id, viaConsultancyId, viaConsultancySeats, `link:${body.via}`);
+    }
   } else {
     // Keep phone in step if it was verified on the Firebase account since.
     const patch: Partial<Student> = { lastSeenAt: now };

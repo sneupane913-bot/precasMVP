@@ -108,10 +108,10 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] F4 Student signup bound to the consultancy server-side from the slug, only if approved
 - [x] F5 Admin dashboard: seats total, used, left, own students only
 - [x] F6 Admin sees engagement and entitlement, never transcript content
-- [ ] F7 Seat allocation atomic, never oversold or negative
+- [x] F7 Seat allocation atomic, never oversold or negative — `grantSeat` wired into signup; 6 simultaneous signups against 3 seats produce exactly 3 — proven by qa/tenant-check.js. Note: this proves the claim-key algorithm in one process. The distributed guarantee still rests on Netlify Blobs' write-if-absent and is untested against the real store.
 - [x] F8 Admin notifications list
-- [ ] F9 Tenant isolation proven: admin A cannot read admin B by any injection
-- [ ] F10 Direct students never visible to any admin
+- [x] F9 Tenant isolation proven: admin A cannot read admin B by any injection — extra `consultancyId`/`tenant` fields are stripped by the schema, wrong passcode 403s, suspended reads nothing — proven by qa/tenant-check.js
+- [x] F10 Direct students never visible to any admin — proven by qa/tenant-check.js
 
 ## G. Super admin
 
@@ -186,20 +186,28 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 | C Back office UI | 4 / 4 | 4 | done |
 | D Student lifecycle | 15 + 2~ / 20 | 20 | q10 gate built and verified; practice mode and history are the gap |
 | E Payment and approval | 8 / 11 | 11 | checkout and pending screens done; admin approval routes left |
-| F Consultancy and admin | 7 / 10 | 10 | isolation still to be proven by test |
+| F Consultancy and admin | 10 / 10 | 10 | done; seats now actually allocate, isolation proven |
 | G Super admin | 8 / 9 | 9 | only the approve/reject tally left |
 | H Owner | 3 / 4 | 4 | recovery from an empty store untested |
 | I Money and abuse | 5 + 2~ / 10 | 10 | credits are now actually debited, one per sitting, proven by test |
 | J Data and privacy | 1 / 5 | 5 | Supabase not provisioned |
 | K Open defects | 10 + 2~ / 12 | 12 | K11 closed with evidence; K12 needs one deployed click |
-| **Total (excluding phase 2)** | **92 done, 6 partial / 126** | **126** | **about 73 percent** |
+| **Total (excluding phase 2)** | **95 done, 6 partial / 126** | **126** | **about 75 percent** |
 
 Phase 2 (the AI connection) is 0 of 4 and is deliberately last.
 
 ## Next five, in order
 
-1. **F7, F9, F10**, seat allocation atomicity and proving tenant isolation by test.
-2. **E9, E10**, an admin approving their own link's students, and the super admin's approval being counted back to that admin.
-3. **B21, B23**, the consultancy page and the results page to their approved designs.
-4. **D18, D19**, practice mode (single question drilling) and student history.
-5. **B18 to B20**, the FAQ and the universities list (the CSV is still missing from the repo).
+1. **E9, E10**, an admin approving their own link's students, and the super admin's approval being counted back to that admin.
+2. **B21, B23**, the consultancy page and the results page to their approved designs.
+3. **D18, D19**, practice mode (single question drilling) and student history.
+4. **B18 to B20**, the FAQ and the universities list (the CSV is still missing from the repo).
+5. **G4, H4, I6, I8 to I10**, the super admin tally, owner recovery from an empty store, and the remaining abuse limits.
+
+## Open decision needing the client
+
+**How much is one consultancy seat worth?** It was never specified and seats were
+being sold with nothing behind them. `SEAT_GRANT` in `lib/data/plans.ts` is now
+3 mocks and 8 practice sessions, derived from the client's own bundle costs
+(118 NPR per seat against Prep's 241 for 6 mocks and 15 practice). If a seat
+should be worth more, raise `SEAT_GRANT` and the bundle prices together.

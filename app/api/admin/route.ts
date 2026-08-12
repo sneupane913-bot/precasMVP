@@ -114,6 +114,7 @@ export async function POST(req: Request) {
   );
 
   const paid = orders.filter((o) => o.state === 'verified');
+  const liveSeats = seats.filter((s) => !s.revokedAt).length;
 
   return NextResponse.json({
     ok: true,
@@ -125,8 +126,12 @@ export async function POST(req: Request) {
         studentCount: mine.length,
         activeStudents: mine.filter((s) => s.status === 'active').length,
         seatsTotal: c.seatsTotal,
-        seatsUsed: seats.length,
-        seatsLeft: Math.max(0, c.seatsTotal - seats.length),
+        // Revoked seats are free again. Counting them as used understated
+        // seatsLeft and disagreed with allocateSeat, which has always filtered
+        // on revokedAt. Two places disagreeing about how many seats are left is
+        // how a consultancy ends up being told it is full when it is not.
+        seatsUsed: liveSeats,
+        seatsLeft: Math.max(0, c.seatsTotal - liveSeats),
         paidOrders: paid.length,
       },
     },

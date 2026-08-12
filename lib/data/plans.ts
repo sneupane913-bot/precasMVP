@@ -104,6 +104,24 @@ export const BUNDLES: Bundle[] = [
   { code: 'large', name: 'Large', priceNpr: 24000, seats: 100, costNpr: 11800 },
 ];
 
+/**
+ * What one consultancy seat actually gives the student who takes it.
+ *
+ * ** NEEDS THE CLIENT'S CONFIRMATION. ** This was never specified, and seats
+ * were being sold with nothing behind them, so rather than invent a number I
+ * derived one from the client's own figures in BUNDLES above:
+ *
+ *   every bundle costs us 118 NPR per seat (2360/20, 5900/50, 11800/100)
+ *   the Prep pack costs us 241 NPR and contains 6 mocks and 15 practice
+ *   118/241 is a shade under half, so a seat is half a Prep pack
+ *
+ * That gives 3 mocks and 8 practice sessions, and it keeps the wholesale
+ * margin the client already priced for (a seat sells at 300 and costs 118).
+ * If the client wants a seat to be worth more, raise these two numbers and the
+ * bundle prices together, never one without the other.
+ */
+export const SEAT_GRANT = { mocks: 3, practice: 8 } as const;
+
 /** What the competition charges, so our page can show the comparison honestly. */
 export const COMPETITOR_PER_MOCK_NPR = { best: 143, typical: 175, worst: 199 };
 

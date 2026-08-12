@@ -1,5 +1,5 @@
 import { repo, type LedgerEntry, type Student } from '@/lib/db';
-import { getPlan, TRIAL_QUESTION_COUNT, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
+import { getPlan, SEAT_GRANT, TRIAL_QUESTION_COUNT, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
 
 /**
  * Entitlement: what a student is allowed to do right now.
@@ -112,6 +112,67 @@ export async function grantPack(
   );
 
   return { granted: true, mocks, practice: plan.practiceSessions };
+}
+
+/**
+ * Take a seat for a student who arrived through an approved consultancy link,
+ * and grant what the seat is worth (F7).
+ *
+ * Seats were being sold and never allocated: `allocateSeat` existed, correctly
+ * written with per-index claim keys, and had no callers anywhere. So a
+ * consultancy could buy a hundred seats, sign up two hundred students, and the
+ * dashboard would show nothing used.
+ *
+ * Two guarantees this has to keep, and both are the repo's job, not ours:
+ *
+ *   1. Never oversold. Seat *n* is a claim key, written only if absent, so a
+ *      hundred simultaneous signups against fifty seats produce exactly fifty
+ *      winners. We do not read a count and then write one, because that read
+ *      is where every overselling bug in this class lives.
+ *   2. Never double granted. `allocateSeat` is idempotent per student, and the
+ *      grant below is guarded on the ledger as well, so a retried signup takes
+ *      one seat and pays out once.
+ *
+ * A student who arrives after the seats run out is NOT turned away. They keep
+ * their free trial and can buy a pack like anybody else. Blocking them would
+ * punish the student for their consultancy's purchasing.
+ */
+export async function grantSeat(
+  studentId: string,
+  consultancyId: string,
+  seatsTotal: number,
+  allocatedBy: string
+): Promise<{ seated: boolean; mocks: number; practice: number }> {
+  const r = repo();
+  const res = await r.allocateSeat(
+    {
+      id: crypto.randomUUID(),
+      consultancyId,
+      studentId,
+      allocatedBy,
+      allocatedAt: new Date().toISOString(),
+      revokedAt: null,
+    },
+    seatsTotal
+  );
+  if (!res.ok) return { seated: false, mocks: 0, practice: 0 };
+
+  const ledger = await r.listLedger(studentId);
+  if (ledger.some((e) => e.reason === 'seat_allocation')) {
+    return { seated: true, mocks: 0, practice: 0 }; // seat already paid out
+  }
+
+  await r.appendLedger(
+    entry(studentId, 'mock', SEAT_GRANT.mocks, 'seat_allocation', {
+      note: `seat at ${consultancyId}`,
+    })
+  );
+  await r.appendLedger(
+    entry(studentId, 'practice', SEAT_GRANT.practice, 'seat_allocation', {
+      note: `seat at ${consultancyId}`,
+    })
+  );
+  return { seated: true, mocks: SEAT_GRANT.mocks, practice: SEAT_GRANT.practice };
 }
 
 /**
