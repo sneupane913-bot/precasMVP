@@ -52,6 +52,15 @@ export interface StudentRecord {
  * is a different secret from the super admin passcode. A super admin cannot
  * turn it on or off, and cannot see the page.
  */
+/** One line per toggle, append only. QA H3: the switch had no history. */
+export interface OwnerAuditEntry {
+  at: string;
+  action: 'paused' | 'resumed';
+  /** Best-effort source, so a disputed pause has a record beyond "someone". */
+  ip: string;
+  userAgent: string;
+}
+
 export interface PlatformSettings {
   maintenanceMode: boolean;
   maintenanceTitle: string;
@@ -60,6 +69,12 @@ export interface PlatformSettings {
   contactPhone: string;
   enabledAt: string | null;
   enabledBy: string | null;
+  /**
+   * The switch exists for a commercial dispute, so the record of who used it
+   * and when may matter later. Newest first, capped so the document cannot
+   * grow without bound.
+   */
+  ownerAudit?: OwnerAuditEntry[];
 }
 
 export const DEFAULT_SETTINGS: PlatformSettings = {
@@ -71,6 +86,7 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   contactPhone: '',
   enabledAt: null,
   enabledBy: null,
+  ownerAudit: [],
 };
 
 export interface PlatformStore {

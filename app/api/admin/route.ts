@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { platform, type Consultancy } from '@/lib/platform';
-import { store } from '@/lib/store';
+import { repo } from '@/lib/db';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
 import { apiError } from '@/lib/types';
 
@@ -84,45 +84,51 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, data: publicView(updated) });
   }
 
-  // login: return only this consultancy's own data
-  const allStudents = await platform.listStudents();
-  const mine = allStudents.filter((s) => s.consultancyId === c.id);
+  // login: return only this consultancy's own data.
+  //
+  // This used to read platform.listStudents(), the old store, so every student
+  // who signed in with Google was invisible to their own consultancy. It now
+  // reads the live repo, filtered by this consultancy's id, which is also the
+  // only place the binding is decided (never from a request field).
+  const r = repo();
+  const [mine, notifications, seats, orders] = await Promise.all([
+    r.listStudents({ consultancyId: c.id }),
+    r.listNotifications(c.id),
+    r.listSeats(c.id),
+    r.listOrders({ consultancyId: c.id }),
+  ]);
 
-  const sessionIds = mine.flatMap((s) => s.sessionIds);
-  const sessions = (
-    await Promise.all(sessionIds.map((id) => store.get(id)))
-  ).filter((s): s is NonNullable<typeof s> => Boolean(s));
+  // Engagement and entitlement only. No transcript, answer or feedback content
+  // ever reaches a consultancy admin. This is the client's stated rule.
+  const students = await Promise.all(
+    mine.map(async (s) => ({
+      id: s.id,
+      name: s.name,
+      email: s.email,
+      status: s.status,
+      createdAt: s.createdAt,
+      lastSeenAt: s.lastSeenAt,
+      mocksLeft: await r.balance(s.id, 'mock'),
+      practiceLeft: await r.balance(s.id, 'practice'),
+    }))
+  );
 
-  const completed = sessions.filter((s) => s.status === 'completed');
-  const avgScore = completed.length
-    ? Math.round(
-        completed.reduce((n, s) => n + (s.summary?.overallScore ?? 0), 0) / completed.length
-      )
-    : 0;
+  const paid = orders.filter((o) => o.state === 'verified');
 
   return NextResponse.json({
     ok: true,
     data: {
       consultancy: publicView(c),
-      students: mine,
+      students,
+      notifications,
       stats: {
         studentCount: mine.length,
-        seatsLeft: Math.max(0, c.seatsTotal - c.seatsUsed),
-        interviewsCompleted: completed.length,
-        averageScore: avgScore,
+        activeStudents: mine.filter((s) => s.status === 'active').length,
+        seatsTotal: c.seatsTotal,
+        seatsUsed: seats.length,
+        seatsLeft: Math.max(0, c.seatsTotal - seats.length),
+        paidOrders: paid.length,
       },
-      recentSessions: sessions
-        .sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1))
-        .slice(0, 25)
-        .map((s) => ({
-          id: s.id,
-          status: s.status,
-          createdAt: s.createdAt,
-          score: s.summary?.overallScore ?? null,
-          band: s.summary?.band ?? null,
-          answered: s.answers.filter((a) => a.evaluation).length,
-          total: s.questionIds.length,
-        })),
     },
   });
 }

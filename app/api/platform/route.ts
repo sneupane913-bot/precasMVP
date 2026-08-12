@@ -108,6 +108,17 @@ export async function POST(req: Request) {
       contactPhone: body.contactPhone ?? current.contactPhone,
       enabledAt: body.enabled ? new Date().toISOString() : null,
       enabledBy: body.enabled ? 'owner' : null,
+      // QA H3: a control whose stated purpose is a commercial dispute needs a
+      // record. Append only, newest first, capped at 50.
+      ownerAudit: [
+        {
+          at: new Date().toISOString(),
+          action: body.enabled ? ('paused' as const) : ('resumed' as const),
+          ip: clientIp(req),
+          userAgent: (req.headers.get('user-agent') ?? '').slice(0, 200),
+        },
+        ...(current.ownerAudit ?? []),
+      ].slice(0, 50),
     };
     await platform.saveSettings(next);
     return NextResponse.json({ ok: true, data: next });

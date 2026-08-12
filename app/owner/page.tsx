@@ -23,6 +23,10 @@ export default function OwnerPage() {
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
+  // QA H3: the switch had no history. Every toggle is now recorded and shown.
+  const [audit, setAudit] = useState<
+    { at: string; action: string; ip: string; userAgent: string }[]
+  >([]);
 
   async function apply(turnOn: boolean) {
     setBusy(true);
@@ -43,13 +47,20 @@ export default function OwnerPage() {
         }),
       });
       const json = (await res.json()) as
-        | { ok: true; data: { maintenanceMode: boolean } }
+        | {
+            ok: true;
+            data: {
+              maintenanceMode: boolean;
+              ownerAudit?: { at: string; action: string; ip: string; userAgent: string }[];
+            };
+          }
         | { ok: false; error: { userMessage: string } };
 
       if (!json.ok) {
         setError(json.error.userMessage || 'That key was not accepted.');
       } else {
         setEnabled(json.data.maintenanceMode);
+        setAudit(json.data.ownerAudit ?? []);
         setResult(
           json.data.maintenanceMode
             ? 'The platform is now OFF. Every student sees your message.'
@@ -174,6 +185,33 @@ export default function OwnerPage() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* QA H3: a switch whose stated purpose is a commercial dispute needs a
+          record, because later somebody will ask who paused it and when. */}
+      {audit.length > 0 && (
+        <section className="mt-8 overflow-hidden rounded-2xl border-2 border-slate-200 bg-white">
+          <div className="border-b border-slate-200 p-5">
+            <h2 className="font-bold text-ink">History of this switch</h2>
+            <p className="text-sm text-slate-600">Newest first. Kept as a record.</p>
+          </div>
+          <ul className="divide-y divide-slate-100">
+            {audit.map((a, i) => (
+              <li key={`${a.at}-${i}`} className="flex flex-wrap justify-between gap-2 px-5 py-3">
+                <span
+                  className={`font-semibold ${
+                    a.action === 'paused' ? 'text-red-700' : 'text-emerald-700'
+                  }`}
+                >
+                  {a.action === 'paused' ? 'Platform paused' : 'Platform resumed'}
+                </span>
+                <span className="text-sm text-slate-500">
+                  {new Date(a.at).toLocaleString()} · {a.ip || 'unknown source'}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       <p className="mt-6 text-xs leading-relaxed text-slate-400">

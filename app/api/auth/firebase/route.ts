@@ -6,7 +6,7 @@ import { repo, type Student } from '@/lib/db';
 import { evaluateTrial } from '@/lib/trial-gate';
 import { grantTrial } from '@/lib/entitlement';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
-import { platformDown } from '@/lib/platform';
+import { platformDown, platform } from '@/lib/platform';
 import { apiError, type ApiResult } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -77,6 +77,14 @@ export async function POST(req: Request) {
       if (referrer) referredByCode = referrer.referralCode;
     }
 
+    // Resolve the consultancy link, if there is one. Server side, so the slug
+    // is checked rather than trusted.
+    let viaConsultancyId: string | null = null;
+    if (body.via) {
+      const c = await platform.getConsultancy(body.via);
+      if (c && c.status === 'approved') viaConsultancyId = c.id;
+    }
+
     const fresh: Student = {
       id: crypto.randomUUID(),
       authProviderId: identity.uid,
@@ -86,11 +94,16 @@ export async function POST(req: Request) {
       // Phone arrives later, at payment, via OTP on the same Firebase account.
       phoneE164: identity.phoneE164,
       phoneVerifiedAt: identity.phoneE164 ? now : null,
-      // Consultancy binding comes from a SEAT, never from a URL parameter.
-      // A student cannot join a consultancy by editing a link.
-      consultancyId: null,
+      // Bound from the consultancy's own link, and only if that consultancy
+      // exists and is approved. A student cannot invent a consultancy by
+      // editing the URL, and a pending or suspended one binds nobody.
+      //
+      // Binding is attribution, NOT entitlement: it decides whose dashboard
+      // this student appears on. Credits still come only from a seat or a
+      // verified payment, so a forged link buys nothing.
+      consultancyId: viaConsultancyId,
       attributionConsultancy: null,
-      source: body.via ? 'consultancy' : 'direct',
+      source: viaConsultancyId ? 'consultancy' : 'direct',
       createdVia: body.via ?? 'marketing',
       status: 'active',
       disabledAt: null,

@@ -1,263 +1,308 @@
 'use client';
 
-import { useState } from 'react';
-import type { Consultancy, StudentRecord } from '@/lib/platform';
-import { BUNDLES } from '@/lib/data/plans';
+import { useCallback, useState } from 'react';
 
-interface AdminData {
-  consultancy: Omit<Consultancy, 'passcode'>;
-  students: StudentRecord[];
-  stats: {
-    studentCount: number;
-    seatsLeft: number;
-    interviewsCompleted: number;
-    averageScore: number;
-  };
-  recentSessions: {
-    id: string;
-    status: string;
-    createdAt: string;
-    score: number | null;
-    band: string | null;
-    answered: number;
-    total: number;
-  }[];
+/**
+ * Consultancy portal, rebuilt to docs/design-reference/consultancy_admin_dashboard.
+ *
+ * Two rules this page must never break:
+ *  1. A consultancy sees ONLY its own students. The server filters by the
+ *     consultancy id it authenticated as, so there is no field here that could
+ *     name another consultancy.
+ *  2. No transcript, answer or feedback content. Engagement and entitlement
+ *     only. That is the client's stated privacy rule for admins.
+ */
+
+interface Student {
+  id: string;
+  name: string | null;
+  email: string | null;
+  status: string;
+  createdAt: string;
+  lastSeenAt: string;
+  mocksLeft: number;
+  practiceLeft: number;
 }
 
-/** Consultancy portal. Sees its own students only, never another's. */
+interface Notification {
+  id: string;
+  message: string;
+  createdAt: string;
+  readAt: string | null;
+}
+
+interface AdminData {
+  consultancy: {
+    id: string;
+    slug: string;
+    name: string;
+    logoUrl: string | null;
+    primaryColor: string;
+    status: string;
+    seatsTotal: number;
+  };
+  students: Student[];
+  notifications: Notification[];
+  stats: {
+    studentCount: number;
+    activeStudents: number;
+    seatsTotal: number;
+    seatsUsed: number;
+    seatsLeft: number;
+    paidOrders: number;
+  };
+}
+
 export default function AdminPage() {
   const [slug, setSlug] = useState('');
-  const [pass, setPass] = useState('');
+  const [passcode, setPasscode] = useState('');
   const [data, setData] = useState<AdminData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [color, setColor] = useState('#0d1b2a');
-  const [logo, setLogo] = useState('');
-  const [saved, setSaved] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  async function call(body: Record<string, unknown>) {
+  const login = useCallback(async () => {
     setBusy(true);
     setError(null);
     try {
       const res = await fetch('/api/admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug, passcode: pass, ...body }),
+        body: JSON.stringify({ action: 'login', slug, passcode }),
       });
       const json = (await res.json()) as
         | { ok: true; data: AdminData }
         | { ok: false; error: { userMessage: string } };
       if (!json.ok) {
         setError(json.error.userMessage);
-        return null;
+        return;
       }
-      return json.data;
+      setData(json.data);
     } catch {
-      setError('Could not reach the server.');
-      return null;
+      setError('Could not reach the server. Check your connection and try again.');
     } finally {
       setBusy(false);
     }
-  }
+  }, [slug, passcode]);
 
-  async function login() {
-    const d = await call({ action: 'login' });
-    if (d) {
-      setData(d);
-      setColor(d.consultancy.primaryColor);
-      setLogo(d.consultancy.logoUrl ?? '');
-    }
-  }
-
-  async function saveBranding() {
-    setSaved(false);
-    const res = await fetch('/api/admin', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'updateBranding',
-        slug,
-        passcode: pass,
-        logoUrl: logo.trim() || null,
-        primaryColor: color,
-      }),
-    });
-    const json = await res.json();
-    if (json.ok) setSaved(true);
-    else setError(json.error?.userMessage ?? 'Could not save.');
-  }
-
+  // ------------------------------------------------------------- sign in ---
   if (!data) {
     return (
-      <main className="mx-auto max-w-sm p-6 sm:p-10">
-        <h1 className="mb-1 text-2xl font-bold text-ink">Consultancy portal</h1>
-        <p className="mb-6 leading-relaxed text-slate-600">
-          Sign in to see your students and put your own logo on the interview.
-        </p>
+      <main className="grid min-h-screen place-items-center bg-paper px-5">
+        <div className="w-full max-w-sm">
+          <h1 className="mb-1 font-serif text-2xl font-bold text-ink">Consultancy portal</h1>
+          <p className="mb-6 text-slate-600">Sign in to see your own students.</p>
 
-        <label className="mb-1 block text-sm font-semibold text-ink">Your short name</label>
-        <input
-          value={slug}
-          onChange={(e) => setSlug(e.target.value.toLowerCase().trim())}
-          placeholder="e.g. himalaya-education"
-          className="mb-4 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
-        />
+          <label className="mb-1 block text-sm font-semibold text-ink">Your short name</label>
+          <input
+            value={slug}
+            onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+            placeholder="for example kathmandu-hub"
+            className="mb-4 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+          />
 
-        <label className="mb-1 block text-sm font-semibold text-ink">Passcode</label>
-        <input
-          type="password"
-          value={pass}
-          onChange={(e) => setPass(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && slug && pass && login()}
-          className="mb-4 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
-        />
+          <label className="mb-1 block text-sm font-semibold text-ink">Passcode</label>
+          <input
+            type="password"
+            value={passcode}
+            onChange={(e) => setPasscode(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && slug && passcode && login()}
+            className="mb-4 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+          />
 
-        {error && (
-          <p className="mb-3 rounded-lg bg-red-50 px-4 py-3 font-medium text-red-700">{error}</p>
-        )}
+          {error && <p className="mb-3 font-medium text-red-600">{error}</p>}
 
-        <button
-          onClick={login}
-          disabled={!slug || !pass || busy}
-          className="w-full rounded-xl bg-ink px-6 py-3.5 font-bold text-white disabled:bg-slate-300"
-        >
-          {busy ? 'Checking...' : 'Sign in'}
-        </button>
-        {(!slug || !pass) && (
-          <p className="mt-2 text-sm font-semibold text-red-600">
-            Enter both your short name and your passcode.
-          </p>
-        )}
-
-        <div className="mt-8 rounded-2xl bg-white p-5">
-          <h2 className="mb-2 font-bold text-ink">Not signed up yet?</h2>
-          <p className="mb-3 text-sm leading-relaxed text-slate-600">
-            Buy seats in bulk, resell to your students under your own name, keep the difference.
-          </p>
-          <ul className="space-y-1 text-sm text-slate-700">
-            {BUNDLES.map((b) => (
-              <li key={b.code}>
-                <strong>{b.name}</strong>: NPR {b.priceNpr.toLocaleString()} for {b.seats} students,
-                about NPR {Math.round(b.priceNpr / b.seats)} each
-              </li>
-            ))}
-          </ul>
+          <button
+            onClick={login}
+            disabled={!slug || !passcode || busy}
+            className="w-full rounded-xl bg-ink px-6 py-3.5 font-bold text-white disabled:bg-slate-300"
+          >
+            {busy ? 'Checking...' : 'Sign in'}
+          </button>
+          {(!slug || !passcode) && (
+            <p className="mt-2 text-sm font-semibold text-red-600">
+              Enter both your short name and your passcode.
+            </p>
+          )}
         </div>
       </main>
     );
   }
 
-  const c = data.consultancy;
   const s = data.stats;
+  const link =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/c/${data.consultancy.slug}`
+      : `/c/${data.consultancy.slug}`;
 
   return (
-    <main className="mx-auto max-w-4xl p-4 sm:p-6">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">{c.name}</h1>
-          <p className="text-slate-600">Your students and their results.</p>
-        </div>
-        <button
-          onClick={login}
-          className="rounded-xl border-2 border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700"
-        >
-          Refresh
-        </button>
-      </div>
-
-      <section className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {[
-          ['Students', String(s.studentCount)],
-          ['Seats left', String(s.seatsLeft)],
-          ['Interviews done', String(s.interviewsCompleted)],
-          ['Average score', s.averageScore ? `${s.averageScore}%` : '—'],
-        ].map(([label, value]) => (
-          <div key={label} className="rounded-xl border border-slate-200 bg-white p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
-            <p className="text-2xl font-black text-ink">{value}</p>
-          </div>
-        ))}
-      </section>
-
-      {/* Branded link */}
-      <section className="mb-6 rounded-2xl border-2 border-ink bg-white p-5">
-        <h2 className="mb-1 font-bold text-ink">Your student link</h2>
-        <p className="mb-3 text-sm text-slate-600">
-          Send this to your students. It shows your logo and your colours.
-        </p>
-        <code className="block break-all rounded-lg bg-slate-100 px-4 py-3 text-sm font-semibold text-ink">
-          {typeof window !== 'undefined' ? window.location.origin : ''}/c/{c.slug}
-        </code>
-      </section>
-
-      {/* Branding */}
-      <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5">
-        <h2 className="mb-3 font-bold text-ink">Your branding</h2>
-        <div className="mb-3 grid gap-3 sm:grid-cols-2">
+    <div className="min-h-screen bg-paper">
+      {/* ------------------------------------------------------- top bar --- */}
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-4">
           <div>
-            <label className="mb-1 block text-sm font-semibold text-ink">Logo image address</label>
-            <input
-              value={logo}
-              onChange={(e) => setLogo(e.target.value)}
-              placeholder="https://..."
-              className="w-full rounded-lg border-2 border-slate-200 px-3 py-2.5"
-            />
+            <p className="font-serif text-xl font-bold text-ink">{data.consultancy.name}</p>
+            <p className="text-sm text-slate-500">Consultancy portal</p>
           </div>
-          <div>
-            <label className="mb-1 block text-sm font-semibold text-ink">Main colour</label>
-            <input
-              type="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              className="h-11 w-full rounded-lg border-2 border-slate-200"
-            />
-          </div>
+          <button
+            onClick={login}
+            disabled={busy}
+            className="rounded-xl border-2 border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 disabled:opacity-50"
+          >
+            {busy ? 'Loading...' : 'Refresh'}
+          </button>
         </div>
-        <button
-          onClick={saveBranding}
-          className="rounded-xl bg-ink px-5 py-3 font-bold text-white"
-        >
-          Save
-        </button>
-        {saved && <span className="ml-3 font-semibold text-emerald-700">Saved.</span>}
-      </section>
+      </header>
 
-      {/* Students */}
-      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-        <div className="border-b border-slate-200 p-5">
-          <h2 className="font-bold text-ink">Your students</h2>
-        </div>
-        {data.students.length === 0 ? (
-          <p className="p-8 text-center leading-relaxed text-slate-500">
-            No students yet. Share your link above and they will appear here as soon as they start
-            an interview.
+      <main className="mx-auto max-w-6xl px-5 py-8">
+        {error && (
+          <p className="mb-4 rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3 font-medium text-red-800">
+            {error}
           </p>
-        ) : (
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-5 py-2.5 font-semibold">Student</th>
-                <th className="px-3 py-2.5 font-semibold">Plan</th>
-                <th className="px-5 py-2.5 font-semibold">Credits left</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {data.students.map((st) => (
-                <tr key={st.id}>
-                  <td className="px-5 py-3">
-                    <p className="font-semibold text-ink">{st.name || 'Unnamed'}</p>
-                    <p className="text-xs text-slate-500">{st.phone || 'no phone'}</p>
-                  </td>
-                  <td className="px-3 py-3 text-slate-600">{st.planCode}</td>
-                  <td className="px-5 py-3 tabular-nums text-slate-600">
-                    {st.mocksRemaining} mocks · {st.practiceRemaining} practice
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         )}
-      </section>
-    </main>
+
+        {/* Notifications, including "super admin approved this for you". */}
+        {data.notifications.length > 0 && (
+          <section className="mb-6 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-5">
+            <h2 className="mb-2 font-bold text-emerald-900">Messages for you</h2>
+            <ul className="space-y-1.5">
+              {data.notifications.slice(0, 5).map((n) => (
+                <li key={n.id} className="text-sm text-emerald-900">
+                  {n.message}
+                  <span className="ml-2 text-emerald-700/70">
+                    {new Date(n.createdAt).toLocaleDateString()}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* Stats */}
+        <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <Stat label="Seats bought" value={String(s.seatsTotal)} hint="your bundle" />
+          <Stat label="Seats used" value={String(s.seatsUsed)} hint="given to students" />
+          <Stat
+            label="Seats left"
+            value={String(s.seatsLeft)}
+            hint={s.seatsLeft === 0 ? 'none left' : 'still available'}
+            accent={s.seatsLeft === 0}
+          />
+          <Stat
+            label="Your students"
+            value={String(s.studentCount)}
+            hint={`${s.activeStudents} active`}
+          />
+        </section>
+
+        {/* Share link */}
+        <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5">
+          <h2 className="mb-1 font-serif text-lg font-bold text-ink">Your student link</h2>
+          <p className="mb-4 text-sm text-slate-600">
+            Give this to your students. Anyone who signs up through it belongs to you and appears
+            below.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <code className="flex-1 truncate rounded-xl bg-[#eff4ff] px-4 py-3 text-sm text-ink">
+              {link}
+            </code>
+            <button
+              onClick={() => {
+                navigator.clipboard?.writeText(link);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              className="rounded-xl bg-ink px-5 py-3 text-sm font-bold text-white"
+            >
+              {copied ? 'Copied' : 'Copy link'}
+            </button>
+          </div>
+        </section>
+
+        {/* Students */}
+        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div className="border-b border-slate-200 p-5">
+            <h2 className="font-serif text-lg font-bold text-ink">Your students</h2>
+            <p className="text-sm text-slate-600">
+              How much they are practising and what they have left. We never show you what a student
+              said in an interview.
+            </p>
+          </div>
+
+          {data.students.length === 0 ? (
+            <div className="p-10 text-center">
+              <p className="mb-2 font-semibold text-ink">No students yet</p>
+              <p className="text-sm text-slate-500">
+                Share your link above. Students appear here the moment they sign up through it.
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                  <tr>
+                    <th className="px-5 py-3 font-semibold">Student</th>
+                    <th className="px-3 py-3 font-semibold">Mocks left</th>
+                    <th className="px-3 py-3 font-semibold">Practice left</th>
+                    <th className="px-3 py-3 font-semibold">Last active</th>
+                    <th className="px-5 py-3 font-semibold">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {data.students.map((st) => (
+                    <tr key={st.id}>
+                      <td className="px-5 py-3">
+                        <p className="font-semibold text-ink">{st.name || 'Unnamed'}</p>
+                        <p className="text-xs text-slate-500">{st.email || 'no email'}</p>
+                      </td>
+                      <td className="px-3 py-3 tabular-nums text-slate-700">{st.mocksLeft}</td>
+                      <td className="px-3 py-3 tabular-nums text-slate-700">{st.practiceLeft}</td>
+                      <td className="px-3 py-3 text-slate-600">
+                        {new Date(st.lastSeenAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-5 py-3">
+                        <span
+                          className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                            st.status === 'active'
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}
+                        >
+                          {st.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      </main>
+    </div>
+  );
+}
+
+function Stat({
+  label,
+  value,
+  hint,
+  accent = false,
+}: {
+  label: string;
+  value: string;
+  hint: string;
+  accent?: boolean;
+}) {
+  return (
+    <div
+      className={`rounded-2xl border p-5 ${
+        accent ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-white'
+      }`}
+    >
+      <p className="mb-2 text-sm text-slate-600">{label}</p>
+      <p className="font-serif text-3xl font-black text-ink">{value}</p>
+      <p className="mt-1 text-xs text-slate-500">{hint}</p>
+    </div>
   );
 }
