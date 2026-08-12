@@ -6,6 +6,7 @@ import type { Institution, PublicQuestion } from '@/lib/types';
 import { FLAG_META } from '@/lib/types';
 import { useMonitor } from '@/lib/useMonitor';
 import { MonitorPanel } from '@/components/MonitorPanel';
+import { TrialGate } from '@/components/TrialGate';
 
 type Phase =
   | 'ready'        // question shown, not yet recording
@@ -13,7 +14,8 @@ type Phase =
   | 'uploading'
   | 'reviewed'     // transcript came back, student can move on
   | 'retry'        // transcription failed, student must choose
-  | 'finishing';
+  | 'finishing'
+  | 'trial_gate';
 
 /**
  * PEE plus wrap-up. This is the house method for every answer in the product:
@@ -50,12 +52,18 @@ export function InterviewRoom({
   questions,
   startIndex,
   demo,
+  isTrial,
+  fullMockLength,
 }: {
   sessionId: string;
   institution: Institution;
   questions: PublicQuestion[];
   startIndex: number;
   demo: { stt: boolean; evaluator: boolean; storage: boolean };
+  /** True when this sitting is the free 10 of a 17 question paper. */
+  isTrial: boolean;
+  /** How long the full paper is, so the gate can say what is still locked. */
+  fullMockLength: number;
 }) {
   const router = useRouter();
 
@@ -325,17 +333,32 @@ export function InterviewRoom({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLast]);
 
-  const finish = useCallback(async () => {
-    setPhase('finishing');
+  /** Close the session and release the camera. Shared by both endings. */
+  const closeSession = useCallback(async () => {
     stopRecording();
     streamRef.current?.getTracks().forEach((t) => t.stop());
+    window.speechSynthesis?.cancel();
     try {
       await fetch(`/api/session/${sessionId}/complete`, { method: 'POST' });
     } catch {
       /* the results page rebuilds the summary anyway */
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId]);
+
+  const finish = useCallback(async () => {
+    setPhase('finishing');
+    await closeSession();
+
+    // D13: a trial student does NOT get dropped straight onto results. They
+    // have just finished the free ten of a seventeen question paper, and this
+    // is the moment they decide. Two real choices, report always available.
+    if (isTrial) {
+      setPhase('trial_gate');
+      return;
+    }
     router.push(`/results/${sessionId}`);
-  }, [router, sessionId]);
+  }, [router, sessionId, isTrial, closeSession]);
 
   // Warn before leaving mid-interview.
   useEffect(() => {
@@ -351,6 +374,18 @@ export function InterviewRoom({
 
   const answeredCount = answeredIds.size;
   const pct = 1 - secondsLeft / Math.max(1, question.timeLimitSeconds);
+
+  // D13/D14/D15: the gate after the last free question.
+  if (phase === 'trial_gate') {
+    return (
+      <TrialGate
+        answered={questions.length}
+        total={fullMockLength}
+        remaining={Math.max(0, fullMockLength - questions.length)}
+        onSeeReport={() => router.push(`/results/${sessionId}`)}
+      />
+    );
+  }
 
   if (error) {
     return (

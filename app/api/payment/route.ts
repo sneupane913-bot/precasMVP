@@ -100,7 +100,12 @@ export async function POST(req: Request) {
       mocks: number;
       practice: number;
       expiresAt: string;
-      payTo: { walletName: string; walletNumber: string; accountName: string };
+      payTo: {
+        walletName: string;
+        walletNumber: string;
+        accountName: string;
+        qrImageUrl: string | null;
+      };
     }> = {
       ok: true,
       data: {
@@ -114,6 +119,12 @@ export async function POST(req: Request) {
           walletName: process.env.PAY_WALLET_NAME ?? 'eSewa',
           walletNumber: process.env.PAY_WALLET_NUMBER ?? '',
           accountName: process.env.PAY_ACCOUNT_NAME ?? '',
+          // The owner uploads their own wallet QR and puts the URL here. We do
+          // not generate the QR ourselves: a wallet QR encodes merchant data we
+          // do not hold, and a QR we invented would take the student's money to
+          // nowhere. Absent means "show the number instead", never a broken
+          // image.
+          qrImageUrl: process.env.PAY_QR_IMAGE_URL || null,
         },
       },
     };

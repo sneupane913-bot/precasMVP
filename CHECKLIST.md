@@ -77,9 +77,9 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [~] D10 Device check screen (exists, needs design pass and real-device testing)
 - [~] D11 Interview room (exists, needs design pass and real-device testing)
 - [x] D12 Consent actually recorded with version and timestamp, stale versions refused (QA-208) — proven by qa/lifecycle-check.js
-- [ ] D13 The gate after question 10: two clear choices, pay to continue or see the report
-- [ ] D14 Report shown after question 10, same report a paying student sees
-- [ ] D15 Paid features clearly locked for a trial student, with a plain reason
+- [x] D13 The gate after question 10: two clear choices, pay to continue or see the report — `components/TrialGate.tsx`, wired into `InterviewRoom`; markup render-verified
+- [x] D14 Report shown after question 10, same report a paying student sees — the gate routes to the same `/results/{id}` page, nothing is withheld from the free report
+- [x] D15 Paid features clearly locked for a trial student, with a plain reason — `LockedNotice`, always states what is locked and what unlocks it, never a bare disabled control
 - [x] D16 Paying lifts the sitting from 10 to 17 questions — proven by qa/lifecycle-check.js
 - [x] D17 Paying grants the pack on approval — proven by qa/lifecycle-check.js
 - [ ] D18 Practice mode (single question drilling)
@@ -92,9 +92,9 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] E2 `POST /api/payment` create and submit actions
 - [x] E3 Super admin verify and reject payment actions
 - [x] E4 Credit ledger (append only) and `grantCredit`
-- [ ] E5 Checkout screen: QR, payer details, amount, screenshot upload
+- [x] E5 Checkout screen: QR, payer details, amount, screenshot upload — QR from `PAY_QR_IMAGE_URL` with a copyable number fallback; `/api/payment/screenshot` guarded for owner, type and size — proven by qa/lifecycle-check.js
 - [x] E6 Unique wallet transaction id enforced (reused id -> TXN_ALREADY_USED) — proven by qa/lifecycle-check.js
-- [ ] E7 Approval pending screen with the WhatsApp contact route
+- [x] E7 Approval pending screen with the WhatsApp contact route — three-step progress, the student's own amount, transaction number and reference, and a WhatsApp route out
 - [x] E8 Allocation idempotent (second approval refused, no double grant) — proven by qa/lifecycle-check.js
 - [ ] E9 Admin can approve their own link's students
 - [ ] E10 Super admin approving an admin's student notifies that admin and is counted
@@ -165,8 +165,8 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] K8 QA-209 closed: the public read returns only `maintenanceMode:false` when up, and the contact message only when down, which students need
 - [x] K9 QA-210 closed: empty and non-multipart bodies return 400 — proven by qa/lifecycle-check.js
 - [~] K10 QA-211 icon-192, icon-512 and apple-touch-icon exist and are wired into the manifest and head. Install flow still to verify on a real phone.
-- [ ] K11 H4 `/results/*` dead end for an old link
-- [ ] K12 H5 `/interview/{unknown}` returns 200 instead of a clear recovery screen
+- [x] K11 H4 closed: `/results/*` now has its own recovery screen (`RecoveryScreen`), 404 status with a real way forward — render-verified by curl
+- [~] K12 H5 `/interview/{unknown}` now renders the same `RecoveryScreen`. The markup is render-verified through the results route; the branch that selects it is client-side and still needs one click on the deployed site. Status stays 200 by necessity: the id is only checked after the page loads.
 
 ## L. Phase 2, after the lifecycle is complete
 
@@ -184,22 +184,22 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 | A Foundation and pipeline | 12 / 13 | 13 | regression suite added; only the build SHA surface left |
 | B Student UI | 18 / 28 | 28 | core pages done, secondary pages left |
 | C Back office UI | 4 / 4 | 4 | done |
-| D Student lifecycle | 12 + 2~ / 20 | 20 | consent, unlock and grant now proven; the q10 gate is the gap |
-| E Payment and approval | 6 / 11 | 11 | money guarantees proven; the screens are the gap |
+| D Student lifecycle | 15 + 2~ / 20 | 20 | q10 gate built and verified; practice mode and history are the gap |
+| E Payment and approval | 8 / 11 | 11 | checkout and pending screens done; admin approval routes left |
 | F Consultancy and admin | 7 / 10 | 10 | isolation still to be proven by test |
 | G Super admin | 8 / 9 | 9 | only the approve/reject tally left |
 | H Owner | 3 / 4 | 4 | recovery from an empty store untested |
-| I Money and abuse | 4 + 2~ / 10 | 10 | limits live but per-process; referrals and rewards missing |
+| I Money and abuse | 5 + 2~ / 10 | 10 | credits are now actually debited, one per sitting, proven by test |
 | J Data and privacy | 1 / 5 | 5 | Supabase not provisioned |
-| K Open defects | 9 + 1~ / 12 | 12 | 5 closed this session with evidence |
-| **Total (excluding phase 2)** | **84 done, 5 partial / 126** | **126** | **about 67 percent** |
+| K Open defects | 10 + 2~ / 12 | 12 | K11 closed with evidence; K12 needs one deployed click |
+| **Total (excluding phase 2)** | **92 done, 6 partial / 126** | **126** | **about 73 percent** |
 
 Phase 2 (the AI connection) is 0 of 4 and is deliberately last.
 
 ## Next five, in order
 
-1. **D13 to D15**, the gate after question 10: the two choices, the report, and paid features clearly locked.
-2. **E5 and E7**, the checkout screen (QR, payer details, screenshot) and the approval pending screen.
-3. **K11, K12**, the dead ends: an old `/results/*` link and an unknown `/interview/*` id must both offer a way out.
-4. **F7, F9, F10**, seat allocation atomicity and proving tenant isolation by test.
-5. **B21, B23**, the consultancy page and the results page to their approved designs.
+1. **F7, F9, F10**, seat allocation atomicity and proving tenant isolation by test.
+2. **E9, E10**, an admin approving their own link's students, and the super admin's approval being counted back to that admin.
+3. **B21, B23**, the consultancy page and the results page to their approved designs.
+4. **D18, D19**, practice mode (single question drilling) and student history.
+5. **B18 to B20**, the FAQ and the universities list (the CSV is still missing from the repo).

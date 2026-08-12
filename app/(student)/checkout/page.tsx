@@ -10,7 +10,12 @@ interface CreatedOrder {
   mocks: number;
   practice: number;
   expiresAt: string;
-  payTo: { walletName: string; walletNumber: string; accountName: string };
+  payTo: {
+    walletName: string;
+    walletNumber: string;
+    accountName: string;
+    qrImageUrl: string | null;
+  };
 }
 
 export default function CheckoutPage() {
@@ -46,6 +51,40 @@ function Checkout() {
   const [suffix, setSuffix] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [shotName, setShotName] = useState<string | null>(null);
+  const [shotNote, setShotNote] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  /**
+   * Upload the receipt picture.
+   *
+   * Deliberately fire-and-report: a failure here NEVER blocks the payment,
+   * because the transaction number is what we actually verify against. The
+   * worst outcome of a failed upload is that our verifier has one less piece of
+   * context, so we tell the student that plainly instead of showing red.
+   */
+  async function uploadShot(file: File) {
+    if (!order) return;
+    setShotName(file.name);
+    setShotNote('Sending your picture...');
+    const fd = new FormData();
+    fd.append('orderId', order.orderId);
+    fd.append('screenshot', file);
+    try {
+      const res = await fetch('/api/payment/screenshot', { method: 'POST', body: fd });
+      const json = await res.json();
+      setShotNote(
+        json.ok
+          ? 'Picture attached.'
+          : (json.error?.userMessage ??
+              'We could not save the picture. Your transaction number is what we check, so carry on.')
+      );
+    } catch {
+      setShotNote(
+        'We could not save the picture. That is fine, your transaction number is what we check.'
+      );
+    }
+  }
 
   async function createOrder() {
     setBusy(true);
@@ -168,6 +207,30 @@ function Checkout() {
             <li>• Checking our bank record</li>
             <li>• Credits added</li>
           </ol>
+
+          {/* Their own copy of what we hold. A student who has paid and can
+              quote a reference back to us is a student who does not feel
+              cheated while they wait. */}
+          {order && (
+            <dl className="mb-4 rounded-xl bg-white/70 p-4 text-sm">
+              <div className="flex justify-between gap-3 py-0.5">
+                <dt className="text-sky-900/70">Amount</dt>
+                <dd className="font-bold text-sky-900">NPR {order.amountNpr.toLocaleString()}</dd>
+              </div>
+              <div className="flex justify-between gap-3 py-0.5">
+                <dt className="text-sky-900/70">Transaction number</dt>
+                <dd className="font-mono font-bold text-sky-900">{txn.trim()}</dd>
+              </div>
+              <div className="flex justify-between gap-3 py-0.5">
+                <dt className="text-sky-900/70">Reference</dt>
+                <dd className="font-mono text-sky-900">{order.orderId.slice(0, 8)}</dd>
+              </div>
+            </dl>
+          )}
+          <p className="mb-4 text-xs leading-relaxed text-sky-900/70">
+            Keep this reference. If anything goes wrong, quoting it lets us find your payment
+            straight away.
+          </p>
           <a
             href={`https://wa.me/${(process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? '').replace(/\D/g, '')}`}
             className="block rounded-xl border-2 border-sky-300 bg-white px-5 py-3 text-center font-semibold text-sky-900"
@@ -203,12 +266,44 @@ function Checkout() {
             <p className="text-sm text-slate-500">Amount to pay</p>
             <p className="mb-4 text-4xl font-black text-ink">NPR {order.amountNpr.toLocaleString()}</p>
             {order.payTo.walletNumber ? (
-              <div className="rounded-xl bg-slate-50 p-4 text-left text-sm">
-                <p className="text-slate-500">Send to</p>
-                <p className="font-bold text-ink">{order.payTo.walletName}</p>
-                <p className="font-mono text-lg font-bold text-ink">{order.payTo.walletNumber}</p>
-                <p className="text-slate-600">{order.payTo.accountName}</p>
-              </div>
+              <>
+                {/* The QR is a convenience, not the only route. Many students
+                    scan from the same phone that shows this page, which cannot
+                    work, so the number is always given as well and is always
+                    copyable. */}
+                {order.payTo.qrImageUrl && (
+                  <div className="mb-4">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={order.payTo.qrImageUrl}
+                      alt={`${order.payTo.walletName} payment QR code for ${order.payTo.accountName}`}
+                      className="mx-auto h-56 w-56 rounded-xl border-2 border-slate-200 bg-white object-contain p-2"
+                    />
+                    <p className="mt-2 text-xs text-slate-500">
+                      Scan with your wallet app, then type the amount yourself.
+                    </p>
+                  </div>
+                )}
+                <div className="rounded-xl bg-slate-50 p-4 text-left text-sm">
+                  <p className="text-slate-500">
+                    {order.payTo.qrImageUrl ? 'Or send to' : 'Send to'}
+                  </p>
+                  <p className="font-bold text-ink">{order.payTo.walletName}</p>
+                  <p className="font-mono text-lg font-bold text-ink">{order.payTo.walletNumber}</p>
+                  <p className="mb-3 text-slate-600">{order.payTo.accountName}</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void navigator.clipboard?.writeText(order.payTo.walletNumber);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                    className="w-full rounded-lg border-2 border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700"
+                  >
+                    {copied ? 'Copied' : 'Copy the number'}
+                  </button>
+                </div>
+              </>
             ) : (
               <p className="rounded-xl bg-amber-50 p-4 text-sm text-amber-900">
                 Payment details are not set up yet. Please contact us on WhatsApp to pay.
@@ -246,6 +341,27 @@ function Checkout() {
               onChange={(e) => setSuffix(e.target.value.replace(/\D/g, '').slice(0, 4))}
               className="mb-4 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
             />
+
+            {/* Optional, and labelled optional. Asking for a screenshot as a
+                requirement would strand every student whose phone storage is
+                full or whose connection drops on a 2 MB upload. */}
+            <label className="mb-1 block text-sm font-semibold text-ink">
+              Picture of the receipt <span className="font-normal text-slate-500">(optional)</span>
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void uploadShot(f);
+              }}
+              className="mb-1 w-full rounded-xl border-2 border-dashed border-slate-200 px-4 py-3 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-ink"
+            />
+            <p className="mb-4 text-xs leading-relaxed text-slate-500">
+              {shotNote
+                ? `${shotName ? shotName + ' — ' : ''}${shotNote}`
+                : 'It helps us find your payment faster, but the transaction number above is what we actually check. You can skip this.'}
+            </p>
 
             <button
               onClick={submit}

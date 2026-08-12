@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import type { Institution, InterviewSession, PublicQuestion } from '@/lib/types';
 import { CONSENT_POINTS, CONSENT_VERSION } from '@/lib/consent';
+import { FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
 import { DeviceCheck } from '@/components/DeviceCheck';
 import { InterviewRoom } from '@/components/InterviewRoom';
+import { RecoveryScreen, WRONG_DEVICE, CLEARED_DATA } from '@/components/RecoveryScreen';
 
 type Loaded = {
   session: InterviewSession;
@@ -60,18 +62,39 @@ export default function InterviewPage() {
     );
   }
 
+  /**
+   * K12. An unknown or expired interview id used to leave the student on a
+   * near-blank screen with one button and no explanation.
+   *
+   * The status code cannot be anything but 200 here, because the id is only
+   * checked after the page has loaded in the browser. What matters is that the
+   * screen itself is a recovery screen: it names the likely causes, promises
+   * that nothing paid for is lost, and always offers two ways out.
+   *
+   * We do not distinguish "no such interview" from "not yours". Saying which
+   * would tell a stranger holding a guessed id that the session exists.
+   */
   if (stage === 'error' || !data) {
     return (
-      <div className="mx-auto max-w-md p-6 text-center">
-        <h1 className="mb-3 text-xl font-bold text-ink">We could not open this interview</h1>
-        <p className="mb-6 text-slate-600">{error}</p>
-        <a
-          href="/universities"
-          className="inline-flex w-full items-center justify-center rounded-xl bg-ink px-6 py-3.5 text-base font-semibold text-white"
-        >
-          Start a new interview
-        </a>
-      </div>
+      <RecoveryScreen
+        title="We could not open this interview"
+        lead={
+          error ??
+          'This interview link did not work. Nothing has been lost and nothing you paid for has been taken.'
+        }
+        reasons={[
+          [
+            'The link is old.',
+            'An interview that was never started closes after a while, and the link stops working.',
+          ],
+          WRONG_DEVICE,
+          CLEARED_DATA,
+        ]}
+        primary={{ href: '/universities', label: 'Start a new interview' }}
+        // True by construction: the credit is debited on the first answer, not
+        // when a session is created. See the consume() call in the answer route.
+        footnote="Starting again does not use up a mock interview unless you record an answer."
+      />
     );
   }
 
@@ -147,6 +170,10 @@ export default function InterviewPage() {
       questions={data.questions}
       startIndex={data.session.currentIndex}
       demo={data.demo}
+      // D13: the gate only applies to the capped free sitting. A paying
+      // student finishing their 17 goes straight to the report.
+      isTrial={data.session.isTrial}
+      fullMockLength={FULL_MOCK_QUESTION_COUNT}
     />
   );
 }

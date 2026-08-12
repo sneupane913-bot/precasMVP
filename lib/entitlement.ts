@@ -114,15 +114,38 @@ export async function grantPack(
   return { granted: true, mocks, practice: plan.practiceSessions };
 }
 
-/** Consumption. Called when a sitting actually starts, never from the browser. */
+/**
+ * Consumption. Called from the server when a sitting actually starts, never
+ * from the browser.
+ *
+ * "Actually starts" means the first answer the student records, not the moment
+ * the session row is created. A student who opens the interview, fails the
+ * device check and closes the tab has not used anything, and charging them for
+ * that would be indefensible. The interview error screen promises exactly
+ * this, so the promise and the code have to agree.
+ *
+ * Idempotent per session, and that is load-bearing rather than tidy. This runs
+ * on every answer in the sitting, so without the guard a 17-question mock would
+ * cost seventeen credits. One sitting, one debit, however many times it is
+ * called.
+ */
 export async function consume(
   studentId: string,
   kind: LedgerEntry['kind'],
   sessionId: string
 ): Promise<boolean> {
   const r = repo();
-  const balance = await r.balance(studentId, kind);
+  const ledger = await r.listLedger(studentId);
+  const already = ledger.some(
+    (e) => e.reason === 'session_consumed' && e.sessionId === sessionId && e.kind === kind
+  );
+  if (already) return true;
+
+  const balance = ledger
+    .filter((e) => e.kind === kind)
+    .reduce((sum, e) => sum + e.delta, 0);
   if (balance <= 0) return false;
+
   await r.appendLedger(entry(studentId, kind, -1, 'session_consumed', { sessionId }));
   return true;
 }

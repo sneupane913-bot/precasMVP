@@ -7,6 +7,8 @@ import { evaluateAnswer } from '@/lib/ai/evaluate';
 import { checkAudio, checkCredits, LIMITS } from '@/lib/credits';
 import { platformDown } from '@/lib/platform';
 import { ownsSession } from '@/lib/owner-session';
+import { currentStudent } from '@/lib/auth/session';
+import { consume, entitlementFor } from '@/lib/entitlement';
 import { rateLimit, clientIp, LIMITS as RL, spendBreakerTripped, recordPaidCall } from '@/lib/rate-limit';
 import { apiError, type Answer, type ApiResult } from '@/lib/types';
 
@@ -115,6 +117,40 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json(apiError(credits.code, 'no credits', credits.userMessage), {
       status: 402,
     });
+  }
+
+  /**
+   * Debit the sitting.
+   *
+   * This is the point where a mock interview is genuinely used: the student has
+   * recorded something we are about to pay a provider to transcribe. Before
+   * this, nothing has cost us anything and nothing should cost them anything.
+   *
+   * `consume` is idempotent per session, so the remaining sixteen answers of a
+   * seventeen-question mock do not each take another credit.
+   *
+   * An anonymous session with no signed-in student is left alone. Those are
+   * bound to the owner cookie and capped by the trial gate, and inventing a
+   * debit against a student that does not exist would corrupt the ledger.
+   */
+  const answeringStudent = await currentStudent();
+  if (answeringStudent) {
+    const paid = await consume(
+      answeringStudent.id,
+      session.mode === 'practice' ? 'practice' : 'mock',
+      session.id
+    );
+    if (!paid) {
+      const ent = await entitlementFor(answeringStudent);
+      return NextResponse.json(
+        apiError(
+          'NO_CREDITS_LEFT',
+          'balance exhausted',
+          ent.reason ?? 'You have used all your practice. Buy a pack to keep going.'
+        ),
+        { status: 402 }
+      );
+    }
   }
 
   // Global breaker. The last thing between a runaway and a real bill.
