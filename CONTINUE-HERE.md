@@ -17,15 +17,30 @@ How to actually do it (this is proven and works):
 - `request_access` for Terminal warns you once and tells you to retry in the same turn. Retry immediately in that same turn.
 - Navigate Finder with `cmd+shift+G` then type the path (typing works in Finder).
 
-## 0c. THE CHECKLIST IS THE PLAN (binding rule)
+## 0c. THE CHECKLISTS ARE THE PLAN (binding rule)
 
-**`CHECKLIST.md` in the project root is the single master list of everything this project needs**, in build order, with a score at the bottom. The client asked for it because he was tired of being the one tracking what is done.
+**`CHECKLIST.md` in the project root is the index. It points at three lists**,
+because three different people need three different things and mixing them is
+how work gets missed. The client asked for this split on 12 August 2026.
+
+| File | Who | What | How often |
+|---|---|---|---|
+| `CHECKLIST-DEV.md` | whoever is coding | everything still to be BUILT, in build order, with the score table | work top to bottom |
+| `CHECKLIST-QA.md` | whoever is QA | everything to be CONFIRMED — a release gate, 8 gates including the per-button lifecycle | **from the top, EVERY release** |
+| `CHECKLIST-MARKETING.md` | marketing analyst | claim honesty, pricing integrity, funnel, channels, competitor watch | claims before every public change, rest monthly |
+
+**The difference that matters:** the developer list is ticked once and moves on.
+The QA list is run again from the top every single time, forever, because its
+whole job is catching the thing that used to work.
 
 Rules:
-- Work top to bottom through it. Do not jump around.
-- Nothing is marked `[x]` until it has been built, typechecked, built, and seen working. `[~]` means partly done.
+- Work top to bottom through `CHECKLIST-DEV.md`. Do not jump around.
+- Nothing is `[x]` until it has been built, typechecked, built, and **seen working**. `[~]` means partly done. If you could not run it, say so — never tick it.
 - **Update the statuses and the score table every time you finish work**, in the same commit.
 - New scope goes into the correct section in order, never appended at the end.
+- **Anything the client decides goes into `CHECKLIST.md` under "Decisions taken"**, so it is not re-litigated by the next person.
+- **Anything you got wrong and corrected goes under "Corrections on the record"** in the same file. A wrong number that is quietly fixed comes back.
+- Before handing anything to the client as finished, run `CHECKLIST-QA.md` gates 1 to 3 at minimum.
 - When the client asks "where are we", read him the score and the next few items, nothing more.
 
 ## 0b. HOW TO REPORT BACK TO THE CLIENT (binding rule)
@@ -239,3 +254,9 @@ QA-203 CRITICAL unlimited unverified trials (the money leak once STT is live), Q
   **`qa/tenant-check.js` now 12 of 12** (added E9-cross, E9, E9-once, E10). Lifecycle still 20/20. Build passes, `/consultancy` renders the two new bundles and no longer shows 50 or 100.
   **A test-hygiene trap worth keeping:** the suite reused one IP for six super-admin calls, tripped the five-per-window auth limiter on the sixth, and an unrelated assertion then failed. Every super-admin call now uses its own `10.9.9.x`. **When a QA assertion fails, check the rate limiter before believing the product is broken.**
   Checklist **97 done + 6 partial of 126, about 77 percent**.
+- **2026-08-12 (session 3, part 6 — the checklists split into three):** Client asked for the one master list to become three, one per role, and for this handoff file to point at all of them so another AI can pick up cleanly.
+  **`CHECKLIST.md` is now a short index** holding the score, the client's settled decisions, and my corrections on the record. It points at:
+  **`CHECKLIST-DEV.md`** — the old master list, everything still to be BUILT. Ticked once, stays ticked.
+  **`CHECKLIST-QA.md`** — NEW, and the one the client specifically asked for. A release gate run from the top every single time, in 8 gates: (0) the four traps that have already produced false results here — no `.env.local` in the mirror, `next dev` not `next start`, the 5-per-IP auth limiter, and stripping React's `<!-- -->` before asserting on HTML; (1) automated, must be 20/20 and 12/12; (2) every route answers and offers a way onward; (3) **the lifecycle of every button** — 46 named controls, each checked in four states: normal, working, failure, recovery, because *a control that silently does nothing is the worst defect class in this product*; (4) the twelve money guarantees; (5) roles, privacy and isolation; (6) whether what is on screen is actually true; (7) a real phone on mobile data; (8) after the deploy, including that a failed Netlify build leaves the OLD site up looking fine.
+  **`CHECKLIST-MARKETING.md`** — NEW. Leads with claim verification because this product has already had to retract two claims ("60% cheaper for the same thing" compared different pack sizes; "no other platform lets you try free" was untrue). Then pricing integrity (the NPR 300 wholesale price must never reach a student-facing page), the five funnel numbers worth measuring, channels, competitor watch, and a short list of things marketing must NOT do — no fake countdowns, no pressure before the student has seen their report, no claims about visa outcomes, and never touching transcripts for marketing.
+  **Rule 0c in this file was rewritten** to cover all three, and now also requires that client decisions go under "Decisions taken" and my own corrections go under "Corrections on the record" in `CHECKLIST.md`.
