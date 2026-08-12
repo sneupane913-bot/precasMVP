@@ -38,6 +38,13 @@ function call(path, body, { ip = '10.0.0.1', cookie = null } = {}) {
 }
 
 const SUPER = 'super-dev';
+/**
+ * Every super-admin call below uses its OWN 10.9.9.x address. The auth limiter
+ * is five attempts per IP per five minutes, and this suite legitimately makes
+ * more than five. An earlier version reused one address, silently got a 429 on
+ * the sixth call, and a later assertion failed for a reason that had nothing to
+ * do with the thing under test.
+ */
 let pass = 0, fail = 0;
 const t = (id, ok, detail) => { ok ? pass++ : fail++; console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${id.padEnd(12)} ${detail}`); };
 
@@ -53,11 +60,11 @@ const OVERSUBSCRIBE = 6;
     const made = await call('/api/platform', {
       action: 'createConsultancy', superKey: SUPER,
       name: c.slug, slug: c.slug, seatsTotal: SEATS, paidNpr: 6000, passcode: c.passcode,
-    }, { ip: '10.9.9.9' });
+    }, { ip: '10.9.9.1' });
     c.id = made.json?.data?.id;
     await call('/api/platform', {
       action: 'setConsultancyStatus', superKey: SUPER, consultancyId: c.id, status: 'approved',
-    }, { ip: '10.9.9.9' });
+    }, { ip: '10.9.9.2' });
   }
   t('setup', !!A.id && !!B.id, `two approved consultancies with ${SEATS} seats each`);
 
@@ -111,10 +118,61 @@ const OVERSUBSCRIBE = 6;
     `direct student signed up; A still sees ${countAfter} (must stay ${OVERSUBSCRIBE})`);
 
   // A consultancy that is not approved reads nothing at all.
-  await call('/api/platform', { action: 'setConsultancyStatus', superKey: SUPER, consultancyId: B.id, status: 'suspended' }, { ip: '10.9.9.9' });
+  await call('/api/platform', { action: 'setConsultancyStatus', superKey: SUPER, consultancyId: B.id, status: 'suspended' }, { ip: '10.9.9.3' });
   const suspended = await call('/api/admin', { action: 'login', slug: B.slug, passcode: B.passcode }, { ip: '10.8.8.6' });
   t('F9-status', suspended.code === 403 && !suspended.json?.data,
     `suspended consultancy -> ${suspended.code}, no data returned`);
+
+  // ---- E9 / E10: who may approve a payment ------------------------------
+  // Re-approve B so it can act again.
+  await call('/api/platform', { action: 'setConsultancyStatus', superKey: SUPER, consultancyId: B.id, status: 'approved' }, { ip: '10.9.9.4' });
+
+  // A student of A pays.
+  const stu = await call('/api/auth/firebase',
+    { idToken: `dev:qa-pay-${stamp}`, fingerprint: 'fp-pay', via: A.slug }, { ip: '10.4.0.1' });
+  const cookie = (stu.cookies || []).map((c) => c.split(';')[0]).join('; ');
+  const made = await call('/api/payment', { action: 'create', packCode: 'prep' }, { ip: '10.4.0.1', cookie });
+  const oid = made.json?.data?.orderId;
+  await call('/api/payment',
+    { action: 'submit', orderId: oid, walletTxnId: `TXN${stamp}`, payerName: 'QA', payerPhoneSuffix: '1234' },
+    { ip: '10.4.0.1', cookie });
+
+  // B must not be able to touch A's order, even holding a valid id.
+  const cross = await call('/api/admin',
+    { action: 'approvePayment', slug: B.slug, passcode: B.passcode, orderId: oid, confirmedReceived: true },
+    { ip: '10.8.8.7' });
+  t('E9-cross', cross.code === 404, `consultancy B approving consultancy A's order -> ${cross.code}`);
+
+  // A may approve its own.
+  const own = await call('/api/admin',
+    { action: 'approvePayment', slug: A.slug, passcode: A.passcode, orderId: oid, confirmedReceived: true },
+    { ip: '10.8.8.8' });
+  t('E9', own.json?.ok === true && own.json?.data?.granted?.mocks === 6,
+    `consultancy A approving its own student -> granted ${own.json?.data?.granted?.mocks} mocks`);
+
+  // Approving twice must not pay twice.
+  const again = await call('/api/admin',
+    { action: 'approvePayment', slug: A.slug, passcode: A.passcode, orderId: oid, confirmedReceived: true },
+    { ip: '10.8.8.9' });
+  t('E9-once', again.json?.data?.alreadyVerified === true,
+    `second approval -> ${again.json?.data?.alreadyVerified ? 'refused' : 'DOUBLE GRANTED'}`);
+
+  // E10: the super admin approving a consultancy's student must TELL them.
+  const stu2 = await call('/api/auth/firebase',
+    { idToken: `dev:qa-pay2-${stamp}`, fingerprint: 'fp-pay2', via: A.slug }, { ip: '10.5.0.1' });
+  const ck2 = (stu2.cookies || []).map((c) => c.split(';')[0]).join('; ');
+  const made2 = await call('/api/payment', { action: 'create', packCode: 'prep' }, { ip: '10.5.0.1', cookie: ck2 });
+  await call('/api/payment',
+    { action: 'submit', orderId: made2.json?.data?.orderId, walletTxnId: `TXN2${stamp}`, payerName: 'QA', payerPhoneSuffix: '1234' },
+    { ip: '10.5.0.1', cookie: ck2 });
+  const beforeN = (await call('/api/admin', { action: 'login', slug: A.slug, passcode: A.passcode }, { ip: '10.7.7.1' })).json?.data?.notifications?.length ?? 0;
+  await call('/api/super',
+    { action: 'verifyPayment', superKey: SUPER, orderId: made2.json?.data?.orderId, confirmedInWalletLedger: true },
+    { ip: '10.9.9.5' });
+  const afterLogin = (await call('/api/admin', { action: 'login', slug: A.slug, passcode: A.passcode }, { ip: '10.7.7.2' })).json?.data;
+  const afterN = afterLogin?.notifications?.length ?? 0;
+  t('E10', afterN === beforeN + 1,
+    `super admin approved A's student: A's notifications ${beforeN} -> ${afterN}`);
 
   console.log(`\n  ${pass} passed, ${fail} failed`);
   process.exit(fail ? 1 : 0);

@@ -96,8 +96,8 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] E6 Unique wallet transaction id enforced (reused id -> TXN_ALREADY_USED) — proven by qa/lifecycle-check.js
 - [x] E7 Approval pending screen with the WhatsApp contact route — three-step progress, the student's own amount, transaction number and reference, and a WhatsApp route out
 - [x] E8 Allocation idempotent (second approval refused, no double grant) — proven by qa/lifecycle-check.js
-- [ ] E9 Admin can approve their own link's students
-- [ ] E10 Super admin approving an admin's student notifies that admin and is counted
+- [x] E9 Admin can approve their own link's students — client decision 12 Aug; shared `lib/payments.ts`, scoped to the admin's own orders (B approving A's order 404s) — proven by qa/tenant-check.js
+- [x] E10 Super admin approving an admin's student notifies that admin and is counted — proven by qa/tenant-check.js
 - [ ] E11 Full payment journey tested end to end, including rejection and resubmission
 
 ## F. Consultancy and admin
@@ -185,14 +185,14 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 | B Student UI | 18 / 28 | 28 | core pages done, secondary pages left |
 | C Back office UI | 4 / 4 | 4 | done |
 | D Student lifecycle | 15 + 2~ / 20 | 20 | q10 gate built and verified; practice mode and history are the gap |
-| E Payment and approval | 8 / 11 | 11 | checkout and pending screens done; admin approval routes left |
+| E Payment and approval | 10 / 11 | 11 | only the full end-to-end journey test (E11) left |
 | F Consultancy and admin | 10 / 10 | 10 | done; seats now actually allocate, isolation proven |
 | G Super admin | 8 / 9 | 9 | only the approve/reject tally left |
 | H Owner | 3 / 4 | 4 | recovery from an empty store untested |
 | I Money and abuse | 5 + 2~ / 10 | 10 | credits are now actually debited, one per sitting, proven by test |
 | J Data and privacy | 1 / 5 | 5 | Supabase not provisioned |
 | K Open defects | 10 + 2~ / 12 | 12 | K11 closed with evidence; K12 needs one deployed click |
-| **Total (excluding phase 2)** | **95 done, 6 partial / 126** | **126** | **about 75 percent** |
+| **Total (excluding phase 2)** | **97 done, 6 partial / 126** | **126** | **about 77 percent** |
 
 Phase 2 (the AI connection) is 0 of 4 and is deliberately last.
 
@@ -204,10 +204,25 @@ Phase 2 (the AI connection) is 0 of 4 and is deliberately last.
 4. **B18 to B20**, the FAQ and the universities list (the CSV is still missing from the repo).
 5. **G4, H4, I6, I8 to I10**, the super admin tally, owner recovery from an empty store, and the remaining abuse limits.
 
-## Open decision needing the client
+## Decisions taken 12 August 2026
 
-**How much is one consultancy seat worth?** It was never specified and seats were
-being sold with nothing behind them. `SEAT_GRANT` in `lib/data/plans.ts` is now
-3 mocks and 8 practice sessions, derived from the client's own bundle costs
-(118 NPR per seat against Prep's 241 for 6 mocks and 15 practice). If a seat
-should be worth more, raise `SEAT_GRANT` and the bundle prices together.
+**A seat is the Serious pack** (12 mocks, 30 practice) — exactly what a paying
+student gets for NPR 799. A consultancy student must not receive a lesser
+product than someone off the street; the consultancy gets the discount, the
+student gets the same thing. `SEAT_GRANT` is derived from the plan, so it cannot
+drift. (An earlier note here said 3 mocks; that came from misreading Pro's cost
+as Prep's and was wrong.)
+
+**Bundles are 20 and 30 seats at NPR 300 a seat** (NPR 6,000 and NPR 9,000). The
+50 and 100 tiers are gone. NPR 300 against NPR 799 retail is a 62 percent
+discount, which is deliberate: the consultancy resells to their own students, so
+they need room underneath our price or the channel stops existing.
+
+**Consultancy admins may approve their own students' payments.** The money lands
+in our wallet, not theirs, so they are asserting something they cannot verify.
+The client accepted that for speed. The mitigation is a paper trail, not a
+block: every consultancy approval is stamped with who did it and carries the note
+"Approved by the consultancy, not checked against our wallet ledger."
+
+**The full page-by-page, button-by-button audit happens after the lifecycle is
+finished**, so the three unbuilt pages are not audited twice.

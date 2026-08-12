@@ -4,6 +4,7 @@ import { isSuperAdmin, platform } from '@/lib/platform';
 import { repo, type ApprovalAudit } from '@/lib/db';
 import { grantPack, rewardReferral, adminGrant } from '@/lib/entitlement';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
+import { approvePayment } from '@/lib/payments';
 import { apiError } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -163,56 +164,31 @@ export async function POST(req: Request) {
   }
 
   // ---------------------------------------------------------- verifyPayment
+  //
+  // The work itself lives in lib/payments.ts, shared with the consultancy
+  // route (E9). Two places that can release credits must run the same code.
   if (body.action === 'verifyPayment') {
     const order = await r.getOrder(body.orderId);
     if (!order) {
       return NextResponse.json(apiError('NOT_FOUND', 'no order', 'Not found.'), { status: 404 });
     }
-
-    // Idempotent. Re-verifying must never hand out a second pack, and QA
-    // tests exactly this.
-    if (order.state === 'verified' && order.allocatedAt) {
+    const res = await approvePayment(
+      order,
+      { role: 'super_admin', id: 'super_admin', label: 'super admin' },
+      body.note
+    );
+    if (!res.ok) {
+      return NextResponse.json(apiError(res.code, res.code, res.userMessage), { status: 409 });
+    }
+    if (res.alreadyVerified) {
       return NextResponse.json({
         ok: true,
         data: { alreadyVerified: true, message: 'This payment was already approved. Nothing changed.' },
       });
     }
-    if (order.state !== 'submitted') {
-      return NextResponse.json(
-        apiError('BAD_STATE', `order is ${order.state}`, 'This payment is not waiting for approval.'),
-        { status: 409 }
-      );
-    }
-
-    const granted = await grantPack(order.studentId, order.packCode, order.id);
-    await r.updateOrder(order.id, {
-      state: 'verified',
-      verifiedBy: 'super_admin',
-      verifiedAt: new Date().toISOString(),
-      allocatedAt: new Date().toISOString(),
-    });
-
-    // Referral reward pays only now, when a real payment has been confirmed.
-    let referral = { rewarded: false, why: 'no referrer' };
-    const student = await r.getStudent(order.studentId);
-    if (student?.referredByCode) {
-      const referrer = await r.getStudentByReferralCode(student.referredByCode);
-      if (referrer) referral = await rewardReferral(referrer.id, student.id);
-    }
-
-    await audit({
-      actorRole: 'super_admin',
-      actorId: 'super_admin',
-      action: 'approve_payment',
-      subjectId: order.id,
-      before: 'submitted',
-      after: 'verified',
-      note: body.note ?? `txn ${order.walletTxnId}, NPR ${order.amountNpr}`,
-    });
-
     return NextResponse.json({
       ok: true,
-      data: { granted, referral, message: 'Approved and credits added.' },
+      data: { granted: res.granted, referral: res.referral, message: 'Approved and credits added.' },
     });
   }
 

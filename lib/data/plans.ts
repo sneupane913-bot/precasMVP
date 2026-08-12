@@ -89,6 +89,32 @@ export const PLANS: Plan[] = [
   },
 ];
 
+/**
+ * What one consultancy seat gives the student who takes it.
+ *
+ * Client decision, 12 August 2026: **a seat is the Serious pack**, exactly what
+ * a paying student gets for NPR 799. A consultancy student must not receive a
+ * lesser product than someone who walked in off the street; the consultancy
+ * gets the discount, the student gets the same thing.
+ *
+ * This is deliberately DERIVED from the plan rather than typed out, so a seat
+ * cannot silently drift away from what we sell. Change the Serious pack and the
+ * seat follows.
+ *
+ * It also matches what the original cost sheet always assumed: every bundle was
+ * costed at NPR 118 a seat, and NPR 118 is exactly the Serious pack's cost.
+ * (An earlier version of this file said 3 mocks, derived from misreading Pro's
+ * cost as Prep's. That was wrong and is corrected here.)
+ */
+const SEAT_PLAN = PLANS.find((p) => p.code === 'serious')!;
+export const SEAT_GRANT = {
+  mocks: SEAT_PLAN.mockInterviews,
+  practice: SEAT_PLAN.practiceSessions,
+} as const;
+
+/** What one seat costs us in provider bills. Bundle costs are built from this. */
+export const SEAT_COST_NPR = SEAT_PLAN.costNpr;
+
 /** Bulk seats sold to consultancies, who resell under their own name. */
 export interface Bundle {
   code: string;
@@ -98,29 +124,23 @@ export interface Bundle {
   costNpr: number;
 }
 
-export const BUNDLES: Bundle[] = [
-  { code: 'small', name: 'Small', priceNpr: 6000, seats: 20, costNpr: 2360 },
-  { code: 'medium', name: 'Medium', priceNpr: 13500, seats: 50, costNpr: 5900 },
-  { code: 'large', name: 'Large', priceNpr: 24000, seats: 100, costNpr: 11800 },
-];
-
 /**
- * What one consultancy seat actually gives the student who takes it.
+ * Client decision, 12 August 2026. Two sizes only, at NPR 300 a seat.
  *
- * ** NEEDS THE CLIENT'S CONFIRMATION. ** This was never specified, and seats
- * were being sold with nothing behind them, so rather than invent a number I
- * derived one from the client's own figures in BUNDLES above:
+ * The 50 and 100 seat bundles were dropped: Nepali consultancies buy in
+ * twenties, and an unsold tier on the page only makes the real ones look small.
  *
- *   every bundle costs us 118 NPR per seat (2360/20, 5900/50, 11800/100)
- *   the Prep pack costs us 241 NPR and contains 6 mocks and 15 practice
- *   118/241 is a shade under half, so a seat is half a Prep pack
- *
- * That gives 3 mocks and 8 practice sessions, and it keeps the wholesale
- * margin the client already priced for (a seat sells at 300 and costs 118).
- * If the client wants a seat to be worth more, raise these two numbers and the
- * bundle prices together, never one without the other.
+ * NPR 300 against a NPR 799 retail price is a 62 percent discount, and that is
+ * deliberate rather than generous. The consultancy has to resell to their own
+ * students to make anything, so they need room underneath our retail price. At
+ * 300 they can charge 500 or 600, make real money, and keep buying. Priced near
+ * retail the channel simply stops existing, which is worth more to us than the
+ * extra margin per seat.
  */
-export const SEAT_GRANT = { mocks: 3, practice: 8 } as const;
+export const BUNDLES: Bundle[] = [
+  { code: 'b20', name: '20 seats', priceNpr: 6000, seats: 20, costNpr: 20 * SEAT_COST_NPR },
+  { code: 'b30', name: '30 seats', priceNpr: 9000, seats: 30, costNpr: 30 * SEAT_COST_NPR },
+];
 
 /** What the competition charges, so our page can show the comparison honestly. */
 export const COMPETITOR_PER_MOCK_NPR = { best: 143, typical: 175, worst: 199 };

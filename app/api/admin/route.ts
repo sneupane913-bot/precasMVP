@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { platform, type Consultancy } from '@/lib/platform';
 import { repo } from '@/lib/db';
+import { approvePayment, rejectPayment, type Actor } from '@/lib/payments';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
 import { apiError } from '@/lib/types';
 
@@ -19,6 +20,27 @@ const Body = z.discriminatedUnion('action', [
     passcode: z.string().min(1).max(60),
     logoUrl: z.string().url().max(500).nullable(),
     primaryColor: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+  }),
+  // E9. A consultancy approves its own students' payments.
+  z.object({
+    action: z.literal('approvePayment'),
+    slug: z.string().min(1).max(60),
+    passcode: z.string().min(1).max(60),
+    orderId: z.string().min(1).max(64),
+    /**
+     * The admin states plainly that they have seen the money. They are NOT
+     * looking at our wallet, so this is their word, and it is recorded as
+     * their word in the audit trail rather than as a verified fact.
+     */
+    confirmedReceived: z.literal(true),
+    note: z.string().max(500).optional(),
+  }),
+  z.object({
+    action: z.literal('rejectPayment'),
+    slug: z.string().min(1).max(60),
+    passcode: z.string().min(1).max(60),
+    orderId: z.string().min(1).max(64),
+    reason: z.string().min(3).max(500),
   }),
 ]);
 
@@ -72,6 +94,51 @@ export async function POST(req: Request) {
       ),
       { status: 403 }
     );
+  }
+
+  // E9. Approve or reject a payment, but ONLY one belonging to this
+  // consultancy's own student. The ownership check is the whole security of
+  // this feature: without it, any approved consultancy could release credits
+  // for any student on the platform by guessing an order id.
+  if (body.action === 'approvePayment' || body.action === 'rejectPayment') {
+    const r0 = repo();
+    const order = await r0.getOrder(body.orderId);
+    if (!order || order.consultancyId !== c.id) {
+      // Same 404 either way, so this cannot be used to discover which order
+      // ids exist on other consultancies.
+      return NextResponse.json(
+        apiError('NOT_FOUND', 'no order or not this consultancy', 'We could not find that payment.'),
+        { status: 404 }
+      );
+    }
+
+    const actor: Actor = {
+      role: 'admin',
+      id: c.id,
+      label: `${c.name} (${c.slug})`,
+    };
+
+    const res =
+      body.action === 'approvePayment'
+        ? await approvePayment(order, actor, body.note)
+        : await rejectPayment(order, actor, body.reason);
+
+    if (!res.ok) {
+      return NextResponse.json(apiError(res.code, res.code, res.userMessage), { status: 409 });
+    }
+    return NextResponse.json({
+      ok: true,
+      data:
+        body.action === 'approvePayment'
+          ? {
+              ...res,
+              message:
+                'alreadyVerified' in res && res.alreadyVerified
+                  ? 'This payment was already approved. Nothing changed.'
+                  : 'Approved. Your student can carry on straight away.',
+            }
+          : { message: 'Rejected. Your student has been told to check their transaction number.' },
+    });
   }
 
   if (body.action === 'updateBranding') {
