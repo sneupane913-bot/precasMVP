@@ -5,7 +5,7 @@ Statuses: `[x]` done and verified · `[~]` partly done · `[ ]` not started · `
 
 Rules: nothing is `[x]` until it has been built, typechecked, built, and seen working. When you add scope, add it to the right section here in order, never at the end.
 
-Last updated: 2026-08-12 (session 3).
+Last updated: 2026-08-12 (session 3). Verified items now say how they were proven.
 
 ---
 
@@ -22,6 +22,7 @@ Last updated: 2026-08-12 (session 3).
 - [x] A9 Netlify secret scanner configured for public `NEXT_PUBLIC_*` values
 - [x] A10 Firebase sign-in working in production (root cause was a corrupted env var value)
 - [x] A11 `lib/build-info.ts` exists
+- [x] A11a `qa/lifecycle-check.js` regression suite: 14 end-to-end guarantees, all passing
 - [ ] A12 Build SHA and time visible in super admin so QA can prove which revision is live (LIVE-004)
 
 ## B. Design system and student-facing UI
@@ -75,12 +76,12 @@ Last updated: 2026-08-12 (session 3).
 - [x] D9 Answer, complete and flag endpoints exist
 - [~] D10 Device check screen (exists, needs design pass and real-device testing)
 - [~] D11 Interview room (exists, needs design pass and real-device testing)
-- [ ] D12 Consent actually recorded with version and timestamp at the moment of consent (QA-208)
+- [x] D12 Consent actually recorded with version and timestamp, stale versions refused (QA-208) — proven by qa/lifecycle-check.js
 - [ ] D13 The gate after question 10: two clear choices, pay to continue or see the report
 - [ ] D14 Report shown after question 10, same report a paying student sees
 - [ ] D15 Paid features clearly locked for a trial student, with a plain reason
-- [ ] D16 Paying unlocks the remaining 7 questions of that same sitting
-- [ ] D17 Paying grants the pack (each mock 17 questions) atomically on approval
+- [x] D16 Paying lifts the sitting from 10 to 17 questions — proven by qa/lifecycle-check.js
+- [x] D17 Paying grants the pack on approval — proven by qa/lifecycle-check.js
 - [ ] D18 Practice mode (single question drilling)
 - [ ] D19 Student history: past sessions and reports
 - [ ] D20 Full walk through of the direct student journey end to end on a real phone
@@ -92,9 +93,9 @@ Last updated: 2026-08-12 (session 3).
 - [x] E3 Super admin verify and reject payment actions
 - [x] E4 Credit ledger (append only) and `grantCredit`
 - [ ] E5 Checkout screen: QR, payer details, amount, screenshot upload
-- [ ] E6 Unique wallet transaction id enforced so one payment cannot be claimed twice
+- [x] E6 Unique wallet transaction id enforced (reused id -> TXN_ALREADY_USED) — proven by qa/lifecycle-check.js
 - [ ] E7 Approval pending screen with the WhatsApp contact route
-- [ ] E8 Allocation is idempotent (re-approving never double credits)
+- [x] E8 Allocation idempotent (second approval refused, no double grant) — proven by qa/lifecycle-check.js
 - [ ] E9 Admin can approve their own link's students
 - [ ] E10 Super admin approving an admin's student notifies that admin and is counted
 - [ ] E11 Full payment journey tested end to end, including rejection and resubmission
@@ -137,9 +138,9 @@ Last updated: 2026-08-12 (session 3).
 - [x] I2 Audio guards: silence, oversize, over-length
 - [x] I3 Retry cap per question
 - [x] I4 `lib/rate-limit.ts` exists and is applied to session create
-- [ ] I5 Rate limits on every auth and money endpoint (QA-202)
+- [~] I5 Rate limits live on session create, answer, flag, auth, payment (measured 429s). Per-process only, so the real ceiling is limit x Netlify instances. Durable limits need Postgres or Redis.
 - [ ] I6 Trial abuse: one trial per Google account, device and IP velocity, consultancy Wi-Fi allow-listed
-- [ ] I7 Provider spend breaker and per-account daily mock cap
+- [~] I7 Global provider spend breaker guards every transcription call; per-account daily cap constant exists but is not yet enforced.
 - [ ] I8 Referrals: +1 mock only on a verified paid referral, fraud guarded, lifetime cap
 - [ ] I9 Rewards engine: post-trial bonus and honest campaign countdowns, super admin controlled
 - [ ] I10 Fraud test pass (docs/LIFECYCLE_BUILD_SPEC.md section 5)
@@ -159,11 +160,11 @@ Last updated: 2026-08-12 (session 3).
 - [x] K3 QA-205 false price on home (fixed)
 - [x] K4 QA-207 hidden packs shown (fixed)
 - [x] K5 M1 bare 404 (fixed)
-- [ ] K6 QA-201 ownerId echoed in the API body and reused across sessions
-- [ ] K7 QA-204 Behaviour shows 0% on a silent, zero-violation attempt
+- [x] K6 QA-201 closed: ownerId stripped from the API response — proven by qa/lifecycle-check.js
+- [x] K7 QA-204 closed: silent clean attempt scores behaviour 100, heard-dependent scores are null not 0 — proven by qa/lifecycle-check.js
 - [x] K8 QA-209 closed: the public read returns only `maintenanceMode:false` when up, and the contact message only when down, which students need
-- [ ] K9 QA-210 answer endpoint returns 500 on an empty body
-- [ ] K10 QA-211 PWA icons 404
+- [x] K9 QA-210 closed: empty and non-multipart bodies return 400 — proven by qa/lifecycle-check.js
+- [~] K10 QA-211 icon-192, icon-512 and apple-touch-icon exist and are wired into the manifest and head. Install flow still to verify on a real phone.
 - [ ] K11 H4 `/results/*` dead end for an old link
 - [ ] K12 H5 `/interview/{unknown}` returns 200 instead of a clear recovery screen
 
@@ -180,25 +181,25 @@ Last updated: 2026-08-12 (session 3).
 
 | Section | Done | Total | Notes |
 |---|---|---|---|
-| A Foundation and pipeline | 11 / 12 | 12 | only the build SHA surface left |
+| A Foundation and pipeline | 12 / 13 | 13 | regression suite added; only the build SHA surface left |
 | B Student UI | 18 / 28 | 28 | core pages done, secondary pages left |
 | C Back office UI | 4 / 4 | 4 | done |
-| D Student lifecycle | 9 / 20 | 20 | plumbing exists, the paid half is missing |
-| E Payment and approval | 4 / 11 | 11 | model exists, screens and guarantees missing |
-| F Consultancy and admin | 7 / 10 | 10 | branded link and dashboard done |
+| D Student lifecycle | 12 + 2~ / 20 | 20 | consent, unlock and grant now proven; the q10 gate is the gap |
+| E Payment and approval | 6 / 11 | 11 | money guarantees proven; the screens are the gap |
+| F Consultancy and admin | 7 / 10 | 10 | isolation still to be proven by test |
 | G Super admin | 8 / 9 | 9 | only the approve/reject tally left |
-| H Owner | 3 / 4 | 4 | audit trail added |
-| I Money and abuse | 4 / 10 | 10 | limits and referrals missing |
+| H Owner | 3 / 4 | 4 | recovery from an empty store untested |
+| I Money and abuse | 4 + 2~ / 10 | 10 | limits live but per-process; referrals and rewards missing |
 | J Data and privacy | 1 / 5 | 5 | Supabase not provisioned |
-| K Open defects | 6 / 12 | 12 | 6 still open |
-| **Total (excluding phase 2)** | **75 / 125** | **125** | **about 60 percent** |
+| K Open defects | 9 + 1~ / 12 | 12 | 5 closed this session with evidence |
+| **Total (excluding phase 2)** | **84 done, 5 partial / 126** | **126** | **about 67 percent** |
 
 Phase 2 (the AI connection) is 0 of 4 and is deliberately last.
 
 ## Next five, in order
 
-1. E5 to E8, the checkout screen and the money guarantees (QR, payer details, screenshot, unique transaction id, idempotent allocation).
-2. D13 to D17, the question 10 gate, the report, and unlocking the paid half.
-3. B21 and B22, the consultancy and checkout shells.
-4. I5 and I6, rate limits everywhere and the trial abuse controls.
-5. B23, the results page to its approved design, and K7 the 0% behaviour defect.
+1. **D13 to D15**, the gate after question 10: the two choices, the report, and paid features clearly locked.
+2. **E5 and E7**, the checkout screen (QR, payer details, screenshot) and the approval pending screen.
+3. **K11, K12**, the dead ends: an old `/results/*` link and an unknown `/interview/*` id must both offer a way out.
+4. **F7, F9, F10**, seat allocation atomicity and proving tenant isolation by test.
+5. **B21, B23**, the consultancy page and the results page to their approved designs.
