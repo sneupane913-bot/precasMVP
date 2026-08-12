@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { publicInstitutions } from '@/lib/data/institutions';
+import type { Institution } from '@/lib/types';
 import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
 
@@ -61,6 +62,11 @@ function UniversityBrowser() {
       return matchQ && matchType;
     });
   }, [q, type]);
+
+  // B20: the pinned six first, then the rest of the UK. Both come from the
+  // same filtered set, so search and the chips work across everything.
+  const featured = useMemo(() => results.filter((i) => i.featured), [results]);
+  const others = useMemo(() => results.filter((i) => !i.featured), [results]);
 
   async function start(slug: string) {
     // Not signed in: send them to sign in and come straight back here.
@@ -154,10 +160,10 @@ function UniversityBrowser() {
           </div>
         ) : (
           <>
-          {/* "Most applied" label: these six are the ones our students actually
-              apply to. When the full UK list lands (B20) these stay pinned and
-              the rest become searchable below. */}
-          {!q.trim() && type === 'all' && (
+          {/* B20: the six our students actually apply to are pinned under
+              "Most applied"; the rest of the UK is listed below so a student
+              can always find their own university. */}
+          {featured.length > 0 && (
             <h2 className="mb-4 flex items-center gap-2 font-serif text-xl font-bold text-ink">
               <span className="text-emerald-500" aria-hidden>
                 ★
@@ -166,77 +172,107 @@ function UniversityBrowser() {
             </h2>
           )}
           <ul className="grid gap-4 sm:grid-cols-2">
-            {results.map((i) => (
-              <li
-                key={i.id}
-                className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5"
-              >
-                {/* Card layout follows docs/design-reference/universities_catalogue:
-                    logo chip, name, city, then Duration / Questions stat boxes. */}
-                <div className="mb-4 flex items-start justify-between gap-3">
-                  <div className="flex min-w-0 items-start gap-3">
-                    {/* QA B2: several marks are white artwork and vanished on a
-                        white chip. brightness(0) renders every mark as ink so
-                        all six are visible and consistent. */}
-                    {i.logoUrl ? (
-                      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#eff4ff] p-2">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={i.logoUrl}
-                          alt=""
-                          className="max-h-full max-w-full object-contain opacity-70 [filter:brightness(0)]"
-                        />
-                      </span>
-                    ) : (
-                      <span
-                        className="grid h-12 w-12 shrink-0 place-items-center rounded-xl text-base font-black text-white"
-                        style={{ backgroundColor: i.accent }}
-                      >
-                        {i.monogram}
-                      </span>
-                    )}
-                    <div className="min-w-0">
-                      <h2 className="font-serif text-lg font-bold leading-tight text-ink">
-                        {i.name}
-                      </h2>
-                      <p className="mt-0.5 text-sm text-slate-500">{i.city}</p>
-                    </div>
-                  </div>
-                  <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
-                    Free first try
-                  </span>
-                </div>
-
-                <div className="mb-4 grid grid-cols-2 gap-3">
-                  <div className="rounded-xl border border-slate-200 px-3 py-2.5 text-center">
-                    <p className="text-xs text-slate-500">Duration</p>
-                    <p className="font-bold text-ink">{i.durationMinutes} mins</p>
-                  </div>
-                  <div className="rounded-xl border border-slate-200 px-3 py-2.5 text-center">
-                    <p className="text-xs text-slate-500">Questions</p>
-                    <p className="font-bold text-ink">{i.questionCount} Qs</p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => start(i.slug)}
-                  disabled={starting !== null}
-                  className="mt-auto w-full rounded-xl bg-ink px-5 py-3.5 text-base font-bold text-white transition hover:bg-ink/90 active:scale-[0.99] disabled:opacity-50"
-                >
-                  {starting === i.slug
-                    ? 'Starting...'
-                    : signedIn === false
-                      ? 'Sign in to start'
-                      : 'Start interview'}
-                </button>
-              </li>
+            {featured.map((i) => (
+              <UniCard key={i.id} i={i} starting={starting} signedIn={signedIn} onStart={start} />
             ))}
           </ul>
+
+          {others.length > 0 && (
+            <>
+              <h2 className="mb-4 mt-10 font-serif text-xl font-bold text-ink">
+                All UK universities
+                <span className="ml-2 text-sm font-normal text-slate-500">
+                  {others.length} more
+                </span>
+              </h2>
+              <ul className="grid gap-4 sm:grid-cols-2">
+                {others.map((i) => (
+                  <UniCard key={i.id} i={i} starting={starting} signedIn={signedIn} onStart={start} />
+                ))}
+              </ul>
+            </>
+          )}
           </>
         )}
       </div>
       </main>
       <SiteFooter />
     </>
+  );
+}
+
+/**
+ * One university card. Extracted so the pinned six and the wider UK list
+ * cannot drift apart visually.
+ */
+function UniCard({
+  i,
+  starting,
+  signedIn,
+  onStart,
+}: {
+  i: Institution;
+  starting: string | null;
+  signedIn: boolean | null;
+  onStart: (slug: string) => void;
+}) {
+  return (
+    <li className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5">
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-start gap-3">
+          {/* QA B2: several official marks are white artwork and vanished on a
+              white chip. brightness(0) renders every mark as ink, so they are
+              all visible and consistent. Universities with no mark of ours
+              show a monogram: we never scrape a logo we are not licensed for. */}
+          {i.logoUrl ? (
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#eff4ff] p-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={i.logoUrl}
+                alt=""
+                className="max-h-full max-w-full object-contain opacity-70 [filter:brightness(0)]"
+              />
+            </span>
+          ) : (
+            <span
+              className="grid h-12 w-12 shrink-0 place-items-center rounded-xl text-base font-black text-white"
+              style={{ backgroundColor: i.accent }}
+            >
+              {i.monogram}
+            </span>
+          )}
+          <div className="min-w-0">
+            <h3 className="font-serif text-lg font-bold leading-tight text-ink">{i.name}</h3>
+            <p className="mt-0.5 text-sm text-slate-500">{i.city}</p>
+          </div>
+        </div>
+        <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
+          Free first try
+        </span>
+      </div>
+
+      <div className="mb-4 grid grid-cols-2 gap-3">
+        <div className="rounded-xl border border-slate-200 px-3 py-2.5 text-center">
+          <p className="text-xs text-slate-500">Duration</p>
+          <p className="font-bold text-ink">{i.durationMinutes} mins</p>
+        </div>
+        <div className="rounded-xl border border-slate-200 px-3 py-2.5 text-center">
+          <p className="text-xs text-slate-500">Questions</p>
+          <p className="font-bold text-ink">{i.questionCount} Qs</p>
+        </div>
+      </div>
+
+      <button
+        onClick={() => onStart(i.slug)}
+        disabled={starting !== null}
+        className="mt-auto w-full rounded-xl bg-ink px-5 py-3.5 text-base font-bold text-white transition hover:bg-ink/90 active:scale-[0.99] disabled:opacity-50"
+      >
+        {starting === i.slug
+          ? 'Starting...'
+          : signedIn === false
+            ? 'Sign in to start'
+            : 'Start interview'}
+      </button>
+    </li>
   );
 }

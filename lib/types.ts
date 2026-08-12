@@ -59,6 +59,13 @@ export interface Institution {
   logoNeedsDarkBackground: boolean;
   /** Hidden from public listings, usable in the pilot. */
   pilotOnly: boolean;
+  /**
+   * Pinned to the top of the catalogue under "Most applied". These are the six
+   * the client's students actually apply to and the only ones with a sourced,
+   * university-specific blurb. Everything else is listed so a student can find
+   * their own university, and carries the generic themes wording.
+   */
+  featured?: boolean;
 }
 
 export interface Question {

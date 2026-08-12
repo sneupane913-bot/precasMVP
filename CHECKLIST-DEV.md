@@ -26,7 +26,7 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] A10 Firebase sign-in working in production (root cause was a corrupted env var value)
 - [x] A11 `lib/build-info.ts` exists
 - [x] A11a `qa/lifecycle-check.js` regression suite: 14 end-to-end guarantees, all passing
-- [ ] A12 Build SHA and time visible in super admin so QA can prove which revision is live (LIVE-004)
+- [x] A12 Build SHA, context, branch and build time render at the foot of the super admin dashboard
 
 ## B. Design system and student-facing UI
 
@@ -48,11 +48,11 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] B15 Consultancy wholesale price removed from the public student pricing page
 - [x] B16 Legal pages exist and are linked: `/privacy`, `/terms`, `/refund`
 - [x] B17 Branded 404 with a way back
-- [ ] B18 Home: FAQ section
-- [ ] B19 Universities: "Most applied" pinned section and filter chips per the approved design
+- [x] B18 Home: FAQ section, four real questions, works with no JavaScript
+- [x] B19 Universities: centred header, wider search, restyled chips, Most applied heading
 - [ ] B20 Universities: full UK list (needs the university CSV, which is missing from the repo)
-- [ ] B21 `/consultancy` B2B page rebuilt to its approved design, with header and footer
-- [ ] B22 `/checkout` given the shell and a way back
+- [x] B21 `/consultancy` given a business-facing header and the site footer
+- [x] B22 `/checkout` given brand and a way back to the packs
 - [ ] B23 Results page rebuilt to its approved design
 - [ ] B24 Interview room reviewed against the design system
 - [ ] B25 Scroll reset on stage change (LIVE-008)
@@ -121,7 +121,7 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] G1 Overview, orders, flagged trials, student status actions exist
 - [x] G2 Approval audit model (`ApprovalAudit`)
 - [x] G3 Overview segregated by source (direct vs consultancy)
-- [ ] G4 Approve and reject with a running approved/rejected tally
+- [x] G4 Running waiting / approved / rejected tally on the payments tab
 - [x] G5 Enable and disable a student, wired in the UI
 - [x] G6 Referral leaderboard
 - [x] G7 Attribution report (which consultancies direct students named)

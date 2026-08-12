@@ -17,7 +17,7 @@ job is catching the thing that used to work.
 
 ## Where the project stands
 
-**97 done, 6 partial, of 126 developer items — about 77 percent.**
+**101 done, 6 partial, of 126 developer items — about 80 percent.**
 Automated suites: `qa/lifecycle-check.js` **20/20**, `qa/tenant-check.js` **12/12**.
 
 Phase 2 (connecting the real AI: Groq speech-to-text and the evaluator) is
