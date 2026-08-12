@@ -2,6 +2,17 @@
   command = "npm run build"
   publish = ".next"
 
+  [build.environment]
+    # Netlify's secret scanner fails the build when it finds an env var value
+    # inside the build output. NEXT_PUBLIC_FIREBASE_API_KEY is *meant* to be in
+    # the client bundle: a Firebase Web API key identifies the project, it does
+    # not authorise anything, and Google documents it as public. Access is
+    # controlled by Authorised Domains and security rules, not by hiding it.
+    # The real secrets (OWNER_ACCESS_KEY, SUPER_ADMIN_PASSCODE, SESSION_SECRET)
+    # are server-only and are deliberately NOT listed here, so the scanner keeps
+    # protecting them.
+    SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_FIREBASE_API_KEY,NEXT_PUBLIC_FIREBASE_PROJECT_ID,NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,NEXT_PUBLIC_SUPPORT_WHATSAPP"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
