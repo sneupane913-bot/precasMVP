@@ -6,9 +6,10 @@ import { getPlan } from '@/lib/data/plans';
 import { store } from '@/lib/store';
 import { checkCredits } from '@/lib/credits';
 import { platformDown } from '@/lib/platform';
-import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
+import { rateLimit, clientIp, LIMITS as RL, maxMocksPerDay } from '@/lib/rate-limit';
 import { ensureOwnerId } from '@/lib/owner-session';
 import { currentStudent } from '@/lib/auth/session';
+import { repo } from '@/lib/db';
 import { apiError, type ApiResult, type InterviewSession } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -72,6 +73,25 @@ export async function POST(req: Request) {
     return NextResponse.json(
       apiError('BAD_REQUEST', 'invalid body', 'Something went wrong. Please go back and try again.'),
       { status: 400 }
+    );
+  }
+
+  // I7. The monthly spend breaker protects the business; this protects it from
+  // one account. A student on an unlimited-feeling pack, or a script holding a
+  // valid session, could otherwise burn the whole month's transcription budget
+  // alone in an afternoon. The constant existed but nothing enforced it.
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const mocksToday = (await repo().listLedger(student.id)).filter(
+    (e) => e.kind === 'mock' && e.reason === 'session_consumed' && e.createdAt >= since
+  ).length;
+  if (mocksToday >= maxMocksPerDay()) {
+    return NextResponse.json(
+      apiError(
+        'DAILY_LIMIT',
+        `daily mock cap ${maxMocksPerDay()}`,
+        `You have started ${mocksToday} mock interviews today. Please come back tomorrow, or message us if you need more.`
+      ),
+      { status: 429 }
     );
   }
 

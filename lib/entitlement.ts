@@ -224,6 +224,34 @@ export async function rewardReferral(
   const r = repo();
   if (referrerId === referredStudentId) return { rewarded: false, why: 'self referral' };
 
+  // I8 fraud guard. Blocking only "same student id" catches nobody, because the
+  // obvious abuse is one person making a second Google account and referring
+  // themselves. Their trial claims are the only place we hold a device and an
+  // IP, so compare those.
+  //
+  // Deliberately NOT blocking on IP alone: a consultancy lab, a household and a
+  // shared hostel all sit behind one IP, and those referrals are real. A shared
+  // DEVICE FINGERPRINT is the strong signal, so that blocks; a shared IP only
+  // blocks when the two accounts were created close together, which is what
+  // self-referral actually looks like.
+  const claims = await r.listTrialClaims();
+  const mine = claims.find((c) => c.studentId === referrerId);
+  const theirs = claims.find((c) => c.studentId === referredStudentId);
+
+  if (mine && theirs) {
+    if (mine.fingerprintHash && mine.fingerprintHash === theirs.fingerprintHash) {
+      return { rewarded: false, why: 'same device as the referrer' };
+    }
+    if (mine.ip && mine.ip === theirs.ip) {
+      const hours =
+        Math.abs(new Date(theirs.claimedAt).getTime() - new Date(mine.claimedAt).getTime()) /
+        3_600_000;
+      if (hours < 24) {
+        return { rewarded: false, why: 'same network within 24 hours of the referrer' };
+      }
+    }
+  }
+
   const ledger = await r.listLedger(referrerId);
   const already = ledger.some(
     (e) => e.reason === 'referral_reward' && e.note === referredStudentId

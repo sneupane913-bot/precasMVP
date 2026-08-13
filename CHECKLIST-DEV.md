@@ -50,7 +50,7 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] B17 Branded 404 with a way back
 - [x] B18 Home: FAQ section, four real questions, works with no JavaScript
 - [x] B19 Universities: centred header, wider search, restyled chips, Most applied heading
-- [ ] B20 Universities: full UK list (needs the university CSV, which is missing from the repo)
+- [x] B20 Universities: 92 UK universities, six pinned as Most applied and 87 listed below. Name and city only for the wider list, generic themes wording, no invented per-university claims, no scraped logos
 - [x] B21 `/consultancy` given a business-facing header and the site footer
 - [x] B22 `/checkout` given brand and a way back to the packs
 - [ ] B23 Results page rebuilt to its approved design
