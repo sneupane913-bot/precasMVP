@@ -47,25 +47,53 @@ function StartInner() {
    */
   useEffect(() => {
     let cancelled = false;
+
+    /**
+     * V-9. Every fetch here is on a timeout, and `loading` is cleared in a
+     * `finally`, because of what the client saw on an iPhone 6s: **no sign-in
+     * button at all.**
+     *
+     * The cause was structural rather than a bug in any one line. This screen
+     * renders a grey placeholder while `loading` is true, and `loading` was
+     * only cleared after two awaited fetches had both resolved. On a slow or
+     * old device, one stalled request meant the placeholder stayed forever and
+     * the student simply never got a button to press.
+     *
+     * A sign-in screen must ALWAYS end up showing a way to sign in. If we
+     * cannot reach our own API, that is our problem to display, not a reason
+     * to show the student nothing.
+     */
+    const withTimeout = async (url: string, ms = 6000) => {
+      const ac = new AbortController();
+      const timer = setTimeout(() => ac.abort(), ms);
+      try {
+        const r = await fetch(url, { signal: ac.signal });
+        return await r.json();
+      } finally {
+        clearTimeout(timer);
+      }
+    };
+
     (async () => {
       try {
-        const me = await fetch('/api/me').then((r) => r.json());
+        const me = await withTimeout('/api/me');
         if (!cancelled && me?.data?.signedIn) {
           router.replace(next);
           return;
         }
       } catch {
-        // If we cannot tell, show the sign-in screen. Better a needless
-        // sign-in than a locked door.
+        // Cannot tell: show the sign-in screen. Better a needless sign-in than
+        // a locked door.
       }
       if (cancelled) return;
       try {
-        const j = await fetch('/api/auth/config').then((r) => r.json());
+        const j = await withTimeout('/api/auth/config');
         if (!cancelled) setConfig(j.data?.firebase ?? null);
       } catch {
         if (!cancelled) setConfig(null);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      if (!cancelled) setLoading(false);
     })();
     return () => {
       cancelled = true;

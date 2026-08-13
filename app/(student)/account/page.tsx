@@ -27,6 +27,14 @@ interface Session {
   band: string | null;
 }
 
+interface Progress {
+  sittings: number;
+  /** Null until there are two scored sittings. One point is a dot, not a direction. */
+  trend: number | null;
+  latest: number | null;
+  weakest: { key: string; label: string; value: number; advice: string } | null;
+}
+
 interface Account {
   name: string | null;
   email: string | null;
@@ -34,6 +42,7 @@ interface Account {
   entitlement: { mocksLeft: number; practiceLeft: number; isTrial: boolean };
   sessions: Session[];
   offer?: Offer | null;
+  progress?: Progress;
 }
 
 const BAND_LABEL: Record<string, string> = {
@@ -139,6 +148,68 @@ export default function AccountPage() {
                 </p>
               </div>
             </section>
+
+            {/* S-41 and S-42. Progress, and the one thing to work on next.
+                S-44: nothing here is a number the student cannot act on, so
+                the whole block is hidden until there is something real to say. */}
+            {data.progress && data.progress.sittings > 0 && (
+              <section className="mb-8 grid gap-4 sm:grid-cols-2">
+                <div className="rounded-2xl border border-slate-200 bg-white p-5">
+                  <p className="mb-1 text-sm text-slate-600">Your progress</p>
+                  {data.progress.trend === null ? (
+                    <>
+                      <p className="font-serif text-2xl font-bold text-ink">
+                        {data.progress.sittings === 1 ? 'One interview done' : `${data.progress.sittings} done`}
+                      </p>
+                      {/* Honest: we will not draw a trend from a single point. */}
+                      <p className="mt-1 text-sm leading-relaxed text-slate-500">
+                        Do one more and we will show you whether you are improving.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p
+                        className={`font-serif text-3xl font-black ${
+                          data.progress.trend > 0
+                            ? 'text-emerald-600'
+                            : data.progress.trend < 0
+                              ? 'text-amber-600'
+                              : 'text-ink'
+                        }`}
+                      >
+                        {data.progress.trend > 0 ? '+' : ''}
+                        {data.progress.trend}%
+                      </p>
+                      <p className="mt-1 text-sm leading-relaxed text-slate-500">
+                        {data.progress.trend > 0
+                          ? `Better than your first interview. You are at ${data.progress.latest}% now.`
+                          : data.progress.trend < 0
+                            ? `Down from your first interview. That happens \u2014 the questions get harder as you go further in.`
+                            : `The same as your first interview. You are at ${data.progress.latest}%.`}
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                {data.progress.weakest && (
+                  <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-5">
+                    <p className="mb-1 text-sm text-emerald-800">Work on this next</p>
+                    <p className="font-serif text-xl font-bold text-ink">
+                      {data.progress.weakest.label}
+                    </p>
+                    <p className="mb-3 mt-1 text-sm leading-relaxed text-emerald-900">
+                      {data.progress.weakest.advice}
+                    </p>
+                    <Link
+                      href="/practice"
+                      className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white"
+                    >
+                      Practise one question
+                    </Link>
+                  </div>
+                )}
+              </section>
+            )}
 
             {/* History */}
             <section className="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-white">

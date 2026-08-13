@@ -74,6 +74,9 @@ export function InterviewRoom({
   const [finalTranscript, setFinalTranscript] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [attemptsLeft, setAttemptsLeft] = useState(2);
+  /** S-28. True when the upload failed for network reasons and the audio survives. */
+  const [canResend, setCanResend] = useState(false);
+  const pendingRef = useRef<{ blob: Blob; questionId: string; durationSeconds: number } | null>(null);
   const [tipIndex, setTipIndex] = useState(0);
   const [cameraOn, setCameraOn] = useState(true);
   /** Question read-aloud. Off by default: the browser voice is poor. */
@@ -284,6 +287,21 @@ export function InterviewRoom({
     }
     if (durationSeconds < 8) raise('answer_too_short', 3000);
 
+    /**
+     * S-28. Hold on to the recording.
+     *
+     * A dropped connection is the normal case on Nepali mobile data, not the
+     * exception. Before this, a failed upload told the student to "record
+     * again" — throwing away an answer they had already given, on a question
+     * with only three attempts, because OUR request failed. That is charging a
+     * student for our network problem.
+     *
+     * The audio stays in memory so the same recording can simply be sent
+     * again. Re-recording remains available, but it is no longer the only way
+     * out.
+     */
+    pendingRef.current = { blob, questionId: question.id, durationSeconds };
+
     const form = new FormData();
     form.append('audio', blob, 'answer.webm');
     form.append('questionId', question.id);
@@ -320,12 +338,50 @@ export function InterviewRoom({
       );
       setPhase('reviewed');
     } catch {
+      // Our failure, not theirs, and the recording is safe.
+      setCanResend(true);
       setMessage(
-        'Your answer could not be sent. Check your internet connection and try recording again.'
+        'Your answer was recorded but could not reach us. Your connection dropped. Nothing is lost \u2014 send the same recording again.'
       );
       setPhase('retry');
     }
   }, [question.id, sessionId, raise]);
+
+  /** S-28. Send the recording we already have, without making them speak again. */
+  const resend = useCallback(async () => {
+    const pending = pendingRef.current;
+    if (!pending) return;
+    setCanResend(false);
+    setMessage('Sending your answer again...');
+    setPhase('uploading');
+    const form = new FormData();
+    form.append('audio', pending.blob, 'answer.webm');
+    form.append('questionId', pending.questionId);
+    form.append('durationSeconds', String(pending.durationSeconds));
+    try {
+      const res = await fetch(`/api/session/${sessionId}/answer`, { method: 'POST', body: form });
+      const json = (await res.json()) as UploadResponse;
+      if (!json.ok) {
+        setMessage(json.error.userMessage);
+        setPhase('retry');
+        return;
+      }
+      if (json.data.transcriptStatus !== 'ok') {
+        setAttemptsLeft(json.data.attemptsLeft ?? 0);
+        setMessage(json.userMessage ?? 'We could not hear your answer. Please record it again.');
+        setPhase('retry');
+        return;
+      }
+      setFinalTranscript(json.data.transcript ?? '');
+      setAnsweredIds((prev) => new Set(prev).add(pending.questionId));
+      setMessage(null);
+      setPhase('reviewed');
+    } catch {
+      setCanResend(true);
+      setMessage('Still no connection. Your recording is safe \u2014 try again in a moment.');
+      setPhase('retry');
+    }
+  }, [sessionId]);
 
   const next = useCallback(() => {
     if (isLast) void finish();
@@ -626,10 +682,24 @@ export function InterviewRoom({
                 <div className="w-full animate-slideUp rounded-xl border-2 border-amber-300 bg-amber-50 p-4">
                   <p className="mb-1 font-bold text-amber-900">We could not use that answer</p>
                   <p className="mb-4 text-sm leading-relaxed text-amber-900/90">{message}</p>
+
+                  {/* S-28. When the recording survived, sending it again is the
+                      first and best option. Re-recording an answer you already
+                      gave, because our network failed, is not acceptable. */}
+                  {canResend && (
+                    <button
+                      onClick={resend}
+                      className="mb-2 w-full rounded-xl bg-emerald-600 px-5 py-3 text-base font-bold text-white"
+                    >
+                      Send the same recording again
+                    </button>
+                  )}
+
                   <div className="flex flex-col gap-2 sm:flex-row">
                     <button
                       onClick={() => {
                         setMessage(null);
+                        setCanResend(false);
                         setSecondsLeft(question.timeLimitSeconds);
                         setPhase('ready');
                       }}

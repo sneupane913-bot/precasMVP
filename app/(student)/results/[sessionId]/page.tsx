@@ -6,6 +6,7 @@ import { InstallPrompt } from '@/components/InstallPrompt';
 import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
 import { BUILD_INFO } from '@/lib/build-info';
+import { weakestOf } from '@/lib/advice';
 import { buildSummary } from '@/lib/summary';
 import { getInstitution } from '@/lib/data/institutions';
 import { getQuestion, resolvedQuestion } from '@/lib/data/questions';
@@ -98,6 +99,39 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
             </>
           )}
         </section>
+
+        {/* ---------- S-37. The one thing to do before the next attempt. ----------
+            Placed immediately under the verdict, above the detail, because a
+            student who has just read a low score is looking for what to DO and
+            will not scroll past four sub-scores to find it. "Keep practising"
+            is not advice; this names one concrete change. */}
+        {(() => {
+          const weakest = scored.length > 0 ? weakestOf(summary.subScores) : null;
+          if (!weakest) return null;
+          return (
+            <section className="rounded-2xl border-2 border-ink bg-white p-6">
+              <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-emerald-700">
+                Do this before your next interview
+              </p>
+              <h2 className="mb-2 font-serif text-xl font-bold text-ink">{weakest.label}</h2>
+              <p className="mb-5 leading-relaxed text-slate-700">{weakest.advice}</p>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Link
+                  href="/practice"
+                  className="flex-1 rounded-xl bg-ink px-5 py-3.5 text-center font-bold text-white"
+                >
+                  Practise this now
+                </Link>
+                <Link
+                  href="/universities"
+                  className="flex-1 rounded-xl border-2 border-slate-300 px-5 py-3.5 text-center font-semibold text-slate-700"
+                >
+                  Take another full interview
+                </Link>
+              </div>
+            </section>
+          );
+        })()}
 
         {/* ---------- Sub-scores. null means not assessed, never zero. ---------- */}
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">

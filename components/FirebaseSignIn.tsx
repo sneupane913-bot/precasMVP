@@ -27,6 +27,23 @@ export interface FirebaseWebConfig {
 }
 
 /** Codes that mean "this browser will not allow the popup". */
+/**
+ * V-9. iOS Safari, and every in-app browser (Facebook, Instagram, TikTok),
+ * either block the popup or lose the storage it depends on. Our students reach
+ * us from exactly those places, so on those browsers we do not attempt a popup
+ * at all — we go straight to redirect, which always works.
+ *
+ * Trying the popup first there produces the worst outcome: a button that looks
+ * like it did nothing.
+ */
+function popupIsUnreliable(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent;
+  const iOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const inApp = /FBAN|FBAV|Instagram|Line|Twitter|TikTok|WebView|wv\)/i.test(ua);
+  return iOS || inApp;
+}
+
 const REDIRECT_FALLBACK_CODES = new Set([
   'auth/popup-blocked',
   'auth/web-storage-unsupported',
@@ -169,6 +186,13 @@ export function FirebaseSignIn({
       // inside student A's account.
       provider.setCustomParameters({ prompt: 'select_account' });
 
+      // Straight to redirect where popups are known to fail.
+      if (popupIsUnreliable()) {
+        setDetail('this browser blocks sign-in popups, using redirect');
+        await authMod.signInWithRedirect(auth, provider);
+        return;
+      }
+
       try {
         const cred = await authMod.signInWithPopup(auth, provider);
         const idToken = await cred.user.getIdToken();
@@ -192,9 +216,22 @@ export function FirebaseSignIn({
           return; // the page navigates away
         }
 
-        setError(describe(code));
-        setDetail(`popup: ${code}`);
-        setBusy(false);
+        /**
+         * Anything else we did not anticipate ALSO tries redirect before
+         * giving up. The previous version showed an error for any code not on
+         * the known list, which on an unusual browser reads as "this product
+         * does not work" when redirect would have signed them in fine.
+         */
+        try {
+          setError('Opening Google in this window instead...');
+          setDetail(`popup failed (${code}), trying redirect`);
+          await authMod.signInWithRedirect(auth, provider);
+          return;
+        } catch {
+          setError(describe(code));
+          setDetail(`popup: ${code}, redirect also failed`);
+          setBusy(false);
+        }
       }
     } catch (e) {
       const code = (e as { code?: string }).code ?? 'unknown';
@@ -207,7 +244,18 @@ export function FirebaseSignIn({
     }
   }
 
-  if (!ready) return <div className="h-14" />;
+  // Never render an invisible placeholder. A student staring at empty space
+  // has no way to know whether the page is loading or broken (V-9).
+  if (!ready) {
+    return (
+      <button
+        disabled
+        className="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-slate-200 bg-white px-6 py-4 text-lg font-bold text-slate-400"
+      >
+        Getting ready...
+      </button>
+    );
+  }
 
   // ---- Development: no Firebase project configured yet -------------------
   if (!config) {

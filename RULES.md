@@ -27,8 +27,28 @@ So: **rules first. Then code. Then QA checks code against rules.**
 - **Nothing ships against an unwritten rule.** If behaviour is undefined here,
   it is a gap, not a judgement call for whoever is typing.
 
-Status: `[BUILT]` in code · `[BUILT+PROVEN]` in code and covered by a named test
-· `[TODO]` not built · `[OPEN]` needs a client decision.
+## The four states of a rule
+
+A rule climbs this ladder. It never skips a rung, and it never goes up on
+somebody's word.
+
+| Status | What it means | Who grants it |
+|---|---|---|
+| `TODO` | Not built. | — |
+| `BUILT` | The code exists. **Proves nothing.** | coder |
+| `BUILT+PROVEN` | An automated test names this rule ID and passes. | coder + QA |
+| **`BUILT+PROVEN+TESTED`** | **Seen working with human eyes, in a real browser, with the client watching.** | **client, in the session** |
+
+`OPEN` means it needs a client decision before it can be built at all.
+
+**Why TESTED exists.** Every suite was green while a student could not stay
+signed in. API tests send JSON and read JSON; they cannot see a redirect loop, a
+button that does nothing, or a spinner that never stops. So the last rung is a
+human clicking the thing and watching it happen. Nothing in this product is
+finished until a rule reaches TESTED.
+
+**TESTED is granted live, together, in Chrome — never by me alone.** I click, we
+both watch, and the status changes only when the client has seen it.
 
 ---
 
@@ -47,7 +67,7 @@ These bind everywhere. A rule later in the document never overrides one here.
 | G-7 | **The worst outcome is a soft deny, never a ban.** A student wrongly flagged keeps browsing, keeps their report, and can still pay. | BUILT+PROVEN |
 | G-8 | **No admin, at any level, reads a student's answers.** Transcripts contain family income, visa refusals, finances. Engagement and entitlement only. | BUILT+PROVEN |
 | G-9 | **Every claim on screen must be true today.** No superlative we cannot prove, no countdown that resets, no metric we have not measured. | BUILT |
-| G-10 | **A control that appears to do nothing is a defect,** even if the server behaved correctly. Every button reports what it did. | TODO |
+| G-10 | **A control that appears to do nothing is a defect,** even if the server behaved correctly. Every button reports what it did. `components/ActionButton.tsx` makes working / failed / done impossible to forget, and locks against a second tap while in flight. | BUILT |
 | G-11 | **Money-moving actions are written to an audit trail** with who, when, and what changed. | BUILT+PROVEN |
 | G-12 | **Nothing is `[BUILT+PROVEN]` until a test names its rule ID and passes.** | — |
 
@@ -88,7 +108,7 @@ Never signed in. Has no credits, no history, no session.
 | V-6 | A visitor never sees a hidden pack (`starter`, `pro`) and cannot buy one by naming it. | BUILT+PROVEN |
 | V-7 | An unknown URL shows a branded page with two ways out. | BUILT |
 | V-8 | A consultancy link `/c/{slug}` shows that consultancy's branding. An unknown or unapproved slug 404s. | BUILT+PROVEN |
-| V-9 | **Sign-in must work on the browsers our students actually use** — Android Chrome, iOS Safari, and old iPhones. If the popup is blocked, fall back to redirect automatically. | TODO |
+| V-9 | **Sign-in must work on the browsers our students actually use** — Android Chrome, iOS Safari, old iPhones, and in-app browsers. iOS and in-app browsers now skip the popup entirely and go straight to redirect; any unexpected popup failure also falls back to redirect; and the sign-in screen can never render an invisible placeholder (the iPhone 6s symptom: no button at all). | BUILT |
 | V-10 | A visitor is never asked for a card, a password, or a phone number before the free trial. | BUILT |
 
 ---
@@ -147,7 +167,7 @@ the ledger. It is never stored in a field that can drift.
 | S-25 | The credit is taken on the **first recorded answer**, not when the session is created. Opening the room and closing it costs nothing. | BUILT+PROVEN |
 | S-26 | A silent or too-short answer is refused with a reason and a retry — **never scored**. | BUILT+PROVEN |
 | S-27 | Three attempts per question, then move on. Read from the stored attempt number, not by counting rows. | BUILT |
-| S-28 | A dropped connection mid-answer either preserves the answer or offers a clear retry. It never loses the sitting. | TODO |
+| S-28 | A dropped connection mid-answer **preserves the recording** and offers "send the same recording again". Re-recording an answer the student already gave, because OUR network failed, on a question with three attempts, is charging them for our problem. | BUILT |
 | S-29 | Demo or placeholder text is **labelled as such** and never presented as the student's own words. | BUILT |
 | S-30 | An unknown or expired interview link shows a recovery screen naming the likely reasons, not a spinner. | BUILT |
 
@@ -161,7 +181,7 @@ the ledger. It is never stored in a field that can drift.
 | S-34 | Feedback is available in English and Nepali. | BUILT |
 | S-35 | A report is readable only by the student who made it. A stranger gets 404. | BUILT+PROVEN |
 | S-36 | Opening a report on another device shows a recovery screen explaining why, **without confirming the report exists**. | BUILT+PROVEN |
-| S-37 | The report names what to do next, concretely, not "keep practising". | TODO |
+| S-37 | The report names what to do next, concretely, not "keep practising". One named weakness with one concrete action, placed directly under the verdict where a student looking for what to DO will actually see it. Shared with the dashboard via `lib/advice.ts` so the two cannot disagree. | BUILT |
 
 ## 3.5 The student's own dashboard — THE MISSING ACTOR SURFACE
 
@@ -169,13 +189,13 @@ Nothing here is proven. This is the gap that made the product feel broken.
 
 | ID | Rule | Status |
 |---|---|---|
-| S-38 | A signed-in student has a **home of their own** showing: credits left, mocks taken, practice done, and every past report. | TODO |
-| S-39 | It states plainly **what they have bought and what remains** — "3 mock interviews left of the 3 in your pack". | TODO |
-| S-40 | Every past report is reachable from it. A student who paid must never have to hunt for what they paid for. | TODO |
-| S-41 | It shows **progress over time** — whether their score is improving — because that is the reason to come back. | TODO |
-| S-42 | It surfaces what to practise next, based on their weakest sub-score. | TODO |
+| S-38 | A signed-in student has a **home of their own** at `/account` showing credits left, everything they have done, and every past report. | BUILT |
+| S-39 | It states plainly **what they have bought and what remains**. | BUILT |
+| S-40 | Every past report is reachable from it. A student who paid must never have to hunt for what they paid for. | BUILT |
+| S-41 | It shows **progress over time** — whether their score is improving — because that is the reason to come back. Null until TWO scored sittings exist: one point is a dot, not a direction. | BUILT |
+| S-42 | It surfaces what to practise next, based on their weakest **assessed** sub-score, with concrete advice. Nulls are skipped: a skill we could not judge is a gap in our measurement, not a weakness in the student. | BUILT |
 | S-43 | It shows their referral code and how many rewards it has earned. | BUILT |
-| S-44 | It never shows a number the student cannot act on. | TODO |
+| S-44 | It never shows a number the student cannot act on. The whole progress block is hidden until there is something real to say. | BUILT |
 
 ## 3.6 Paying
 
@@ -304,7 +324,7 @@ Not built. Nothing here may be claimed until it is.
 | E-3 | Every error message says what happened, whose fault it is, and what to do next, in words a nervous nineteen-year-old understands. | BUILT |
 | E-4 | No error blames the student for our failure. | BUILT |
 | E-5 | Storage failures are logged loudly. A silent storage outage is the worst possible failure: the site looks healthy and forgets everybody. | BUILT+PROVEN |
-| E-6 | Every button reports success, failure, or progress. Silence is a defect. | TODO |
+| E-6 | Every button reports success, failure, or progress. Silence is a defect. Errors attach to the button that caused them, never floating at the top of a page a phone user cannot see. | BUILT |
 
 ---
 

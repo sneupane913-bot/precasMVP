@@ -7,6 +7,7 @@ import { store } from '@/lib/store';
 import { repo } from '@/lib/db';
 import { getInstitution } from '@/lib/data/institutions';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
+import { weakestOf } from '@/lib/advice';
 import { apiError } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -58,10 +59,43 @@ export async function GET() {
           total: s.questionIds.length,
           // The band, never a bare number, and only when one honestly exists.
           band: s.summary?.band ?? null,
+          score: s.summary?.overallScore ?? null,
+          subScores: s.summary?.subScores ?? null,
         };
       }),
+      /**
+       * S-41 and S-42. Two numbers a student can actually act on.
+       *
+       * `trend` is null until there are TWO scored sittings, because "you are
+       * improving" needs something to improve from. Inventing a direction from
+       * a single data point would be the same sin as scoring silence.
+       *
+       * `weakest` names the sub-score to work on. It ignores nulls, because a
+       * skill we could not assess is not a weakness — it is a gap in our
+       * measurement, and telling a student to practise something we never
+       * judged would be misleading.
+       */
+      progress: buildProgress(sessions),
     },
   });
+}
+
+function buildProgress(sessions: { summary: { overallScore: number; subScores: Record<string, number | null> } | null }[]) {
+  const scored = sessions
+    .filter((s) => s.summary && typeof s.summary.overallScore === 'number')
+    .map((s) => s.summary!);
+
+  if (scored.length === 0) return { sittings: 0, trend: null, latest: null, weakest: null };
+
+  const latest = scored[0];
+  // Two sittings minimum. One point is a dot, not a direction.
+  const trend =
+    scored.length >= 2 ? latest.overallScore - scored[scored.length - 1].overallScore : null;
+
+  // Lowest sub-score that was actually assessed.
+  const weakest = weakestOf(latest.subScores);
+
+  return { sittings: scored.length, trend, latest: latest.overallScore, weakest };
 }
 
 export async function POST(req: Request) {
