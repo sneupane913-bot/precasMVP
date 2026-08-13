@@ -17,6 +17,65 @@ How to actually do it (this is proven and works):
 - `request_access` for Terminal warns you once and tells you to retry in the same turn. Retry immediately in that same turn.
 - Navigate Finder with `cmd+shift+G` then type the path (typing works in Finder).
 
+## 0d. THE TEST PLAN IS THE GATE (binding rule, added 13 August 2026)
+
+**`docs/TEST-PLAN.md` is the release gate. Read it before you touch anything.
+Nothing goes to the client as finished until it has been walked from the top.**
+
+It contains: every page and every control with what must happen and what must
+never happen, the five actor lifecycles as flowcharts, the invariants, the
+regression gate, the open defects, and the defects already fixed.
+
+### What the client has actually asked for, and the standard he expects
+
+He has said this more than once, and every time it was because a previous pass
+covered what he named and stopped there:
+
+> "I don't want you to just create this all thing based on my saying. I see that
+> the last session you checked it only for the fixes which I had told you about.
+> But I want every fix in this website, for every link, for every life cycle
+> that there is. You should start from opening the application, start from
+> checking each of the pages."
+
+> "You're gonna go to the website. You're gonna see how many links are there,
+> what are the things that can happen, what are the things that can go wrong,
+> and what should we test for. Every single test, so that we ensure none of the
+> bugs are there. When a student clicks on a certain link, the link has to be
+> there. When a student does a certain action, the action has to be recorded."
+
+**Treat what he names as examples, never as the scope.** When he describes one
+scenario, he is showing you the KIND of thing to hunt, not the list. Cover the
+whole class.
+
+### Three things that must change about how testing is done here
+
+1. **The automated suites are not enough, and this is proven.** All six suites
+   were green on 13 August 2026, and within minutes the client found two real
+   bugs in a browser (D-01 and D-02 in the test plan). Every suite drives the
+   API and reads server rendered HTML. **Not one of them loads the JavaScript.**
+   Every defect he has found in the last two rounds lives in client side state.
+
+2. **So every pass includes a real browser pass**, using the Claude in Chrome
+   tools, walking Part A of the test plan screen by screen, clicking every
+   control. He has offered to help with the real Google sign in when the flow
+   needs it. Take him up on it.
+
+3. **Never report "all green" from suites alone.** Say which suites passed and
+   say plainly that the browser pass has or has not been done. He has been told
+   "it is clean" and then found bugs himself, and that is the thing that has
+   cost the most trust on this project.
+
+### The bar for calling something done
+
+- Clicked, not read. A route handler that looks correct proves nothing. The
+  consultancy approval queue existed on the server for weeks with no button on
+  the screen, and the code read perfectly the whole time.
+- Zero findings means you did not look hard enough. Go to the wrong turns: the
+  second tap, the back button, the expired session, the shared machine, the
+  student who signs out and back in.
+- A test is written before the fix, and watched failing first. A test that has
+  never failed has proved nothing.
+
 ## 0c. THE CHECKLISTS ARE THE PLAN (binding rule)
 
 **`CHECKLIST.md` in the project root is the index. It points at three lists**,
@@ -261,3 +320,15 @@ QA-203 CRITICAL unlimited unverified trials (the money leak once STT is live), Q
   **`CHECKLIST-MARKETING.md`** — NEW. Leads with claim verification because this product has already had to retract two claims ("60% cheaper for the same thing" compared different pack sizes; "no other platform lets you try free" was untrue). Then pricing integrity (the NPR 300 wholesale price must never reach a student-facing page), the five funnel numbers worth measuring, channels, competitor watch, and a short list of things marketing must NOT do — no fake countdowns, no pressure before the student has seen their report, no claims about visa outcomes, and never touching transcripts for marketing.
   **Rule 0c in this file was rewritten** to cover all three, and now also requires that client decisions go under "Decisions taken" and my own corrections go under "Corrections on the record" in `CHECKLIST.md`.
   **Pushed:** `482e020..8b563a5 master -> main` at 12:28.
+- **2026-08-13 (session 4 — the walks, eight bugs, and the test plan):**
+  Built `qa/walk-check.js`, which is different in kind from the other five suites and is now the important one. The others prove individual guarantees in isolation. This one walks each ACTOR from their first click to their last, in the order they really click, with the wrong turns included: the second tap on bad wifi, the abandoned QR page, the sign out and back in, the second Gmail on the same laptop, the shared consultancy machine. **The bugs live between the steps, not inside them**, and a list of endpoints cannot find them.
+  **Eight real defects found and fixed.** Three of them were critical.
+  (1) **No way to sign out anywhere in the product.** Not a missing nicety: this product runs in consultancy labs on shared machines with a ninety day cookie, so the next student to sit down was already signed in as the last one, could read their report and spend the credits they paid for. Added `components/HeaderSession.tsx`, `/signout`, and `POST /api/signout`. The page is a plain form so it works when the JavaScript never loads, which is exactly the machine where it matters.
+  (2) **One student could have two payments waiting for approval at once.** The client predicted this one almost word for word. He pays once, opens the checkout again, types a slightly different number, and two requests sit in the queue for one payment. Whoever approves sees two, believes two, grants two packs. `create` now refuses while one is submitted and says plainly that his payment is already being checked.
+  (3) **A consultancy could not see the payments only they were allowed to approve.** `/api/admin` fetched the orders, used them to count revenue, and never sent them to the browser; the portal page had no queue and no buttons. So the client's own rule, that a student from an admin link is approved by that admin, was unreachable. The server code read perfectly the whole time. **This is why nothing is passed by reading code.**
+  Also fixed: a refused student got red text with nothing to click (refusals now carry an action the server chooses, rendered as a button); every checkout visit wrote a new order without limit; tapping "I have paid" twice on bad wifi showed red to someone who had really paid (submit is now idempotent for the same number); we told a consultancy when we approved their student and said nothing when we rejected; and a verified payment could be flipped to rejected while the credits stayed granted, because `/api/super` wrote the order itself instead of calling the shared `rejectPayment`. Removed `checkCredits()`, a placeholder in the answer route that always returned allowed and read like a control.
+  **Result: walk 78/78, adversarial 18/18, lifecycle 20/20, journey 26/26, fraud 19/19, tenant 12/12, `tsc` clean.**
+  **Then the client found two more bugs in a browser, within minutes, with every suite green.** `/start` never asks whether you are already signed in, so a signed in student who taps "My practice" is shown the Google chooser again; and the catalogue keeps saying "Sign in to start" after you have signed in. **Both are client side state, and not one of the six suites loads any JavaScript.** That is the real lesson of this session and it is written up as D-04.
+  **New: `docs/TEST-PLAN.md`, and it is now the release gate.** Every page with every control and what must never happen, the five actor lifecycles as flowcharts, the invariants, the regression gate, the open defects, and the ones already fixed. **New rule 0d in this file** records the standard the client has set, in his own words, and requires a real browser pass with the Claude in Chrome tools on every release. Do not report "all green" from the suites alone again.
+  **Open and NOT fixed, deliberately, because the client asked for documentation rather than more code:** D-01 `/start` ignores an existing session, D-02 stale signed in state on the catalogue, D-03 no visible confirmation of who is signed in, D-04 no browser level testing at all. They are the first work of the next session.
+  **Not yet committed or pushed.**

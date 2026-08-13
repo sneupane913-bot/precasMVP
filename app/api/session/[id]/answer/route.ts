@@ -4,7 +4,7 @@ import { getInstitution } from '@/lib/data/institutions';
 import { getQuestion, resolvedQuestion } from '@/lib/data/questions';
 import { transcribe, redact } from '@/lib/ai/stt';
 import { evaluateAnswer } from '@/lib/ai/evaluate';
-import { checkAudio, checkCredits, LIMITS } from '@/lib/credits';
+import { checkAudio, LIMITS } from '@/lib/credits';
 import { platformDown } from '@/lib/platform';
 import { ownsSession } from '@/lib/owner-session';
 import { currentStudent } from '@/lib/auth/session';
@@ -112,12 +112,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     );
   }
 
-  const credits = await checkCredits(null);
-  if (!credits.allowed) {
-    return NextResponse.json(apiError(credits.code, 'no credits', credits.userMessage), {
-      status: 402,
-    });
-  }
+  // (There used to be a checkCredits() call here. It was a placeholder that
+  // always returned allowed, so it read like a control while guarding nothing.
+  // The real debit is the ledger consume immediately below, which is the only
+  // thing the browser cannot influence.)
 
   /**
    * Debit the sitting.

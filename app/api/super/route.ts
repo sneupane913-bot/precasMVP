@@ -4,7 +4,7 @@ import { isSuperAdmin, platform } from '@/lib/platform';
 import { repo, type ApprovalAudit } from '@/lib/db';
 import { grantPack, rewardReferral, adminGrant } from '@/lib/entitlement';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
-import { approvePayment } from '@/lib/payments';
+import { approvePayment, rejectPayment } from '@/lib/payments';
 import { apiError } from '@/lib/types';
 import { BUILD_INFO } from '@/lib/build-info';
 
@@ -197,21 +197,35 @@ export async function POST(req: Request) {
   }
 
   // ---------------------------------------------------------- rejectPayment
+  //
+  // WALK 6.3 and 6.4. This branch used to write the order itself instead of
+  // calling the shared rejectPayment, and skipping that one function cost two
+  // guarantees at once:
+  //
+  //   6.4  It would happily flip an ALREADY VERIFIED order to rejected. The
+  //        credits stay granted, because nothing un-grants them, so the money
+  //        record says refused and the student record says paid. Once those two
+  //        disagree there is no way to tell later which one was right.
+  //
+  //   6.3  It never told the consultancy. We message them when we approve one
+  //        of their students and said nothing when we refused one, so their
+  //        student is stuck and the only person who could help was never told.
+  //
+  // Both are fixed by doing what the approve branch already does: calling the
+  // one shared function. Two routes that can move money must run the same code.
   if (body.action === 'rejectPayment') {
     const order = await r.getOrder(body.orderId);
     if (!order) {
       return NextResponse.json(apiError('NOT_FOUND', 'no order', 'Not found.'), { status: 404 });
     }
-    await r.updateOrder(order.id, { state: 'rejected', rejectedReason: body.reason });
-    await audit({
-      actorRole: 'super_admin',
-      actorId: 'super_admin',
-      action: 'reject_payment',
-      subjectId: order.id,
-      before: order.state,
-      after: 'rejected',
-      note: body.reason,
-    });
+    const res = await rejectPayment(
+      order,
+      { role: 'super_admin', id: 'super_admin', label: 'super admin' },
+      body.reason
+    );
+    if (!res.ok) {
+      return NextResponse.json(apiError(res.code, res.code, res.userMessage), { status: 409 });
+    }
     return NextResponse.json({ ok: true, data: { state: 'rejected' } });
   }
 
@@ -285,7 +299,10 @@ export async function POST(req: Request) {
     await audit({
       actorRole: 'super_admin',
       actorId: 'super_admin',
-      action: 'approve_admin_student',
+      // Filed under its own name. This used to be recorded as
+      // 'approve_admin_student', so a hand written credit grant read in the
+      // audit trail as approving a student, which is a different act.
+      action: 'grant_credit',
       subjectId: body.studentId,
       before: null,
       after: `+${body.amount} ${body.kind}`,

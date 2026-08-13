@@ -216,10 +216,12 @@ export class BlobRepo implements Repo {
   async listOrders(filter?: {
     state?: PaymentOrder['state'];
     consultancyId?: string;
+    studentId?: string;
   }): Promise<PaymentOrder[]> {
     let all = await this.getMany<PaymentOrder>('order/');
     if (filter?.state) all = all.filter((o) => o.state === filter.state);
     if (filter?.consultancyId) all = all.filter((o) => o.consultancyId === filter.consultancyId);
+    if (filter?.studentId) all = all.filter((o) => o.studentId === filter.studentId);
     return all.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
   }
 

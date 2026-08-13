@@ -349,11 +349,16 @@ export class SupabaseRepo implements Repo {
     const r = await patch('payment_orders', `id=eq.${id}`, fromOrder(p));
     return r ? toOrder(r) : null;
   }
-  async listOrders(filter?: { state?: PaymentOrder['state']; consultancyId?: string }) {
+  async listOrders(filter?: {
+    state?: PaymentOrder['state'];
+    consultancyId?: string;
+    studentId?: string;
+  }) {
     let q = 'payment_orders?select=*&order=created_at.desc';
     if (filter?.state) q += `&state=eq.${filter.state}`;
     if (filter?.consultancyId)
       q += `&consultancy_id=eq.${encodeURIComponent(filter.consultancyId)}`;
+    if (filter?.studentId) q += `&student_id=eq.${encodeURIComponent(filter.studentId)}`;
     return (await selectRows(q)).map(toOrder);
   }
 

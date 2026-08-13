@@ -279,15 +279,36 @@ export interface SessionSummary {
   nextSteps: string[];
 }
 
+/**
+ * Where a refused student is meant to go next.
+ *
+ * WALK 1, step 1.11. A student who has used their free ten taps "Start
+ * interview" and gets a sentence printed in red with nothing on it to click.
+ * He has been told no and handed nothing, which reads as a broken product
+ * rather than a locked one, and the client's rule is the opposite: every
+ * blocked click becomes an offer to pay.
+ *
+ * So a refusal now carries its own way out. The server decides where that is,
+ * because the server is the only thing that knows WHY it said no.
+ */
+export interface ApiAction {
+  label: string;
+  href: string;
+}
+
 /** Every API route returns this shape. Never throw a raw error to the client. */
 export type ApiResult<T> =
   | { ok: true; data: T }
-  | { ok: false; error: { code: string; message: string; userMessage: string } };
+  | {
+      ok: false;
+      error: { code: string; message: string; userMessage: string; action?: ApiAction };
+    };
 
 export function apiError(
   code: string,
   message: string,
-  userMessage: string
+  userMessage: string,
+  action?: ApiAction
 ): ApiResult<never> {
-  return { ok: false, error: { code, message, userMessage } };
+  return { ok: false, error: { code, message, userMessage, ...(action ? { action } : {}) } };
 }

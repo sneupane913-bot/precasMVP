@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { HeaderSession } from '@/components/HeaderSession';
 
 /**
  * Global header for the public marketing pages (home, universities, pricing,
@@ -39,29 +40,13 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        {/* Right side actions */}
+        {/* Right side actions.
+            D19: a signed-in student needs a way back to their own history.
+            WALK 1.16: and a way OUT. These depend on whether anyone is signed
+            in, so they live in a small client island rather than making the
+            whole header client-side. */}
         <div className="flex items-center gap-2">
-          {/* D19: a signed-in student needs a way back to their own history.
-              Server component, so this always shows; /account itself redirects
-              to sign-in if they are not signed in, which keeps this simple. */}
-          <Link
-            href="/account"
-            className="hidden text-sm font-semibold text-slate-600 transition hover:text-ink sm:inline"
-          >
-            My practice
-          </Link>
-          <Link
-            href="/start"
-            className="hidden text-sm font-semibold text-ink transition hover:opacity-70 sm:inline"
-          >
-            Sign in
-          </Link>
-          <Link
-            href="/start"
-            className="inline-flex items-center justify-center rounded-xl bg-ink px-4 py-2.5 text-sm font-bold text-white transition active:scale-[0.98]"
-          >
-            Start free
-          </Link>
+          <HeaderSession />
         </div>
       </div>
     </header>

@@ -136,7 +136,11 @@ export async function POST(req: Request) {
         'NO_CREDITS_LEFT',
         `no ${parsed.mode} credit`,
         (parsed.mode === 'practice' ? ent.practiceReason : ent.reason) ??
-          'Buy a pack to keep practising.'
+          'Buy a pack to keep practising.',
+        // WALK 1.11. Being told no is not the same as being stuck. The refusal
+        // carries the way out with it, so the catalogue can put a button under
+        // the sentence instead of leaving a student staring at red text.
+        { label: 'See the packs', href: '/pricing' }
       ),
       { status: 402 }
     );

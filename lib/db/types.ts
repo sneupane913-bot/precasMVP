@@ -134,6 +134,8 @@ export interface ApprovalAudit {
     | 'approve_consultancy'
     | 'suspend_consultancy'
     | 'approve_admin_student'
+    /** A super admin adding credit by hand. Its own act, its own name. */
+    | 'grant_credit'
     | 'grant_trial_override'
     | 'decline_trial_override'
     | 'enable_student'

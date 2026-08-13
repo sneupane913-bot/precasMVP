@@ -71,8 +71,54 @@ export async function POST(req: Request) {
       );
     }
 
+    const mine = await r.listOrders({ studentId: student.id });
+
+    /**
+     * WALK 4.4, and it is the one that costs money.
+     *
+     * A student who has already sent us a transaction number and is waiting
+     * must not be able to start a second payment. The client asked exactly
+     * this: "from the same person, multiple requests to the admin cannot go."
+     * Without this, a student who pays once and then opens the checkout again
+     * and types a slightly different number puts TWO requests in the approval
+     * queue for ONE payment. Whoever is approving sees two, believes two, and
+     * approves two, and we hand out two packs for one lot of money.
+     *
+     * We do not create a rival order at all. We show them the one they already
+     * have and tell them plainly it is being checked.
+     */
+    const waiting = mine.find((o) => o.state === 'submitted');
+    if (waiting) {
+      return NextResponse.json(
+        apiError(
+          'PAYMENT_ALREADY_WAITING',
+          `order ${waiting.id} is already submitted`,
+          'You have already sent us a payment and we are checking it now. There is no need to pay again. We will switch your credits on as soon as it is confirmed.',
+          { label: 'See my practice', href: '/account' }
+        ),
+        { status: 409 }
+      );
+    }
+
+    /**
+     * WALK 3.5. Opening the checkout page writes an order, so a student who
+     * opens it, closes it, and opens it again writes another, without limit. An
+     * abandoned checkout is not fraud and must never be punished, but it must
+     * also not be a way to grow our payments table for ever.
+     *
+     * So an unfinished order for the same pack is handed back rather than
+     * replaced. Nothing about the student's experience changes: they see the
+     * same amount and the same wallet details. The table simply stops growing.
+     */
+    const reusable = mine.find(
+      (o) =>
+        o.state === 'created' &&
+        o.packCode === plan.code &&
+        new Date(o.expiresAt).getTime() > Date.now()
+    );
+
     const now = Date.now();
-    const order: PaymentOrder = {
+    const order: PaymentOrder = reusable ?? {
       id: crypto.randomUUID(),
       studentId: student.id,
       consultancyId: student.consultancyId,
@@ -91,7 +137,7 @@ export async function POST(req: Request) {
       createdAt: new Date(now).toISOString(),
       expiresAt: new Date(now + ORDER_TTL_MINUTES * 60_000).toISOString(),
     };
-    await r.createOrder(order);
+    if (!reusable) await r.createOrder(order);
 
     const result: ApiResult<{
       orderId: string;
@@ -140,9 +186,46 @@ export async function POST(req: Request) {
         { status: 404 }
       );
     }
+    /**
+     * WALK 4.2. The client's exact scenario: "his wifi is not that good, so he
+     * is clicking send send send send."
+     *
+     * The first tap succeeded on the server. His phone never saw the reply, so
+     * he taps again, and the old code answered the second identical tap with a
+     * red error. A student who has just sent real money and is then shown red
+     * concludes the payment failed. He either pays a second time or he decides
+     * he has been cheated, and both of those are our fault, not his.
+     *
+     * The same tap with the same transaction number on the same order is the
+     * same request, so it gets the same calm answer. Idempotent, not scolding.
+     *
+     * Only the SAME number: a different number on an already submitted order is
+     * a genuine conflict and is still refused below.
+     */
+    const sameTxn =
+      order.state === 'submitted' &&
+      order.walletTxnId === body.walletTxnId.trim().toUpperCase();
+    if (sameTxn) {
+      return NextResponse.json({
+        ok: true,
+        data: {
+          state: order.state,
+          message:
+            'Thank you. We already have these details and we are checking your payment now. You do not need to send them again.',
+        },
+      });
+    }
+
     if (order.state !== 'created') {
       return NextResponse.json(
-        apiError('BAD_STATE', `order is ${order.state}`, 'This payment has already been submitted.'),
+        apiError(
+          'BAD_STATE',
+          `order is ${order.state}`,
+          order.state === 'verified'
+            ? 'This payment has already been approved and your credits are on your account.'
+            : 'We already have a payment from you and we are checking it. Please do not send it again.',
+          { label: 'See my practice', href: '/account' }
+        ),
         { status: 409 }
       );
     }
@@ -175,6 +258,33 @@ export async function POST(req: Request) {
       payerName: body.payerName,
       payerPhoneSuffix: body.payerPhoneSuffix,
     });
+
+    /**
+     * Tell whoever has to approve this that it is waiting.
+     *
+     * The client's rule: "the moment he clicks send, a notification should go
+     * to either admin or the super admin, based on how it has linked." The
+     * routing is the order's own consultancy binding, which was set when the
+     * order was created from the student's binding, so it cannot be influenced
+     * from the browser.
+     *
+     *   bound to a consultancy -> that consultancy is told, and only that one
+     *   no consultancy         -> nothing to send, and nothing is needed: the
+     *                             super admin's queue counts waiting orders
+     *                             directly, so a message would be noise
+     *
+     * A student who taps send twice does not generate two messages, because the
+     * second identical tap returns above and never reaches this line.
+     */
+    if (order.consultancyId) {
+      await r.addNotification({
+        id: crypto.randomUUID(),
+        consultancyId: order.consultancyId,
+        message: `${body.payerName} has sent a payment of NPR ${order.amountNpr.toLocaleString()} and is waiting for you to approve it.`,
+        createdAt: new Date().toISOString(),
+        readAt: null,
+      });
+    }
 
     return NextResponse.json({
       ok: true,

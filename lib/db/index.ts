@@ -60,7 +60,13 @@ export interface Repo {
   createOrder(o: PaymentOrder): Promise<PaymentOrder>;
   getOrder(id: string): Promise<PaymentOrder | null>;
   updateOrder(id: string, patch: Partial<PaymentOrder>): Promise<PaymentOrder | null>;
-  listOrders(filter?: { state?: PaymentOrder['state']; consultancyId?: string }): Promise<PaymentOrder[]>;
+  listOrders(filter?: {
+    state?: PaymentOrder['state'];
+    consultancyId?: string;
+    /** One student's own orders. Used to stop a second payment being started
+     *  while one is already waiting for approval (WALK 4.4). */
+    studentId?: string;
+  }): Promise<PaymentOrder[]>;
   /**
    * Atomically reserve a wallet transaction id. Returns false when it is
    * already claimed. This is THE control against a screenshot being reused.

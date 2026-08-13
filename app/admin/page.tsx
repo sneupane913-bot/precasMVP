@@ -31,6 +31,26 @@ interface Notification {
   readAt: string | null;
 }
 
+/**
+ * A payment one of their own students has sent, waiting on them.
+ * WALK 5.6: this used to exist on the server and never reach this page.
+ */
+interface Order {
+  id: string;
+  studentName: string | null;
+  studentEmail: string | null;
+  packCode: string;
+  amountNpr: number;
+  walletTxnId: string | null;
+  payerName: string | null;
+  payerPhoneSuffix: string | null;
+  screenshotUrl: string | null;
+  state: string;
+  rejectedReason: string | null;
+  createdAt: string;
+  verifiedAt: string | null;
+}
+
 interface AdminData {
   consultancy: {
     id: string;
@@ -43,6 +63,7 @@ interface AdminData {
   };
   students: Student[];
   notifications: Notification[];
+  orders: Order[];
   stats: {
     studentCount: number;
     activeStudents: number;
@@ -50,6 +71,7 @@ interface AdminData {
     seatsUsed: number;
     seatsLeft: number;
     paidOrders: number;
+    ordersAwaiting: number;
   };
 }
 
@@ -60,6 +82,7 @@ export default function AdminPage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [deciding, setDeciding] = useState<string | null>(null);
 
   const login = useCallback(async () => {
     setBusy(true);
@@ -84,6 +107,56 @@ export default function AdminPage() {
       setBusy(false);
     }
   }, [slug, passcode]);
+
+  /**
+   * Approve or reject one of their own students' payments.
+   *
+   * The confirmation wording is deliberate and is not boilerplate. The money
+   * for these orders lands in OUR wallet, not theirs, so the admin is asserting
+   * something they cannot see for themselves. They should be asked to mean it.
+   */
+  const decide = useCallback(
+    async (order: Order, approve: boolean) => {
+      const reason = approve
+        ? null
+        : window.prompt(
+            'Why can this payment not be approved? Your student will be shown this, so please be plain.'
+          );
+      if (!approve && (!reason || reason.trim().length < 3)) return;
+      if (
+        approve &&
+        !window.confirm(
+          `Approve NPR ${order.amountNpr.toLocaleString()} from ${order.payerName ?? 'this student'}?\n\nTransaction ${order.walletTxnId}\n\nOnly approve this if you have seen the money yourself. Their credits switch on straight away and this is recorded against your name.`
+        )
+      )
+        return;
+
+      setDeciding(order.id);
+      setError(null);
+      try {
+        const res = await fetch('/api/admin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(
+            approve
+              ? { action: 'approvePayment', slug, passcode, orderId: order.id, confirmedReceived: true }
+              : { action: 'rejectPayment', slug, passcode, orderId: order.id, reason: reason?.trim() }
+          ),
+        });
+        const json = await res.json();
+        if (!json.ok) {
+          setError(json.error.userMessage);
+          return;
+        }
+        await login(); // refresh the queue so it cannot show a stale state
+      } catch {
+        setError('Could not reach the server. Check your connection and try again.');
+      } finally {
+        setDeciding(null);
+      }
+    },
+    [slug, passcode, login]
+  );
 
   // ------------------------------------------------------------- sign in ---
   if (!data) {
@@ -130,6 +203,8 @@ export default function AdminPage() {
   }
 
   const s = data.stats;
+  const waiting = (data.orders ?? []).filter((o) => o.state === 'submitted');
+  const settled = (data.orders ?? []).filter((o) => o.state !== 'submitted' && o.state !== 'created');
   const link =
     typeof window !== 'undefined'
       ? `${window.location.origin}/c/${data.consultancy.slug}`
@@ -172,6 +247,78 @@ export default function AdminPage() {
                   <span className="ml-2 text-emerald-700/70">
                     {new Date(n.createdAt).toLocaleDateString()}
                   </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* ------------------------------------------- payments waiting ---
+            WALK 5.6. The client's rule is that a student who signed up through
+            this consultancy's link is approved by this consultancy. That rule
+            was unreachable until this section existed: the server could approve
+            and the screen had no button. Put first, above everything else,
+            because a student is sitting waiting on it. */}
+        {waiting.length > 0 && (
+          <section className="mb-6 overflow-hidden rounded-2xl border-2 border-amber-300 bg-amber-50">
+            <div className="border-b border-amber-200 p-5">
+              <h2 className="font-serif text-lg font-bold text-amber-900">
+                {waiting.length === 1
+                  ? '1 student is waiting for you'
+                  : `${waiting.length} students are waiting for you`}
+              </h2>
+              <p className="text-sm text-amber-900/80">
+                They have paid and sent us the transaction number. Approve it only if you have seen
+                the money yourself. Their credits switch on the moment you do.
+              </p>
+            </div>
+            <ul className="divide-y divide-amber-200">
+              {waiting.map((o) => (
+                <li key={o.id} className="flex flex-wrap items-center gap-4 bg-white/60 p-5">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-ink">
+                      {o.studentName || o.payerName || 'Unnamed student'}
+                      <span className="ml-2 font-serif text-lg">
+                        NPR {o.amountNpr.toLocaleString()}
+                      </span>
+                    </p>
+                    <p className="text-sm text-slate-600">
+                      {o.studentEmail || 'no email'} · paid as {o.payerName || 'unknown'} · number
+                      ending {o.payerPhoneSuffix || '----'}
+                    </p>
+                    <p className="mt-1 font-mono text-sm text-ink">
+                      Transaction {o.walletTxnId}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      Sent {new Date(o.createdAt).toLocaleString()}
+                    </p>
+                    {o.screenshotUrl && (
+                      <a
+                        href={o.screenshotUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm font-semibold text-ink underline"
+                      >
+                        See their receipt
+                      </a>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => decide(o, true)}
+                      disabled={deciding === o.id}
+                      className="rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white disabled:opacity-50"
+                    >
+                      {deciding === o.id ? 'Working...' : 'Approve'}
+                    </button>
+                    <button
+                      onClick={() => decide(o, false)}
+                      disabled={deciding === o.id}
+                      className="rounded-xl border-2 border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700 disabled:opacity-50"
+                    >
+                      Cannot confirm
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -278,6 +425,45 @@ export default function AdminPage() {
             </div>
           )}
         </section>
+
+        {/* Settled payments, so an admin can answer "what happened to mine?"
+            without messaging us. Deliberately below the students table: it is
+            a record, not a task. */}
+        {settled.length > 0 && (
+          <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+            <div className="border-b border-slate-200 p-5">
+              <h2 className="font-serif text-lg font-bold text-ink">Payments already decided</h2>
+              <p className="text-sm text-slate-600">
+                Approved by you or by us. Nothing here needs doing.
+              </p>
+            </div>
+            <ul className="divide-y divide-slate-100">
+              {settled.slice(0, 25).map((o) => (
+                <li key={o.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-ink">
+                      {o.studentName || o.payerName || 'Unnamed'} · NPR{' '}
+                      {o.amountNpr.toLocaleString()}
+                    </p>
+                    <p className="font-mono text-xs text-slate-500">{o.walletTxnId}</p>
+                    {o.rejectedReason && (
+                      <p className="text-xs text-amber-800">Not confirmed: {o.rejectedReason}</p>
+                    )}
+                  </div>
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                      o.state === 'verified'
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : 'bg-slate-100 text-slate-700'
+                    }`}
+                  >
+                    {o.state === 'verified' ? 'approved' : o.state}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </main>
     </div>
   );

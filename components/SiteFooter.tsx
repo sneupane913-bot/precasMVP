@@ -22,6 +22,11 @@ export function SiteFooter() {
         { label: 'Practise one question', href: '/practice' },
         { label: 'Pricing', href: '/pricing' },
         { label: 'Start free', href: '/start' },
+        // WALK 1.16. On a shared consultancy machine this is the most important
+        // link on the page, and it is here rather than only in the header
+        // because it must be findable without JavaScript and easy to say out
+        // loud over the phone.
+        { label: 'Sign out', href: '/signout' },
       ],
     },
     {

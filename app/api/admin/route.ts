@@ -183,12 +183,45 @@ export async function POST(req: Request) {
   const paid = orders.filter((o) => o.state === 'verified');
   const liveSeats = seats.filter((s) => !s.revokedAt).length;
 
+  /**
+   * WALK 5.6, and it made the whole consultancy approval feature imaginary.
+   *
+   * This route could already approve a payment, and the client's rule is that a
+   * student who signed up through a consultancy link is approved by THAT
+   * consultancy. But the orders were fetched here, used only to count revenue,
+   * and never sent to the browser, and the portal page had no queue on it. So
+   * the one person allowed to approve their student's payment had no way to see
+   * that a payment existed. The student paid and waited for a button nobody
+   * could press.
+   *
+   * Only their own orders, because listOrders was filtered by their own
+   * consultancy id above. Never a transcript, never another consultancy's
+   * money.
+   */
+  const byId = new Map(mine.map((s) => [s.id, s]));
+  const visibleOrders = orders.map((o) => ({
+    id: o.id,
+    studentName: byId.get(o.studentId)?.name ?? null,
+    studentEmail: byId.get(o.studentId)?.email ?? null,
+    packCode: o.packCode,
+    amountNpr: o.amountNpr,
+    walletTxnId: o.walletTxnId,
+    payerName: o.payerName,
+    payerPhoneSuffix: o.payerPhoneSuffix,
+    screenshotUrl: o.screenshotUrl,
+    state: o.state,
+    rejectedReason: o.rejectedReason,
+    createdAt: o.createdAt,
+    verifiedAt: o.verifiedAt,
+  }));
+
   return NextResponse.json({
     ok: true,
     data: {
       consultancy: publicView(c),
       students,
       notifications,
+      orders: visibleOrders,
       stats: {
         studentCount: mine.length,
         activeStudents: mine.filter((s) => s.status === 'active').length,
@@ -200,6 +233,8 @@ export async function POST(req: Request) {
         seatsUsed: liveSeats,
         seatsLeft: Math.max(0, c.seatsTotal - liveSeats),
         paidOrders: paid.length,
+        /** How many of their students are waiting on them right now. */
+        ordersAwaiting: orders.filter((o) => o.state === 'submitted').length,
       },
     },
   });

@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { publicInstitutions } from '@/lib/data/institutions';
 import type { Institution } from '@/lib/types';
@@ -30,6 +31,14 @@ function UniversityBrowser() {
   const [type, setType] = useState<'all' | 'Pre-CAS' | 'CAS' | 'Pre-Admission'>('all');
   const [starting, setStarting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  /**
+   * WALK 1.11. When the server refuses, it now says where to go next. Holding
+   * that here is what turns a red sentence into something a student can act on.
+   */
+  const [errorAction, setErrorAction] = useState<{ label: string; href: string } | null>(null);
+  /** Whether this student still has a free try to spend, so the cards can stop
+   *  promising one to somebody who has already used theirs. */
+  const [hasCredit, setHasCredit] = useState<boolean | null>(null);
   // QA B1: the catalogue let anyone start an interview without signing in.
   // We check once on load so the buttons can say "Sign in to start" instead of
   // failing after the tap.
@@ -40,7 +49,11 @@ function UniversityBrowser() {
     fetch('/api/me')
       .then((r) => r.json())
       .then((j) => {
-        if (!cancelled) setSignedIn(Boolean(j?.data?.signedIn));
+        if (cancelled) return;
+        setSignedIn(Boolean(j?.data?.signedIn));
+        setHasCredit(
+          j?.data?.signedIn ? Boolean(j?.data?.entitlement?.canStartMock) : true
+        );
       })
       .catch(() => {
         if (!cancelled) setSignedIn(false);
@@ -49,6 +62,21 @@ function UniversityBrowser() {
       cancelled = true;
     };
   }, []);
+
+  /**
+   * The catalogue already sends a refused student to sign in with
+   * `?start=<slug>` so they can be brought back to the university they picked.
+   * Nothing ever read that parameter, so they were returned to a page of forty
+   * seven cards and had to find theirs again. Now they land where they were.
+   */
+  const [resumed, setResumed] = useState(false);
+  useEffect(() => {
+    const wanted = searchParams.get('start');
+    if (!wanted || resumed || signedIn !== true) return;
+    setResumed(true);
+    void start(wanted);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, signedIn, resumed]);
 
   const results = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -76,6 +104,7 @@ function UniversityBrowser() {
     }
     setStarting(slug);
     setError(null);
+    setErrorAction(null);
     try {
       const res = await fetch('/api/session/create', {
         method: 'POST',
@@ -85,7 +114,7 @@ function UniversityBrowser() {
       });
       const json = (await res.json()) as
         | { ok: true; data: { sessionId: string } }
-        | { ok: false; error: { userMessage: string } };
+        | { ok: false; error: { userMessage: string; action?: { label: string; href: string } } };
 
       if (!json.ok) {
         // Session expired between load and tap: recover by signing in again
@@ -95,6 +124,9 @@ function UniversityBrowser() {
           return;
         }
         setError(json.error.userMessage);
+        setErrorAction(json.error.action ?? null);
+        // Their free try is gone, so stop the cards promising one.
+        if (res.status === 402) setHasCredit(false);
         setStarting(null);
         return;
       }
@@ -144,10 +176,29 @@ function UniversityBrowser() {
           ))}
         </div>
 
+        {/* WALK 1.11. A student who has used their free ten taps Start and gets
+            told no. Told no with nothing to click reads as broken. The server
+            sends the way out with the refusal, and it is rendered as a real
+            button under the sentence. Amber, not red: nothing has gone wrong,
+            this is simply the paid part. */}
         {error && (
-          <p className="mb-4 rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3 font-medium text-red-800">
-            {error}
-          </p>
+          <div
+            className={`mb-4 rounded-xl border-2 px-4 py-3 ${
+              errorAction ? 'border-amber-300 bg-amber-50' : 'border-red-200 bg-red-50'
+            }`}
+          >
+            <p className={`font-medium ${errorAction ? 'text-amber-900' : 'text-red-800'}`}>
+              {error}
+            </p>
+            {errorAction && (
+              <Link
+                href={errorAction.href}
+                className="mt-3 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white"
+              >
+                {errorAction.label}
+              </Link>
+            )}
+          </div>
         )}
 
         {results.length === 0 ? (
@@ -173,7 +224,7 @@ function UniversityBrowser() {
           )}
           <ul className="grid gap-4 sm:grid-cols-2">
             {featured.map((i) => (
-              <UniCard key={i.id} i={i} starting={starting} signedIn={signedIn} onStart={start} />
+              <UniCard key={i.id} i={i} starting={starting} signedIn={signedIn} hasCredit={hasCredit} onStart={start} />
             ))}
           </ul>
 
@@ -187,7 +238,7 @@ function UniversityBrowser() {
               </h2>
               <ul className="grid gap-4 sm:grid-cols-2">
                 {others.map((i) => (
-                  <UniCard key={i.id} i={i} starting={starting} signedIn={signedIn} onStart={start} />
+                  <UniCard key={i.id} i={i} starting={starting} signedIn={signedIn} hasCredit={hasCredit} onStart={start} />
                 ))}
               </ul>
             </>
@@ -209,13 +260,20 @@ function UniCard({
   i,
   starting,
   signedIn,
+  hasCredit,
   onStart,
 }: {
   i: Institution;
   starting: string | null;
   signedIn: boolean | null;
+  /** Null while we are still asking. False once we know they have none left. */
+  hasCredit: boolean | null;
   onStart: (slug: string) => void;
 }) {
+  // WALK 1.11. Forty seven cards each promising a "free first try" to a student
+  // who used theirs an hour ago is the product telling him something untrue,
+  // and then refusing him when he believes it. The card tells the truth first.
+  const locked = signedIn === true && hasCredit === false;
   return (
     <li className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5">
       <div className="mb-4 flex items-start justify-between gap-3">
@@ -246,8 +304,12 @@ function UniCard({
             <p className="mt-0.5 text-sm text-slate-500">{i.city}</p>
           </div>
         </div>
-        <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
-          Free first try
+        <span
+          className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ${
+            locked ? 'bg-amber-50 text-amber-800' : 'bg-emerald-50 text-emerald-700'
+          }`}
+        >
+          {locked ? 'Needs a pack' : 'Free first try'}
         </span>
       </div>
 
@@ -271,7 +333,9 @@ function UniCard({
           ? 'Starting...'
           : signedIn === false
             ? 'Sign in to start'
-            : 'Start interview'}
+            : locked
+              ? 'Buy a pack to start'
+              : 'Start interview'}
       </button>
     </li>
   );
