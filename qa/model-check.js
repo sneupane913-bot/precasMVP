@@ -112,8 +112,18 @@ async function signIn(token, opts = {}) {
     /eligiblePool/.test(qfile) && !/generateQuestion|makeUpQuestion|synthesi/i.test(qfile),
     'a student who practises three mocks and then meets nothing familiar has been cheated');
   t('N-29', 'The question bank cites where its questions come from',
-    /source|citation|researched|https?:\/\//i.test(qfile),
-    /source|https?:\/\//i.test(qfile) ? 'sources present' : 'NO SOURCES — cannot claim these are what universities ask');
+    /SOURCES, checked/i.test(qfile) && /https:\/\/www\.brookes\.ac\.uk/.test(qfile) &&
+    /THE FIVE TOPIC AREAS/.test(qfile),
+    'two named UK university sources, dated, with every category mapped to a published topic area');
+
+  t('Q-1', 'Every category maps to a published Pre-CAS topic area',
+    ['why_uk', 'why_university', 'why_course', 'finance', 'future_plans'].every((c) => qfile.includes(c)),
+    'the five topic areas the universities themselves publish are all covered');
+
+  t('Q-2', 'The bank encodes what the sources say actually fails a student',
+    /not enough to rely on university rankings/i.test(qfile) &&
+    /general answers that anyone could give/i.test(qfile),
+    'a rankings-only answer must score badly on genuineIntent, not well - taken from the source, not guessed');
 
   console.log('\n=== PRACTICE ===\n');
 

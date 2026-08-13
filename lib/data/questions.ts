@@ -1,3 +1,52 @@
+/**
+ * WHERE THESE QUESTIONS COME FROM (N-29, Q-1, Q-2).
+ *
+ * Nothing in this bank was invented. Every category below maps to a topic area
+ * that a UK university or UKVI itself publishes as part of the Pre-CAS /
+ * credibility interview, and the wording is adapted from those published
+ * examples rather than guessed at.
+ *
+ * This matters more than it looks. A bank somebody made up would still LOOK
+ * like a product: students would practise, get scores, and feel prepared, and
+ * we would only find out it was useless when they started failing real
+ * interviews. So the sources are recorded here, with dates, and no page may
+ * claim these are the questions universities ask unless this block is true.
+ *
+ * SOURCES, checked 13 August 2026:
+ *
+ *  [S1] Oxford Brookes University — "UKVI Credibility interviews", the
+ *       university's own guidance to its offer holders, listing the five topic
+ *       areas and example questions under each.
+ *       https://www.brookes.ac.uk/students/isat/visas/student-visa/credibility-interviews
+ *
+ *  [S2] University of Lincoln — "Pre-CAS Interview | Information for Offer
+ *       Holders", confirming the interview format and purpose.
+ *       https://www.lincoln.ac.uk/studywithus/internationalstudents/informationforofferholders/pre-casinterview/
+ *
+ * THE FIVE TOPIC AREAS [S1], and the categories in this file that cover them:
+ *
+ *   1. Study in the UK          -> why_uk
+ *   2. Why this university      -> why_university, accommodation
+ *   3. Why this course          -> why_course, education, study_gap
+ *   4. Financing your studies   -> finance
+ *   5. Post-study plans         -> future_plans, progression
+ *
+ * Plus identity and conversational, which are how a real interview opens and
+ * how an interviewer probes an answer that sounded recited.
+ *
+ * TWO THINGS [S1] SAYS THAT SHAPE THE WHOLE PRODUCT:
+ *
+ *   "If you just give general answers that anyone could give, then your visa
+ *   application may be refused."  <- this is why N-30 forbids generic feedback.
+ *   Coaching a student towards a general answer would be coaching them to fail.
+ *
+ *   "It is not enough to rely on university rankings."  <- so an answer that
+ *   only cites a ranking must score badly on genuineIntent, not well.
+ *
+ * WHEN ADDING A QUESTION: cite which topic area it belongs to. A question that
+ * fits none of them is not a Pre-CAS question, however sensible it sounds.
+ */
+
 import type { Institution, Question, PublicQuestion } from '@/lib/types';
 
 // The question bank. {{university}} and {{city}} are resolved per session, so

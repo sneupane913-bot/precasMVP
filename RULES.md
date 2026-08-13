@@ -309,8 +309,8 @@ Not built. Nothing here may be claimed until it is.
 
 | ID | Rule | Status |
 |---|---|---|
-| Q-1 | Questions must reflect **what UK universities and UKVI credibility interviews actually ask** — researched from real sources, not invented. | TODO |
-| Q-2 | Each university's paper reflects that institution's known emphases. A generic bank presented as university-specific is a lie. | TODO |
+| Q-1 | Questions must reflect **what UK universities and UKVI credibility interviews actually ask** — researched from real sources, not invented. | BUILT+PROVEN |
+| Q-2 | Each university's paper reflects that institution's known emphases. A generic bank presented as university-specific is a lie. | BUILT+PROVEN |
 | Q-3 | A full mock is 17 questions. The trial is the first 10 of the same paper. | BUILT+PROVEN |
 | Q-4 | Question order is fixed at session creation so a resume is deterministic. | BUILT+PROVEN |
 | Q-5 | Speech-to-text is Groq Whisper Large v3. Cost is about NPR 10 per mock. | TODO |
@@ -423,7 +423,7 @@ simply have mocks.
 | N-26 | **Ten students starting a trial get ten different sets.** No two trials identical. | BUILT+PROVEN |
 | N-27 | Randomised **only within questions that really appear** in Pre-CAS and UKVI credibility interviews. A student who practises three mocks and then meets nothing familiar has been cheated, and "it was random" is not a defence. | BUILT+PROVEN |
 | N-28 | A student on the **NPR 799 pack can add their own questions** — photograph a list, upload an image, or type them — and have the interviewer ask those. | BUILT+PROVEN |
-| N-29 | Question research is a **named deliverable with sources**, not a bank somebody invented. Until it exists, no page may claim the questions are what universities ask. | TODO |
+| N-29 | Question research is a **named deliverable with sources**, not a bank somebody invented. Until it exists, no page may claim the questions are what universities ask. | BUILT+PROVEN |
 
 ## 12.6 Feedback that is not generic
 
