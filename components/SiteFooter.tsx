@@ -19,6 +19,7 @@ export function SiteFooter() {
       title: 'Practise',
       links: [
         { label: 'Choose your university', href: '/universities' },
+        { label: 'Practise one question', href: '/practice' },
         { label: 'Pricing', href: '/pricing' },
         { label: 'Start free', href: '/start' },
       ],

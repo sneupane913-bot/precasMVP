@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getInstitution } from '@/lib/data/institutions';
-import { buildQuestionPlan, publicQuestion, getQuestion } from '@/lib/data/questions';
+import {
+  buildQuestionPlan,
+  buildPracticePlan,
+  publicQuestion,
+  getQuestion,
+} from '@/lib/data/questions';
 import { getPlan } from '@/lib/data/plans';
 import { store } from '@/lib/store';
 import { checkCredits } from '@/lib/credits';
@@ -26,6 +31,8 @@ export const runtime = 'nodejs';
 const Body = z.object({
   institution: z.string().min(1).max(120),
   mode: z.enum(['test', 'practice']).default('test'),
+  /** D18: practice can be aimed at one category. Never affects entitlement. */
+  category: z.string().max(40).optional(),
 });
 
 export async function POST(req: Request) {
@@ -81,10 +88,12 @@ export async function POST(req: Request) {
   // valid session, could otherwise burn the whole month's transcription budget
   // alone in an afternoon. The constant existed but nothing enforced it.
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  // Practice is a single question and costs a fraction of a mock, so the daily
+  // mock cap deliberately does not apply to it.
   const mocksToday = (await repo().listLedger(student.id)).filter(
     (e) => e.kind === 'mock' && e.reason === 'session_consumed' && e.createdAt >= since
   ).length;
-  if (mocksToday >= maxMocksPerDay()) {
+  if (parsed.mode === 'test' && mocksToday >= maxMocksPerDay()) {
     return NextResponse.json(
       apiError(
         'DAILY_LIMIT',
@@ -120,8 +129,16 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-  const questionLimit = Math.min(plan.maxQuestionsPerMock, institution.questionCount);
-  const questionIds = buildQuestionPlan(questionLimit);
+  // D18. Practice is a single question drill, a full mock is the exam. They
+  // draw on two separate credit pools, so which one this is decides what the
+  // student is charged as well as how long it is.
+  const isPractice = parsed.mode === 'practice';
+  const questionLimit = isPractice
+    ? 1
+    : Math.min(plan.maxQuestionsPerMock, institution.questionCount);
+  const questionIds = isPractice
+    ? buildPracticePlan(parsed.category)
+    : buildQuestionPlan(questionLimit);
 
   // Bind the session to this browser so nobody else can read the transcript.
   const ownerId = await ensureOwnerId();

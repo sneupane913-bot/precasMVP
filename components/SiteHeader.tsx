@@ -11,7 +11,7 @@ import Link from 'next/link';
 export function SiteHeader() {
   const nav = [
     { label: 'Universities', href: '/universities' },
-    { label: 'How it works', href: '/#how-it-works' },
+    { label: 'Practise one question', href: '/practice' },
     { label: 'Pricing', href: '/pricing' },
   ];
 

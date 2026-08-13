@@ -384,3 +384,23 @@ export function buildQuestionPlan(limit: number): string[] {
   }
   return picked;
 }
+
+/**
+ * D18 practice mode: one question at a time.
+ *
+ * A full mock is the exam. Practice is the drill you do between exams, so it is
+ * a single question, optionally from the category the student is weakest in.
+ * The results page then tells them about that one answer, which is the fastest
+ * useful loop in the product.
+ */
+export function buildPracticePlan(category?: string): string[] {
+  const pool = category ? QUESTIONS.filter((q) => q.category === category) : QUESTIONS;
+  const from = pool.length > 0 ? pool : QUESTIONS;
+  const pick = from[Math.floor(Math.random() * from.length)]!;
+  return [pick.id];
+}
+
+/** Categories that actually have questions, for the practice picker. */
+export function practiceCategories(): string[] {
+  return [...new Set(QUESTIONS.map((q) => q.category))];
+}

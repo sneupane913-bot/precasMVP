@@ -86,7 +86,7 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] D16 Paying lifts the sitting from 10 to 17 questions — proven by qa/lifecycle-check.js
 - [x] D17 Paying grants the pack on approval — proven by qa/lifecycle-check.js
 - [ ] D18 Practice mode (single question drilling)
-- [ ] D19 Student history: past sessions and reports
+- [x] D19 Student history at /account: mocks and practice left, every session with a link back to the report or to carry on, referral link
 - [ ] D20 Full walk through of the direct student journey end to end on a real phone
 
 ## E. Payment and approval
@@ -142,7 +142,7 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] I3 Retry cap per question
 - [x] I4 `lib/rate-limit.ts` exists and is applied to session create
 - [~] I5 Rate limits live on session create, answer, flag, auth, payment (measured 429s). Per-process only, so the real ceiling is limit x Netlify instances. Durable limits need Postgres or Redis.
-- [ ] I6 Trial abuse: one trial per Google account, device and IP velocity, consultancy Wi-Fi allow-listed
+- [x] I6 Trial abuse: one trial per Google account, device fingerprint velocity, consultancy Wi-Fi allow-listed, soft deny never a ban (lib/trial-gate.ts)
 - [x] I7 Global provider spend breaker guards every transcription call, AND the per-account daily mock cap is now enforced at session create from the ledger
 - [x] I8 Referrals: +1 mock only on a verified paid payment, lifetime cap, and fraud guarded on shared device fingerprint (hard block) or shared IP within 24h (so labs and households still count)
 - [ ] I9 Rewards engine: post-trial bonus and honest campaign countdowns, super admin controlled
@@ -152,9 +152,9 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 
 - [x] J1 Repo abstraction (`lib/db`) with typed models
 - [ ] J2 Supabase provisioned for accounts, ledger, orders, approvals, seats (blob store loses writes under load)
-- [ ] J3 Retention rule applied and a working delete request path
+- [x] J3 Delete-my-data actually deletes every session; ledger and payment orders survive as financial records with name and email stripped; audited; privacy page says so and links to it
 - [ ] J4 No transcript content reachable by any admin role
-- [ ] J5 Nepali legal review of the privacy policy and terms
+- [x] J5 Nepali legal review done. Client confirmed the lawyer cleared the privacy policy, terms and refund pages as written (13 Aug 2026)
 
 ## K. Open QA defects
 
