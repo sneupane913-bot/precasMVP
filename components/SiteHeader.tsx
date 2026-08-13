@@ -41,6 +41,15 @@ export function SiteHeader() {
 
         {/* Right side actions */}
         <div className="flex items-center gap-2">
+          {/* D19: a signed-in student needs a way back to their own history.
+              Server component, so this always shows; /account itself redirects
+              to sign-in if they are not signed in, which keeps this simple. */}
+          <Link
+            href="/account"
+            className="hidden text-sm font-semibold text-slate-600 transition hover:text-ink sm:inline"
+          >
+            My practice
+          </Link>
           <Link
             href="/start"
             className="hidden text-sm font-semibold text-ink transition hover:opacity-70 sm:inline"

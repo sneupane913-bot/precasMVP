@@ -43,9 +43,18 @@ export default function PrivacyPage() {
           </section>
           <section>
             <h2 className="mb-2 text-lg font-bold text-ink">How long we keep it</h2>
-            <p>
+            <p className="mb-3">
               We keep your practice history for 90 days after you last use the product, then delete
-              it. You can ask us to delete your data sooner at any time.
+              it.
+            </p>
+            <p>
+              You do not have to wait for that. Open{' '}
+              <a href="/account" className="font-semibold text-ink underline">
+                your practice page
+              </a>{' '}
+              and press "Delete my data", and every interview and every answer you have given us is
+              removed straight away. We keep only the record of any payment, because we are required
+              to, and your name and email are stripped from it.
             </p>
           </section>
           <section>

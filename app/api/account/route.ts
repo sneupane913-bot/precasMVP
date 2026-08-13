@@ -1,0 +1,123 @@
+import { NextResponse } from 'next/server';
+import { z } from 'zod';
+import { currentStudent, clearStudentSession } from '@/lib/auth/session';
+import { entitlementFor } from '@/lib/entitlement';
+import { store } from '@/lib/store';
+import { repo } from '@/lib/db';
+import { getInstitution } from '@/lib/data/institutions';
+import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
+import { apiError } from '@/lib/types';
+
+export const runtime = 'nodejs';
+
+/**
+ * The student's own account: their history (D19) and their right to delete
+ * their data (J3).
+ *
+ * Everything here is scoped to the signed-in student on the server. There is no
+ * id in the request that could name somebody else, which is the same rule the
+ * session routes follow.
+ */
+
+const Body = z.object({ action: z.literal('deleteEverything'), confirm: z.literal('DELETE') });
+
+export async function GET() {
+  const student = await currentStudent();
+  if (!student) {
+    return NextResponse.json(
+      apiError('NOT_SIGNED_IN', 'no session', 'Please sign in to see your practice history.'),
+      { status: 401 }
+    );
+  }
+
+  const [sessions, ent] = await Promise.all([
+    store.listByStudent(student.id),
+    entitlementFor(student),
+  ]);
+
+  return NextResponse.json({
+    ok: true,
+    data: {
+      name: student.name,
+      email: student.email,
+      referralCode: student.referralCode,
+      entitlement: ent,
+      sessions: sessions.map((s) => {
+        const inst = getInstitution(s.institutionId);
+        return {
+          id: s.id,
+          university: inst?.name ?? 'Your university',
+          mode: s.mode,
+          status: s.status,
+          createdAt: s.createdAt,
+          completedAt: s.completedAt,
+          answered: s.answers.filter((a) => a.transcriptStatus === 'ok').length,
+          total: s.questionIds.length,
+          // The band, never a bare number, and only when one honestly exists.
+          band: s.summary?.band ?? null,
+        };
+      }),
+    },
+  });
+}
+
+export async function POST(req: Request) {
+  const rl = rateLimit(`account:${clientIp(req)}`, RL.auth);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      apiError('RATE_LIMITED', 'too many attempts', 'Please wait a few minutes and try again.'),
+      { status: 429 }
+    );
+  }
+
+  const student = await currentStudent();
+  if (!student) {
+    return NextResponse.json(apiError('NOT_SIGNED_IN', 'no session', 'Please sign in.'), {
+      status: 401,
+    });
+  }
+
+  try {
+    Body.parse(await req.json());
+  } catch {
+    return NextResponse.json(
+      apiError('BAD_REQUEST', 'invalid body', 'Something went wrong. Please try again.'),
+      { status: 400 }
+    );
+  }
+
+  // J3. A delete button that does not delete is worse than no button, so this
+  // removes the recordings-derived data itself, not a flag saying to remove it.
+  //
+  // What goes: every interview session, which is where the transcripts and
+  // feedback live. What stays: the append-only ledger and any payment orders,
+  // because those are financial records and deleting them would destroy the
+  // audit trail behind money that changed hands. The student record is marked
+  // disabled and stripped of name and email rather than removed, so a payment
+  // dispute can still be traced without holding their personal details.
+  const removed = await store.deleteByStudent(student.id);
+
+  await repo().updateStudent(student.id, {
+    name: null,
+    email: null,
+    status: 'disabled',
+    disabledAt: new Date().toISOString(),
+    disabledBy: 'student_request',
+  });
+
+  await repo().appendAudit({
+    id: crypto.randomUUID(),
+    actorRole: 'student',
+    actorId: student.id,
+    action: 'delete_my_data',
+    subjectId: student.id,
+    before: 'active',
+    after: 'deleted',
+    note: `student deleted their own data, ${removed} sessions removed`,
+    createdAt: new Date().toISOString(),
+  });
+
+  await clearStudentSession();
+
+  return NextResponse.json({ ok: true, data: { sessionsRemoved: removed } });
+}

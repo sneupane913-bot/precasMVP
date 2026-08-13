@@ -20,6 +20,14 @@ export interface SessionStore {
   create(session: InterviewSession): Promise<void>;
   get(id: string): Promise<InterviewSession | null>;
   update(id: string, patch: Partial<InterviewSession>): Promise<InterviewSession | null>;
+  /** D19: a student's own history. Newest first. */
+  listByStudent(studentId: string): Promise<InterviewSession[]>;
+  /** J3: the delete-my-data path must actually delete. */
+  deleteByStudent(studentId: string): Promise<number>;
+}
+
+function newestFirst(a: InterviewSession, b: InterviewSession): number {
+  return a.createdAt < b.createdAt ? 1 : -1;
 }
 
 class MemoryStore implements SessionStore {
@@ -37,6 +45,19 @@ class MemoryStore implements SessionStore {
     const next = { ...existing, ...patch };
     this.map.set(id, next);
     return next;
+  }
+  async listByStudent(studentId: string) {
+    return [...this.map.values()].filter((s) => s.studentId === studentId).sort(newestFirst);
+  }
+  async deleteByStudent(studentId: string) {
+    let n = 0;
+    for (const [id, s] of this.map) {
+      if (s.studentId === studentId) {
+        this.map.delete(id);
+        n += 1;
+      }
+    }
+    return n;
   }
 }
 
@@ -69,6 +90,34 @@ class BlobStore implements SessionStore {
     const next = { ...existing, ...patch };
     await s.setJSON(id, next);
     return next;
+  }
+
+  /**
+   * Blobs has no query, so we list keys and read them. Fine at pilot scale and
+   * one of the reasons Postgres is the destination for this data.
+   */
+  private async all(): Promise<InterviewSession[]> {
+    try {
+      const s = await this.blobs();
+      const { blobs } = await s.list();
+      const rows = await Promise.all(
+        blobs.map((b) => s.get(b.key, { type: 'json' }) as Promise<InterviewSession | null>)
+      );
+      return rows.filter((r): r is InterviewSession => Boolean(r));
+    } catch {
+      return [];
+    }
+  }
+
+  async listByStudent(studentId: string) {
+    return (await this.all()).filter((s) => s.studentId === studentId).sort(newestFirst);
+  }
+
+  async deleteByStudent(studentId: string) {
+    const s = await this.blobs();
+    const mine = await this.listByStudent(studentId);
+    for (const row of mine) await s.delete(row.id);
+    return mine.length;
   }
 }
 

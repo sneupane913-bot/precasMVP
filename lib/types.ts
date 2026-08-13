@@ -239,6 +239,12 @@ export interface InterviewSession {
    */
   ownerId: string | null;
   /**
+   * The signed-in student who owns this session. Null only on sessions created
+   * before sign-in was required. Needed for their own history (D19) and for
+   * delete-my-data to find everything (J3).
+   */
+  studentId: string | null;
+  /**
    * QA-208: the consent screen was shown but nothing was recorded, so we could
    * not later prove what a student agreed to or when. Recorded per session
    * until accounts exist, then it moves onto the student record.

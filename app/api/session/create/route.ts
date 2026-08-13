@@ -138,6 +138,7 @@ export async function POST(req: Request) {
     flags: [],
     isTrial: true,
     ownerId,
+    studentId: student.id,
     consentVersion: null,
     consentAt: null,
     createdAt: new Date().toISOString(),

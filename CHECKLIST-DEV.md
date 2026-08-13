@@ -143,8 +143,8 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] I4 `lib/rate-limit.ts` exists and is applied to session create
 - [~] I5 Rate limits live on session create, answer, flag, auth, payment (measured 429s). Per-process only, so the real ceiling is limit x Netlify instances. Durable limits need Postgres or Redis.
 - [ ] I6 Trial abuse: one trial per Google account, device and IP velocity, consultancy Wi-Fi allow-listed
-- [~] I7 Global provider spend breaker guards every transcription call; per-account daily cap constant exists but is not yet enforced.
-- [ ] I8 Referrals: +1 mock only on a verified paid referral, fraud guarded, lifetime cap
+- [x] I7 Global provider spend breaker guards every transcription call, AND the per-account daily mock cap is now enforced at session create from the ledger
+- [x] I8 Referrals: +1 mock only on a verified paid payment, lifetime cap, and fraud guarded on shared device fingerprint (hard block) or shared IP within 24h (so labs and households still count)
 - [ ] I9 Rewards engine: post-trial bonus and honest campaign countdowns, super admin controlled
 - [ ] I10 Fraud test pass (docs/LIFECYCLE_BUILD_SPEC.md section 5)
 

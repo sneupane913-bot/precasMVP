@@ -126,7 +126,7 @@ export interface PaymentOrder {
 
 export interface ApprovalAudit {
   id: string;
-  actorRole: 'super_admin' | 'admin' | 'owner' | 'system';
+  actorRole: 'super_admin' | 'admin' | 'owner' | 'system' | 'student';
   actorId: string;
   action:
     | 'approve_payment'
@@ -140,7 +140,9 @@ export interface ApprovalAudit {
     | 'disable_student'
     | 'owner_platform_off'
     | 'owner_platform_on'
-    | 'reward_rule_change';
+    | 'reward_rule_change'
+    /** J3: the student exercised their own right to be deleted. */
+    | 'delete_my_data';
   subjectId: string;
   before: string | null;
   after: string | null;
