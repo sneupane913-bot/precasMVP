@@ -103,11 +103,26 @@ function t(id, ok, detail) { (ok ? pass++ : fail++); console.log(`  ${ok ? 'PASS
   const okShot = await upload('/api/payment/screenshot', { orderId: oid }, { name: 'r.png', type: 'image/png', bytes: png });
   t('E5-ok', J(okShot.body)?.ok === true, `valid receipt -> ${okShot.code}`);
 
-  // E6 unique wallet txn
+  // E6 unique wallet txn.
+  //
+  // This used to try to create a SECOND order for the same student. That path
+  // is now correctly refused with 409 ("we are already checking a payment"), so
+  // the old test never reached the duplicate-txn guard at all and failed with
+  // BAD_REQUEST on an undefined order id. The real threat was never one student
+  // paying twice anyway: it is a screenshot forwarded to a FRIEND, so that is
+  // what this now tests.
   await req('POST', '/api/payment', { action: 'submit', orderId: oid, walletTxnId: 'TXNQA1', payerName: 'QA', payerPhoneSuffix: '1234' });
-  const pay2 = J((await req('POST', '/api/payment', { action: 'create', packCode: 'serious' })).body);
-  const dup = J((await req('POST', '/api/payment', { action: 'submit', orderId: pay2?.data?.orderId, walletTxnId: 'TXNQA1', payerName: 'QA', payerPhoneSuffix: '1234' })).body);
-  t('E6', dup?.error?.code === 'TXN_ALREADY_USED', `reused txn -> ${dup?.error?.code || 'ACCEPTED (DEFECT)'}`);
+  const friend = await (async () => {
+    const saved = { ...jar };
+    for (const k of Object.keys(jar)) delete jar[k];
+    await req('POST', '/api/auth/firebase', { idToken: 'dev:qa1-friend', fingerprint: 'fp_qa1_friend' });
+    const p2 = J((await req('POST', '/api/payment', { action: 'create', packCode: 'serious' })).body);
+    const d = J((await req('POST', '/api/payment', { action: 'submit', orderId: p2?.data?.orderId, walletTxnId: 'TXNQA1', payerName: 'Friend', payerPhoneSuffix: '9999' })).body);
+    for (const k of Object.keys(jar)) delete jar[k];
+    Object.assign(jar, saved);
+    return d;
+  })();
+  t('E6', friend?.error?.code === 'TXN_ALREADY_USED', `friend reuses the same txn -> ${friend?.error?.code || 'ACCEPTED (DEFECT)'}`);
 
   // E8 idempotent allocation
   const v1 = J((await req('POST', '/api/super', { action: 'verifyPayment', superKey: 'super-dev', orderId: oid, confirmedInWalletLedger: true })).body);

@@ -27,6 +27,20 @@ import type {
  * with zero configuration.
  */
 
+/**
+ * Thrown when the store itself could not be reached, as opposed to the record
+ * genuinely not being there. Callers translate this to a 503 with an honest
+ * message, never to "you are not signed in".
+ */
+export class StoreUnavailableError extends Error {
+  readonly cause: unknown;
+  constructor(message: string, cause?: unknown) {
+    super(message);
+    this.name = 'StoreUnavailableError';
+    this.cause = cause;
+  }
+}
+
 type Bag = Map<string, unknown>;
 
 const g = globalThis as unknown as { __precasMem?: Bag };
@@ -51,8 +65,23 @@ export class BlobRepo implements Repo {
     try {
       const s = await this.store();
       return ((await s.get(key, { type: 'json' })) as T) ?? null;
-    } catch {
-      return null;
+    } catch (e) {
+      /**
+       * PILOT-01, the worst bug in this file's history.
+       *
+       * This used to `return null`, which made a BROKEN STORE look exactly like
+       * A STUDENT WHO DOES NOT EXIST. The consequence was invisible and awful:
+       * a student signs in with Google successfully, the next request cannot
+       * read their record, `currentStudent()` returns null, every API answers
+       * 401, the page bounces them to /start, they sign in again, and it
+       * repeats forever. Nothing is logged, nothing looks broken, and the site
+       * simply refuses to remember anybody.
+       *
+       * A store that cannot be read is an OUTAGE, and an outage must be loud.
+       * "Not found" is a fact about the data; "I could not look" is a fact
+       * about us, and the student deserves to be told which one happened.
+       */
+      throw new StoreUnavailableError(`read failed for ${key}`, e);
     }
   }
 
@@ -73,8 +102,11 @@ export class BlobRepo implements Repo {
       const s = await this.store();
       const res = await s.list({ prefix });
       return res.blobs.map((b) => b.key);
-    } catch {
-      return [];
+    } catch (e) {
+      // Same disease as get(). An empty list from a broken store told a
+      // consultancy admin they had zero students, which looks like a working
+      // dashboard for a business with no customers rather than an outage.
+      throw new StoreUnavailableError(`list failed for ${prefix}`, e);
     }
   }
 
@@ -97,10 +129,30 @@ export class BlobRepo implements Repo {
   private async claim(key: string, value: unknown): Promise<boolean> {
     const existing = await this.get<unknown>(key);
     if (existing !== null) return false;
-    await this.put(key, value);
-    const after = await this.get<{ __claimId?: string }>(key);
-    // Re-read and confirm we are the writer that stuck.
-    return JSON.stringify(after) === JSON.stringify(value);
+
+    /**
+     * PILOT-03. This is the primitive behind every uniqueness guarantee in the
+     * product — one wallet transaction claimed once, one seat taken once — so
+     * its failure mode is money.
+     *
+     * It used to decide "did I win?" by comparing the value it wrote against
+     * the value now stored. That works only if every writer's value is
+     * distinct, and the callers' values were things like
+     * `{ orderId, at: new Date().toISOString() }`. Three requests landing in
+     * the SAME MILLISECOND produce byte-identical values, so all three re-read,
+     * all three match, and all three believe they claimed it.
+     *
+     * The client predicted exactly this: "if they click submit two or three
+     * times, would that prompt multiple approval messages to the admin?" It
+     * would have.
+     *
+     * The fix is a token that cannot collide, so the comparison answers "was it
+     * MY write that stuck", not "does the stored value look like mine".
+     */
+    const token = `${Date.now()}-${crypto.randomUUID()}`;
+    await this.put(key, { ...(value as object), __claimToken: token });
+    const after = await this.get<{ __claimToken?: string }>(key);
+    return after?.__claimToken === token;
   }
 
   // ----------------------------------------------------------------- students

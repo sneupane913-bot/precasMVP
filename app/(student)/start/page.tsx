@@ -32,13 +32,45 @@ function StartInner() {
   const via = params.get('via') ?? undefined;
   const next = params.get('next') ?? '/universities';
 
+  /**
+   * PILOT-02. This page never used to ask whether you were ALREADY signed in.
+   *
+   * That is what turned a single failure into an endless loop. Any page that
+   * got a 401 pushed the student here; this page showed the Google button
+   * again; they signed in; they were pushed back; and round it went. The client
+   * described exactly this: "my practice just reloads the sign in with Gmail
+   * page again and again."
+   *
+   * So the first thing this page does now is check. If a session already
+   * exists, we do not show a sign-in screen to somebody who is signed in — we
+   * send them where they were going.
+   */
   useEffect(() => {
-    fetch('/api/auth/config')
-      .then((r) => r.json())
-      .then((j) => setConfig(j.data?.firebase ?? null))
-      .catch(() => setConfig(null))
-      .finally(() => setLoading(false));
-  }, []);
+    let cancelled = false;
+    (async () => {
+      try {
+        const me = await fetch('/api/me').then((r) => r.json());
+        if (!cancelled && me?.data?.signedIn) {
+          router.replace(next);
+          return;
+        }
+      } catch {
+        // If we cannot tell, show the sign-in screen. Better a needless
+        // sign-in than a locked door.
+      }
+      if (cancelled) return;
+      try {
+        const j = await fetch('/api/auth/config').then((r) => r.json());
+        if (!cancelled) setConfig(j.data?.firebase ?? null);
+      } catch {
+        if (!cancelled) setConfig(null);
+      }
+      if (!cancelled) setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [next, router]);
 
   return (
     <main className="grid min-h-screen lg:grid-cols-2">

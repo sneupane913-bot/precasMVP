@@ -32,7 +32,11 @@ function absorb(h) {
 function req(method, path, body, opts = {}) {
   return new Promise((res) => {
     const data = body ? JSON.stringify(body) : null;
-    const headers = {};
+    // Every call gets its own source address unless the caller pins one.
+    // The payment limiter is 10 per IP per hour and this suite legitimately
+    // makes more than that, so sharing one address produced 429s that read
+    // like product defects. Real students are not all behind one IP either.
+    const headers = { 'x-forwarded-for': opts.ip || `10.60.${ipN >> 8 & 255}.${(ipN++ % 250) + 1}` };
     if (data) headers['Content-Type'] = 'application/json';
     if (!opts.noCookie && Object.keys(jar).length) headers['Cookie'] = cookieHeader();
     const r = http.request({ host: '127.0.0.1', port: P, path, method, headers }, (resp) => {
@@ -46,6 +50,7 @@ function req(method, path, body, opts = {}) {
     r.end();
   });
 }
+let ipN = 0;
 const J = (s) => {
   try {
     return JSON.parse(s);

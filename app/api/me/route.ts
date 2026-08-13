@@ -5,11 +5,13 @@ import { entitlementFor } from '@/lib/entitlement';
 import { activeOfferFor } from '@/lib/rewards';
 import { repo } from '@/lib/db';
 import { apiError, type ApiResult } from '@/lib/types';
+import { withStoreErrors } from '@/lib/api-errors';
 
 export const runtime = 'nodejs';
 
 /** Who am I, and what am I allowed to do. Everything computed server-side. */
 export async function GET() {
+  return withStoreErrors(async () => {
   const student = await currentStudent();
   if (!student) {
     return NextResponse.json({ ok: true, data: { signedIn: false } });
@@ -49,6 +51,7 @@ export async function GET() {
     },
   };
   return NextResponse.json(result);
+  });
 }
 
 const Patch = z.object({
