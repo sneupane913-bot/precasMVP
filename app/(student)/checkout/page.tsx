@@ -3,6 +3,22 @@
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { ContactUs } from '@/components/ContactUs';
+import { publicPlans } from '@/lib/data/plans';
+
+/**
+ * The packs offered on this page, read from plans.ts.
+ *
+ * Never a hand-written list. copy-check.js fails the build on a pack number
+ * typed into a page, and the reason is the /consultancy bug: 12 mocks promised
+ * where 10 were granted, because somebody typed the number once.
+ */
+const PACK_CHOICES = publicPlans().map((p) => ({
+  code: p.code,
+  priceNpr: p.priceNpr,
+  mockInterviews: p.mockInterviews,
+  practiceSessions: p.practiceSessions,
+}));
 
 interface CreatedOrder {
   orderId: string;
@@ -44,7 +60,20 @@ export default function CheckoutPage() {
  */
 function Checkout() {
   const params = useSearchParams();
-  const pack = params.get('pack') ?? 'prep';
+  const [pack, setPack] = useState(params.get('pack') ?? 'prep');
+
+  /**
+   * Change pack without leaving the page.
+   *
+   * The URL is kept in step with replaceState so a refresh does not silently
+   * revert the choice — and so does not become a third source of truth beside
+   * this state and the server's order.
+   */
+  function switchPack(code: string) {
+    if (code === pack) return;
+    setPack(code);
+    window.history.replaceState(null, '', `/checkout?pack=${code}`);
+  }
 
   const [order, setOrder] = useState<CreatedOrder | null>(null);
   const [state, setState] = useState<'choosing' | 'paying' | 'submitted' | 'verified' | 'rejected'>(
@@ -114,10 +143,18 @@ function Checkout() {
     }
   }
 
+  /**
+   * Re-price when the pack changes, as well as on first load.
+   *
+   * Without `pack` in the dependency list the radio would move and the amount
+   * would not — a screen showing the Serious option selected above an NPR 449
+   * total. That is the same defect as every other one found tonight: two
+   * sources of truth allowed to disagree on screen.
+   */
   useEffect(() => {
     void createOrder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pack]);
 
   async function submit() {
     if (!order) return;
@@ -202,9 +239,53 @@ function Checkout() {
 
       <h1 className="mb-1 font-serif text-2xl text-ink">Pay to continue</h1>
       {order && (
-        <p className="mb-6 text-slate-600">
+        <p className="mb-4 text-slate-600">
           {order.packName}: {order.mocks} mock interviews and {order.practice} practice sessions.
         </p>
+      )}
+
+      {/* ------------------------------------------------------------------
+          SWITCH PACK HERE. Client's request, and it removes a real trap:
+          changing your mind used to mean going Back to /pricing, which meant
+          leaving a page you had already started filling in. Back is exactly
+          the action that has cost this product a mock and a free trial
+          tonight, so any screen that forces it is a screen to fix.
+
+          The price is still decided entirely by the SERVER from the pack code
+          (E2) — this only changes which code we ask about. Sizes and prices
+          come from plans.ts so they cannot drift from the ledger.
+          ------------------------------------------------------------------ */}
+      {state === 'choosing' && (
+        <fieldset className="mb-6 rounded-2xl border border-slate-200 bg-white p-4">
+          <legend className="px-1 text-sm font-semibold text-ink">Which pack?</legend>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {PACK_CHOICES.map((p) => {
+              const on = pack === p.code;
+              return (
+                <label
+                  key={p.code}
+                  className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 p-3 transition ${
+                    on ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="pack"
+                    checked={on}
+                    onChange={() => switchPack(p.code)}
+                    className="mt-1 h-4 w-4 accent-emerald-600"
+                  />
+                  <span>
+                    <span className="block font-bold text-ink">NPR {p.priceNpr}</span>
+                    <span className="block text-sm text-slate-600">
+                      {p.mockInterviews} mock interviews, {p.practiceSessions} practice
+                    </span>
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
       )}
 
       {error && (
@@ -221,6 +302,9 @@ function Checkout() {
             machine, so it can take a little time. You do not need to pay again, and you do not need
             to stay on this page.
           </p>
+          {/* The client's point: a student who has sent real money and heard
+              nothing has exactly one question — "who do I call" — and this
+              screen did not answer it. */}
           <ol className="mb-4 space-y-1 text-sm text-sky-900/90">
             <li>✓ Payment details received</li>
             <li>• Checking our bank record</li>
@@ -250,12 +334,15 @@ function Checkout() {
             Keep this reference. If anything goes wrong, quoting it lets us find your payment
             straight away.
           </p>
-          <a
-            href={`https://wa.me/${(process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? '').replace(/\D/g, '')}`}
-            className="block rounded-xl border-2 border-sky-300 bg-white px-5 py-3 text-center font-semibold text-sky-900"
-          >
-            Message us if it takes too long
-          </a>
+          {/* Was a bare link reading the ENV VAR, not the super admin's
+              setting — so changing the support number in /super would not have
+              changed it here. And no number written anywhere. Both fixed by
+              using the order's own supportWhatsapp through ContactUs. */}
+          <ContactUs
+            whatsapp={order?.supportWhatsapp}
+            message={order?.supportMessage ?? undefined}
+            urgent
+          />
         </div>
       )}
 
@@ -338,10 +425,30 @@ function Checkout() {
             </p>
 
             <label className="mb-1 block text-sm font-semibold text-ink">Transaction number</label>
+            {/* --------------------------------------------------------------
+                The placeholder used to read "0011ABCD2233", which matches no
+                wallet anybody in Nepal actually uses. Three real receipts:
+
+                  eSewa            Transaction Code   1NOH8C2      (7, letters and digits)
+                  Nabil Bank       Transaction ID     697873804    (9 digits)
+                  mobile banking   Reference Code     395407924    (9 digits)
+
+                So the format varies, the LABEL varies, and a student hunting
+                for "transaction number" on a receipt that says "Reference
+                Code" will reasonably conclude they have the wrong screen.
+                Naming all three names is what makes this findable, and real
+                examples are what stop somebody typing the amount instead.
+                -------------------------------------------------------------- */}
+            <p className="mb-2 text-xs leading-relaxed text-slate-500">
+              On your receipt this may be called <strong>Transaction Code</strong>,{' '}
+              <strong>Transaction ID</strong> or <strong>Reference Code</strong>. They are all the
+              same thing. Examples: <span className="font-mono">1NOH8C2</span> from eSewa, or{' '}
+              <span className="font-mono">697873804</span> from a bank transfer.
+            </p>
             <input
               value={txn}
               onChange={(e) => setTxn(e.target.value)}
-              placeholder="e.g. 0011ABCD2233"
+              placeholder="1NOH8C2  or  697873804"
               className="mb-3 w-full rounded-xl border-2 border-slate-200 px-4 py-3 font-mono outline-none focus:border-ink"
             />
 
@@ -353,12 +460,23 @@ function Checkout() {
             />
 
             <label className="mb-1 block text-sm font-semibold text-ink">
-              Last 4 digits of the number you paid from
+              Last 4 digits of your phone number
             </label>
+            {/* "the number you paid from" was ambiguous between the phone
+                number, the account number and the transaction number — three
+                different numbers all present on the same receipt. A worked
+                example removes the guess entirely. */}
+            <p className="mb-2 text-xs leading-relaxed text-slate-500">
+              The phone number your wallet is registered to. If it is{' '}
+              <span className="font-mono">98432 05222</span>, type{' '}
+              <span className="font-mono font-bold text-ink">5222</span>.
+            </p>
             <input
               value={suffix}
               onChange={(e) => setSuffix(e.target.value.replace(/\D/g, '').slice(0, 4))}
-              className="mb-4 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+              inputMode="numeric"
+              placeholder="5222"
+              className="mb-4 w-full rounded-xl border-2 border-slate-200 px-4 py-3 font-mono outline-none focus:border-ink"
             />
 
             {/* Optional, and labelled optional. Asking for a screenshot as a
@@ -392,14 +510,14 @@ function Checkout() {
             {/* N-12. The escape hatch, under the button that might fail.
                 A student who has sent money and hit a problem must not have to
                 hunt for us, and must not have to compose the message. */}
-            {order.supportWhatsapp && (
-              <a
-                href={`https://wa.me/${order.supportWhatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(order.supportMessage ?? '')}`}
-                className="mt-3 block rounded-xl border-2 border-emerald-300 bg-emerald-50 px-5 py-3 text-center text-sm font-semibold text-emerald-900"
-              >
-                Something wrong? Message us on WhatsApp
-              </a>
-            )}
+            {/* Was a bare button with the number written nowhere. If WhatsApp
+                does not open, or opens the wrong account, a button is nothing.
+                ContactUs always shows the number as dialable text too. */}
+            <ContactUs
+              whatsapp={order.supportWhatsapp}
+              message={order.supportMessage ?? undefined}
+              className="mt-4"
+            />
 
             {(txn.trim().length < 4 || !payerName.trim() || suffix.length < 2) && (
               <p className="mt-2 text-sm font-semibold text-red-600">

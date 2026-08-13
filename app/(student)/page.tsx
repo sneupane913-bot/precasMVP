@@ -177,7 +177,7 @@ export default async function HomePage() {
             there is nothing to cancel.
           </p>
 
-          <PricingPacks compact />
+          <PricingPacks compact signedIn={Boolean(session?.signedIn)} />
         </div>
       </section>
 

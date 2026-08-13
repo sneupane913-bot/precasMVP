@@ -1,6 +1,8 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import { PasscodeInput } from '@/components/PasscodeInput';
+import { PaySettingsForm, type PaySettings } from '@/components/PaySettingsForm';
 
 /**
  * Super admin, rebuilt to docs/design-reference/super_admin_dashboard.
@@ -35,7 +37,10 @@ interface Overview {
     referredByCode: string | null;
     createdAt: string;
     lastSeenAt: string;
+    phone: string | null;
+    whatsappConfirmed: boolean | null;
   }[];
+  paySettings: PaySettings;
   attribution: { name: string; count: number }[];
   referralLeaderboard: { code: string; name: string | null; paid: number }[];
   build?: { shortSha: string; context: string; builtAt: string; branch: string };
@@ -50,6 +55,10 @@ interface Order {
   amountNpr: number;
   walletTxnId: string | null;
   payerName: string | null;
+  /** The student's own number, so an approver can ring them. N-13. */
+  payerPhone: string | null;
+  /** Last 4 they typed, to check against the wallet ledger. */
+  payerPhoneSuffix: string | null;
   state: string;
   createdAt: string;
 }
@@ -63,7 +72,7 @@ interface FlaggedTrial {
   createdAt: string;
 }
 
-type Tab = 'dashboard' | 'students' | 'payments' | 'flagged';
+type Tab = 'dashboard' | 'students' | 'payments' | 'flagged' | 'settings';
 
 export default function SuperAdminPage() {
   const [key, setKey] = useState('');
@@ -78,7 +87,13 @@ export default function SuperAdminPage() {
   const call = useCallback(
     async (body: Record<string, unknown>): Promise<unknown | null> => {
       setBusy(true);
+      // Clear BOTH. The client saw "Too many attempts. Please wait five
+      // minutes." sitting directly above "Payment verified and the pack was
+      // added to that student." — two banners contradicting each other, with
+      // no way to tell which was current. A screen showing two mutually
+      // exclusive outcomes at once is worse than a screen showing neither.
       setError(null);
+      setNotice(null);
       try {
         const res = await fetch('/api/super', {
           method: 'POST',
@@ -90,6 +105,7 @@ export default function SuperAdminPage() {
           | { ok: false; error: { userMessage: string } };
         if (!json.ok) {
           setError(json.error.userMessage);
+          setNotice(null);
           return null;
         }
         return json.data;
@@ -112,6 +128,16 @@ export default function SuperAdminPage() {
     const f = (await call({ action: 'flaggedTrials' })) as FlaggedTrial[] | null;
     if (f) setFlagged(f);
   }, [call]);
+
+  async function savePaySettings(next: PaySettings): Promise<boolean> {
+    const ok = await call({ action: 'setPaymentSettings', ...next });
+    if (ok) {
+      setNotice('Payment details saved. Students see them straight away.');
+      await loadAll();
+      return true;
+    }
+    return false;
+  }
 
   async function verify(orderId: string) {
     const ok = await call({ action: 'verifyPayment', orderId, confirmedInWalletLedger: true });
@@ -194,13 +220,14 @@ export default function SuperAdminPage() {
         <div className="w-full max-w-sm">
           <h1 className="mb-1 font-serif text-2xl font-bold text-ink">Super admin</h1>
           <p className="mb-6 text-slate-600">Everything across the platform.</p>
-          <input
-            type="password"
+          {/* Readable on request. The client was locked out of his own back
+              office by a masked field he could not check. See PasscodeInput. */}
+          <PasscodeInput
             value={key}
-            onChange={(e) => setKey(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && key && loadAll()}
+            onChange={setKey}
+            onEnter={loadAll}
             placeholder="Super admin passcode"
-            className="mb-3 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+            autoFocus
           />
           {error && <p className="mb-3 font-medium text-red-600">{error}</p>}
           <button
@@ -232,6 +259,7 @@ export default function SuperAdminPage() {
     { id: 'students', label: 'Students' },
     { id: 'payments', label: `Payments${awaiting.length ? ` (${awaiting.length})` : ''}` },
     { id: 'flagged', label: `Flagged${flagged.length ? ` (${flagged.length})` : ''}` },
+    { id: 'settings', label: 'Payment details' },
   ];
 
   return (
@@ -401,6 +429,7 @@ export default function SuperAdminPage() {
                   <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                     <tr>
                       <th className="px-5 py-3 font-semibold">Student</th>
+                      <th className="px-3 py-3 font-semibold">Phone</th>
                       <th className="px-3 py-3 font-semibold">Source</th>
                       <th className="px-3 py-3 font-semibold">Applying through</th>
                       <th className="px-3 py-3 font-semibold">Status</th>
@@ -413,6 +442,23 @@ export default function SuperAdminPage() {
                         <td className="px-5 py-3">
                           <p className="font-semibold text-ink">{s.name || 'Unnamed'}</p>
                           <p className="text-xs text-slate-500">{s.email || 'no email'}</p>
+                        </td>
+                        {/* Tappable. If the only way to act on a row is to
+                            copy a number out by hand, the row is a list entry
+                            and not a tool. */}
+                        <td className="px-3 py-3 text-slate-600">
+                          {s.phone ? (
+                            <a href={`tel:${s.phone}`} className="font-medium text-ink underline underline-offset-2">
+                              {s.phone}
+                            </a>
+                          ) : (
+                            <span className="text-slate-400">not given</span>
+                          )}
+                          {s.phone && s.whatsappConfirmed === false && (
+                            <span className="ml-1 block text-[11px] font-semibold text-amber-700">
+                              not on WhatsApp
+                            </span>
+                          )}
                         </td>
                         <td className="px-3 py-3 text-slate-600">
                           {s.consultancyId ? 'Consultancy' : 'Direct'}
@@ -482,6 +528,7 @@ export default function SuperAdminPage() {
                       <th className="px-3 py-3 font-semibold">Pack</th>
                       <th className="px-3 py-3 font-semibold">Amount</th>
                       <th className="px-3 py-3 font-semibold">Transaction id</th>
+                      <th className="px-3 py-3 font-semibold">Phone</th>
                       <th className="px-3 py-3 font-semibold">State</th>
                       <th className="px-5 py-3 font-semibold">Action</th>
                     </tr>
@@ -497,6 +544,26 @@ export default function SuperAdminPage() {
                         <td className="px-3 py-3 tabular-nums">NPR {o.amountNpr.toLocaleString()}</td>
                         <td className="px-3 py-3 font-mono text-xs text-slate-600">
                           {o.walletTxnId || '—'}
+                        </td>
+                        {/* N-13. When money has not landed, the only useful next
+                            step is to ring them. Making the approver look the
+                            number up elsewhere is how a payment sits overnight
+                            while a student assumes they were robbed. The last 4
+                            they typed sits underneath, because that is what you
+                            check against the wallet ledger. */}
+                        <td className="px-3 py-3 text-xs">
+                          {o.payerPhone ? (
+                            <a href={`tel:${o.payerPhone}`} className="font-semibold text-ink underline underline-offset-2">
+                              {o.payerPhone}
+                            </a>
+                          ) : (
+                            <span className="text-slate-400">not given</span>
+                          )}
+                          {o.payerPhoneSuffix && (
+                            <span className="block text-[11px] text-slate-500">
+                              paid from ...{o.payerPhoneSuffix}
+                            </span>
+                          )}
                         </td>
                         <td className="px-3 py-3">
                           <span
@@ -540,6 +607,11 @@ export default function SuperAdminPage() {
               </div>
             )}
           </section>
+        )}
+
+        {/* ------------------------------------------- payment details --- */}
+        {tab === 'settings' && data && (
+          <PaySettingsForm initial={data.paySettings} onSave={savePaySettings} busy={busy} />
         )}
 
         {/* --------------------------------------------------- flagged --- */}

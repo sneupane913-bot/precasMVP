@@ -3,7 +3,13 @@ import { z } from 'zod';
 import { isSuperAdmin, platform, platformDown } from '@/lib/platform';
 import { repo, type ApprovalAudit } from '@/lib/db';
 import { grantPack, rewardReferral, adminGrant } from '@/lib/entitlement';
-import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
+import {
+  rateLimit,
+  rateLimitPeek,
+  rateLimitPenalise,
+  clientIp,
+  LIMITS as RL,
+} from '@/lib/rate-limit';
 import { approvePayment, rejectPayment } from '@/lib/payments';
 import { apiError } from '@/lib/types';
 import { BUILD_INFO } from '@/lib/build-info';
@@ -96,7 +102,14 @@ export async function POST(req: Request) {
   }
 
 
-  const rl = rateLimit(`super:${clientIp(req)}`, RL.auth);
+  /**
+   * PEEK, do not consume. `auth` is a brute-force budget and brute force means
+   * GUESSING — so only a WRONG passcode may spend from it. Consuming here
+   * charged every legitimate action the same as an attack: loading /super
+   * fires four actions, which spent four of five, and the next click was
+   * refused with "Too many attempts". See LIMITS.backOffice.
+   */
+  const rl = rateLimitPeek(`super:${clientIp(req)}`, RL.auth);
   if (!rl.allowed) {
     return NextResponse.json(
       apiError('RATE_LIMITED', 'auth attempts', 'Too many attempts. Please wait five minutes.'),
@@ -114,7 +127,25 @@ export async function POST(req: Request) {
   }
 
   if (!isSuperAdmin(body.superKey)) {
+    // ONLY a wrong passcode spends from the brute-force budget.
+    rateLimitPenalise(`super:${clientIp(req)}`, RL.auth);
     return NextResponse.json(apiError('FORBIDDEN', 'bad super key', 'Not allowed.'), { status: 403 });
+  }
+
+  /**
+   * Authenticated work gets its own, generous budget.
+   *
+   * Still bounded: a runaway retry loop in the browser must not be able to spin
+   * against the store forever. But 240 a minute is far more than a human
+   * clicking around a dense dashboard, so it will never be the reason a real
+   * payment cannot be approved.
+   */
+  const work = rateLimit(`super-work:${clientIp(req)}`, RL.backOffice);
+  if (!work.allowed) {
+    return NextResponse.json(
+      apiError('RATE_LIMITED', 'back-office flood', 'That is a lot of requests at once. Give it a moment and try again.'),
+      { status: 429, headers: { 'Retry-After': String(work.retryAfterSec) } }
+    );
   }
 
   const r = repo();
@@ -180,7 +211,44 @@ export async function POST(req: Request) {
           referredByCode: s.referredByCode,
           createdAt: s.createdAt,
           lastSeenAt: s.lastSeenAt,
+          /**
+           * A NUMBER YOU CAN RING.
+           *
+           * 14 Aug: the client asked why there was no phone number here. The
+           * answer is the whole reason this dashboard exists — when something
+           * has gone wrong with a student's payment or their details, the only
+           * useful next action is to call them. A directory you cannot act on
+           * is a list, not a tool.
+           *
+           * `whatsappConfirmed` travels with it because half the support plan
+           * is a WhatsApp link, and a number that turns out NOT to be on
+           * WhatsApp is a student we cannot reach on the day it matters. We
+           * ASK, we never assume (N-22).
+           *
+           * Still no transcript, at any level. G-8 has no exceptions.
+           */
+          phone: s.whatsappNumber ?? s.phoneE164 ?? null,
+          whatsappConfirmed: s.whatsappConfirmed ?? null,
         })),
+        /**
+         * The payment and support details, so the super admin can EDIT them.
+         *
+         * `setPaymentSettings` existed and worked from the day it was written.
+         * There was simply no form anywhere that called it, so the QR, the
+         * wallet number and the support number could only be changed by
+         * editing env vars and redeploying — which is exactly what N-10 and
+         * N-11 exist to prevent. The client asked for this twice.
+         */
+        paySettings: await (async () => {
+          const st = await platform.getSettings();
+          return {
+            payQrImageUrl: st.payQrImageUrl ?? '',
+            payWalletName: st.payWalletName ?? '',
+            payWalletNumber: st.payWalletNumber ?? '',
+            payAccountName: st.payAccountName ?? '',
+            supportWhatsapp: st.supportWhatsapp ?? '',
+          };
+        })(),
         // A12 / LIVE-004: an entire audit round was wasted on a stale deploy.
         // QA can now read the live revision straight off this dashboard.
         build: BUILD_INFO,

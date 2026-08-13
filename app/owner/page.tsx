@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { PasscodeInput } from '@/components/PasscodeInput';
 
 /**
  * Owner control. Not linked from anywhere in the product.
@@ -83,13 +84,7 @@ export default function OwnerPage() {
       </p>
 
       <label className="mb-1 block text-sm font-semibold text-ink">Owner key</label>
-      <input
-        type="password"
-        value={key}
-        onChange={(e) => setKey(e.target.value)}
-        placeholder="Your owner key"
-        className="mb-6 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
-      />
+      <PasscodeInput value={key} onChange={setKey} placeholder="Your owner key" />
 
       <div className="mb-6 rounded-2xl border-2 border-slate-200 bg-white p-5">
         <h2 className="mb-1 font-bold text-ink">Message students will see</h2>

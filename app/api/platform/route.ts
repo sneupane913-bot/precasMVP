@@ -8,7 +8,13 @@ import {
   DEFAULT_SETTINGS,
   type Consultancy,
 } from '@/lib/platform';
-import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
+import {
+  rateLimit,
+  rateLimitPeek,
+  rateLimitPenalise,
+  clientIp,
+  LIMITS as RL,
+} from '@/lib/rate-limit';
 import { apiError } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -72,7 +78,14 @@ const Body = z.discriminatedUnion('action', [
 ]);
 
 export async function POST(req: Request) {
-  const rl = rateLimit(`platform-auth:${clientIp(req)}`, RL.auth);
+  /**
+   * PEEK, do not consume. `auth` is a brute-force budget and brute force means
+   * GUESSING — so only a WRONG passcode may spend from it. Consuming here
+   * charged every legitimate action the same as an attack: loading /super
+   * fires four actions, which spent four of five, and the next click was
+   * refused with "Too many attempts". See LIMITS.backOffice.
+   */
+  const rl = rateLimitPeek(`platform-auth:${clientIp(req)}`, RL.auth);
   if (!rl.allowed) {
     return NextResponse.json(
       apiError('RATE_LIMITED', 'auth attempts', 'Too many attempts. Please wait five minutes and try again.'),
@@ -93,6 +106,7 @@ export async function POST(req: Request) {
   // ---- Owner only. A super admin cannot reach this branch. ----
   if (body.action === 'setMaintenance') {
     if (!isOwner(body.ownerKey)) {
+      rateLimitPenalise(`platform-auth:${clientIp(req)}`, RL.auth);
       return NextResponse.json(apiError('FORBIDDEN', 'bad owner key', 'Not allowed.'), {
         status: 403,
       });

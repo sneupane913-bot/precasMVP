@@ -28,8 +28,16 @@ import {
 export function PricingPacks({
   /** Home shows a tighter version. The pricing page shows the full one. */
   compact = false,
+  /**
+   * Whether anybody is signed in, resolved by the SERVER page that renders
+   * this. Passed in rather than fetched here, because a price button that
+   * changes its destination a second after the page paints is a button
+   * somebody has already tapped.
+   */
+  signedIn = false,
 }: {
   compact?: boolean;
+  signedIn?: boolean;
 }) {
   const paid = publicPlans();
   const trial = getPlan('trial')!;
@@ -150,8 +158,27 @@ export function PricingPacks({
                 </li>
               </ul>
 
+              {/* --------------------------------------------------------------
+                  "Choose Prep" sent EVERY student to /start, which is the
+                  sign-in page, which then bounced a signed-in student to
+                  /universities. So the one button on the site whose entire job
+                  is to take money went to the catalogue instead of checkout —
+                  including for a student who had used all ten free questions
+                  and was explicitly trying to pay us. The client found it in
+                  under a minute and was right to be annoyed.
+
+                  A signed-in student goes straight to checkout for the pack
+                  they picked. A signed-out student signs in and is carried on
+                  to that same checkout, so the choice survives the detour.
+                  Nobody who taps a price button lands somewhere that is not
+                  about paying.
+                  -------------------------------------------------------------- */}
               <Link
-                href="/start"
+                href={
+                  signedIn
+                    ? `/checkout?pack=${p.code}`
+                    : `/start?next=${encodeURIComponent(`/checkout?pack=${p.code}`)}`
+                }
                 className={`inline-flex w-full items-center justify-center rounded-xl px-5 font-bold transition active:scale-[0.98] ${
                   hero
                     ? 'bg-emerald-400 py-4 text-base text-ink hover:bg-emerald-300'

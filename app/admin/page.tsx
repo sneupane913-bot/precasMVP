@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import { PasscodeInput } from '@/components/PasscodeInput';
 
 /**
  * Consultancy portal, rebuilt to docs/design-reference/consultancy_admin_dashboard.
@@ -175,12 +176,12 @@ export default function AdminPage() {
           />
 
           <label className="mb-1 block text-sm font-semibold text-ink">Passcode</label>
-          <input
-            type="password"
+          <PasscodeInput
             value={passcode}
-            onChange={(e) => setPasscode(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && slug && passcode && login()}
-            className="mb-4 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+            onChange={setPasscode}
+            onEnter={() => slug && passcode && login()}
+            placeholder="Passcode"
+            label="Consultancy passcode"
           />
 
           {error && <p className="mb-3 font-medium text-red-600">{error}</p>}

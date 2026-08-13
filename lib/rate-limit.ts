@@ -62,7 +62,48 @@ export const LIMITS = {
   payment: { max: 10, windowSec: 3600 },
   /** Cheap telemetry, but must not be unbounded. */
   flag: { max: 300, windowSec: 60 },
+  /**
+   * Work done by an ALREADY AUTHENTICATED back-office user.
+   *
+   * 14 Aug. `auth` (5 per 5 minutes) was applied to every /api/super call,
+   * including reads. Opening /super fires four actions — overview, students,
+   * payments, flagged — so simply LOADING THE PAGE spent four of the five, and
+   * the client's first click on Approve came back "Too many attempts. Please
+   * wait five minutes." He could not approve a payment at all.
+   *
+   * `auth` is a brute-force limit. Brute force means GUESSING, and a guess is
+   * a FAILED attempt. Charging a correct passcode the same price as a wrong
+   * one locks out the only person who is supposed to be there, and does
+   * nothing to an attacker that counting failures would not do better.
+   *
+   * So: failures are counted against `auth`; successful authenticated work
+   * gets this, which is generous enough for a human clicking around a dense
+   * dashboard and still bounded so a runaway retry loop cannot spin forever.
+   */
+  backOffice: { max: 240, windowSec: 60 },
 } as const satisfies Record<string, Limit>;
+
+/**
+ * Look at a bucket WITHOUT consuming from it.
+ *
+ * Needed to throttle failed passcode attempts only. The check has to happen
+ * before we know whether the passcode is right, and consuming a token at that
+ * point is exactly the bug above.
+ */
+export function rateLimitPeek(key: string, limit: Limit): RateResult {
+  const now = Date.now();
+  const b = buckets().get(key);
+  if (!b || now >= b.resetAt) return { allowed: true, remaining: limit.max, retryAfterSec: 0 };
+  if (b.count >= limit.max) {
+    return { allowed: false, remaining: 0, retryAfterSec: Math.max(1, Math.ceil((b.resetAt - now) / 1000)) };
+  }
+  return { allowed: true, remaining: limit.max - b.count, retryAfterSec: 0 };
+}
+
+/** Record one FAILED attempt. Call this only after the secret was wrong. */
+export function rateLimitPenalise(key: string, limit: Limit): void {
+  rateLimit(key, limit);
+}
 
 export interface RateResult {
   allowed: boolean;

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { supportWhatsapp } from '@/lib/support';
 
 /**
  * Global footer for the public marketing pages (home, universities, pricing,
@@ -9,9 +10,11 @@ import Link from 'next/link';
  * is unfinished and not safe to pay through. This gives the product the legal,
  * contact and trust anchor that every real product has. See docs/UX_AUDIT.md G3.
  */
-export function SiteFooter() {
+export async function SiteFooter() {
   const year = new Date().getFullYear();
-  const waDigits = (process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? '').replace(/\D/g, '');
+  // The super admin's number, not the env var. Changing it in /super used to
+  // change nothing on the site.
+  const waDigits = (await supportWhatsapp()).replace(/\D/g, '');
   const waHref = waDigits ? `https://wa.me/${waDigits}` : '/pricing';
 
   const columns: { title: string; links: { label: string; href: string; external?: boolean }[] }[] = [

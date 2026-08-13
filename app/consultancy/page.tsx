@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { BUNDLES, SEAT_GRANT, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
 import { SiteFooter } from '@/components/SiteFooter';
+import { supportWhatsapp } from '@/lib/support';
 
 export const metadata = {
   title: 'Partner pricing',
@@ -19,7 +20,8 @@ export const metadata = {
  * Unlisted is not secret. Anyone with the URL can read it. That is fine for a
  * price list; add a passcode if the client ever wants real privacy.
  */
-export default function ConsultancyPage() {
+export default async function ConsultancyPage() {
+  const wa = (await supportWhatsapp()).replace(/\D/g, '');
   return (
     <>
       {/* B21: this page had no shell at all, so a partner who landed here could
@@ -101,7 +103,7 @@ export default function ConsultancyPage() {
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <a
-          href={`https://wa.me/${(process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? '').replace(/\D/g, '')}`}
+          href={`https://wa.me/${wa}`}
           className="flex-1 rounded-xl bg-emerald-600 px-6 py-4 text-center text-lg font-bold text-white"
         >
           Talk to us on WhatsApp

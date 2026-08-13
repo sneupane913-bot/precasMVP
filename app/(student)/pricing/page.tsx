@@ -29,7 +29,7 @@ export default async function PricingPage() {
             Pay once. No monthly bill, nothing to cancel. Your credits do not expire.
           </p>
 
-          <PricingPacks />
+          <PricingPacks signedIn={Boolean(session?.signedIn)} />
           <PriceComparison />
         </div>
       </main>

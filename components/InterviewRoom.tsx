@@ -74,6 +74,8 @@ export function InterviewRoom({
   const [finalTranscript, setFinalTranscript] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [attemptsLeft, setAttemptsLeft] = useState(2);
+  /** Whether this browser can give us a live hearing signal at all. */
+  const [liveSupported, setLiveSupported] = useState(false);
   /** S-28. True when the upload failed for network reasons and the audio survives. */
   const [canResend, setCanResend] = useState(false);
   const pendingRef = useRef<{ blob: Blob; questionId: string; durationSeconds: number } | null>(null);
@@ -212,7 +214,14 @@ export function InterviewRoom({
       (window as unknown as { SpeechRecognition?: SpeechRecognitionCtor }).SpeechRecognition ??
       (window as unknown as { webkitSpeechRecognition?: SpeechRecognitionCtor })
         .webkitSpeechRecognition;
-    if (!Ctor) return; // Firefox and Safari. The server transcript still works.
+    // Firefox and Safari have no SpeechRecognition. The server transcript
+    // still works there, so the interview is unaffected — but we must not warn
+    // "we cannot hear you" in a browser where we were never listening.
+    if (!Ctor) {
+      setLiveSupported(false);
+      return;
+    }
+    setLiveSupported(true);
     try {
       const rec = new Ctor();
       rec.continuous = true;
@@ -453,6 +462,22 @@ export function InterviewRoom({
   }, [phase]);
 
   const answeredCount = answeredIds.size;
+
+  /**
+   * Are we picking anything up?
+   *
+   * True once they have been recording for a few seconds with nothing heard.
+   * The delay matters: firing instantly would scold every student during the
+   * breath they take before their first word, which is worse than saying
+   * nothing. Browsers without SpeechRecognition (Firefox, Safari) never set
+   * liveText, so this stays FALSE for them rather than crying wolf on every
+   * answer — the server transcript still works there.
+   */
+  const notHearingYou =
+    phase === 'recording' &&
+    liveSupported &&
+    liveText.trim().length === 0 &&
+    question.timeLimitSeconds - secondsLeft >= 5;
   const pct = 1 - secondsLeft / Math.max(1, question.timeLimitSeconds);
 
   // D13/D14/D15: the gate after the last free question.
@@ -640,17 +665,44 @@ export function InterviewRoom({
               </span>
             </div>
 
-            {/* transcript area */}
+            {/* ----------------------------------------------------------------
+                TRANSCRIPT AREA. Their words are shown AFTER the answer, never
+                during it.
+
+                14 Aug, client's call and he is right: watching your own words
+                appear as you speak is a live self-monitoring loop, and a
+                nervous speaker reading their own half-finished sentences will
+                stop, correct, and lose their thread. The real interview has no
+                such display, so practising with one trains a habit that will
+                not be there on the day.
+
+                But the live signal is NOT thrown away — it is the only cheap
+                way to know whether we are hearing anything at all. The client
+                found that speaking quietly produced nothing while the screen
+                said "Listening", which reads as working when it is not. So the
+                signal now drives ONE thing: telling them to speak up.
+                ---------------------------------------------------------------- */}
             <div className="mb-5 min-h-[104px] rounded-xl bg-white/70 p-4 text-[15px] leading-relaxed text-slate-800">
               {phase === 'reviewed' && finalTranscript ? (
                 <p>{finalTranscript}</p>
-              ) : liveText ? (
-                <p>{liveText}</p>
+              ) : phase === 'recording' ? (
+                notHearingYou ? (
+                  <div>
+                    <p className="mb-1 font-bold text-amber-700">We cannot hear you yet</p>
+                    <p className="text-sm leading-relaxed text-amber-800">
+                      Speak louder, and a little closer to the microphone. Nothing is being picked
+                      up, so this answer would come back empty. The officer will need to hear you
+                      clearly too.
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-slate-500">
+                    Recording. Keep going — you will see what we heard when you stop.
+                  </p>
+                )
               ) : (
                 <p className="text-slate-400">
-                  {phase === 'recording'
-                    ? 'Listening. Speak clearly and keep going.'
-                    : 'Your words will appear here once you start speaking.'}
+                  Your answer will be shown back to you once you stop recording.
                 </p>
               )}
             </div>
