@@ -295,11 +295,11 @@ Nothing here is proven. This is the gap that made the product feel broken.
 
 | ID | Rule | Status |
 |---|---|---|
-| M-8 | **NPR 449 = 3 mock interviews + 15 practice sessions.** | OPEN — needs applying |
-| M-9 | **NPR 799 = 10 mock interviews + 20 practice sessions.** | OPEN — needs applying |
-| M-10 | A seat for a consultancy student = the NPR 799 pack. If M-9 changes, seats change with it. | OPEN — follows M-9 |
+| M-8 | **NPR 449 = 3 mock interviews + 15 practice sessions.** Applied 13 Aug. Costs us about NPR 30. | BUILT |
+| M-9 | **NPR 799 = 10 mock interviews + 20 practice sessions.** Applied 13 Aug. Costs us about NPR 98. | BUILT |
+| M-10 | A consultancy seat = the NPR 799 pack, **derived from it in code** so it can never drift. Now 10 mocks + 20 practice. | BUILT |
 | M-11 | Bundles are 20 and 30 seats at NPR 300 each. | BUILT+PROVEN |
-| M-12 | Per-mock price must stay under the competitor's. At M-8/M-9 that is NPR 150 and NPR 80, against their NPR 143–160. **NPR 449 is no longer clearly cheaper per mock and the pricing page comparison must be re-checked before it goes live.** | OPEN |
+| M-12 | **The per-mock comparison is withdrawn.** At NPR 449 for 3 mocks we are NPR 150 a mock against the competitor's 143-160, so a per-mock table would have been a false claim (G-9). The page now compares the two things that ARE true and are the client's own argument: our entry pack is NPR 449 against their NPR 799, and we let a student try ten real questions free while they do not. | BUILT |
 
 ---
 

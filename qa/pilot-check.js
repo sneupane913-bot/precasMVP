@@ -272,8 +272,8 @@ function answer(sessionId, questionId, jar, ip) {
 
   // Seats: five seats, more students than that later; and the seat grant.
   const seatedBalance = (loginA.json?.data?.students ?? [])[0]?.mocksLeft;
-  t('CS-16', 'A seat gives the full Serious pack', seatedBalance === 13,
-    `seated student has ${seatedBalance} mocks (12 seat + 1 trial)`);
+  t('CS-16', 'A seat gives the full Serious pack', seatedBalance === 11,
+    `seated student has ${seatedBalance} mocks (10 seat + 1 trial)`);
 
   // Admin A cannot touch B's payment, even with a real order id.
   const bOrder = await req('POST', '/api/payment', { action: 'create', packCode: 'prep' }, { ip: viaB.ip, cookie: viaB.jar });

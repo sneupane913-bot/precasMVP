@@ -158,6 +158,35 @@ async function signIn(token, opts = {}) {
   t('N-17', 'Devices running many Google accounts reach a human queue',
     dev.json?.ok === true, `queue reachable, ${Array.isArray(dev.json?.data) ? dev.json.data.length : '?'} entries`);
 
+  console.log('\n=== PRICING ===\n');
+
+  const plans = fs.readFileSync('lib/data/plans.ts', 'utf8');
+  const prep = (plans.match(/code: 'prep'[\s\S]*?costNpr: (\d+)/) || [])[0] || '';
+  const serious = (plans.match(/code: 'serious'[\s\S]*?costNpr: (\d+)/) || [])[0] || '';
+  t('M-8', 'NPR 449 buys 3 mocks and 15 practice',
+    /priceNpr: 449/.test(prep) && /mockInterviews: 3/.test(prep) && /practiceSessions: 15/.test(prep),
+    'prep = 449 / 3 mocks / 15 practice, costs us ~NPR 30');
+  t('M-9', 'NPR 799 buys 10 mocks and 20 practice',
+    /priceNpr: 799/.test(serious) && /mockInterviews: 10/.test(serious) && /practiceSessions: 20/.test(serious),
+    'serious = 799 / 10 mocks / 20 practice, costs us ~NPR 98');
+  t('M-10', 'A seat is derived from the 799 pack and cannot drift',
+    /SEAT_PLAN\.mockInterviews/.test(plans) && /SEAT_PLAN\.practiceSessions/.test(plans),
+    'SEAT_GRANT reads the plan rather than repeating its numbers');
+
+  const cmp = fs.readFileSync('components/PricingPacks.tsx', 'utf8');
+  // Strip comments first: the file EXPLAINS why the per-mock rate is not shown,
+  // and grepping the raw file matches that explanation. Fourth time this class
+  // of mistake has appeared - assert on code, never on prose.
+  const cmpCode = cmp.replace(/\{\s*\/\*[\s\S]*?\*\/\s*\}/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+  t('M-12', 'No per-mock rate is rendered anywhere',
+    !/per mock interview|perMockNpr\(/.test(cmpCode) && /Entry pack/.test(cmpCode),
+    'at 449 for 3 mocks we are NPR 150/mock vs their 143-160; the page compares entry price and free trial instead');
+
+  const pricingPage = await req('GET', '/pricing');
+  t('G-9b', 'The live pricing page makes no per-mock claim',
+    !/per mock/i.test(pricingPage.body),
+    /per mock/i.test(pricingPage.body) ? 'STILL CLAIMS a per-mock rate' : 'no per-mock rate rendered anywhere');
+
   console.log('\n=== THE AI CONTRACT ===\n');
 
   const c = fs.readFileSync('lib/ai/contract.ts', 'utf8');

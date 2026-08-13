@@ -147,7 +147,7 @@ const OVERSUBSCRIBE = 6;
   const own = await call('/api/admin',
     { action: 'approvePayment', slug: A.slug, passcode: A.passcode, orderId: oid, confirmedReceived: true },
     { ip: '10.8.8.8' });
-  t('E9', own.json?.ok === true && own.json?.data?.granted?.mocks === 6,
+  t('E9', own.json?.ok === true && own.json?.data?.granted?.mocks === 3,
     `consultancy A approving its own student -> granted ${own.json?.data?.granted?.mocks} mocks`);
 
   // Approving twice must not pay twice.

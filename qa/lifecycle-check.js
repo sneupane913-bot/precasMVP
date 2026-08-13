@@ -133,7 +133,7 @@ function t(id, ok, detail) { (ok ? pass++ : fail++); console.log(`  ${ok ? 'PASS
   // nothing further, not the exact size of the first.
   const firstGrant = v1?.data?.granted?.mocks;
   t('E8', (firstGrant === 6 || firstGrant === 7) && v2?.data?.alreadyVerified === true,
-    `first grant=${firstGrant} (6, or 7 with the post-trial bonus) second=${v2?.data?.alreadyVerified ? 'refused' : 'DOUBLE GRANTED'}`);
+    `first grant=${firstGrant} (3, or 4 with the post-trial bonus) second=${v2?.data?.alreadyVerified ? 'refused' : 'DOUBLE GRANTED'}`);
 
   // D16/D17 paying lifts the question allowance
   const me2 = J((await req('GET', '/api/me')).body);

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { publicPlans, getPlan, perMockNpr, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
+import { publicPlans, getPlan, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
 
 /**
  * The pricing block, shared by `/pricing` and the home page.
@@ -98,8 +98,14 @@ export function PricingPacks({
                   one time
                 </span>
               </p>
+              {/* M-12. The per-mock rate is deliberately NOT shown. At NPR 449
+                  for 3 mocks it is NPR 150, against a competitor's 143-160, so
+                  printing it would invite exactly the comparison we would lose
+                  and would make the table below a false claim (G-9). What is
+                  true and worth saying is the pack contents and the free
+                  trial. */}
               <p className={`mb-5 text-sm ${hero ? 'text-emerald-300' : 'text-slate-500'}`}>
-                about NPR {perMockNpr(p)} per mock interview
+                {p.mockInterviews} full interviews and {p.practiceSessions} practice questions
               </p>
 
               <ul className="mb-6 flex-1 space-y-3 text-sm">
@@ -182,47 +188,39 @@ export function PriceComparison() {
   return (
     <section className="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-white">
       <div className="border-b border-slate-200 p-5">
-        <h2 className="font-bold text-ink">What one mock interview costs</h2>
+        <h2 className="font-bold text-ink">What it costs to start</h2>
         <p className="text-sm text-slate-600">
-          The fairest way to compare is the price of a single mock interview, because packs contain
-          different numbers.
+          Most students want a few real rehearsals before one interview, not a big package.
         </p>
       </div>
       <table className="w-full text-left text-sm">
         <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
           <tr>
-            <th className="px-5 py-2.5 font-semibold">Pack</th>
-            <th className="px-3 py-2.5 font-semibold">Mocks</th>
-            <th className="px-5 py-2.5 font-semibold">Price per mock</th>
+            <th className="px-5 py-2.5 font-semibold">Platform</th>
+            <th className="px-3 py-2.5 font-semibold">Entry pack</th>
+            <th className="px-5 py-2.5 font-semibold">Try before paying</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
           <tr className="bg-emerald-50/50">
-            <td className="px-5 py-3 font-semibold text-ink">Ours, NPR 449</td>
-            <td className="px-3 py-3 tabular-nums">6</td>
-            <td className="px-5 py-3 font-bold text-emerald-700">NPR 75</td>
-          </tr>
-          <tr className="bg-emerald-50/50">
-            <td className="px-5 py-3 font-semibold text-ink">Ours, NPR 799</td>
-            <td className="px-3 py-3 tabular-nums">12</td>
-            <td className="px-5 py-3 font-bold text-emerald-700">NPR 67</td>
+            <td className="px-5 py-3 font-semibold text-ink">PreCAS Practice</td>
+            <td className="px-3 py-3 font-bold tabular-nums text-emerald-700">NPR 449</td>
+            <td className="px-5 py-3 font-semibold text-emerald-700">
+              10 real questions, free
+            </td>
           </tr>
           <tr>
-            <td className="px-5 py-3 text-slate-600">Another Nepali platform, NPR 799</td>
-            <td className="px-3 py-3 tabular-nums text-slate-600">5</td>
-            <td className="px-5 py-3 font-semibold text-slate-600">NPR 160</td>
-          </tr>
-          <tr>
-            <td className="px-5 py-3 text-slate-600">Another Nepali platform, NPR 1,999</td>
-            <td className="px-3 py-3 tabular-nums text-slate-600">14</td>
-            <td className="px-5 py-3 font-semibold text-slate-600">NPR 143</td>
+            <td className="px-5 py-3 text-slate-600">Another Nepali platform</td>
+            <td className="px-3 py-3 tabular-nums text-slate-600">NPR 799</td>
+            <td className="px-5 py-3 text-slate-600">—</td>
           </tr>
         </tbody>
       </table>
       <p className="border-t border-slate-100 px-5 py-3 text-xs leading-relaxed text-slate-500">
-        Competitor prices taken from their public checkout pages on 6 August 2026. Packs differ in
-        what they include, so compare the per-mock price rather than the headline number. Prices
-        change, so please check theirs before deciding.
+        Competitor prices taken from their public checkout on 6 August 2026. Packs contain different
+        numbers of interviews, so this compares only the entry price and the free trial rather than
+        claiming a cheaper rate per interview. Prices change, so please check theirs before you
+        decide.
       </p>
     </section>
   );
