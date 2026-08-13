@@ -76,6 +76,33 @@ whole class.
 - A test is written before the fix, and watched failing first. A test that has
   never failed has proved nothing.
 
+## 0b. RULES.md IS THE SOURCE OF TRUTH (binding rule, added 13 Aug 2026)
+
+**`RULES.md` in the project root outranks every other document, including the
+checklists and including the code.**
+
+The client called this out and he was right. We built the product first and
+wrote tests afterwards. A test written after the code can only confirm what was
+built; it cannot tell you what *should* have been built. That is exactly why
+every suite was green while a real student could not stay signed in — there was
+no independent statement of correct behaviour for the code to be wrong *about*.
+
+The order is now: **rules → code → QA checks code against rules.**
+
+- Every rule has an ID (G-1, S-25, C-13, M-8 …). The coder builds to the ID.
+  **Every test names the rule it proves.** A test that proves nothing in
+  `RULES.md` is not a test, it is a habit.
+- **If a rule is missing, stop and write it there first.** Never make the
+  judgement call in code. Undefined behaviour is a gap, not a licence.
+- If code and rules disagree, the rules win — or the rule is wrong and gets
+  changed in `RULES.md` first, never silently in code.
+- Statuses in that file are `[BUILT]`, `[BUILT+PROVEN]`, `[TODO]`, `[OPEN]`.
+  **Nothing is `BUILT+PROVEN` until a passing test cites its rule ID.**
+- Part 10 of `RULES.md` lists the rules with **no test at all**. That list is
+  the honest gap. Never describe anything on it as working.
+
+---
+
 ## 0c. THE CHECKLISTS ARE THE PLAN (binding rule)
 
 **`CHECKLIST.md` in the project root is the index. It points at three lists**,
@@ -344,3 +371,15 @@ QA-203 CRITICAL unlimited unverified trials (the money leak once STT is live), Q
   **Harness lessons, both cost a run.** Next refuses a second `next dev` for the same project and silently reuses the first, so two suites tested nothing and reported "code 0". Kill the port between suites. And `fraud-check.js` shared one IP across more than ten payment calls, hitting the 10-per-hour limiter; it now varies `x-forwarded-for`, as `tenant-check.js` already did.
   **All seven suites green:** lifecycle 20/20, tenant 12/12, fraud 19/19, journey 26/26, walk 78 steps 0 bugs, adversarial 18/18, pilot 29/29.
   **STILL NOT PROVEN, and must not be claimed:** anything requiring a real browser — the Google popup and its redirect fallback, camera and microphone, the 360px phone pass, and the PWA install. No browser can be installed in this sandbox (Playwright cannot get root). These need a human with a phone.
+
+- **2026-08-13 (THE RESET — rules first, and a new host):** The client stopped the work and named the real failure himself: *"I did not make a strategic plan. I did not make a skeleton of where everything needs to go. Once the rules were embedded, none of these bugs would have come."* He is right, and it is the single most important thing in this file.
+  **What actually went wrong, stated plainly:** we wrote code, then wrote tests that described the code we had already written. Tests written after the fact can only confirm what you built. They cannot tell you what you *should* have built. That is why 124 assertions were green while a student could not stay signed in — nothing existed for the code to be wrong *about*. **Rules → code → QA. In that order, from now on.**
+  **Created `RULES.md`** and made it outrank everything else (new binding rule 0b above). Five actors, ~120 numbered rules, each marked BUILT / BUILT+PROVEN / TODO / OPEN, and **Part 10 lists every rule with no test at all** so the gap is impossible to hide. The gap list is long and includes all of the AI, the whole student dashboard, and everything needing a real browser or phone.
+  **We had forgotten an actor.** The student had no home of their own — no dashboard, no history, no sense of what they had bought. Rules S-38 to S-44 now cover it, all TODO. This is why "My practice" felt broken: there was nothing behind it worth arriving at.
+  **HOSTING DECIDED.** Moving off Netlify to **Himalayan Host, "20X Faster Local Cloud with Free .COM", NPR 3,500/year**, local Kathmandu datacentre, DirectAdmin, Node.js supported. Coupon `HH2026` for 10% off. Reasoning: a .com alone costs NPR 1,500–2,000/yr, so the hosting is effectively ~NPR 1,500, and local hosting matters for students on Nepali mobile data. `merotestbooking.com` is abandoned — a fresh domain.
+  **TWO THINGS TO SETTLE BEFORE DEPLOYING THERE (OPEN-1, OPEN-4 in RULES.md):** (1) their pages say "Node.js supported", which normally means the CloudLinux/Passenger selector — that runs simple Express apps reliably but **Next.js 16 App Router is heavier and I cannot test their environment from here.** Open a ticket asking exactly: *"Can I run a Next.js 16 application on a persistent Node.js process with `next start`?"* If no, the NPR 12,000/yr Europe VPS is the honest answer. (2) **Netlify Blobs does not exist there.** Their shared plans give MySQL, not Postgres. Point at Supabase's free cloud tier (the schema is already written in `supabase/schema.sql`) rather than writing a MySQL layer.
+  **PRICING CHANGED, NOT YET APPLIED (M-8 to M-12):** NPR 449 = **3 mocks + 15 practice**; NPR 799 = **10 mocks + 20 practice**. A consultancy seat follows the 799 pack. **Flagged for the client:** at 3 mocks, NPR 449 is NPR 150 per mock against the competitor's NPR 143–160 — it is no longer clearly cheaper, so the comparison table on `/pricing` must be re-checked before this goes live or it becomes a false claim.
+  **Still true and still unpushed:** commits `1efbb13` and earlier are waiting; the Mac was locked. Until they are pushed the live site still has the silent sign-in loop (PILOT-01).
+  **HOSTING RE-DECIDED, same day.** Himalayan Host support was asked "can I run a Next.js 16 application on a persistent Node.js process with `next start`?" and replied with a link to the **VPS** page — not the shared hosting page. That is not an answer, but the choice of link reads as "you need a VPS for that", which fits: shared-plan "Node.js support" on DirectAdmin is the CloudLinux/Passenger selector, built for small apps and usually unable to keep a Next.js server resident. A VPS certainly works (root access; their own blurb mentions running n8n), but the cost jumps from NPR 3,500/yr shared to **NPR 12,000/yr Europe or NPR 42,000/yr KTM**, and building one blind is most of a day out of three.
+  **Decision: stay on Netlify for the pilot and migrate afterwards.** Free, already working, and a new domain points at it in about thirty minutes. Local hosting is a speed improvement, not a works-versus-does-not-work improvement, and speed is not what is short right now. Storage stays Supabase free tier (OPEN-4 settled).
+  **If someone revisits this:** the precise question to put to the host is whether the shared plan can run a long-running Node 20+ process listening on a port behind their web server, staying resident between requests, and if not whether KTM Small is the cheapest plan that can.
