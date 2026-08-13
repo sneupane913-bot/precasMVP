@@ -28,3 +28,11 @@ dev-output.txt
 
 # FUSE/iCloud artefacts left behind when a synced file is replaced
 .fuse_hidden*
+
+# Scratch copies left by editors and by half-finished test runs. qa/model-check.js.tmp
+# was committed by accident on 13 Aug; the push script untracks anything that
+# matches this file, so it clears itself on the next push.
+*.tmp
+
+# The commit message Claude hands to SAVE-AND-PUSH.command. Not part of the product.
+.commit-message.txt

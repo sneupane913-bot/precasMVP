@@ -3,7 +3,32 @@
 `lifecycle-check.js` walks the whole money-and-identity journey against a
 running dev server and asserts the guarantees that must never regress.
 
-## Run it
+## Two kinds of suite
+
+**Server suites** need a running dev server (everything below). **`contract-check.mjs`
+does not** — it imports `lib/ai/contract.ts` directly and executes it. No server,
+no API keys, no network:
+
+```bash
+cd ~/Developer/"Content Karkhana"/precas-mvp
+node --experimental-strip-types --no-warnings qa/contract-check.mjs
+```
+
+Run that one first. It is instant, and if the AI contract is broken there is no
+point starting a server.
+
+Note the split of responsibility. `model-check.js` and `rules-check.js` prove
+rules by **reading** the source, which is right for "the system prompt lives in
+code" and wrong for anything about behaviour — four tests on this project passed
+by matching a comment while the code beneath did something else.
+`contract-check.mjs` proves the behavioural rules by **running** them: it feeds
+`looksGeneric()` an invented quote, every generic phrase we claim to catch, and
+an input polluted with a name, email, phone and payment history, then asserts
+what actually comes out. It was checked against nine deliberate mutations of
+`contract.ts` and caught all nine. If you change `contract.ts`, break it on
+purpose once and confirm this suite goes red before you trust it green.
+
+## Run the server suites
 
 Build a mirror outside the mounted folder (the mount blocks `.next` writes),
 then start the server and run the suite **in the same shell**, because a

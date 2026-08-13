@@ -295,11 +295,11 @@ Nothing here is proven. This is the gap that made the product feel broken.
 
 | ID | Rule | Status |
 |---|---|---|
-| M-8 | **NPR 449 = 3 mock interviews + 15 practice sessions.** Applied 13 Aug. Costs us about NPR 30. | BUILT |
-| M-9 | **NPR 799 = 10 mock interviews + 20 practice sessions.** Applied 13 Aug. Costs us about NPR 98. | BUILT |
-| M-10 | A consultancy seat = the NPR 799 pack, **derived from it in code** so it can never drift. Now 10 mocks + 20 practice. | BUILT |
+| M-8 | **NPR 449 = 3 mock interviews + 15 practice sessions.** Applied 13 Aug. Costs us about NPR 30. | BUILT+PROVEN |
+| M-9 | **NPR 799 = 10 mock interviews + 20 practice sessions.** Applied 13 Aug. Costs us about NPR 98. | BUILT+PROVEN |
+| M-10 | A consultancy seat = the NPR 799 pack, **derived from it in code** so it can never drift. Now 10 mocks + 20 practice. | BUILT+PROVEN |
 | M-11 | Bundles are 20 and 30 seats at NPR 300 each. | BUILT+PROVEN |
-| M-12 | **The per-mock comparison is withdrawn.** At NPR 449 for 3 mocks we are NPR 150 a mock against the competitor's 143-160, so a per-mock table would have been a false claim (G-9). The page now compares the two things that ARE true and are the client's own argument: our entry pack is NPR 449 against their NPR 799, and we let a student try ten real questions free while they do not. | BUILT |
+| M-12 | **The per-mock comparison is withdrawn.** At NPR 449 for 3 mocks we are NPR 150 a mock against the competitor's 143-160, so a per-mock table would have been a false claim (G-9). The page now compares the two things that ARE true and are the client's own argument: our entry pack is NPR 449 against their NPR 799, and we let a student try ten real questions free while they do not. | BUILT+PROVEN |
 
 ---
 
@@ -339,9 +339,11 @@ Not built. Nothing here may be claimed until it is.
 
 A rule with no test is a hope. Current coverage:
 
-| `rules-check.js` | the 59 rules that were only BUILT | **59/59** |
 | Suite | Rules it proves | Result |
 |---|---|---|
+| `rules-check.js` | the 59 rules that were only BUILT | **59/59** |
+| `model-check.js` | Part 12 in full — N-1…N-47, M-4…M-12, Q-1…Q-10, AI-1…AI-8 | **69/69** |
+| `contract-check.mjs` | N-30, N-31, N-32, and a second **executed** pass over AI-1…AI-4, AI-6, AI-7 | **25/25** |
 | `pilot-check.js` | S-6, S-17, S-24, S-25, S-45, S-48, S-49, S-51, C-3, C-4, C-9, C-13, C-16, C-17, G-5, G-8 | 29/29 |
 | `lifecycle-check.js` | G-1, G-2, G-6, S-11, S-18, S-32, S-48, M-1 | 20/20 |
 | `tenant-check.js` | C-1…C-14 | 12/12 |
@@ -349,6 +351,21 @@ A rule with no test is a hope. Current coverage:
 | `journey-check.js` | V-2, V-3, S-1, S-11, S-14 | 26/26 |
 | `walk-check.js` | G-3, V-1, V-7 | 78 steps |
 | `adversarial-check.js` | G-2, G-5, C-3 | 18/18 |
+
+**Two kinds of test, and the difference matters.** `model-check.js` and
+`rules-check.js` prove rules by READING the source — the right tool for "the
+system prompt lives in code, not a provider console", and the wrong tool for
+anything about behaviour. Four times on this project a test passed because it
+matched a *comment* that described the rule while the code beneath did
+something else. `contract-check.mjs` therefore imports the real functions and
+runs them: it feeds `looksGeneric()` an invented quote, every generic phrase we
+claim to catch, and an input object deliberately polluted with a name, an
+email, a phone number and a payment history, and asserts what actually comes
+out. It was verified against **nine deliberate mutations** of `contract.ts`
+(approve-everything, drop the quote check, skip one generic phrase, drop the
+Nepali requirement, leak the student name, rubber-stamp the shape check, soften
+the accent instruction, add a translated field, allow a one-word wrap-up) and
+caught all nine. A suite that has never been seen to fail proves nothing.
 
 **Rules with NO test at all** — the honest gap list:
 
@@ -429,9 +446,9 @@ simply have mocks.
 
 | ID | Rule | Status |
 |---|---|---|
-| N-30 | **Feedback is written about THIS student's answer**, quoting what they actually said. Two students never receive the same paragraph. Enforced at runtime by `looksGeneric()` in `lib/ai/contract.ts`, which rejects any response whose "evidence" field does not actually overlap the transcript. | BUILT |
-| N-31 | Generic feedback is a **defect**, not a shortcoming. A model under load drifts towards safe generic sentences because they are the highest-probability output, so every response is checked, not spot-checked. When it fails we drop the prose and say so — a missing paragraph is honest, a generic one is a lie that costs the student their interview. | BUILT |
-| N-32 | **Nepali is not a translation of the report.** It carries only what a frightened student must not misunderstand: what went wrong and what to do. Scores, the question, and their own words stay in English, because the interview is in English and reading their own answer back in Nepali helps nobody. Fixed as one field in the contract. | BUILT |
+| N-30 | **Feedback is written about THIS student's answer**, quoting what they actually said. Two students never receive the same paragraph. Enforced at runtime by `looksGeneric()` in `lib/ai/contract.ts`, which rejects any response whose "evidence" field does not actually overlap the transcript. | BUILT+PROVEN |
+| N-31 | Generic feedback is a **defect**, not a shortcoming. A model under load drifts towards safe generic sentences because they are the highest-probability output, so every response is checked, not spot-checked. When it fails we drop the prose and say so — a missing paragraph is honest, a generic one is a lie that costs the student their interview. | BUILT+PROVEN |
+| N-32 | **Nepali is not a translation of the report.** It carries only what a frightened student must not misunderstand: what went wrong and what to do. Scores, the question, and their own words stay in English, because the interview is in English and reading their own answer back in Nepali helps nobody. Fixed as one field in the contract. | BUILT+PROVEN |
 
 ## 12.7 Practice — a whole feature nobody had specified
 
@@ -479,14 +496,14 @@ so connecting one is plumbing rather than design.
 
 | ID | Rule | Status |
 |---|---|---|
-| AI-1 | The evaluator receives: the question, its category and intent, the transcript, how long they spoke, the university, the level, and **what they said earlier in the same sitting**. Nothing else. | BUILT |
-| AI-2 | **No identifying data reaches any provider.** Not name, email, phone, consultancy or payment history. A grader does not need to know who somebody is to say whether they named their course. | BUILT |
-| AI-3 | It returns PEE + Wrap-up, a Nepali line, three sub-scores that may be null, and a **contradiction** field. | BUILT |
-| AI-4 | **Contradiction detection is the highest-value output.** A student whose father is a farmer in question 3 and a businessman in question 11 has a problem no single-answer grader can see, and an officer certainly will. | BUILT |
-| AI-5 | The system prompt lives **in code**, versioned and diffable, never in a provider console. | BUILT |
-| AI-6 | Accent, grammar slips and Nepali sentence order are **never penalised** where meaning is clear. Only vagueness, contradiction, numbers that do not add up, and recited answers. | BUILT |
-| AI-7 | Transcription is Groq Whisper Large v3 with a **language hint and a vocabulary hint**, so the model does not "correct" a Nepali speaker into words they never said and then quote them back as evidence. | BUILT |
-| AI-8 | On generic or malformed output the prose is **dropped**, the score and recording are kept, and the student is told plainly. Never shipped, never fabricated. | BUILT |
+| AI-1 | The evaluator receives: the question, its category and intent, the transcript, how long they spoke, the university, the level, and **what they said earlier in the same sitting**. Nothing else. | BUILT+PROVEN |
+| AI-2 | **No identifying data reaches any provider.** Not name, email, phone, consultancy or payment history. A grader does not need to know who somebody is to say whether they named their course. | BUILT+PROVEN |
+| AI-3 | It returns PEE + Wrap-up, a Nepali line, three sub-scores that may be null, and a **contradiction** field. | BUILT+PROVEN |
+| AI-4 | **Contradiction detection is the highest-value output.** A student whose father is a farmer in question 3 and a businessman in question 11 has a problem no single-answer grader can see, and an officer certainly will. | BUILT+PROVEN |
+| AI-5 | The system prompt lives **in code**, versioned and diffable, never in a provider console. | BUILT+PROVEN |
+| AI-6 | Accent, grammar slips and Nepali sentence order are **never penalised** where meaning is clear. Only vagueness, contradiction, numbers that do not add up, and recited answers. | BUILT+PROVEN |
+| AI-7 | Transcription is Groq Whisper Large v3 with a **language hint and a vocabulary hint**, so the model does not "correct" a Nepali speaker into words they never said and then quote them back as evidence. | BUILT+PROVEN |
+| AI-8 | On generic or malformed output the prose is **dropped**, the score and recording are kept, and the student is told plainly. Never shipped, never fabricated. | BUILT+PROVEN |
 | AI-9 | When the key arrives, only `stt.ts` and `evaluate.ts` change. G-1, N-30, Q-10 and G-8 must all still hold. | TODO |
 
 ---
