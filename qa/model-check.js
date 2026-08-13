@@ -167,6 +167,9 @@ async function signIn(token, opts = {}) {
 
   console.log('\n=== SEATS (N-1) ===\n');
 
+  const direct2 = await signIn(`n4d-${S}`);
+  const stu2Ip = direct2.ip, stu2Jar = direct2.jar;
+
   const SU = 'super-dev';
   const cs = `n1-${S}`;
   const mk = await req('POST', '/api/platform',
@@ -204,6 +207,19 @@ async function signIn(token, opts = {}) {
   t('N-1b', 'An invented seat size in the URL grants the default, not itself',
     fm.json?.data?.entitlement?.mocksLeft === 11,
     `?seat=seat9999 -> ${fm.json?.data?.entitlement?.mocksLeft} mocks (falls back, never trusts the URL)`);
+
+  // N-4. A seat-backed student is never sold to.
+  const seated = await signInSeat(`n4-${S}`, cs, 'seat6');
+  const seatedMe = await req('GET', '/api/me', null, { ip: seated.ip, cookie: seated.jar });
+  const seatedAcct = await req('GET', '/api/account', null, { ip: seated.ip, cookie: seated.jar });
+  t('N-4', 'A consultancy student is marked seat-backed and never sold to',
+    seatedMe.json?.data?.seatBacked === true && seatedAcct.json?.data?.seatBacked === true,
+    `me.seatBacked=${seatedMe.json?.data?.seatBacked} account.seatBacked=${seatedAcct.json?.data?.seatBacked}, mocks ${seatedMe.json?.data?.entitlement?.mocksLeft}`);
+
+  const payingMe = await req('GET', '/api/me', null, { ip: stu2Ip, cookie: stu2Jar });
+  t('N-4b', 'A student who pays us directly is NOT marked seat-backed',
+    payingMe.json?.data?.seatBacked === false,
+    `direct student seatBacked=${payingMe.json?.data?.seatBacked} (so they still see prices)`);
 
   console.log('\n=== PRICING ===\n');
 

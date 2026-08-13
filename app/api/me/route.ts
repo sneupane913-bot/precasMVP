@@ -45,6 +45,18 @@ export async function GET() {
     profileComplete: boolean;
     entitlement: typeof ent;
     offer: typeof offer;
+    /**
+     * N-4. True when this student's mocks came from a consultancy seat and
+     * they still have some left.
+     *
+     * A consultancy student does not pay us — their consultancy did. Showing
+     * them a price, a QR code or a pay button would be asking a second time
+     * for something already bought, which is the fastest way to lose a
+     * consultancy's trust in front of thirty of their students.
+     *
+     * Computed on the server from the ledger, never sent up by the browser.
+     */
+    seatBacked: boolean;
   }> = {
     ok: true,
     data: {
@@ -53,6 +65,8 @@ export async function GET() {
       email: student.email,
       referralCode: student.referralCode,
       referralsRewarded: referrals,
+      seatBacked:
+        ledger.some((e) => e.reason === 'seat_allocation') && ent.mocksLeft > 0,
       // The full profile is captured at the report moment, not before the
       // trial. Forcing a form on a nervous student before any value is the
       // funnel mistake the marketing analyst correctly pushed back on.

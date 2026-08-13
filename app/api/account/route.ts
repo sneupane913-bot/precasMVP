@@ -43,6 +43,9 @@ export async function GET() {
     );
   }
 
+  const seatLedger = await repo().listLedger(student.id);
+  const seatBacked = seatLedger.some((e) => e.reason === 'seat_allocation');
+
   const [sessions, ent, offer] = await Promise.all([
     store.listByStudent(student.id),
     entitlementFor(student),
@@ -57,6 +60,13 @@ export async function GET() {
       referralCode: student.referralCode,
       entitlement: ent,
       offer,
+      /**
+       * N-4. A consultancy student never sees a price, a QR or a pay button
+       * while their seat still has mocks on it. Their consultancy already
+       * paid; asking again in front of thirty of their students is the fastest
+       * way to lose that consultancy.
+       */
+      seatBacked: seatBacked && ent.mocksLeft > 0,
       sessions: sessions.map((s) => {
         const inst = getInstitution(s.institutionId);
         return {

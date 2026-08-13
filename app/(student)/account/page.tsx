@@ -43,6 +43,8 @@ interface Account {
   sessions: Session[];
   offer?: Offer | null;
   progress?: Progress;
+  /** N-4. Their consultancy paid; never show them a price. */
+  seatBacked?: boolean;
 }
 
 const BAND_LABEL: Record<string, string> = {
@@ -131,6 +133,18 @@ export default function AccountPage() {
               <div className="mb-8">
                 <OfferCountdown offer={data.offer} />
               </div>
+            )}
+
+            {/* N-4. A seat-backed student is told where their mocks came from
+                and what to do when they run out, instead of being sold to. */}
+            {data.seatBacked && (
+              <section className="mb-8 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-5">
+                <p className="mb-1 font-bold text-ink">Your consultancy is covering this</p>
+                <p className="text-sm leading-relaxed text-emerald-900">
+                  You do not pay us anything. When your interviews run out, ask your consultancy to
+                  add more — they can do it in a moment.
+                </p>
+              </section>
             )}
 
             {/* What they have left */}
