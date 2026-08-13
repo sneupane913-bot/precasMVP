@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { InstallPrompt } from '@/components/InstallPrompt';
 import { useRouter } from 'next/navigation';
 import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
@@ -45,6 +46,11 @@ interface Account {
   progress?: Progress;
   /** N-4. Their consultancy paid; never show them a price. */
   seatBacked?: boolean;
+  /** N-14. Always offered to a paying student. */
+  offerUpgrade?: boolean;
+  /** N-15. Turns on at two mocks or fewer. */
+  offerRenew?: boolean;
+  lastPayer?: { name: string | null; phoneSuffix: string | null } | null;
 }
 
 const BAND_LABEL: Record<string, string> = {
@@ -147,6 +153,13 @@ export default function AccountPage() {
               </section>
             )}
 
+            {/* N-16. The dashboard is the page a student comes BACK to, so it
+                is the right place to offer the install. The report is seen
+                once; this is seen every time. */}
+            <div className="mb-8">
+              <InstallPrompt show />
+            </div>
+
             {/* What they have left */}
             <section className="mb-8 grid gap-4 sm:grid-cols-2">
               <div className="rounded-2xl border border-slate-200 bg-white p-5">
@@ -223,6 +236,43 @@ export default function AccountPage() {
                   </div>
                 )}
               </section>
+            )}
+
+            {/* N-15 first, N-14 second. A student who is nearly out needs the
+                top-up, not the shop. Ordering them the other way round is how a
+                nearly-empty student ends up comparing packs while their
+                interview is next week. */}
+            {data.offerRenew && (
+              <section className="mb-8 rounded-2xl border-2 border-ink bg-white p-6">
+                <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-emerald-700">
+                  {data.entitlement.mocksLeft === 0 ? 'You have none left' : 'Nearly out'}
+                </p>
+                <h2 className="mb-2 font-serif text-xl font-bold text-ink">
+                  {data.entitlement.mocksLeft === 0
+                    ? 'Top up to keep practising'
+                    : `Only ${data.entitlement.mocksLeft} mock interview${data.entitlement.mocksLeft === 1 ? '' : 's'} left`}
+                </h2>
+                <p className="mb-5 leading-relaxed text-slate-600">
+                  {data.lastPayer?.name
+                    ? 'Your details are already filled in, so this takes a moment.'
+                    : 'It takes a moment, and your interviews never expire.'}
+                </p>
+                <Link
+                  href="/checkout?pack=prep&renew=1"
+                  className="inline-flex items-center justify-center rounded-xl bg-ink px-6 py-3.5 font-bold text-white"
+                >
+                  Top up
+                </Link>
+              </section>
+            )}
+
+            {data.offerUpgrade && !data.offerRenew && (
+              <p className="mb-8 text-center text-sm text-slate-500">
+                Want more interviews?{' '}
+                <Link href="/pricing" className="font-semibold text-ink underline underline-offset-4">
+                  See the bigger pack
+                </Link>
+              </p>
             )}
 
             {/* History */}

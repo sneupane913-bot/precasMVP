@@ -279,6 +279,30 @@ async function signIn(token, opts = {}) {
     !!mineQ && 'payerPhone' in mineQ && mineQ.payerPhoneSuffix === '4321',
     `queue item has payerPhone field and the last 4 digits (${mineQ?.payerPhoneSuffix})`);
 
+  console.log('\n=== UPGRADE, RENEWAL AND INSTALL ===\n');
+
+  const lowStu = await signIn(`n15-${S}`);
+  const lowAcct = await req('GET', '/api/account', null, { ip: lowStu.ip, cookie: lowStu.jar });
+  t('N-14', 'A paying student is always offered a way to buy more',
+    lowAcct.json?.data?.offerUpgrade === true,
+    `offerUpgrade=${lowAcct.json?.data?.offerUpgrade} for a student who pays us`);
+  t('N-15', 'The top-up appears at two mocks or fewer, not at zero',
+    lowAcct.json?.data?.offerRenew === true && lowAcct.json?.data?.entitlement?.mocksLeft <= 2,
+    `mocksLeft=${lowAcct.json?.data?.entitlement?.mocksLeft} -> offerRenew=${lowAcct.json?.data?.offerRenew}`);
+  t('N-15b', 'The checkout can be pre-filled from their last payment',
+    'lastPayer' in (lowAcct.json?.data ?? {}),
+    `lastPayer=${JSON.stringify(lowAcct.json?.data?.lastPayer)} (null until they have paid once)`);
+
+  const seatAcct = await req('GET', '/api/account', null, { ip: seated.ip, cookie: seated.jar });
+  t('N-14b', 'A seat-backed student is never offered a price',
+    seatAcct.json?.data?.offerUpgrade === false && seatAcct.json?.data?.offerRenew === false,
+    `seat-backed: offerUpgrade=${seatAcct.json?.data?.offerUpgrade} offerRenew=${seatAcct.json?.data?.offerRenew}`);
+
+  const acctSrc = fs.readFileSync('app/(student)/account/page.tsx', 'utf8');
+  t('N-16', 'The install prompt is on the page they come BACK to',
+    /InstallPrompt/.test(acctSrc),
+    'dashboard offers install, not only the report they see once');
+
   console.log('\n=== PRICING ===\n');
 
   const plans = fs.readFileSync('lib/data/plans.ts', 'utf8');

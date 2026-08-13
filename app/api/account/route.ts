@@ -67,6 +67,29 @@ export async function GET() {
        * way to lose that consultancy.
        */
       seatBacked: seatBacked && ent.mocksLeft > 0,
+      /**
+       * N-14, N-15. What to offer this student, decided here rather than in
+       * the browser so the rule lives in one place.
+       *
+       * `upgrade` is always true for a student who pays us: somebody on the
+       * 449 pack should always be able to move up without hunting for it.
+       * A seat-backed student is excluded — their consultancy paid, and
+       * showing them a price is N-4.
+       *
+       * `renew` turns on at two mocks or fewer. Earlier is nagging; at zero it
+       * is too late, because they have already been stopped mid-preparation.
+       */
+      offerUpgrade: !seatBacked,
+      offerRenew: !seatBacked && ent.mocksLeft <= 2,
+      /**
+       * N-15. Pre-fill for the next checkout, so a returning student is not
+       * asked the same three questions again. Their own last payment only.
+       */
+      lastPayer: await (async () => {
+        const orders = await repo().listOrders({ studentId: student.id });
+        const paid = orders.filter((o) => o.state === 'verified' && o.payerName).at(-1);
+        return paid ? { name: paid.payerName, phoneSuffix: paid.payerPhoneSuffix } : null;
+      })(),
       sessions: sessions.map((s) => {
         const inst = getInstitution(s.institutionId);
         return {
