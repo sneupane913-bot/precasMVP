@@ -32,7 +32,9 @@ export async function POST(req: Request) {
     return NextResponse.json(apiError(down.code, down.message, down.userMessage), { status: 503 });
   }
 
-  const rl = rateLimit(`auth:${clientIp(req)}`, RL.auth);
+  // Uses the generous sign-in limit, NOT the passcode limit: a consultancy
+  // lab shares one IP and thirty students must all be able to sign in.
+  const rl = rateLimit(`signin:${clientIp(req)}`, RL.signIn);
   if (!rl.allowed) {
     return NextResponse.json(
       apiError('RATE_LIMITED', 'auth attempts', 'Too many sign-in attempts. Please wait a few minutes.'),

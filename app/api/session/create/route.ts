@@ -7,13 +7,12 @@ import {
   publicQuestion,
   getQuestion,
 } from '@/lib/data/questions';
-import { getPlan } from '@/lib/data/plans';
 import { store } from '@/lib/store';
-import { checkCredits } from '@/lib/credits';
 import { platformDown } from '@/lib/platform';
 import { rateLimit, clientIp, LIMITS as RL, maxMocksPerDay } from '@/lib/rate-limit';
 import { ensureOwnerId } from '@/lib/owner-session';
 import { currentStudent } from '@/lib/auth/session';
+import { entitlementFor } from '@/lib/entitlement';
 import { repo } from '@/lib/db';
 import { apiError, type ApiResult, type InterviewSession } from '@/lib/types';
 
@@ -112,21 +111,34 @@ export async function POST(req: Request) {
     );
   }
 
-  const credits = await checkCredits(null);
-  if (!credits.allowed) {
-    return NextResponse.json(apiError(credits.code, 'no credits', credits.userMessage), {
-      status: 402,
-    });
-  }
-
   // ---- Entitlement is decided HERE, never by the caller. ----
-  // Payments are not live, so every session is a trial. When paid packs land,
-  // this reads the buyer's entitlement. The browser never gets a say.
-  const plan = getPlan('trial');
-  if (!plan) {
+  //
+  // Two adversarial findings both traced to this block ignoring what the
+  // student is actually entitled to:
+  //
+  //   CASE 1. Nothing checked whether they held a credit, so a student who had
+  //   used their free ten could open a whole second interview, sit through the
+  //   device check, and only be refused at the moment they spoke. Being turned
+  //   away after committing is worse than being told up front.
+  //
+  //   CASE 2. The plan was hard-coded to 'trial', so a student who had PAID
+  //   still received a 10 question session. They bought the remaining seven and
+  //   never got them. That is the worst kind of bug, because they paid for it.
+  //
+  // Both now come from the ledger, which is the only thing the browser cannot
+  // influence.
+  const ent = await entitlementFor(student);
+
+  const canStart = parsed.mode === 'practice' ? ent.canStartPractice : ent.canStartMock;
+  if (!canStart) {
     return NextResponse.json(
-      apiError('CONFIG', 'trial plan missing', 'Something went wrong. Please try again.'),
-      { status: 500 }
+      apiError(
+        'NO_CREDITS_LEFT',
+        `no ${parsed.mode} credit`,
+        (parsed.mode === 'practice' ? ent.practiceReason : ent.reason) ??
+          'Buy a pack to keep practising.'
+      ),
+      { status: 402 }
     );
   }
   // D18. Practice is a single question drill, a full mock is the exam. They
@@ -135,7 +147,7 @@ export async function POST(req: Request) {
   const isPractice = parsed.mode === 'practice';
   const questionLimit = isPractice
     ? 1
-    : Math.min(plan.maxQuestionsPerMock, institution.questionCount);
+    : Math.min(ent.questionsAllowed, institution.questionCount);
   const questionIds = isPractice
     ? buildPracticePlan(parsed.category)
     : buildQuestionPlan(questionLimit);
@@ -153,7 +165,7 @@ export async function POST(req: Request) {
     currentIndex: 0,
     answers: [],
     flags: [],
-    isTrial: true,
+    isTrial: !ent.hasPaid,
     ownerId,
     studentId: student.id,
     consentVersion: null,

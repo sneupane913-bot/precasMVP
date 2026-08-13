@@ -18,6 +18,7 @@ export interface Entitlement {
   canStartMock: boolean;
   canStartPractice: boolean;
   reason: string | null;
+  practiceReason: string | null;
 }
 
 export async function entitlementFor(student: Student): Promise<Entitlement> {
@@ -48,6 +49,17 @@ export async function entitlementFor(student: Student): Promise<Entitlement> {
         : hasPaid
           ? 'You have used all the mock interviews in your pack.'
           : 'You have used your free questions. Buy a pack to keep going.',
+    /**
+     * Practice needs its own sentence. The free trial contains no practice
+     * questions at all, so telling that student they have "used all" of theirs
+     * is simply untrue, and it reads like the product losing their credits.
+     */
+    practiceReason:
+      practiceLeft > 0
+        ? null
+        : ledger.some((e) => e.kind === 'practice' && e.delta > 0)
+          ? 'You have used all the practice questions in your pack.'
+          : 'Practice questions come with a pack. Your free try is the ten question mock interview.',
   };
 }
 

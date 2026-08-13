@@ -35,8 +35,27 @@ export const LIMITS = {
   sessionCreate: { max: 10, windowSec: 60 },
   /** The expensive one. 22 answers per mock, so this allows about 2 mocks. */
   answer: { max: 45, windowSec: 60 },
-  /** Login attempts. This is what makes passcode brute force impractical. */
+  /**
+   * PASSCODE login attempts (admin, super admin, owner). Tight on purpose:
+   * these are short secrets compared with ===, so throttling is the only thing
+   * making brute force impractical.
+   */
   auth: { max: 5, windowSec: 300 },
+  /**
+   * Student sign-in with Google. Deliberately far more generous than `auth`,
+   * and this is not a loosening.
+   *
+   * There is no secret to guess here: the request carries a Firebase ID token
+   * that Google itself signed, so brute force is not the threat model. The real
+   * risk runs the other way. A consultancy lab is thirty students on ONE
+   * Wi-Fi, and under the passcode limit only the first five could ever sign in.
+   * That would lock out twenty five paying students and look like the product
+   * being broken.
+   *
+   * Trial abuse is handled where it belongs, in lib/trial-gate.ts, by device
+   * and account signals rather than by refusing to let people log in.
+   */
+  signIn: { max: 60, windowSec: 300 },
   /** OTP costs real money per message. */
   otpSend: { max: 3, windowSec: 3600 },
   /** Payment submissions. */
