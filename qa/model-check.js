@@ -244,6 +244,41 @@ async function signIn(token, opts = {}) {
   t('N-5b', 'One consultancy cannot top up another\'s student', cross.code === 404,
     `renewing a stranger's student -> ${cross.code}`);
 
+  console.log('\n=== QR, CONTACT AND WHATSAPP ===\n');
+
+  const set = await req('POST', '/api/super', {
+    action: 'setPaymentSettings', superKey: SU,
+    payQrImageUrl: 'https://example.test/qr.png', payWalletName: 'eSewa',
+    payWalletNumber: '9800000001', payAccountName: 'PreCAS', supportWhatsapp: '9779800000002',
+  });
+  const payer = await signIn(`n11-${S}`);
+  const ord = await req('POST', '/api/payment', { action: 'create', packCode: 'prep' }, { ip: payer.ip, cookie: payer.jar });
+  const pd = ord.json?.data;
+  t('N-11', 'The super admin can change the QR and wallet without a deploy',
+    set.json?.ok === true && pd?.payTo?.qrImageUrl === 'https://example.test/qr.png' && pd?.payTo?.walletNumber === '9800000001',
+    `checkout now shows qr=${pd?.payTo?.qrImageUrl} wallet=${pd?.payTo?.walletNumber}`);
+  t('N-20', 'The support number is editable and reaches the student',
+    pd?.supportWhatsapp === '9779800000002',
+    `supportWhatsapp=${pd?.supportWhatsapp}`);
+  t('N-12', 'The WhatsApp message is written for them, not by them',
+    /problem with my payment/i.test(pd?.supportMessage ?? '') && (pd?.supportMessage ?? '').includes(String(pd?.orderId).slice(0, 8)),
+    `"${(pd?.supportMessage ?? '').slice(0, 62)}..." carries their reference`);
+
+  const adminTry = await req('POST', '/api/admin',
+    { action: 'setPaymentSettings', slug: cs, passcode: 'n1pass123', payWalletNumber: '9779999999' });
+  t('N-11b', 'A consultancy admin cannot change the QR or the wallet',
+    adminTry.code === 400 || adminTry.json?.ok !== true,
+    `admin attempting setPaymentSettings -> ${adminTry.code} (no such action on their route)`);
+
+  await req('POST', '/api/payment',
+    { action: 'submit', orderId: pd?.orderId, walletTxnId: `N11${S}`, payerName: 'Phone Test', payerPhoneSuffix: '4321' },
+    { ip: payer.ip, cookie: payer.jar });
+  const queue = await req('POST', '/api/super', { action: 'orders', superKey: SU });
+  const mineQ = (queue.json?.data ?? []).find((o) => o.walletTxnId === `N11${S}`.toUpperCase());
+  t('N-13', 'Every approval request carries a number to ring',
+    !!mineQ && 'payerPhone' in mineQ && mineQ.payerPhoneSuffix === '4321',
+    `queue item has payerPhone field and the last 4 digits (${mineQ?.payerPhoneSuffix})`);
+
   console.log('\n=== PRICING ===\n');
 
   const plans = fs.readFileSync('lib/data/plans.ts', 'utf8');

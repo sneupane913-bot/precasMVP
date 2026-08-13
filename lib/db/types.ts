@@ -144,7 +144,9 @@ export interface ApprovalAudit {
     | 'owner_platform_on'
     | 'reward_rule_change'
     /** J3: the student exercised their own right to be deleted. */
-    | 'delete_my_data';
+    | 'delete_my_data'
+    /** N-11. Payment or support details changed by the super admin. */
+    | 'set_payment_settings';
   subjectId: string;
   before: string | null;
   after: string | null;

@@ -4,7 +4,7 @@ import { currentStudent } from '@/lib/auth/session';
 import { repo, type PaymentOrder } from '@/lib/db';
 import { getPlan, publicPlans } from '@/lib/data/plans';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
-import { platformDown } from '@/lib/platform';
+import { platformDown, platform } from '@/lib/platform';
 import { apiError, type ApiResult } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -117,6 +117,7 @@ export async function POST(req: Request) {
         new Date(o.expiresAt).getTime() > Date.now()
     );
 
+    const settings = await platform.getSettings();
     const now = Date.now();
     const order: PaymentOrder = reusable ?? {
       id: crypto.randomUUID(),
@@ -146,6 +147,8 @@ export async function POST(req: Request) {
       mocks: number;
       practice: number;
       expiresAt: string;
+      supportWhatsapp: string;
+      supportMessage: string;
       payTo: {
         walletName: string;
         walletNumber: string;
@@ -161,16 +164,35 @@ export async function POST(req: Request) {
         mocks: plan.mockInterviews,
         practice: plan.practiceSessions,
         expiresAt: order.expiresAt,
+        /**
+         * N-12. A worried student should never have to compose a message.
+         *
+         * They have just sent real money and something has gone wrong; asking
+         * them to explain themselves from scratch, in English, on a phone, is
+         * the moment we lose them. The link opens WhatsApp with the whole
+         * message already written and only their name to confirm.
+         */
+        supportWhatsapp: settings.supportWhatsapp || process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || '',
+        supportMessage: `Hello, I am having a problem with my payment on PreCAS Practice. My name is ${student.name ?? ''} and my reference is ${order.id.slice(0, 8)}.`,
         payTo: {
-          walletName: process.env.PAY_WALLET_NAME ?? 'eSewa',
-          walletNumber: process.env.PAY_WALLET_NUMBER ?? '',
-          accountName: process.env.PAY_ACCOUNT_NAME ?? '',
+          /**
+           * N-11. Settings first, environment second.
+           *
+           * The super admin can change the wallet and the QR from the back
+           * office without a deploy, because a wallet that needs a code release
+           * to update is a wallet that will be wrong on the day it matters. The
+           * env vars stay as the fallback so nothing breaks before the first
+           * time somebody sets them.
+           */
+          walletName: settings.payWalletName || process.env.PAY_WALLET_NAME || 'eSewa',
+          walletNumber: settings.payWalletNumber || process.env.PAY_WALLET_NUMBER || '',
+          accountName: settings.payAccountName || process.env.PAY_ACCOUNT_NAME || '',
           // The owner uploads their own wallet QR and puts the URL here. We do
           // not generate the QR ourselves: a wallet QR encodes merchant data we
           // do not hold, and a QR we invented would take the student's money to
           // nowhere. Absent means "show the number instead", never a broken
           // image.
-          qrImageUrl: process.env.PAY_QR_IMAGE_URL || null,
+          qrImageUrl: settings.payQrImageUrl || process.env.PAY_QR_IMAGE_URL || null,
         },
       },
     };

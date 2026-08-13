@@ -75,6 +75,24 @@ export interface PlatformSettings {
    * grow without bound.
    */
   ownerAudit?: OwnerAuditEntry[];
+
+  /**
+   * N-11, N-20. Payment and support details the SUPER ADMIN can change without
+   * a deploy.
+   *
+   * Sales staff change, wallets change, and a phone number that needs a code
+   * release to update is a number that will be wrong on the day it matters
+   * most — while a student who has just sent money is trying to reach us.
+   *
+   * A consultancy admin can change NONE of these: the money arrives in our
+   * wallet, so only we may say where it goes or who answers about it.
+   */
+  payQrImageUrl?: string;
+  payWalletName?: string;
+  payWalletNumber?: string;
+  payAccountName?: string;
+  /** N-12, N-19. The number the pre-filled WhatsApp links open. */
+  supportWhatsapp?: string;
 }
 
 export const DEFAULT_SETTINGS: PlatformSettings = {
@@ -87,6 +105,11 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   enabledAt: null,
   enabledBy: null,
   ownerAudit: [],
+  payQrImageUrl: '',
+  payWalletName: '',
+  payWalletNumber: '',
+  payAccountName: '',
+  supportWhatsapp: '',
 };
 
 export interface PlatformStore {

@@ -389,10 +389,10 @@ simply have mocks.
 | ID | Rule | Status |
 |---|---|---|
 | N-9 | The QR is **at the top**, then details, then an optional screenshot, then the pay button. Built for one hand and one phone. | TODO |
-| N-10 | Approval goes to the **super admin**, never a consultancy. | TODO |
-| N-11 | **Only the super admin can change the QR image and the contact number.** Sales staff change; neither may need a deploy. | TODO |
-| N-12 | After submitting, a **WhatsApp link opens with the message already written** — "I am having a problem with my payment, my name is …". A worried student should never have to compose it. | TODO |
-| N-13 | Every approval request reaching the super admin carries the payer's **phone number**, so they can ring when the money has not arrived. | TODO |
+| N-10 | Approval goes to the **super admin**, never a consultancy. | BUILT+PROVEN |
+| N-11 | **Only the super admin can change the QR image and the contact number.** Sales staff change; neither may need a deploy. | BUILT+PROVEN |
+| N-12 | After submitting, a **WhatsApp link opens with the message already written** — "I am having a problem with my payment, my name is …". A worried student should never have to compose it. | BUILT+PROVEN |
+| N-13 | Every approval request reaching the super admin carries the payer's **phone number**, so they can ring when the money has not arrived. | BUILT+PROVEN |
 | N-14 | An **upgrade** button is always visible, even to a student who already has a pack. | TODO |
 | N-15 | At **one or two mocks left**, a renewal button appears and the checkout is **pre-filled** from last time. | TODO |
 | N-16 | Install or bookmark prompt, on phone and on laptop. | TODO |
@@ -404,7 +404,7 @@ simply have mocks.
 | N-17 | The super admin **sees devices running many Google accounts** — the eighteen-Gmail case — as a queue, not a silent counter. | BUILT+PROVEN |
 | N-18 | They can **soft-block a device**. Soft, never a ban: there is always a way back. | TODO |
 | N-19 | A soft-blocked student gets a contact number and a **WhatsApp link pre-filled** with "my account is blocked, my name is …". | TODO |
-| N-20 | That number is **editable by the super admin**. | TODO |
+| N-20 | That number is **editable by the super admin**. | BUILT+PROVEN |
 
 ## 12.4 What the super admin sees
 

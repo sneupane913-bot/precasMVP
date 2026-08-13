@@ -50,6 +50,19 @@ const Body = z.discriminatedUnion('action', [
     note: z.string().max(200),
   }),
   z.object({ action: z.literal('audit'), superKey: z.string().min(1) }),
+  /**
+   * N-11, N-20. Only the super admin may change where the money goes and who
+   * answers the phone about it. No deploy, and no consultancy involvement.
+   */
+  z.object({
+    action: z.literal('setPaymentSettings'),
+    superKey: z.string().min(1),
+    payQrImageUrl: z.string().max(500).optional(),
+    payWalletName: z.string().max(80).optional(),
+    payWalletNumber: z.string().max(40).optional(),
+    payAccountName: z.string().max(120).optional(),
+    supportWhatsapp: z.string().max(40).optional(),
+  }),
 ]);
 
 async function audit(a: Omit<ApprovalAudit, 'id' | 'createdAt'>): Promise<void> {
@@ -169,12 +182,44 @@ export async function POST(req: Request) {
     const students = await r.listStudents();
     return NextResponse.json({
       ok: true,
-      data: orders.map((o) => ({
-        ...o,
-        studentName: students.find((s) => s.id === o.studentId)?.name ?? null,
-        studentEmail: students.find((s) => s.id === o.studentId)?.email ?? null,
-      })),
+      data: orders.map((o) => {
+        const st = students.find((s) => s.id === o.studentId);
+        return {
+          ...o,
+          studentName: st?.name ?? null,
+          studentEmail: st?.email ?? null,
+          /**
+           * N-13. The payer's phone, on every approval request.
+           *
+           * When the money has not landed, the only useful next step is to ring
+           * them. Making whoever is approving go and look the number up in
+           * another screen is how a payment sits unapproved overnight while a
+           * student assumes they have been robbed.
+           */
+          payerPhone: st?.phoneE164 ?? null,
+          payerPhoneSuffix: o.payerPhoneSuffix,
+        };
+      }),
     });
+  }
+
+  if (body.action === 'setPaymentSettings') {
+    const cur = await platform.getSettings();
+    const next = { ...cur };
+    for (const k of ['payQrImageUrl', 'payWalletName', 'payWalletNumber', 'payAccountName', 'supportWhatsapp'] as const) {
+      if (body[k] !== undefined) next[k] = body[k];
+    }
+    await platform.saveSettings(next);
+    await audit({
+      actorRole: 'super_admin',
+      actorId: 'super_admin',
+      action: 'set_payment_settings',
+      subjectId: 'platform',
+      before: cur.payWalletNumber ?? '',
+      after: next.payWalletNumber ?? '',
+      note: 'payment or support details changed',
+    });
+    return NextResponse.json({ ok: true, data: { saved: true } });
   }
 
   // ---------------------------------------------------------- verifyPayment
