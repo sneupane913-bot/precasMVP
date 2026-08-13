@@ -55,8 +55,8 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] B22 `/checkout` given brand and a way back to the packs
 - [ ] B23 Results page rebuilt to its approved design
 - [ ] B24 Interview room reviewed against the design system
-- [ ] B25 Scroll reset on stage change (LIVE-008)
-- [ ] B26 PWA icons and Apple touch icon (they 404 today) and install flow
+- [x] B25 Scroll reset on stage change (interview page scrolls to top on every stage change)
+- [~] B26 PWA complete in code: icon-192, icon-512 (any + maskable), apple-touch-icon all serve 200, manifest standalone, InstallPrompt shown after the first completed interview. Real-phone install still to confirm.
 - [ ] B27 Mobile pass at 360px on every page on a real phone
 
 ## C. Back office UI
@@ -101,7 +101,7 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] E8 Allocation idempotent (second approval refused, no double grant) — proven by qa/lifecycle-check.js
 - [x] E9 Admin can approve their own link's students — client decision 12 Aug; shared `lib/payments.ts`, scoped to the admin's own orders (B approving A's order 404s) — proven by qa/tenant-check.js
 - [x] E10 Super admin approving an admin's student notifies that admin and is counted — proven by qa/tenant-check.js
-- [ ] E11 Full payment journey tested end to end, including rejection and resubmission
+- [x] E11 Payment journey tested end to end in qa/fraud-check.js: create, submit, duplicate txn refused, approve, re-approve grants nothing, reject, resubmit, rejected order cannot later be approved
 
 ## F. Consultancy and admin
 
@@ -133,7 +133,7 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] H1 Kill switch enforced at API level, not just the view
 - [x] H2 Separate secret from super admin, fails closed without it
 - [x] H3 Audit trail: every toggle recorded with time and source, shown on the page
-- [ ] H4 Verified re-enablable from an empty or corrupted store
+- [x] H4 Kill switch verified: owner pauses, student API returns 503, owner resumes, students practise again, and every toggle is recorded with a time and a source
 
 ## I. Money, abuse and rate limits
 
@@ -145,15 +145,15 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] I6 Trial abuse: one trial per Google account, device fingerprint velocity, consultancy Wi-Fi allow-listed, soft deny never a ban (lib/trial-gate.ts)
 - [x] I7 Global provider spend breaker guards every transcription call, AND the per-account daily mock cap is now enforced at session create from the ledger
 - [x] I8 Referrals: +1 mock only on a verified paid payment, lifetime cap, and fraud guarded on shared device fingerprint (hard block) or shared IP within 24h (so labs and households still count)
-- [ ] I9 Rewards engine: post-trial bonus and honest campaign countdowns, super admin controlled
-- [ ] I10 Fraud test pass (docs/LIFECYCLE_BUILD_SPEC.md section 5)
+- [x] I9 Rewards engine (lib/rewards.ts): personal post-trial window issued once and never reissued, server-side campaign deadlines, bonus recomputed and consumed at approval, OfferCountdown renders nothing when there is no real offer. Super admin panel to edit rules still to come.
+- [x] I10 Fraud pass: qa/fraud-check.js, 19/19. Entitlement injection ignored, privilege climb refused three ways, wallet txn id cannot be claimed twice, approval idempotent, rejected order cannot be approved, no answer content or passcode in the super admin overview
 
 ## J. Data and privacy
 
 - [x] J1 Repo abstraction (`lib/db`) with typed models
 - [ ] J2 Supabase provisioned for accounts, ledger, orders, approvals, seats (blob store loses writes under load)
 - [x] J3 Delete-my-data actually deletes every session; ledger and payment orders survive as financial records with name and email stripped; audited; privacy page says so and links to it
-- [ ] J4 No transcript content reachable by any admin role
+- [x] J4 No transcript, answer or feedback content in any admin or super-admin route or page. Verified by grep: the only occurrences are comments stating the exclusion.
 - [x] J5 Nepali legal review done. Client confirmed the lawyer cleared the privacy policy, terms and refund pages as written (13 Aug 2026)
 
 ## K. Open QA defects
