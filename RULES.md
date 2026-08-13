@@ -388,7 +388,7 @@ simply have mocks.
 
 | ID | Rule | Status |
 |---|---|---|
-| N-9 | The QR is **at the top**, then details, then an optional screenshot, then the pay button. Built for one hand and one phone. | TODO |
+| N-9 | The QR is **at the top**, then details, then an optional screenshot, then the pay button. Built for one hand and one phone. | BUILT+PROVEN |
 | N-10 | Approval goes to the **super admin**, never a consultancy. | BUILT+PROVEN |
 | N-11 | **Only the super admin can change the QR image and the contact number.** Sales staff change; neither may need a deploy. | BUILT+PROVEN |
 | N-12 | After submitting, a **WhatsApp link opens with the message already written** — "I am having a problem with my payment, my name is …". A worried student should never have to compose it. | BUILT+PROVEN |

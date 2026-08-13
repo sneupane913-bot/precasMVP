@@ -11,6 +11,9 @@ interface CreatedOrder {
   mocks: number;
   practice: number;
   expiresAt: string;
+  /** N-12. Set by the super admin, with the message already written. */
+  supportWhatsapp?: string;
+  supportMessage?: string;
   payTo: {
     walletName: string;
     walletNumber: string;
@@ -386,6 +389,18 @@ function Checkout() {
             >
               {busy ? 'Sending...' : 'I have paid'}
             </button>
+            {/* N-12. The escape hatch, under the button that might fail.
+                A student who has sent money and hit a problem must not have to
+                hunt for us, and must not have to compose the message. */}
+            {order.supportWhatsapp && (
+              <a
+                href={`https://wa.me/${order.supportWhatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(order.supportMessage ?? '')}`}
+                className="mt-3 block rounded-xl border-2 border-emerald-300 bg-emerald-50 px-5 py-3 text-center text-sm font-semibold text-emerald-900"
+              >
+                Something wrong? Message us on WhatsApp
+              </a>
+            )}
+
             {(txn.trim().length < 4 || !payerName.trim() || suffix.length < 2) && (
               <p className="mt-2 text-sm font-semibold text-red-600">
                 Fill in the transaction number, the name you paid with, and the last 4 digits.

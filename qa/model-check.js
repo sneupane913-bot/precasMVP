@@ -282,6 +282,19 @@ async function signIn(token, opts = {}) {
     !!mineQ && 'payerPhone' in mineQ && mineQ.payerPhoneSuffix === '4321',
     `queue item has payerPhone field and the last 4 digits (${mineQ?.payerPhoneSuffix})`);
 
+  // N-9. Order on the page, checked by position in the source: QR, then the
+  // wallet details, then the form, then the optional photo, then the button.
+  const co = fs.readFileSync('app/(student)/checkout/page.tsx', 'utf8');
+  const pos = (needle) => co.indexOf(needle);
+  t('N-9', 'The checkout is laid out for one hand and one phone',
+    pos('qrImageUrl') < pos('Transaction number') &&
+    pos('Transaction number') < pos('Picture of the receipt') &&
+    pos('Picture of the receipt') < pos('I have paid'),
+    'QR -> wallet number -> details -> optional photo -> pay, in that order');
+  t('N-9b', 'The WhatsApp escape sits under the button that might fail',
+    /Something wrong\? Message us on WhatsApp/.test(co) && pos('I have paid') < pos('Message us on WhatsApp'),
+    'a student who has sent money and hit a problem does not have to hunt for us');
+
   console.log('\n=== SEATS FOR CONSULTANCIES (N-6) ===\n');
 
   const buy = await req('POST', '/api/admin',
