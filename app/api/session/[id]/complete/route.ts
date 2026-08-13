@@ -3,6 +3,7 @@ import { store } from '@/lib/store';
 import { startPostTrialWindow } from '@/lib/rewards';
 import { buildSummary } from '@/lib/summary';
 import { ownsSession } from '@/lib/owner-session';
+import { platformDown } from '@/lib/platform';
 import { apiError, type ApiResult, type SessionSummary } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -13,6 +14,16 @@ export const runtime = 'nodejs';
  * page is instant.
  */
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  // N-41. The kill switch closes EVERY door, not just the shop front. A dark
+  // site with a working till is not a kill switch, and an admin or super admin
+  // still able to move money while students are locked out is exactly the
+  // workaround the owner is paying for the switch to prevent.
+  const down = await platformDown();
+  if (down) {
+    return NextResponse.json(apiError(down.code, down.message, down.userMessage), { status: 503 });
+  }
+
+
   const { id } = await params;
   const session = await store.get(id);
   if (!session || !(await ownsSession(session.ownerId))) {

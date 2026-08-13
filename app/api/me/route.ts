@@ -4,6 +4,7 @@ import { currentStudent, clearStudentSession } from '@/lib/auth/session';
 import { entitlementFor } from '@/lib/entitlement';
 import { activeOfferFor } from '@/lib/rewards';
 import { repo } from '@/lib/db';
+import { platformDown } from '@/lib/platform';
 import { apiError, type ApiResult } from '@/lib/types';
 import { withStoreErrors } from '@/lib/api-errors';
 
@@ -11,6 +12,16 @@ export const runtime = 'nodejs';
 
 /** Who am I, and what am I allowed to do. Everything computed server-side. */
 export async function GET() {
+  // N-41. The kill switch closes EVERY door, not just the shop front. A dark
+  // site with a working till is not a kill switch, and an admin or super admin
+  // still able to move money while students are locked out is exactly the
+  // workaround the owner is paying for the switch to prevent.
+  const down = await platformDown();
+  if (down) {
+    return NextResponse.json(apiError(down.code, down.message, down.userMessage), { status: 503 });
+  }
+
+
   return withStoreErrors(async () => {
   const student = await currentStudent();
   if (!student) {
@@ -66,6 +77,16 @@ const Patch = z.object({
 
 /** Profile completion, captured at the report moment. */
 export async function POST(req: Request) {
+  // N-41. The kill switch closes EVERY door, not just the shop front. A dark
+  // site with a working till is not a kill switch, and an admin or super admin
+  // still able to move money while students are locked out is exactly the
+  // workaround the owner is paying for the switch to prevent.
+  const down = await platformDown();
+  if (down) {
+    return NextResponse.json(apiError(down.code, down.message, down.userMessage), { status: 503 });
+  }
+
+
   const student = await currentStudent();
   if (!student) {
     return NextResponse.json(
@@ -100,6 +121,16 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE() {
+  // N-41. The kill switch closes EVERY door, not just the shop front. A dark
+  // site with a working till is not a kill switch, and an admin or super admin
+  // still able to move money while students are locked out is exactly the
+  // workaround the owner is paying for the switch to prevent.
+  const down = await platformDown();
+  if (down) {
+    return NextResponse.json(apiError(down.code, down.message, down.userMessage), { status: 503 });
+  }
+
+
   await clearStudentSession();
   return NextResponse.json({ ok: true, data: { signedOut: true } });
 }

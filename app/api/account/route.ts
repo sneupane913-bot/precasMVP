@@ -8,6 +8,7 @@ import { repo } from '@/lib/db';
 import { getInstitution } from '@/lib/data/institutions';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
 import { weakestOf } from '@/lib/advice';
+import { platformDown } from '@/lib/platform';
 import { apiError } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -24,6 +25,16 @@ export const runtime = 'nodejs';
 const Body = z.object({ action: z.literal('deleteEverything'), confirm: z.literal('DELETE') });
 
 export async function GET() {
+  // N-41. The kill switch closes EVERY door, not just the shop front. A dark
+  // site with a working till is not a kill switch, and an admin or super admin
+  // still able to move money while students are locked out is exactly the
+  // workaround the owner is paying for the switch to prevent.
+  const down = await platformDown();
+  if (down) {
+    return NextResponse.json(apiError(down.code, down.message, down.userMessage), { status: 503 });
+  }
+
+
   const student = await currentStudent();
   if (!student) {
     return NextResponse.json(
@@ -59,6 +70,15 @@ export async function GET() {
           total: s.questionIds.length,
           // The band, never a bare number, and only when one honestly exists.
           band: s.summary?.band ?? null,
+          /**
+           * N-47. An unfinished sitting is the most valuable thing on this
+           * page: the student has already spent a credit on it and their
+           * answers are sitting there. Sending them back to the catalogue to
+           * "start again" would waste the credit and lose the work, so an
+           * unfinished session links back INTO itself and a finished one links
+           * to its report.
+           */
+          resumeHref: s.status === 'completed' ? `/results/${s.id}` : `/interview/${s.id}`,
           score: s.summary?.overallScore ?? null,
           subScores: s.summary?.subScores ?? null,
         };
@@ -99,6 +119,16 @@ function buildProgress(sessions: { summary: { overallScore: number; subScores: R
 }
 
 export async function POST(req: Request) {
+  // N-41. The kill switch closes EVERY door, not just the shop front. A dark
+  // site with a working till is not a kill switch, and an admin or super admin
+  // still able to move money while students are locked out is exactly the
+  // workaround the owner is paying for the switch to prevent.
+  const down = await platformDown();
+  if (down) {
+    return NextResponse.json(apiError(down.code, down.message, down.userMessage), { status: 503 });
+  }
+
+
   const rl = rateLimit(`account:${clientIp(req)}`, RL.auth);
   if (!rl.allowed) {
     return NextResponse.json(

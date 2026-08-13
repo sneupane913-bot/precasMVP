@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { store } from '@/lib/store';
 import { ownsSession } from '@/lib/owner-session';
 import { CONSENT_VERSION } from '@/lib/consent';
+import { platformDown } from '@/lib/platform';
 import { apiError, type ApiResult } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -20,6 +21,16 @@ const Body = z.object({
  * agreement to text that has since changed.
  */
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  // N-41. The kill switch closes EVERY door, not just the shop front. A dark
+  // site with a working till is not a kill switch, and an admin or super admin
+  // still able to move money while students are locked out is exactly the
+  // workaround the owner is paying for the switch to prevent.
+  const down = await platformDown();
+  if (down) {
+    return NextResponse.json(apiError(down.code, down.message, down.userMessage), { status: 503 });
+  }
+
+
   const { id } = await params;
 
   let body: z.infer<typeof Body>;

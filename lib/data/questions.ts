@@ -363,24 +363,75 @@ export function getQuestion(id: string): Question | undefined {
  * questions, which are chosen to span the full range of categories rather than
  * being the easy opening ones.
  */
+/**
+ * The paper for one sitting (N-26, N-27, Q-4).
+ *
+ * This used to be fully deterministic: every student on the platform received
+ * the same ten questions in the same order. That is the worst possible property
+ * for this product. Ten students in one consultancy lab compare notes, memorise
+ * the set, and walk into a credibility interview with rehearsed answers — which
+ * is the single thing the real interview is designed to catch. We would have
+ * been coaching students into failing.
+ *
+ * So the plan is now **stratified random**, not random:
+ *
+ *   - it always opens with an introduction question, because a real interview
+ *     does, and dropping a student into "how will you fund your studies" as the
+ *     first thing they hear is not a rehearsal of anything;
+ *   - it then takes one question from each category in turn, so the trial still
+ *     spreads across the themes and still diagnoses a genuine weak spot. Pure
+ *     shuffling would sometimes hand somebody six finance questions and tell
+ *     them nothing about the rest;
+ *   - WHICH question fills each slot is random.
+ *
+ * Randomness is drawn only from the vetted bank (N-27). A student who practises
+ * three mocks and then meets nothing familiar has been cheated, and "it was
+ * random" is not a defence.
+ *
+ * The result is stored on the session as `questionIds`, so the paper is fixed
+ * at creation and a resume is deterministic (Q-4, N-45). Random once, never
+ * random again.
+ */
+function shuffled<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j]!, a[i]!];
+  }
+  return a;
+}
+
 export function buildQuestionPlan(limit: number): string[] {
   if (limit >= QUESTIONS.length) return QUESTIONS.map((q) => q.id);
 
-  // Always open with the introduction, then spread across categories so a
-  // trial still shows the student their real weak spots.
-  const first = QUESTIONS[0]!.id;
-  const rest = QUESTIONS.slice(1);
-  const step = rest.length / (limit - 1);
-  const picked: string[] = [first];
-  for (let i = 0; i < limit - 1; i++) {
-    const q = rest[Math.floor(i * step)];
-    if (q && !picked.includes(q.id)) picked.push(q.id);
+  // Openers first. A real interview starts by asking who you are, so the
+  // 'identity' category always fills slot one.
+  const openers = QUESTIONS.filter((q) => q.category === 'identity');
+  const picked: string[] = [];
+  if (openers.length > 0) picked.push(shuffled(openers)[0]!.id);
+
+  // One bucket per category, each internally shuffled.
+  const buckets = new Map<string, string[]>();
+  for (const q of shuffled(QUESTIONS)) {
+    if (picked.includes(q.id)) continue;
+    const list = buckets.get(q.category) ?? [];
+    list.push(q.id);
+    buckets.set(q.category, list);
   }
-  // Guard against duplicates from rounding.
-  let cursor = 0;
-  while (picked.length < limit && cursor < rest.length) {
-    const q = rest[cursor++]!;
-    if (!picked.includes(q.id)) picked.push(q.id);
+
+  // Round-robin across categories so coverage stays even however many we need.
+  const order = shuffled([...buckets.keys()]);
+  let progress = true;
+  while (picked.length < limit && progress) {
+    progress = false;
+    for (const cat of order) {
+      if (picked.length >= limit) break;
+      const list = buckets.get(cat);
+      if (list && list.length > 0) {
+        picked.push(list.shift()!);
+        progress = true;
+      }
+    }
   }
   return picked;
 }

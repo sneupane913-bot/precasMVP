@@ -360,6 +360,118 @@ described as working.**
 
 ---
 
+
+---
+
+# PART 12 — THE 13 AUGUST MODEL
+
+Client decisions, settled. This **replaces** the conflicting parts of Part 4.
+
+## 12.1 The consultancy model
+
+**A consultancy student never pays us and is never "approved".** They arrive
+through their consultancy's link, sign in with Google like anybody else, and
+simply have mocks.
+
+| ID | Rule | Status |
+|---|---|---|
+| N-1 | A consultancy buys seats and **chooses how many mocks each seat carries** — 3, 6 or 10. They may mix sizes in one order. | TODO |
+| N-2 | **Sign-in is Google, always. There are no passwords anywhere in this product.** The admin issues a *link*, not credentials. Signing in through that link binds the student to that consultancy, server-side. One identity system, nothing to store, nothing to reset, nothing to leak. | TODO |
+| N-3 | A seated student sees the seat's mocks **plus the free trial**. A 3-mock seat shows **4**. | TODO |
+| N-4 | **A consultancy student is shown no price, no QR and no pay button** while their consultancy's mocks last. | TODO |
+| N-5 | When their mocks run out they have **two routes, and they choose**: ask their consultancy to renew, which **costs that consultancy one seat**; or upgrade themselves by paying us directly. | TODO |
+| N-6 | An admin near the end of their seats is shown a renewal option and buys more the way a student does: QR, details, screenshot, **super-admin** approval. | TODO |
+| N-7 | **An admin never approves a student payment.** Removed entirely, and `C-12` is retired. Admins pay *us*; how they collect from their own students — cash, their own link, or free — is their business and never touches our system. | TODO |
+| N-8 | How a consultancy charges its own students is invisible to us. We hold no record of it and take no position on it. | TODO |
+
+## 12.2 Payment, for students who pay us directly
+
+| ID | Rule | Status |
+|---|---|---|
+| N-9 | The QR is **at the top**, then details, then an optional screenshot, then the pay button. Built for one hand and one phone. | TODO |
+| N-10 | Approval goes to the **super admin**, never a consultancy. | TODO |
+| N-11 | **Only the super admin can change the QR image and the contact number.** Sales staff change; neither may need a deploy. | TODO |
+| N-12 | After submitting, a **WhatsApp link opens with the message already written** — "I am having a problem with my payment, my name is …". A worried student should never have to compose it. | TODO |
+| N-13 | Every approval request reaching the super admin carries the payer's **phone number**, so they can ring when the money has not arrived. | TODO |
+| N-14 | An **upgrade** button is always visible, even to a student who already has a pack. | TODO |
+| N-15 | At **one or two mocks left**, a renewal button appears and the checkout is **pre-filled** from last time. | TODO |
+| N-16 | Install or bookmark prompt, on phone and on laptop. | TODO |
+
+## 12.3 Abuse, handled by a person
+
+| ID | Rule | Status |
+|---|---|---|
+| N-17 | The super admin **sees devices running many Google accounts** — the eighteen-Gmail case — as a queue, not a silent counter. | BUILT+PROVEN |
+| N-18 | They can **soft-block a device**. Soft, never a ban: there is always a way back. | TODO |
+| N-19 | A soft-blocked student gets a contact number and a **WhatsApp link pre-filled** with "my account is blocked, my name is …". | TODO |
+| N-20 | That number is **editable by the super admin**. | TODO |
+
+## 12.4 What the super admin sees
+
+| ID | Rule | Status |
+|---|---|---|
+| N-21 | Students and consultancies listed **separately**. | TODO |
+| N-22 | Per student: university, **bachelor or masters**, verified Gmail, WhatsApp number, and **whether that number really has WhatsApp** — asked, never assumed. | TODO |
+| N-23 | **City only, asked at payment, optional, with the reason shown.** Not GPS, not silent. Client accepted the advice: a mock interview does not need a student's location, and holding it beside transcripts about family income and visa refusals turns a breach into a scandal. City is enough for sales. | TODO |
+| N-24 | Per consultancy: links sent, renewals done, seats given out. | TODO |
+
+## 12.5 Questions — the heart of the product
+
+| ID | Rule | Status |
+|---|---|---|
+| N-25 | The super admin can **add questions** without a deploy. | TODO |
+| N-26 | **Ten students starting a trial get ten different sets.** No two trials identical. | BUILT+PROVEN |
+| N-27 | Randomised **only within questions that really appear** in Pre-CAS and UKVI credibility interviews. A student who practises three mocks and then meets nothing familiar has been cheated, and "it was random" is not a defence. | TODO |
+| N-28 | A student on the **NPR 799 pack can add their own questions** — photograph a list, upload an image, or type them — and have the interviewer ask those. | TODO |
+| N-29 | Question research is a **named deliverable with sources**, not a bank somebody invented. Until it exists, no page may claim the questions are what universities ask. | TODO |
+
+## 12.6 Feedback that is not generic
+
+| ID | Rule | Status |
+|---|---|---|
+| N-30 | **Feedback is written about THIS student's answer**, quoting what they actually said. Two students never receive the same paragraph. | TODO |
+| N-31 | Generic feedback is a **defect**, not a shortcoming. Identical advice gets memorised and repeated, and a memorised answer is exactly what a credibility interview is designed to catch. Generic feedback would coach students into failing. | TODO |
+| N-32 | **Nepali is not a translation of the report.** It carries only what a frightened student must not misunderstand: what went wrong and what to do. Scores, the question, and their own words stay in English, because the interview is in English and reading their own answer back in Nepali helps nobody. | TODO |
+
+## 12.7 Practice — a whole feature nobody had specified
+
+Practice is sold in both packs and has never been designed. It has no tab.
+
+| ID | Rule | Status |
+|---|---|---|
+| N-33 | Practice has its **own tab** in the header and its own place on the dashboard. | BUILT+PROVEN |
+| N-34 | Practice is **one question at a time**, chosen by theme, with the same recording and feedback as a mock. | TODO |
+| N-35 | A practice session costs a **practice credit, never a mock credit.** The two currencies never mix. | BUILT+PROVEN |
+| N-36 | Practice is aimed at the student's **weakest assessed sub-score** by default, so it continues the report rather than starting over. | TODO |
+| N-37 | Practice answers appear in their history, marked as practice, and never distort the mock score. | TODO |
+
+## 12.8 Choosing a university
+
+| ID | Rule | Status |
+|---|---|---|
+| N-38 | The university list is **searchable**. A long list a student must scroll is a wall, not a choice. | BUILT+PROVEN |
+| N-39 | Filters for the obvious cuts, and the **most applied-to pinned first**. | BUILT+PROVEN |
+| N-40 | A student whose university is **not listed can still start** — a general UK paper rather than a dead end. | BUILT+PROVEN |
+
+## 12.9 The kill switch, hardened
+
+| ID | Rule | Status |
+|---|---|---|
+| N-41 | **Every path shows the closed screen** — `/admin`, `/super`, every API, every unknown slug. Only `/owner` answers. | BUILT+PROVEN |
+| N-42 | **No workaround.** Not by inspecting, not by a different slash, not by calling the API directly. | BUILT+PROVEN |
+| N-43 | **Nothing is deleted.** Every student, consultancy and session survives exactly as it was. Access is suspended; data is not. | BUILT+PROVEN |
+
+## 12.10 Resuming an unfinished mock
+
+| ID | Rule | Status |
+|---|---|---|
+| N-44 | A student who answers 2 of 17 and closes the tab **returns to question 3**, even fifty days later. | BUILT+PROVEN |
+| N-45 | **Never a fresh paper.** Answered questions stay answered. | BUILT+PROVEN |
+| N-46 | An unfinished sitting is **not charged as a finished one**. One credit, taken on the first answer; the remaining questions stay theirs until used. | BUILT+PROVEN |
+| N-47 | The unfinished sitting is on their dashboard with a way straight back into it. | BUILT+PROVEN |
+
+---
+
 # PART 11 — WHAT IS NOT YET DECIDED
 
 | ID | Question | Who decides |

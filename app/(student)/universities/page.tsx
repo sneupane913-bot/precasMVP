@@ -202,11 +202,35 @@ function UniversityBrowser() {
         )}
 
         {results.length === 0 ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center">
-            <p className="mb-2 font-semibold text-ink">We do not have that university yet</p>
-            <p className="text-slate-600">
-              Try a shorter search, or pick any university above. The questions are almost the same
-              everywhere.
+          /**
+           * N-40. Never a dead end here.
+           *
+           * "We do not have that university" with no button is the worst
+           * screen in the funnel: the student has typed their own university,
+           * been told no, and been given nothing to press. The questions in a
+           * credibility interview are overwhelmingly the same wherever you
+           * apply, so a student whose university is missing loses almost
+           * nothing by practising the general UK paper — and loses everything
+           * if we send them away.
+           */
+          <div className="rounded-2xl border-2 border-ink bg-white p-8 text-center">
+            <p className="mb-2 font-semibold text-ink">
+              Your university is not on our list yet
+            </p>
+            <p className="mx-auto mb-5 max-w-md leading-relaxed text-slate-600">
+              That does not stop you. A Pre-CAS interview asks the same themes wherever you apply,
+              so you can practise the general UK paper right now and it will still be the interview
+              you are about to sit.
+            </p>
+            <button
+              onClick={() => start(publicInstitutions()[0]?.slug ?? 'bpp-university')}
+              disabled={starting !== null}
+              className="inline-flex items-center justify-center rounded-xl bg-ink px-6 py-3.5 font-bold text-white disabled:opacity-60"
+            >
+              {starting ? 'Starting...' : 'Practise the general UK interview'}
+            </button>
+            <p className="mt-3 text-sm text-slate-500">
+              Or try a shorter search — "Coventry" rather than "Coventry University London".
             </p>
           </div>
         ) : (

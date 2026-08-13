@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { currentStudent } from '@/lib/auth/session';
 import { repo } from '@/lib/db';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
+import { platformDown } from '@/lib/platform';
 import { apiError, type ApiResult } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -23,6 +24,16 @@ const ALLOWED = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic'])
  * connection, storage denied) must still be able to complete the payment.
  */
 export async function POST(req: Request) {
+  // N-41. The kill switch closes EVERY door, not just the shop front. A dark
+  // site with a working till is not a kill switch, and an admin or super admin
+  // still able to move money while students are locked out is exactly the
+  // workaround the owner is paying for the switch to prevent.
+  const down = await platformDown();
+  if (down) {
+    return NextResponse.json(apiError(down.code, down.message, down.userMessage), { status: 503 });
+  }
+
+
   const rl = rateLimit(`shot:${clientIp(req)}`, RL.payment);
   if (!rl.allowed) {
     return NextResponse.json(

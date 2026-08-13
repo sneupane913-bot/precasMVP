@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { platform, type Consultancy } from '@/lib/platform';
+import { platform, type Consultancy, platformDown } from '@/lib/platform';
 import { repo } from '@/lib/db';
 import { approvePayment, rejectPayment, type Actor } from '@/lib/payments';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
@@ -53,6 +53,16 @@ const Body = z.discriminatedUnion('action', [
  * pending consultancy cannot read anything at all.
  */
 export async function POST(req: Request) {
+  // N-41. The kill switch closes EVERY door, not just the shop front. A dark
+  // site with a working till is not a kill switch, and an admin or super admin
+  // still able to move money while students are locked out is exactly the
+  // workaround the owner is paying for the switch to prevent.
+  const down = await platformDown();
+  if (down) {
+    return NextResponse.json(apiError(down.code, down.message, down.userMessage), { status: 503 });
+  }
+
+
   let body: z.infer<typeof Body>;
   try {
     body = Body.parse(await req.json());
