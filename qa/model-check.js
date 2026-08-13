@@ -158,6 +158,36 @@ async function signIn(token, opts = {}) {
   t('N-17', 'Devices running many Google accounts reach a human queue',
     dev.json?.ok === true, `queue reachable, ${Array.isArray(dev.json?.data) ? dev.json.data.length : '?'} entries`);
 
+  console.log('\n=== THE AI CONTRACT ===\n');
+
+  const c = fs.readFileSync('lib/ai/contract.ts', 'utf8');
+  t('AI-1', 'The evaluator input is fixed and narrow',
+    /previousTranscripts/.test(c) && /durationSeconds/.test(c) && /institution/.test(c),
+    'question, category, intent, transcript, duration, university, level, prior answers');
+  // Check the INTERFACE BODY, not the file. The file explains in prose what is
+  // deliberately not sent, and an earlier version of this assertion matched
+  // that explanation and failed - the same mistake as S-16.
+  const inputBody = (c.match(/export interface EvaluationInput \{([\s\S]*?)\n\}/) || [])[1] || '';
+  const leaks = ['email', 'phone', 'name', 'consultancy', 'payer', 'referral', 'studentId']
+    .filter((f) => new RegExp(`^\\s*(?:/\\*\\*)?\\s*${f}\\w*\\s*[?:]`, 'im').test(inputBody));
+  t('AI-2', 'Nothing identifying is ever sent to a provider', leaks.length === 0,
+    leaks.length ? `LEAKS: ${leaks.join(', ')}` : 'the input shape carries no identifying field at all');
+  t('AI-3', 'Output is PEE + wrap-up + Nepali + nullable sub-scores',
+    /point:/.test(c) && /evidence:/.test(c) && /explanation:/.test(c) && /wrapUp:/.test(c) && /number \| null/.test(c),
+    'nulls allowed so a dimension we could not judge is never scored 0');
+  t('AI-4', 'Contradiction across answers is a first-class output', /contradiction: string \| null/.test(c),
+    'the highest-value thing the AI can find, and invisible to a single-answer grader');
+  t('AI-5', 'The system prompt is in code, not a provider console',
+    /EVALUATOR_SYSTEM_PROMPT/.test(c), 'versioned and diffable like everything else');
+  t('AI-6', 'Accent and grammar are never penalised', /DO NOT PENALISE ACCENT/.test(c),
+    'only vagueness, contradiction, bad numbers and recited answers');
+  t('AI-7', 'Transcription carries a language and vocabulary hint',
+    /VOCABULARY_HINT/.test(c) && /languageHint/.test(c),
+    'stops the model inventing words it then quotes back as evidence');
+  t('AI-8', 'Generic output is rejected at runtime, never shipped',
+    /looksGeneric/.test(c) && /FEEDBACK_UNAVAILABLE/.test(c),
+    'evidence must overlap the transcript; failure drops the prose and says so');
+
   const pass = rows.filter((r) => r.ok).length;
   console.log(`\n  ${pass} passed, ${rows.length - pass} failed, ${rows.length} rules\n`);
   process.exit(0); // first run is a survey, not a gate

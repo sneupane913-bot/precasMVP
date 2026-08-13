@@ -429,9 +429,9 @@ simply have mocks.
 
 | ID | Rule | Status |
 |---|---|---|
-| N-30 | **Feedback is written about THIS student's answer**, quoting what they actually said. Two students never receive the same paragraph. | TODO |
-| N-31 | Generic feedback is a **defect**, not a shortcoming. Identical advice gets memorised and repeated, and a memorised answer is exactly what a credibility interview is designed to catch. Generic feedback would coach students into failing. | TODO |
-| N-32 | **Nepali is not a translation of the report.** It carries only what a frightened student must not misunderstand: what went wrong and what to do. Scores, the question, and their own words stay in English, because the interview is in English and reading their own answer back in Nepali helps nobody. | TODO |
+| N-30 | **Feedback is written about THIS student's answer**, quoting what they actually said. Two students never receive the same paragraph. Enforced at runtime by `looksGeneric()` in `lib/ai/contract.ts`, which rejects any response whose "evidence" field does not actually overlap the transcript. | BUILT |
+| N-31 | Generic feedback is a **defect**, not a shortcoming. A model under load drifts towards safe generic sentences because they are the highest-probability output, so every response is checked, not spot-checked. When it fails we drop the prose and say so — a missing paragraph is honest, a generic one is a lie that costs the student their interview. | BUILT |
+| N-32 | **Nepali is not a translation of the report.** It carries only what a frightened student must not misunderstand: what went wrong and what to do. Scores, the question, and their own words stay in English, because the interview is in English and reading their own answer back in Nepali helps nobody. Fixed as one field in the contract. | BUILT |
 
 ## 12.7 Practice — a whole feature nobody had specified
 
@@ -469,6 +469,25 @@ Practice is sold in both packs and has never been designed. It has no tab.
 | N-45 | **Never a fresh paper.** Answered questions stay answered. | BUILT+PROVEN |
 | N-46 | An unfinished sitting is **not charged as a finished one**. One credit, taken on the first answer; the remaining questions stay theirs until used. | BUILT+PROVEN |
 | N-47 | The unfinished sitting is on their dashboard with a way straight back into it. | BUILT+PROVEN |
+
+---
+
+# PART 13 — THE AI CONTRACT (ready before the key)
+
+`lib/ai/contract.ts` fixes every input and output **before a provider is chosen**,
+so connecting one is plumbing rather than design.
+
+| ID | Rule | Status |
+|---|---|---|
+| AI-1 | The evaluator receives: the question, its category and intent, the transcript, how long they spoke, the university, the level, and **what they said earlier in the same sitting**. Nothing else. | BUILT |
+| AI-2 | **No identifying data reaches any provider.** Not name, email, phone, consultancy or payment history. A grader does not need to know who somebody is to say whether they named their course. | BUILT |
+| AI-3 | It returns PEE + Wrap-up, a Nepali line, three sub-scores that may be null, and a **contradiction** field. | BUILT |
+| AI-4 | **Contradiction detection is the highest-value output.** A student whose father is a farmer in question 3 and a businessman in question 11 has a problem no single-answer grader can see, and an officer certainly will. | BUILT |
+| AI-5 | The system prompt lives **in code**, versioned and diffable, never in a provider console. | BUILT |
+| AI-6 | Accent, grammar slips and Nepali sentence order are **never penalised** where meaning is clear. Only vagueness, contradiction, numbers that do not add up, and recited answers. | BUILT |
+| AI-7 | Transcription is Groq Whisper Large v3 with a **language hint and a vocabulary hint**, so the model does not "correct" a Nepali speaker into words they never said and then quote them back as evidence. | BUILT |
+| AI-8 | On generic or malformed output the prose is **dropped**, the score and recording are kept, and the student is told plainly. Never shipped, never fabricated. | BUILT |
+| AI-9 | When the key arrives, only `stt.ts` and `evaluate.ts` change. G-1, N-30, Q-10 and G-8 must all still hold. | TODO |
 
 ---
 
