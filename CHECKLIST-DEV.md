@@ -53,8 +53,8 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] B20 Universities: 92 UK universities, six pinned as Most applied and 87 listed below. Name and city only for the wider list, generic themes wording, no invented per-university claims, no scraped logos
 - [x] B21 `/consultancy` given a business-facing header and the site footer
 - [x] B22 `/checkout` given brand and a way back to the packs
-- [ ] B23 Results page rebuilt to its approved design
-- [ ] B24 Interview room reviewed against the design system
+- [x] B23 Results page to the approved design: site header, university and date above the title, Practise your weakest answer beside it, sub-score tiles that say Not assessed rather than 0, behaviour table, per-question you-said versus a-better-way, footer
+- [x] B24 Interview room reviewed: monitor grid fixed for 360px, scroll resets on every stage change, demo banner still honest when speech is not connected, no fixed widths over 360px
 - [x] B25 Scroll reset on stage change (interview page scrolls to top on every stage change)
 - [~] B26 PWA complete in code: icon-192, icon-512 (any + maskable), apple-touch-icon all serve 200, manifest standalone, InstallPrompt shown after the first completed interview. Real-phone install still to confirm.
 - [~] B27 Static 360px audit done and two real bugs fixed: the results behaviour table now scrolls instead of widening the page, and the interview monitor drops from three columns to two on a phone. No fixed widths over 360px anywhere. Visual confirmation on a real handset still worth doing.

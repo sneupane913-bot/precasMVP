@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { store } from '@/lib/store';
 import { ownsSession } from '@/lib/owner-session';
 import { InstallPrompt } from '@/components/InstallPrompt';
+import { SiteHeader } from '@/components/SiteHeader';
+import { SiteFooter } from '@/components/SiteFooter';
 import { BUILD_INFO } from '@/lib/build-info';
 import { buildSummary } from '@/lib/summary';
 import { getInstitution } from '@/lib/data/institutions';
@@ -31,11 +33,31 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
   for (const f of session.flags) flagCounts.set(f.type, (flagCounts.get(f.type) ?? 0) + 1);
 
   return (
-    <main className="min-h-screen pb-16">
-      <header className="bg-ink px-5 py-6 text-white">
-        <div className="mx-auto max-w-3xl">
-          <p className="text-sm text-white/60">{institution.name}</p>
-          <h1 className="text-xl font-bold">Your interview results</h1>
+    <>
+      <SiteHeader />
+      <main className="min-h-screen pb-16">
+      {/* B23: header bar per docs/design-reference/results_report. The date and
+          the university sit above the title, and the two things a student
+          actually wants to do next sit beside it. */}
+      <header className="px-4 pt-8 sm:px-6">
+        <div className="mx-auto flex max-w-3xl flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-sm text-slate-500">
+              {institution.name}
+              {session.completedAt
+                ? ` · ${new Date(session.completedAt).toLocaleDateString()}`
+                : ''}
+            </p>
+            <h1 className="font-serif text-3xl font-bold text-ink sm:text-4xl">
+              Interview results
+            </h1>
+          </div>
+          <Link
+            href="/practice"
+            className="rounded-xl bg-ink px-5 py-3 text-sm font-bold text-white"
+          >
+            Practise your weakest answer
+          </Link>
         </div>
       </header>
 
@@ -385,6 +407,8 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
             because nothing proved which revision was live. */}
         <p className="px-2 text-center text-[10px] text-slate-300">build {BUILD_INFO.shortSha}</p>
       </div>
-    </main>
+      </main>
+      <SiteFooter />
+    </>
   );
 }
