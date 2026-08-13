@@ -440,10 +440,10 @@ Practice is sold in both packs and has never been designed. It has no tab.
 | ID | Rule | Status |
 |---|---|---|
 | N-33 | Practice has its **own tab** in the header and its own place on the dashboard. | BUILT+PROVEN |
-| N-34 | Practice is **one question at a time**, chosen by theme, with the same recording and feedback as a mock. | TODO |
+| N-34 | Practice is **one question at a time**, chosen by theme, with the same recording and feedback as a mock. | BUILT+PROVEN |
 | N-35 | A practice session costs a **practice credit, never a mock credit.** The two currencies never mix. | BUILT+PROVEN |
-| N-36 | Practice is aimed at the student's **weakest assessed sub-score** by default, so it continues the report rather than starting over. | TODO |
-| N-37 | Practice answers appear in their history, marked as practice, and never distort the mock score. | TODO |
+| N-36 | Practice is aimed at the student's **weakest assessed sub-score** by default, so it continues the report rather than starting over. | BUILT+PROVEN |
+| N-37 | Practice answers appear in their history, marked as practice, and never distort the mock score. | BUILT+PROVEN |
 
 ## 12.8 Choosing a university
 

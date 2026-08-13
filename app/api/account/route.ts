@@ -96,6 +96,8 @@ export async function GET() {
           id: s.id,
           university: inst?.name ?? 'Your university',
           mode: s.mode,
+          /** N-37. Marked, so a one-question drill is never read as a mock. */
+          isPractice: s.mode === 'practice',
           status: s.status,
           createdAt: s.createdAt,
           completedAt: s.completedAt,
@@ -133,8 +135,17 @@ export async function GET() {
   });
 }
 
-function buildProgress(sessions: { summary: { overallScore: number; subScores: Record<string, number | null> } | null }[]) {
+function buildProgress(sessions: { mode?: string; summary: { overallScore: number; subScores: Record<string, number | null> } | null }[]) {
+  /**
+   * N-37. Practice never distorts the mock trend.
+   *
+   * A practice run is ONE question. Averaging it with a seventeen-question mock
+   * would swing the trend wildly on the strength of a single answer and tell
+   * the student they had improved or collapsed when nothing of the sort
+   * happened.
+   */
   const scored = sessions
+    .filter((s) => s.mode !== 'practice')
     .filter((s) => s.summary && typeof s.summary.overallScore === 'number')
     .map((s) => s.summary!);
 

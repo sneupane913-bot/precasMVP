@@ -279,6 +279,25 @@ async function signIn(token, opts = {}) {
     !!mineQ && 'payerPhone' in mineQ && mineQ.payerPhoneSuffix === '4321',
     `queue item has payerPhone field and the last 4 digits (${mineQ?.payerPhoneSuffix})`);
 
+  console.log('\n=== PRACTICE ===\n');
+
+  const advSrc = fs.readFileSync('lib/advice.ts', 'utf8');
+  t('N-36', 'Practice aims at their weakest ASSESSED sub-score by default',
+    /weakestCategoryFor/.test(advSrc) && /CATEGORY_FOR_SUBSCORE/.test(advSrc) &&
+    fs.readFileSync('app/api/session/create/route.ts', 'utf8').includes('weakestCategoryFor'),
+    'the drill continues the report instead of starting over; null when nothing is scored');
+
+  const acctSrc2 = fs.readFileSync('app/api/account/route.ts', 'utf8');
+  t('N-37', 'Practice is marked in history and never distorts the mock trend',
+    /isPractice/.test(acctSrc2) && /mode !== 'practice'/.test(acctSrc2),
+    'a ONE-question drill averaged with a 17-question mock would swing the trend on a single answer');
+
+  const seatedPractice = await req('POST', '/api/session/create',
+    { institution: 'bpp-university', mode: 'practice' }, { ip: seated.ip, cookie: seated.jar });
+  t('N-34', 'Practice is one question at a time, from a practice credit',
+    (seatedPractice.json?.data?.questions ?? []).length === 1,
+    `seat-backed student with practice credits -> ${(seatedPractice.json?.data?.questions ?? []).length} question`);
+
   console.log('\n=== SUPER ADMIN DIRECTORY ===\n');
 
   // A student pays and volunteers their details at that moment.

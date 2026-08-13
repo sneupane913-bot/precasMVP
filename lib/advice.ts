@@ -58,3 +58,35 @@ export function weakestOf(subScores: Record<string, number | null> | null | unde
   }
   return out;
 }
+
+
+/**
+ * N-36. Which category to drill next, from their own last report.
+ *
+ * Practice that starts from nothing is a worse product than practice that
+ * continues the report they just read. A student who was told "you gave no real
+ * detail" should land on a question that demands real detail, without having to
+ * work out for themselves which theme that is.
+ *
+ * Returns null when there is nothing scored yet, and the caller falls back to
+ * a random question. Guessing a weakness we never measured would be the same
+ * sin as scoring silence.
+ */
+const CATEGORY_FOR_SUBSCORE: Record<string, string> = {
+  // Vague answers are caught hardest by the questions that demand specifics.
+  specificity: 'finance',
+  // "Why this course, why this university" is where a recited answer shows.
+  genuineIntent: 'why_course',
+  // Long-form answers stress clarity most.
+  englishClarity: 'why_uk',
+  interviewBehaviour: 'conversational',
+};
+
+export async function weakestCategoryFor(studentId: string): Promise<string | null> {
+  const { store } = await import('@/lib/store');
+  const sessions = await store.listByStudent(studentId);
+  const scored = sessions.map((s) => s.summary).filter((x): x is NonNullable<typeof x> => Boolean(x));
+  if (scored.length === 0) return null;
+  const w = weakestOf(scored[0]!.subScores as Record<string, number | null>);
+  return w ? (CATEGORY_FOR_SUBSCORE[w.key] ?? null) : null;
+}

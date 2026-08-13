@@ -8,6 +8,7 @@ import {
   getQuestion,
 } from '@/lib/data/questions';
 import { store } from '@/lib/store';
+import { weakestCategoryFor } from '@/lib/advice';
 import { platformDown } from '@/lib/platform';
 import { rateLimit, clientIp, LIMITS as RL, maxMocksPerDay } from '@/lib/rate-limit';
 import { ensureOwnerId } from '@/lib/owner-session';
@@ -153,7 +154,7 @@ export async function POST(req: Request) {
     ? 1
     : Math.min(ent.questionsAllowed, institution.questionCount);
   const questionIds = isPractice
-    ? buildPracticePlan(parsed.category)
+    ? buildPracticePlan(parsed.category ?? (await weakestCategoryFor(student.id)) ?? undefined)
     : buildQuestionPlan(questionLimit);
 
   // Bind the session to this browser so nobody else can read the transcript.
