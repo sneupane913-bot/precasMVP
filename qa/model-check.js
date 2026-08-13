@@ -108,6 +108,9 @@ async function signIn(token, opts = {}) {
     setA === setB ? 'IDENTICAL — every student would memorise the same ten' : 'different sets served');
 
   const qfile = fs.existsSync('lib/data/questions.ts') ? fs.readFileSync('lib/data/questions.ts', 'utf8') : '';
+  t('N-27', 'Randomisation draws only from the vetted bank, never generates',
+    /eligiblePool/.test(qfile) && !/generateQuestion|makeUpQuestion|synthesi/i.test(qfile),
+    'a student who practises three mocks and then meets nothing familiar has been cheated');
   t('N-29', 'The question bank cites where its questions come from',
     /source|citation|researched|https?:\/\//i.test(qfile),
     /source|https?:\/\//i.test(qfile) ? 'sources present' : 'NO SOURCES — cannot claim these are what universities ask');
@@ -278,6 +281,19 @@ async function signIn(token, opts = {}) {
   t('N-13', 'Every approval request carries a number to ring',
     !!mineQ && 'payerPhone' in mineQ && mineQ.payerPhoneSuffix === '4321',
     `queue item has payerPhone field and the last 4 digits (${mineQ?.payerPhoneSuffix})`);
+
+  console.log('\n=== SEATS FOR CONSULTANCIES (N-6) ===\n');
+
+  const buy = await req('POST', '/api/admin',
+    { action: 'buySeats', slug: cs, passcode: 'n1pass123', bundleCode: 'b20' });
+  t('N-6', 'A consultancy buys more seats the same way a student pays',
+    buy.json?.ok === true && buy.json?.data?.seats === 20 && buy.json?.data?.amountNpr === 6000 &&
+    'qrImageUrl' in (buy.json?.data?.payTo ?? {}),
+    `20 seats for NPR ${buy.json?.data?.amountNpr}, same QR and same super-admin queue`);
+  const badBundle = await req('POST', '/api/admin',
+    { action: 'buySeats', slug: cs, passcode: 'n1pass123', bundleCode: 'b9999' });
+  t('N-6b', 'An invented bundle code is refused', badBundle.code === 400,
+    `bundleCode=b9999 -> ${badBundle.code}, the server owns the price (G-2)`);
 
   console.log('\n=== QUESTION AUTHORING ===\n');
 

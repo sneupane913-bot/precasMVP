@@ -380,7 +380,7 @@ simply have mocks.
 | N-3 | A seated student sees the seat's mocks **plus the free trial**. A 3-mock seat shows **4**. | BUILT+PROVEN |
 | N-4 | **A consultancy student is shown no price, no QR and no pay button** while their consultancy's mocks last. | BUILT+PROVEN |
 | N-5 | When their mocks run out they have **two routes, and they choose**: ask their consultancy to renew, which **costs that consultancy one seat**; or upgrade themselves by paying us directly. | BUILT+PROVEN |
-| N-6 | An admin near the end of their seats is shown a renewal option and buys more the way a student does: QR, details, screenshot, **super-admin** approval. | TODO |
+| N-6 | An admin near the end of their seats is shown a renewal option and buys more the way a student does: QR, details, screenshot, **super-admin** approval. | BUILT+PROVEN |
 | N-7 | **An admin never approves a student payment.** Removed entirely, and `C-12` is retired. Admins pay *us*; how they collect from their own students — cash, their own link, or free — is their business and never touches our system. | BUILT+PROVEN |
 | N-8 | How a consultancy charges its own students is invisible to us. We hold no record of it and take no position on it. | BUILT+PROVEN |
 
@@ -421,7 +421,7 @@ simply have mocks.
 |---|---|---|
 | N-25 | The super admin can **add questions** without a deploy. | BUILT+PROVEN |
 | N-26 | **Ten students starting a trial get ten different sets.** No two trials identical. | BUILT+PROVEN |
-| N-27 | Randomised **only within questions that really appear** in Pre-CAS and UKVI credibility interviews. A student who practises three mocks and then meets nothing familiar has been cheated, and "it was random" is not a defence. | TODO |
+| N-27 | Randomised **only within questions that really appear** in Pre-CAS and UKVI credibility interviews. A student who practises three mocks and then meets nothing familiar has been cheated, and "it was random" is not a defence. | BUILT+PROVEN |
 | N-28 | A student on the **NPR 799 pack can add their own questions** — photograph a list, upload an image, or type them — and have the interviewer ask those. | BUILT+PROVEN |
 | N-29 | Question research is a **named deliverable with sources**, not a bank somebody invented. Until it exists, no page may claim the questions are what universities ask. | TODO |
 

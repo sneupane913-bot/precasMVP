@@ -401,6 +401,19 @@ function shuffled<T>(arr: T[]): T[] {
   return a;
 }
 
+/**
+ * N-27. Everything the plan can draw from, and nothing else.
+ *
+ * Randomness is bounded by this function. A question can only appear in a
+ * student's paper if it is in the vetted bank — it is never generated, never
+ * paraphrased, and never invented to fill a slot. A student who practises three
+ * mocks and then meets nothing familiar has been cheated, and "it was random"
+ * is not a defence.
+ */
+export function eligiblePool(): Question[] {
+  return QUESTIONS;
+}
+
 export function buildQuestionPlan(limit: number): string[] {
   if (limit >= QUESTIONS.length) return QUESTIONS.map((q) => q.id);
 

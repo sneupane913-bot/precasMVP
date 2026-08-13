@@ -4,6 +4,7 @@ import { platform, type Consultancy, platformDown } from '@/lib/platform';
 import { repo } from '@/lib/db';
 import { approvePayment, rejectPayment, type Actor } from '@/lib/payments';
 import { renewSeat } from '@/lib/entitlement';
+import { BUNDLES } from '@/lib/data/plans';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
 import { apiError } from '@/lib/types';
 
@@ -49,6 +50,19 @@ const Body = z.discriminatedUnion('action', [
     passcode: z.string().min(1).max(60),
     studentId: z.string().min(1).max(64),
     seatSize: z.string().max(20).optional(),
+  }),
+  /**
+   * N-6. The consultancy buys more seats.
+   *
+   * Deliberately the SAME shape as a student payment — QR, transaction id,
+   * super-admin approval — rather than a special B2B flow. One approval queue,
+   * one set of money guarantees, one place where a mistake can happen.
+   */
+  z.object({
+    action: z.literal('buySeats'),
+    slug: z.string().min(1).max(60),
+    passcode: z.string().min(1).max(60),
+    bundleCode: z.string().min(2).max(20),
   }),
   z.object({
     action: z.literal('rejectPayment'),
@@ -163,6 +177,69 @@ export async function POST(req: Request) {
                   : 'Approved. Your student can carry on straight away.',
             }
           : { message: 'Rejected. Your student has been told to check their transaction number.' },
+    });
+  }
+
+  // N-6. Buy more seats. Creates an order the SUPER ADMIN approves.
+  if (body.action === 'buySeats') {
+    const bundle = BUNDLES.find((b) => b.code === body.bundleCode);
+    if (!bundle) {
+      return NextResponse.json(
+        apiError('BAD_BUNDLE', 'unknown bundle', 'That seat pack is not available.'),
+        { status: 400 }
+      );
+    }
+    const r2 = repo();
+    const mineOrders = await r2.listOrders({ consultancyId: c.id });
+    // Same guard as a student: one payment in flight at a time, so one
+    // transfer cannot become two approvals.
+    const waiting = mineOrders.find((o) => o.state === 'submitted' && !o.studentId);
+    if (waiting) {
+      return NextResponse.json(
+        apiError(
+          'PAYMENT_ALREADY_WAITING',
+          `order ${waiting.id} already submitted`,
+          'We are already checking a seat payment from you. There is no need to send it again.'
+        ),
+        { status: 409 }
+      );
+    }
+    const settings = await platform.getSettings();
+    const now = Date.now();
+    const order = {
+      id: crypto.randomUUID(),
+      // A consultancy order has no student. That is how the super admin queue
+      // tells "seats for a consultancy" from "a pack for a student".
+      studentId: '',
+      consultancyId: c.id,
+      packCode: bundle.code,
+      amountNpr: bundle.priceNpr,
+      walletTxnId: null,
+      payerName: null,
+      payerPhoneSuffix: null,
+      screenshotUrl: null,
+      state: 'created' as const,
+      verifiedBy: null,
+      verifiedAt: null,
+      rejectedReason: null,
+      allocatedAt: null,
+      createdAt: new Date(now).toISOString(),
+      expiresAt: new Date(now + 60 * 60_000).toISOString(),
+    };
+    await r2.createOrder(order);
+    return NextResponse.json({
+      ok: true,
+      data: {
+        orderId: order.id,
+        amountNpr: order.amountNpr,
+        seats: bundle.seats,
+        payTo: {
+          walletName: settings.payWalletName || process.env.PAY_WALLET_NAME || 'eSewa',
+          walletNumber: settings.payWalletNumber || process.env.PAY_WALLET_NUMBER || '',
+          qrImageUrl: settings.payQrImageUrl || process.env.PAY_QR_IMAGE_URL || null,
+        },
+        supportWhatsapp: settings.supportWhatsapp || '',
+      },
     });
   }
 
