@@ -132,7 +132,10 @@ function t(id, ok, detail) { (ok ? pass++ : fail++); console.log(`  ${ok ? 'PASS
   // bonus mock. The guarantee under test is that the SECOND approval grants
   // nothing further, not the exact size of the first.
   const firstGrant = v1?.data?.granted?.mocks;
-  t('E8', (firstGrant === 6 || firstGrant === 7) && v2?.data?.alreadyVerified === true,
+  // 3 from the Prep pack, or 4 when the post-trial bonus (I9) is live. This
+  // still said 6 or 7 from before the 13 Aug price change, so it was asserting
+  // a pack size we no longer sell.
+  t('E8', (firstGrant === 3 || firstGrant === 4) && v2?.data?.alreadyVerified === true,
     `first grant=${firstGrant} (3, or 4 with the post-trial bonus) second=${v2?.data?.alreadyVerified ? 'refused' : 'DOUBLE GRANTED'}`);
 
   // D16/D17 paying lifts the question allowance

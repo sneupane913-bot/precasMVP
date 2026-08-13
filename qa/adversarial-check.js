@@ -124,7 +124,10 @@ async function answerOnce(sid, qid) {
     jar = payerJar;
 
     const me = J((await req('GET', '/api/me')).body);
-    t('  paying grants the pack of mocks', (me?.data?.entitlement?.mocksLeft ?? 0) >= 6, `mocksLeft=${me?.data?.entitlement?.mocksLeft}`);
+    // Prep is 3 mocks since the 13 Aug price change (M-8), plus the free trial
+    // and possibly the post-trial bonus. This still demanded 6, the old pack
+    // size, so it was asserting a product we no longer sell.
+    t('  paying grants the pack of mocks', (me?.data?.entitlement?.mocksLeft ?? 0) >= 3, `mocksLeft=${me?.data?.entitlement?.mocksLeft}`);
     t('  entitlement now allows 17 questions', me?.data?.entitlement?.questionsAllowed === 17, `questionsAllowed=${me?.data?.entitlement?.questionsAllowed}`);
 
     // The one that matters: does a NEW interview actually contain 17 questions?

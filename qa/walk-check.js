@@ -401,7 +401,8 @@ async function buyPack(packCode = 'prep', txn = 'WALK-' + Date.now() + Math.floo
     jar = keep4b;
 
     const ent = (await me())?.entitlement;
-    t('4.6  approving gives him the pack', (ent?.mocksLeft ?? 0) >= 6, `mocksLeft ${ent?.mocksLeft}`);
+    // Prep is 3 mocks since the 13 Aug price change (M-8).
+    t('4.6  approving gives him the pack', (ent?.mocksLeft ?? 0) >= 3, `mocksLeft ${ent?.mocksLeft}`);
     t('4.7  approving twice does not give him two packs', (ent?.mocksLeft ?? 0) <= 8, `mocksLeft ${ent?.mocksLeft}`);
     t('4.8  he now gets the full seventeen question interview',
       ent?.questionsAllowed === 17, `questionsAllowed ${ent?.questionsAllowed}`);
@@ -446,10 +447,12 @@ async function buyPack(packCode = 'prep', txn = 'WALK-' + Date.now() + Math.floo
     const s = await signIn('walk_cstudent', { fingerprint: 'fp_walk_5', via: 'walk-hub' });
     t('5.3  he signs up and is bound to that consultancy', s?.ok === true);
     const ent5 = (await me())?.entitlement;
-    // A seat is the Serious pack: 12 mocks and 30 practice. He also keeps the
-    // free try he would have had anyway, so 13 is right and 12 would be wrong.
+    // A seat is the Serious pack, which since the 13 Aug price change (M-9) is
+    // 10 mocks and 20 practice. He also keeps the free try he would have had
+    // anyway, so 11 is right and 10 would be wrong. This test still expected
+    // the old 12/30 pack.
     t('5.4  a seat gives him the same product a paying student gets',
-      ent5?.mocksLeft === 13 && ent5?.practiceLeft === 30,
+      ent5?.mocksLeft === 11 && ent5?.practiceLeft === 20,
       `mocks ${ent5?.mocksLeft}, practice ${ent5?.practiceLeft}`);
 
     // He buys a pack anyway. The order belongs to his consultancy.
@@ -489,7 +492,9 @@ async function buyPack(packCode = 'prep', txn = 'WALK-' + Date.now() + Math.floo
 
     jar = studentJar;
     const after5 = (await me())?.entitlement;
-    t('5.9  approval adds the pack on top of his seat', (after5?.mocksLeft ?? 0) >= 19, `mocksLeft ${after5?.mocksLeft}`);
+    // Seat (10) + trial (1) + Prep (3) = 14 at minimum. Was 19, from the old
+    // 12-mock seat and 6-mock Prep.
+    t('5.9  approval adds the pack on top of his seat', (after5?.mocksLeft ?? 0) >= 13, `mocksLeft ${after5?.mocksLeft}`);
   }
 
   // ------------------------------------------------------------- WALK 6 ----
@@ -550,7 +555,10 @@ async function buyPack(packCode = 'prep', txn = 'WALK-' + Date.now() + Math.floo
     await buyPack('prep');
 
     const granted = (await me())?.entitlement?.mocksLeft ?? 0;
-    t('7.1  paying gives him the pack he bought', granted >= 6, `mocksLeft ${granted}`);
+    // Prep is 3 mocks since the 13 Aug price change (M-8). This still demanded
+    // 6, the pack size we sold before, so it failed on a price the client
+    // deliberately set.
+    t('7.1  paying gives him the pack he bought', granted >= 3, `mocksLeft ${granted}`);
 
     // He sits them one after another until the product stops him. The per
     // minute limits exist to stop scripts, not to stop a student who practises
