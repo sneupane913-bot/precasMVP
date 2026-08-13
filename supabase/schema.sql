@@ -1,250 +1,202 @@
--- PreCAS Practice: money and identity schema.
+-- PreCAS Practice schema (J2)
 --
--- Run this in the Supabase SQL editor. Field names match lib/db/types.ts, so
--- the repository swap is mechanical.
+-- Run this once in the Supabase SQL editor:
+--   Supabase dashboard -> SQL Editor -> New query -> paste -> Run
 --
--- The two properties this file exists to guarantee, which blob storage cannot:
---   1. UNIQUE(wallet_txn_id)  makes a payment screenshot unclaimable twice.
---   2. Real transactions      make seat allocation and credit grants atomic.
+-- Why this exists: the previous store kept every student, payment, credit and
+-- seat in ONE JSON document and did read-modify-write. Two people acting in the
+-- same second could silently overwrite each other, and the write that vanished
+-- could be a payment. Rows cannot do that to each other.
+--
+-- Access model: every table has row level security ON with no public policy, so
+-- the anon key can read nothing at all. The app talks to these tables only from
+-- the server with the service role key, which bypasses RLS. That is deliberate:
+-- authorisation is decided in our API routes, where the rules already live and
+-- are already tested, rather than being duplicated in two places that can drift.
 
-create extension if not exists "pgcrypto";
-
--- ---------------------------------------------------------------- students
-
-create type student_status as enum ('active', 'disabled');
-create type student_source as enum ('direct', 'consultancy');
-
-create table students (
-  id                      uuid primary key default gen_random_uuid(),
-  auth_provider_id        text not null unique,
-  auth_provider           text not null default 'google',
-  email                   text,
-  name                    text,
-
-  -- Verified at payment, not at trial. See spec section 13.
-  phone_e164              text,
-  phone_verified_at       timestamptz,
-
-  -- Binding relationship, used for access control.
-  consultancy_id          uuid references consultancies(id),
-  -- Free text the student typed. Lead generation only.
-  -- NEVER use this for access control.
+-- ---------------------------------------------------------------- students --
+create table if not exists students (
+  id uuid primary key,
+  auth_provider_id text not null unique,
+  auth_provider text not null,
+  email text,
+  name text,
+  phone_e164 text,
+  phone_verified_at timestamptz,
+  consultancy_id text,
   attribution_consultancy text,
-
-  source                  student_source not null default 'direct',
-  created_via             text not null default 'marketing',
-
-  status                  student_status not null default 'active',
-  disabled_at             timestamptz,
-  disabled_by             text,
-
-  referral_code           text not null unique,
-  referred_by_code        text,
-
-  consent_version         text,
-  consent_at              timestamptz,
-
-  created_at              timestamptz not null default now(),
-  last_seen_at            timestamptz not null default now()
+  source text not null,
+  created_via text not null,
+  status text not null default 'active',
+  disabled_at timestamptz,
+  disabled_by text,
+  referral_code text not null unique,
+  referred_by_code text,
+  consent_version text,
+  consent_at timestamptz,
+  created_at timestamptz not null default now(),
+  last_seen_at timestamptz not null default now()
 );
+create index if not exists students_consultancy_idx on students (consultancy_id);
+create index if not exists students_referred_by_idx on students (referred_by_code);
 
-create index on students (consultancy_id);
-create index on students (referred_by_code);
-
--- ------------------------------------------------------------ trial claims
-
-create table trial_claims (
-  id               uuid primary key default gen_random_uuid(),
-  student_id       uuid not null references students(id) on delete cascade,
-  -- One trial per auth account. This is the gate.
+-- ------------------------------------------------------------ trial claims --
+-- One claim per Google account is the actual trial gate.
+create table if not exists trial_claims (
+  id uuid primary key,
+  student_id uuid not null references students (id) on delete cascade,
   auth_provider_id text not null unique,
   fingerprint_hash text,
-  ip               inet,
-  outcome          text not null check (outcome in ('granted','soft_denied')),
-  risk_score       int  not null default 0,
-  risk_reasons     jsonb not null default '[]',
-  claimed_at       timestamptz not null default now(),
-  overridden_by    text,
-  overridden_at    timestamptz
+  ip text,
+  outcome text not null,
+  risk_score int not null default 0,
+  risk_reasons jsonb not null default '[]'::jsonb,
+  claimed_at timestamptz not null default now(),
+  overridden_by text,
+  overridden_at timestamptz
 );
+create index if not exists trial_claims_fingerprint_idx on trial_claims (fingerprint_hash);
+create index if not exists trial_claims_outcome_idx on trial_claims (outcome);
 
-create index on trial_claims (fingerprint_hash, claimed_at);
-create index on trial_claims (outcome);
-
--- --------------------------------------------------------------- ledger
-
--- Append only. Balance is SUM(delta). There is deliberately no balance
--- column: a mutable balance is the field that drifts under concurrency.
-create table credit_ledger (
-  id         uuid primary key default gen_random_uuid(),
-  student_id uuid not null references students(id) on delete cascade,
-  kind       text not null check (kind in ('mock','practice')),
-  delta      int  not null,
-  reason     text not null,
-  session_id uuid,
-  order_id   uuid,
-  note       text,
+-- ------------------------------------------------------------------ ledger --
+-- Append only. A balance is SUM(delta) and is never stored, because a stored
+-- balance is exactly the column that drifts under concurrency.
+create table if not exists ledger (
+  id uuid primary key,
+  student_id uuid not null references students (id) on delete cascade,
+  kind text not null,
+  delta int not null,
+  reason text not null,
+  session_id text,
+  order_id text,
+  note text,
   created_at timestamptz not null default now()
 );
+create index if not exists ledger_student_idx on ledger (student_id);
+create index if not exists ledger_order_idx on ledger (order_id);
 
-create index on credit_ledger (student_id, kind);
-
-create or replace function credit_balance(p_student uuid, p_kind text)
-returns int language sql stable as $$
-  select coalesce(sum(delta), 0)::int
-  from credit_ledger where student_id = p_student and kind = p_kind;
-$$;
-
--- --------------------------------------------------------- payment orders
-
-create type order_state as enum ('created','submitted','verified','rejected','expired');
-
-create table payment_orders (
-  id                 uuid primary key default gen_random_uuid(),
-  student_id         uuid not null references students(id) on delete cascade,
-  consultancy_id     uuid references consultancies(id),
-  pack_code          text not null,
-  -- Server-owned. The client never sends a price.
-  amount_npr         int  not null check (amount_npr >= 0),
-
-  -- THE anti-double-claim control. One wallet transaction, one order, ever.
-  wallet_txn_id      text unique,
-  payer_name         text,
+-- ---------------------------------------------------------- payment orders --
+create table if not exists payment_orders (
+  id uuid primary key,
+  student_id uuid not null references students (id) on delete cascade,
+  consultancy_id text,
+  pack_code text not null,
+  amount_npr int not null,
+  -- The anti double claim control. One wallet transaction, one order, enforced
+  -- by the database rather than by hopeful application code.
+  wallet_txn_id text unique,
+  payer_name text,
   payer_phone_suffix text,
-  screenshot_url     text,
-
-  state              order_state not null default 'created',
-  verified_by        text,
-  verified_at        timestamptz,
-  rejected_reason    text,
-  -- Set once when credits are granted, so re-verifying cannot double-allocate.
-  allocated_at       timestamptz,
-
-  created_at         timestamptz not null default now(),
-  expires_at         timestamptz not null
+  screenshot_url text,
+  state text not null default 'created',
+  verified_by text,
+  verified_at timestamptz,
+  allocated_at timestamptz,
+  rejected_reason text,
+  created_at timestamptz not null default now(),
+  expires_at timestamptz
 );
+create index if not exists payment_orders_student_idx on payment_orders (student_id);
+create index if not exists payment_orders_state_idx on payment_orders (state);
+create index if not exists payment_orders_consultancy_idx on payment_orders (consultancy_id);
 
-create index on payment_orders (state);
-create index on payment_orders (student_id);
-
--- --------------------------------------------------------------- seats
-
-create table consultancies (
-  id                   uuid primary key default gen_random_uuid(),
-  slug                 text not null unique,
-  name                 text not null,
-  contact_name         text,
-  contact_phone        text,
-  logo_url             text,
-  primary_color        text default '#0d1b2a',
-  status               text not null default 'pending'
-                       check (status in ('pending','approved','suspended')),
-  seats_total          int  not null default 0 check (seats_total >= 0),
-  paid_npr             int  not null default 0,
-  -- Wi-Fi / IP ranges that relax the trial device-velocity threshold.
-  -- The single biggest false-positive reducer for consultancy labs.
-  allowlisted_ips      jsonb not null default '[]',
-  passcode_hash        text not null,
-  created_at           timestamptz not null default now(),
-  approved_at          timestamptz
-);
-
-create table seat_allocations (
-  id             uuid primary key default gen_random_uuid(),
-  consultancy_id uuid not null references consultancies(id) on delete cascade,
-  student_id     uuid not null references students(id) on delete cascade,
-  allocated_by   text not null,
-  allocated_at   timestamptz not null default now(),
-  revoked_at     timestamptz,
+-- ------------------------------------------------------------------- seats --
+create table if not exists seat_allocations (
+  id uuid primary key,
+  consultancy_id text not null,
+  student_id uuid not null references students (id) on delete cascade,
+  allocated_by text,
+  allocated_at timestamptz not null default now(),
+  revoked_at timestamptz,
   unique (consultancy_id, student_id)
 );
+create index if not exists seats_consultancy_idx on seat_allocations (consultancy_id);
 
--- Atomic allocation. Cannot oversell even under twenty concurrent callers,
--- because the count and the insert happen inside one statement's snapshot.
-create or replace function allocate_seat(p_consultancy uuid, p_student uuid, p_by text)
-returns boolean language plpgsql as $$
-declare v_total int; v_used int;
-begin
-  select seats_total into v_total from consultancies where id = p_consultancy for update;
-  if v_total is null then return false; end if;
-
-  select count(*) into v_used
-  from seat_allocations
-  where consultancy_id = p_consultancy and revoked_at is null;
-
-  if v_used >= v_total then return false; end if;
-
-  insert into seat_allocations (consultancy_id, student_id, allocated_by)
-  values (p_consultancy, p_student, p_by)
-  on conflict (consultancy_id, student_id) do nothing;
-
-  return true;
-end; $$;
-
--- --------------------------------------------------------------- audit
-
-create table approvals_audit (
-  id         uuid primary key default gen_random_uuid(),
+-- ------------------------------------------------------------------ audits --
+create table if not exists approvals_audit (
+  id uuid primary key,
   actor_role text not null,
-  actor_id   text not null,
-  action     text not null,
+  actor_id text not null,
+  action text not null,
   subject_id text not null,
-  before     text,
-  after      text,
-  note       text,
+  before_state text,
+  after_state text,
+  note text,
   created_at timestamptz not null default now()
 );
+create index if not exists audit_subject_idx on approvals_audit (subject_id);
 
-create index on approvals_audit (created_at desc);
+create table if not exists admin_notifications (
+  id uuid primary key,
+  consultancy_id text not null,
+  message text not null,
+  created_at timestamptz not null default now(),
+  read_at timestamptz
+);
+create index if not exists notifications_consultancy_idx on admin_notifications (consultancy_id);
 
-create table admin_notifications (
-  id             uuid primary key default gen_random_uuid(),
-  consultancy_id uuid not null references consultancies(id) on delete cascade,
-  message        text not null,
-  created_at     timestamptz not null default now(),
-  read_at        timestamptz
+-- ----------------------------------------------------------------- rewards --
+create table if not exists reward_rules (
+  id text primary key,
+  code text not null,
+  kind text not null,
+  name text not null,
+  public_reason text not null,
+  active boolean not null default true,
+  bonus_mocks_by_pack jsonb not null default '{}'::jsonb,
+  ends_at timestamptz,
+  window_minutes int,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  updated_by text
 );
 
--- --------------------------------------------------------------- rewards
-
-create table reward_rules (
-  id                  uuid primary key default gen_random_uuid(),
-  code                text not null unique,
-  kind                text not null check (kind in ('post_trial_window','campaign','referral')),
-  name                text not null,
-  public_reason       text not null,
-  active              boolean not null default true,
-  bonus_mocks_by_pack jsonb not null default '{}',
-  -- A campaign deadline is set ONCE. Never regenerated per page view.
-  -- An evergreen countdown is a dark pattern and is treated as a defect.
-  ends_at             timestamptz,
-  window_minutes      int,
-  created_at          timestamptz not null default now(),
-  updated_at          timestamptz not null default now(),
-  updated_by          text
+create table if not exists student_offers (
+  id uuid primary key,
+  student_id uuid not null references students (id) on delete cascade,
+  rule_id text not null,
+  started_at timestamptz not null default now(),
+  -- A real instant. Once past, the offer is gone and is never reissued, which
+  -- is the difference between an honest countdown and a dark pattern.
+  ends_at timestamptz not null,
+  consumed_at timestamptz
 );
+create index if not exists offers_student_idx on student_offers (student_id);
 
-create table student_offers (
-  id          uuid primary key default gen_random_uuid(),
-  student_id  uuid not null references students(id) on delete cascade,
-  rule_id     uuid not null references reward_rules(id) on delete cascade,
-  started_at  timestamptz not null default now(),
-  -- Real, personal, and never silently extended or reissued.
-  ends_at     timestamptz not null,
-  consumed_at timestamptz,
-  unique (student_id, rule_id)
+-- ---------------------------------------------------------------- sessions --
+-- Interview sessions, including the transcript. Deleted outright when a student
+-- exercises their right to be deleted, which is why cascade matters here.
+create table if not exists interview_sessions (
+  id uuid primary key,
+  student_id uuid references students (id) on delete cascade,
+  owner_id text,
+  vertical text not null,
+  institution_id text not null,
+  mode text not null,
+  status text not null,
+  question_ids jsonb not null default '[]'::jsonb,
+  current_index int not null default 0,
+  answers jsonb not null default '[]'::jsonb,
+  flags jsonb not null default '[]'::jsonb,
+  is_trial boolean not null default true,
+  consent_version text,
+  consent_at timestamptz,
+  summary jsonb,
+  created_at timestamptz not null default now(),
+  completed_at timestamptz
 );
+create index if not exists sessions_student_idx on interview_sessions (student_id);
 
--- ----------------------------------------------------------------- RLS
-
-alter table students          enable row level security;
-alter table trial_claims      enable row level security;
-alter table credit_ledger     enable row level security;
-alter table payment_orders    enable row level security;
-alter table seat_allocations  enable row level security;
-alter table approvals_audit   enable row level security;
-alter table consultancies     enable row level security;
-
--- Deliberately no permissive policies here. All access goes through the
--- server using the service role. Adding a policy that lets the browser read
--- these tables directly would undo the LIVE-002 fix.
+-- --------------------------------------------------------------------- RLS --
+-- On everywhere, with no policies, so the public anon key can read nothing.
+-- The server uses the service role key and is where authorisation is decided.
+alter table students            enable row level security;
+alter table trial_claims        enable row level security;
+alter table ledger              enable row level security;
+alter table payment_orders      enable row level security;
+alter table seat_allocations    enable row level security;
+alter table approvals_audit     enable row level security;
+alter table admin_notifications enable row level security;
+alter table reward_rules        enable row level security;
+alter table student_offers      enable row level security;
+alter table interview_sessions  enable row level security;

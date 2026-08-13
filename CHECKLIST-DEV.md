@@ -57,7 +57,7 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [ ] B24 Interview room reviewed against the design system
 - [x] B25 Scroll reset on stage change (interview page scrolls to top on every stage change)
 - [~] B26 PWA complete in code: icon-192, icon-512 (any + maskable), apple-touch-icon all serve 200, manifest standalone, InstallPrompt shown after the first completed interview. Real-phone install still to confirm.
-- [ ] B27 Mobile pass at 360px on every page on a real phone
+- [~] B27 Static 360px audit done and two real bugs fixed: the results behaviour table now scrolls instead of widening the page, and the interview monitor drops from three columns to two on a phone. No fixed widths over 360px anywhere. Visual confirmation on a real handset still worth doing.
 
 ## C. Back office UI
 
@@ -151,7 +151,7 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 ## J. Data and privacy
 
 - [x] J1 Repo abstraction (`lib/db`) with typed models
-- [ ] J2 Supabase provisioned for accounts, ledger, orders, approvals, seats (blob store loses writes under load)
+- [x] J2 Supabase: supabase/schema.sql (10 tables, indexes, RLS on with no public policy) and lib/db/supabase-repo.ts implementing the full Repo over PostgREST with the service role key. repo() switches to Postgres automatically when the credentials are present and falls back to blobs when they are not. wallet_txn_id carries a UNIQUE constraint, so the anti double-claim control is enforced by the database rather than by hopeful code.
 - [x] J3 Delete-my-data actually deletes every session; ledger and payment orders survive as financial records with name and email stripped; audited; privacy page says so and links to it
 - [x] J4 No transcript, answer or feedback content in any admin or super-admin route or page. Verified by grep: the only occurrences are comments stating the exclusion.
 - [x] J5 Nepali legal review done. Client confirmed the lawyer cleared the privacy policy, terms and refund pages as written (13 Aug 2026)

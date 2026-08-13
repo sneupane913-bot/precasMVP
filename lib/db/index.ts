@@ -86,16 +86,25 @@ export interface Repo {
 }
 
 import { BlobRepo } from './blob-repo';
+import { SupabaseRepo, supabaseConfigured } from './supabase-repo';
 
 let cached: Repo | null = null;
 
 export function repo(): Repo {
   if (cached) return cached;
-  // The Supabase implementation lands when credentials are configured. Until
-  // then the per-key blob repo is used, which is correct on Netlify and
-  // massively safer than what it replaced.
-  cached = new BlobRepo();
+  // J2. Postgres the moment it is configured, because rows cannot overwrite
+  // each other and a single JSON document can. Falls back to the per-key blob
+  // repo so local development and any environment without credentials still
+  // runs, rather than failing closed on a database that is not there yet.
+  //
+  // Switching is one environment variable, and switching back is removing it.
+  cached = supabaseConfigured() ? new SupabaseRepo() : new BlobRepo();
   return cached;
+}
+
+/** Surfaced in the super admin so it is obvious which store is live. */
+export function repoName(): Repo['name'] {
+  return repo().name;
 }
 
 export function repoIsTransactional(): boolean {

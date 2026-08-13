@@ -107,6 +107,9 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
             <h2 className="font-bold text-ink">How you behaved in the interview</h2>
             <p className="text-sm text-slate-600">These are the same things a real interviewer watches.</p>
           </div>
+          {/* B27: at 360px this table pushed the whole page wider than the
+              screen. Scrolling the table beats scrolling the page sideways. */}
+          <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
               <tr>
@@ -147,6 +150,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
               ))}
             </tbody>
           </table>
+          </div>
         </section>
 
         {/* ---------- What went well ---------- */}

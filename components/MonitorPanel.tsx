@@ -46,7 +46,8 @@ export function MonitorPanel({
         </span>
       </header>
 
-      <div className="mb-3 grid grid-cols-3 gap-2 text-center">
+      {/* B27: three columns is tight at 360px, so start at two and widen. */}
+      <div className="mb-3 grid grid-cols-2 gap-2 text-center sm:grid-cols-3">
         <Stat label="Camera" value={cameraOn ? 'On' : 'Off'} good={cameraOn} />
         <Stat label="Mic" value={micOn ? 'On' : 'Off'} good={micOn} />
         <Stat
