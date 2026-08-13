@@ -410,10 +410,10 @@ simply have mocks.
 
 | ID | Rule | Status |
 |---|---|---|
-| N-21 | Students and consultancies listed **separately**. | TODO |
-| N-22 | Per student: university, **bachelor or masters**, verified Gmail, WhatsApp number, and **whether that number really has WhatsApp** — asked, never assumed. | TODO |
-| N-23 | **City only, asked at payment, optional, with the reason shown.** Not GPS, not silent. Client accepted the advice: a mock interview does not need a student's location, and holding it beside transcripts about family income and visa refusals turns a breach into a scandal. City is enough for sales. | TODO |
-| N-24 | Per consultancy: links sent, renewals done, seats given out. | TODO |
+| N-21 | Students and consultancies listed **separately**. | BUILT+PROVEN |
+| N-22 | Per student: university, **bachelor or masters**, verified Gmail, WhatsApp number, and **whether that number really has WhatsApp** — asked, never assumed. | BUILT+PROVEN |
+| N-23 | **City only, asked at payment, optional, with the reason shown.** Not GPS, not silent. Client accepted the advice: a mock interview does not need a student's location, and holding it beside transcripts about family income and visa refusals turns a breach into a scandal. City is enough for sales. | BUILT+PROVEN |
+| N-24 | Per consultancy: links sent, renewals done, seats given out. | BUILT+PROVEN |
 
 ## 12.5 Questions — the heart of the product
 

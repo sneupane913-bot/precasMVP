@@ -32,6 +32,31 @@ export interface Student {
    * Never use it for access control.
    */
   attributionConsultancy: string | null;
+  /**
+   * N-22. Bachelor or masters. Changes what a good answer looks like, so the
+   * evaluator needs it and the super admin wants it for segmentation.
+   */
+  level?: 'bachelor' | 'masters' | null;
+  /** N-22. Which university they are actually applying to. */
+  targetUniversity?: string | null;
+  /**
+   * N-22. Their WhatsApp number, and whether it REALLY has WhatsApp.
+   *
+   * Asked, never assumed. Half the support plan is a WhatsApp link, and a
+   * number that turns out not to be on WhatsApp is a student we cannot reach
+   * on the day their payment goes wrong.
+   */
+  whatsappNumber?: string | null;
+  whatsappConfirmed?: boolean | null;
+  /**
+   * N-23. CITY only, asked at payment, optional, with the reason shown.
+   *
+   * Not GPS and not silent. A mock interview does not need a student's
+   * location, and holding precise location beside transcripts about family
+   * income and visa refusals turns a breach into a scandal. City is enough for
+   * sales, and it is the most we should ever hold.
+   */
+  city?: string | null;
 
   source: StudentSource;
   /** Consultancy slug, or 'marketing'. */

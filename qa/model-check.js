@@ -279,6 +279,39 @@ async function signIn(token, opts = {}) {
     !!mineQ && 'payerPhone' in mineQ && mineQ.payerPhoneSuffix === '4321',
     `queue item has payerPhone field and the last 4 digits (${mineQ?.payerPhoneSuffix})`);
 
+  console.log('\n=== SUPER ADMIN DIRECTORY ===\n');
+
+  // A student pays and volunteers their details at that moment.
+  const dirStu = await signIn(`n22-${S}`);
+  const dirOrd = await req('POST', '/api/payment', { action: 'create', packCode: 'prep' }, { ip: dirStu.ip, cookie: dirStu.jar });
+  await req('POST', '/api/payment', {
+    action: 'submit', orderId: dirOrd.json?.data?.orderId, walletTxnId: `N22${S}`,
+    payerName: 'Directory Test', payerPhoneSuffix: '7788',
+    whatsappNumber: '9779812345678', whatsappConfirmed: true,
+    city: 'Pokhara', level: 'masters', targetUniversity: 'Coventry University',
+  }, { ip: dirStu.ip, cookie: dirStu.jar });
+
+  const dir = await req('POST', '/api/super', { action: 'directory', superKey: SU });
+  const dd = dir.json?.data;
+  const row = (dd?.students ?? []).find((x) => x.city === 'Pokhara');
+  t('N-21', 'Students and consultancies are listed separately',
+    Array.isArray(dd?.students) && Array.isArray(dd?.consultancies),
+    `${dd?.students?.length} students and ${dd?.consultancies?.length} consultancies, in two lists`);
+  t('N-22', 'Level, university and a CONFIRMED WhatsApp number are captured',
+    row?.level === 'masters' && row?.targetUniversity === 'Coventry University' &&
+    row?.whatsappNumber === '9779812345678' && row?.whatsappConfirmed === true,
+    `level=${row?.level} uni=${row?.targetUniversity} whatsapp=${row?.whatsappNumber} confirmed=${row?.whatsappConfirmed}`);
+  t('N-23', 'City only, volunteered at payment, never GPS',
+    row?.city === 'Pokhara' && !('latitude' in (row ?? {})) && !('gps' in (row ?? {})),
+    `city=${row?.city}, and no coordinate field exists anywhere on the record`);
+  const csRow = (dd?.consultancies ?? []).find((x) => x.slug === cs);
+  t('N-24', 'Per consultancy: seats given out, renewals, students from the link',
+    csRow && typeof csRow.seatsGivenOut === 'number' && typeof csRow.renewals === 'number' && typeof csRow.studentsFromLink === 'number',
+    `${cs}: given ${csRow?.seatsGivenOut}/${csRow?.seatsTotal}, renewals ${csRow?.renewals}, students ${csRow?.studentsFromLink}`);
+  t('N-21b', 'The directory still carries no transcript, at any level',
+    !JSON.stringify(dd ?? {}).includes('transcript'),
+    'G-8 holds for the super admin too');
+
   console.log('\n=== DEVICE SOFT-BLOCK ===\n');
 
   const blockedFp = `blocked-device-${S}`;

@@ -21,6 +21,12 @@ const Body = z.discriminatedUnion('action', [
     walletTxnId: z.string().min(4).max(64),
     payerName: z.string().min(1).max(120),
     payerPhoneSuffix: z.string().min(2).max(6),
+    /** N-22, N-23. Optional, asked once, at the moment it is relevant. */
+    whatsappNumber: z.string().max(30).optional(),
+    whatsappConfirmed: z.boolean().optional(),
+    city: z.string().max(80).optional(),
+    level: z.enum(['bachelor', 'masters']).optional(),
+    targetUniversity: z.string().max(120).optional(),
   }),
   z.object({ action: z.literal('status'), orderId: z.string().min(1).max(64) }),
 ]);
@@ -273,6 +279,15 @@ export async function POST(req: Request) {
         { status: 409 }
       );
     }
+
+    // N-22, N-23. Store what they volunteered, and nothing they did not.
+    const profile: Record<string, unknown> = {};
+    if (body.whatsappNumber) profile.whatsappNumber = body.whatsappNumber;
+    if (body.whatsappConfirmed !== undefined) profile.whatsappConfirmed = body.whatsappConfirmed;
+    if (body.city) profile.city = body.city;
+    if (body.level) profile.level = body.level;
+    if (body.targetUniversity) profile.targetUniversity = body.targetUniversity;
+    if (Object.keys(profile).length > 0) await r.updateStudent(student.id, profile);
 
     const updated = await r.updateOrder(order.id, {
       state: 'submitted',

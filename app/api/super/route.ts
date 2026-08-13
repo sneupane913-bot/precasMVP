@@ -50,6 +50,7 @@ const Body = z.discriminatedUnion('action', [
     note: z.string().max(200),
   }),
   z.object({ action: z.literal('audit'), superKey: z.string().min(1) }),
+  z.object({ action: z.literal('directory'), superKey: z.string().min(1) }),
   /**
    * N-11, N-20. Only the super admin may change where the money goes and who
    * answers the phone about it. No deploy, and no consultancy involvement.
@@ -207,6 +208,75 @@ export async function POST(req: Request) {
           payerPhoneSuffix: o.payerPhoneSuffix,
         };
       }),
+    });
+  }
+
+  /**
+   * N-21, N-22, N-24. Students and consultancies, listed SEPARATELY.
+   *
+   * One mixed list forces whoever is looking to do the sorting in their head,
+   * and the two are answered by different questions: a student is "can they
+   * practise", a consultancy is "are they buying". They are also different
+   * privacy classes, so keeping them apart makes the transcript rule (G-8)
+   * easier to keep rather than harder.
+   */
+  if (body.action === 'directory') {
+    const [students, consultancies, orders, seatsAll] = await Promise.all([
+      r.listStudents(),
+      platform.listConsultancies(),
+      r.listOrders(),
+      Promise.resolve(null),
+    ]);
+
+    const studentRows = await Promise.all(
+      students.map(async (st) => ({
+        id: st.id,
+        name: st.name,
+        email: st.email,
+        // N-22, exactly the fields the client named, and nothing more.
+        level: st.level ?? null,
+        targetUniversity: st.targetUniversity ?? null,
+        whatsappNumber: st.whatsappNumber ?? null,
+        whatsappConfirmed: st.whatsappConfirmed ?? null,
+        city: st.city ?? null,
+        source: st.source,
+        consultancyId: st.consultancyId,
+        status: st.status,
+        createdAt: st.createdAt,
+        lastSeenAt: st.lastSeenAt,
+        mocksLeft: await r.balance(st.id, 'mock'),
+        // NEVER a transcript, at any level. G-8 has no exceptions.
+      }))
+    );
+
+    const consultancyRows = await Promise.all(
+      consultancies.map(async (c) => {
+        const seats = await r.listSeats(c.id);
+        const live = seats.filter((x) => !x.revokedAt);
+        const mine = students.filter((st) => st.consultancyId === c.id);
+        return {
+          id: c.id,
+          name: c.name,
+          slug: c.slug,
+          status: c.status,
+          seatsTotal: c.seatsTotal,
+          // N-24. What the client asked to see per consultancy.
+          seatsGivenOut: live.length,
+          seatsLeft: Math.max(0, c.seatsTotal - live.length),
+          renewals: live.filter((x) => String(x.allocatedBy).startsWith('renew:')).length,
+          studentsFromLink: mine.length,
+          paidNpr: c.paidNpr,
+        };
+      })
+    );
+
+    return NextResponse.json({
+      ok: true,
+      data: {
+        students: studentRows,
+        consultancies: consultancyRows,
+        directPaidOrders: orders.filter((o) => o.state === 'verified' && !o.consultancyId).length,
+      },
     });
   }
 
