@@ -116,6 +116,40 @@ export const SEAT_GRANT = {
 /** What one seat costs us in provider bills. Bundle costs are built from this. */
 export const SEAT_COST_NPR = SEAT_PLAN.costNpr;
 
+/**
+ * N-1. The seat sizes a consultancy may buy, and may mix in one order.
+ *
+ * Priced from what each size costs us (about NPR 10 a mock) with the same
+ * wholesale margin the client set for the flat seat: the consultancy needs room
+ * to resell underneath our retail price or the channel stops existing.
+ *
+ * `practice` scales with the size so a small seat is not a crippled product —
+ * it is a smaller one.
+ */
+export interface SeatSize {
+  code: 'seat3' | 'seat6' | 'seat10';
+  label: string;
+  mocks: number;
+  practice: number;
+  /** What the consultancy pays us per seat. */
+  priceNpr: number;
+  /** What it costs us to deliver. */
+  costNpr: number;
+}
+
+export const SEAT_SIZES: SeatSize[] = [
+  { code: 'seat3', label: '3 mocks', mocks: 3, practice: 15, priceNpr: 150, costNpr: 30 },
+  { code: 'seat6', label: '6 mocks', mocks: 6, practice: 18, priceNpr: 240, costNpr: 59 },
+  { code: 'seat10', label: '10 mocks', mocks: 10, practice: 20, priceNpr: 300, costNpr: 98 },
+];
+
+export function getSeatSize(code: string): SeatSize | undefined {
+  return SEAT_SIZES.find((s) => s.code === code);
+}
+
+/** The size used when a consultancy has not chosen one. The full pack. */
+export const DEFAULT_SEAT_SIZE = SEAT_SIZES[2]!;
+
 /** Bulk seats sold to consultancies, who resell under their own name. */
 export interface Bundle {
   code: string;

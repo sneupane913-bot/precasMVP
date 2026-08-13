@@ -30,6 +30,8 @@ function StartInner() {
 
   const ref = params.get('ref') ?? undefined;
   const via = params.get('via') ?? undefined;
+  /** N-1. The seat size the consultancy's link hands out. */
+  const seat = params.get('seat') ?? undefined;
   const next = params.get('next') ?? '/universities';
 
   /**
@@ -175,6 +177,7 @@ function StartInner() {
               config={config}
               referralCode={ref}
               via={via}
+              seat={seat}
               onSignedIn={(r) => {
                 // Soft deny is never a dead end: they keep browsing and can buy.
                 if (r.trial.outcome === 'soft_denied' && r.trial.message) {

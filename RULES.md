@@ -375,9 +375,9 @@ simply have mocks.
 
 | ID | Rule | Status |
 |---|---|---|
-| N-1 | A consultancy buys seats and **chooses how many mocks each seat carries** — 3, 6 or 10. They may mix sizes in one order. | TODO |
-| N-2 | **Sign-in is Google, always. There are no passwords anywhere in this product.** The admin issues a *link*, not credentials. Signing in through that link binds the student to that consultancy, server-side. One identity system, nothing to store, nothing to reset, nothing to leak. | TODO |
-| N-3 | A seated student sees the seat's mocks **plus the free trial**. A 3-mock seat shows **4**. | TODO |
+| N-1 | A consultancy buys seats and **chooses how many mocks each seat carries** — 3, 6 or 10. They may mix sizes in one order. | BUILT+PROVEN |
+| N-2 | **Sign-in is Google, always. There are no passwords anywhere in this product.** The admin issues a *link*, not credentials. Signing in through that link binds the student to that consultancy, server-side. One identity system, nothing to store, nothing to reset, nothing to leak. | BUILT+PROVEN |
+| N-3 | A seated student sees the seat's mocks **plus the free trial**. A 3-mock seat shows **4**. | BUILT+PROVEN |
 | N-4 | **A consultancy student is shown no price, no QR and no pay button** while their consultancy's mocks last. | TODO |
 | N-5 | When their mocks run out they have **two routes, and they choose**: ask their consultancy to renew, which **costs that consultancy one seat**; or upgrade themselves by paying us directly. | TODO |
 | N-6 | An admin near the end of their seats is shown a renewal option and buys more the way a student does: QR, details, screenshot, **super-admin** approval. | TODO |

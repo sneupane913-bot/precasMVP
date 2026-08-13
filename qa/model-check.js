@@ -48,6 +48,13 @@ function answer(sessionId, questionId, jar, ip) {
 const rows = [];
 const t = (rule, claim, ok, detail) => { rows.push({ rule, ok }); console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${rule.padEnd(6)} ${claim.padEnd(56)} ${detail}`); };
 
+async function signInSeat(token, via, seat) {
+  const ip = nextIp();
+  const r = await req('POST', '/api/auth/firebase',
+    { idToken: `dev:${token}`, fingerprint: token, via, seat }, { ip });
+  return { jar: jarOf(r), ip, res: r };
+}
+
 async function signIn(token, opts = {}) {
   const ip = opts.ip || nextIp();
   const r = await req('POST', '/api/auth/firebase',
@@ -157,6 +164,46 @@ async function signIn(token, opts = {}) {
   const dev = await req('POST', '/api/super', { action: 'flaggedTrials', superKey: 'super-dev' });
   t('N-17', 'Devices running many Google accounts reach a human queue',
     dev.json?.ok === true, `queue reachable, ${Array.isArray(dev.json?.data) ? dev.json.data.length : '?'} entries`);
+
+  console.log('\n=== SEATS (N-1) ===\n');
+
+  const SU = 'super-dev';
+  const cs = `n1-${S}`;
+  const mk = await req('POST', '/api/platform',
+    { action: 'createConsultancy', superKey: SU, name: cs, slug: cs, seatsTotal: 20, paidNpr: 6000, passcode: 'n1pass123' });
+  // 20, not 5: this block signs up seven students and an earlier version ran
+  // the consultancy out of seats halfway through, so seat10 came back as the
+  // bare trial and looked like a broken seat size. It was a broken test.
+  await req('POST', '/api/platform',
+    { action: 'setConsultancyStatus', superKey: SU, consultancyId: mk.json?.data?.id, status: 'approved' });
+
+  // Three students through three DIFFERENT seat-size links from one consultancy.
+  const sizes = [['seat3', 3], ['seat6', 6], ['seat10', 10]];
+  const got = [];
+  for (const [code] of sizes) {
+    const st = await signIn(`n1-${code}-${S}`, { via: cs });
+    const m = await req('GET', '/api/me', null, { ip: st.ip, cookie: st.jar });
+    got.push(m.json?.data?.entitlement?.mocksLeft);
+  }
+  // Without a seat param every link gives the default (10) + 1 trial = 11.
+  t('N-1a', 'A link with no size gives the default seat', got.every((g) => g === 11),
+    `three default links -> ${got.join(', ')} mocks each (10 seat + 1 trial)`);
+
+  const sized = [];
+  for (const [code, mocks] of sizes) {
+    const st = await signInSeat(`n1s-${code}-${S}`, cs, code);
+    const m = await req('GET', '/api/me', null, { ip: st.ip, cookie: st.jar });
+    sized.push([code, m.json?.data?.entitlement?.mocksLeft, mocks + 1]);
+  }
+  t('N-1', 'A consultancy can hand out 3, 6 and 10 mock seats side by side',
+    sized.every(([, actual, want]) => actual === want),
+    sized.map(([c, a, w]) => `${c}:${a}(want ${w})`).join('  '));
+
+  const forged = await signInSeat(`n1x-${S}`, cs, 'seat9999');
+  const fm = await req('GET', '/api/me', null, { ip: forged.ip, cookie: forged.jar });
+  t('N-1b', 'An invented seat size in the URL grants the default, not itself',
+    fm.json?.data?.entitlement?.mocksLeft === 11,
+    `?seat=seat9999 -> ${fm.json?.data?.entitlement?.mocksLeft} mocks (falls back, never trusts the URL)`);
 
   console.log('\n=== PRICING ===\n');
 

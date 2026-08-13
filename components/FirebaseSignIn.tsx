@@ -85,11 +85,14 @@ export function FirebaseSignIn({
   config,
   referralCode,
   via,
+  seat,
   onSignedIn,
 }: {
   config: FirebaseWebConfig | null;
   referralCode?: string;
   via?: string;
+  /** N-1. Seat size code from the consultancy link. */
+  seat?: string;
   onSignedIn: (r: { isNew: boolean; trial: { outcome: string; message: string | null } }) => void;
 }) {
   const [busy, setBusy] = useState(false);
@@ -106,7 +109,7 @@ export function FirebaseSignIn({
         const res = await fetch('/api/auth/firebase', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ idToken, fingerprint: deviceFingerprint(), ref: referralCode, via }),
+          body: JSON.stringify({ idToken, fingerprint: deviceFingerprint(), ref: referralCode, via, seat }),
         });
         const json = (await res.json()) as
           | { ok: true; data: { isNew: boolean; trial: { outcome: string; message: string | null } } }
@@ -124,7 +127,7 @@ export function FirebaseSignIn({
         setBusy(false);
       }
     },
-    [referralCode, via, onSignedIn]
+    [referralCode, via, seat, onSignedIn]
   );
 
   // A redirect sign-in finishes here, on the way back.

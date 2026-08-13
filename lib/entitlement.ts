@@ -1,5 +1,5 @@
 import { repo, type LedgerEntry, type Student } from '@/lib/db';
-import { getPlan, SEAT_GRANT, TRIAL_QUESTION_COUNT, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
+import { getPlan, SEAT_GRANT, getSeatSize, DEFAULT_SEAT_SIZE, TRIAL_QUESTION_COUNT, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
 
 /**
  * Entitlement: what a student is allowed to do right now.
@@ -153,9 +153,16 @@ export async function grantSeat(
   studentId: string,
   consultancyId: string,
   seatsTotal: number,
-  allocatedBy: string
+  allocatedBy: string,
+  /**
+   * N-1. Which size of seat this student is being given. A consultancy may buy
+   * 3, 6 and 10 mock seats in one order and hand them out as it likes.
+   */
+  sizeCode?: string
 ): Promise<{ seated: boolean; mocks: number; practice: number }> {
   const r = repo();
+  const size = (sizeCode && getSeatSize(sizeCode)) || DEFAULT_SEAT_SIZE;
+
   const res = await r.allocateSeat(
     {
       id: crypto.randomUUID(),
@@ -164,6 +171,12 @@ export async function grantSeat(
       allocatedBy,
       allocatedAt: new Date().toISOString(),
       revokedAt: null,
+      // Recorded on the allocation, not read back from the consultancy later.
+      // A consultancy can change its seat size between one student and the
+      // next, and a student given a 10-mock seat must keep 10 even if the next
+      // batch is bought at 3. Reading it live would rewrite their history.
+      mocks: size.mocks,
+      practice: size.practice,
     },
     seatsTotal
   );
@@ -175,16 +188,16 @@ export async function grantSeat(
   }
 
   await r.appendLedger(
-    entry(studentId, 'mock', SEAT_GRANT.mocks, 'seat_allocation', {
-      note: `seat at ${consultancyId}`,
+    entry(studentId, 'mock', size.mocks, 'seat_allocation', {
+      note: `${size.label} seat at ${consultancyId}`,
     })
   );
   await r.appendLedger(
-    entry(studentId, 'practice', SEAT_GRANT.practice, 'seat_allocation', {
-      note: `seat at ${consultancyId}`,
+    entry(studentId, 'practice', size.practice, 'seat_allocation', {
+      note: `${size.label} seat at ${consultancyId}`,
     })
   );
-  return { seated: true, mocks: SEAT_GRANT.mocks, practice: SEAT_GRANT.practice };
+  return { seated: true, mocks: size.mocks, practice: size.practice };
 }
 
 /**

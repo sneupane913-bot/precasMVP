@@ -17,6 +17,13 @@ const Body = z.object({
   fingerprint: z.string().max(200).optional(),
   ref: z.string().max(20).optional(),
   via: z.string().max(60).optional(),
+  /**
+   * N-1. Which seat size this link hands out. The admin chooses when they
+   * create the link, so one consultancy can run 3, 6 and 10 mock links side by
+   * side. Validated server-side against SEAT_SIZES — an unknown value falls
+   * back to the default rather than granting whatever the URL says.
+   */
+  seat: z.string().max(20).optional(),
 });
 
 /**
@@ -130,7 +137,7 @@ export async function POST(req: Request) {
     // the student keeps their free trial and can buy a pack, because being the
     // fifty-first student through a fifty-seat link is not their fault.
     if (viaConsultancyId) {
-      await grantSeat(student.id, viaConsultancyId, viaConsultancySeats, `link:${body.via}`);
+      await grantSeat(student.id, viaConsultancyId, viaConsultancySeats, `link:${body.via}`, body.seat);
     }
   } else {
     // Keep phone in step if it was verified on the Firebase account since.

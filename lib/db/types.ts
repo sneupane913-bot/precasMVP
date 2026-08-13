@@ -168,6 +168,16 @@ export interface SeatAllocation {
   allocatedBy: string;
   allocatedAt: string;
   revokedAt: string | null;
+  /**
+   * N-1. How many mocks THIS seat carried when it was taken.
+   *
+   * Stored on the allocation rather than read from the consultancy, because a
+   * consultancy can change its seat size between one student and the next, and
+   * a student who was given a 10-mock seat must keep 10 even if the next batch
+   * is bought at 3. Reading it live would silently rewrite history.
+   */
+  mocks: number;
+  practice: number;
 }
 
 /**

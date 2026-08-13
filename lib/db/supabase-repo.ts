@@ -1,3 +1,4 @@
+import { DEFAULT_SEAT_SIZE } from '@/lib/data/plans';
 import type {
   Repo,
   Student,
@@ -410,6 +411,9 @@ export class SupabaseRepo implements Repo {
       studentId: r.student_id as string,
       allocatedBy: (r.allocated_by as string) ?? '',
       allocatedAt: r.allocated_at as string,
+      // N-1. Older rows predate variable seat sizes; they were all full seats.
+      mocks: (r.mocks as number) ?? DEFAULT_SEAT_SIZE.mocks,
+      practice: (r.practice as number) ?? DEFAULT_SEAT_SIZE.practice,
       revokedAt: (r.revoked_at as string) ?? null,
     }));
   }
