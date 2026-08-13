@@ -17,8 +17,10 @@ job is catching the thing that used to work.
 
 ## Where the project stands
 
-**112 done, 6 partial, of 126 developer items — about 89 percent.**
-Automated suites: `qa/lifecycle-check.js` **20/20**, `qa/tenant-check.js` **12/12**.
+**120 done, 6 partial, 0 open, of 126 developer items.**
+Every developer item is now built. The six partial items are built in code and
+await a real handset or real students to confirm.
+Automated suites: lifecycle **20/20**, tenant **12/12**, fraud **19/19**, journey **26/26**.
 
 Phase 2 (connecting the real AI: Groq speech-to-text and the evaluator) is
 0 of 4 and is deliberately last. The skeleton has to be right before we pay a

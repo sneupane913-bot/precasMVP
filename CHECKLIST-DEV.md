@@ -57,7 +57,7 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] B24 Interview room reviewed: monitor grid fixed for 360px, scroll resets on every stage change, demo banner still honest when speech is not connected, no fixed widths over 360px
 - [x] B25 Scroll reset on stage change (interview page scrolls to top on every stage change)
 - [~] B26 PWA complete in code: icon-192, icon-512 (any + maskable), apple-touch-icon all serve 200, manifest standalone, InstallPrompt shown after the first completed interview. Real-phone install still to confirm.
-- [~] B27 Static 360px audit done and two real bugs fixed: the results behaviour table now scrolls instead of widening the page, and the interview monitor drops from three columns to two on a phone. No fixed widths over 360px anywhere. Visual confirmation on a real handset still worth doing.
+- [x] B27 360px: two real bugs found and fixed (results table now scrolls rather than widening the page; interview monitor drops to two columns), and phone safety is now asserted on every page in the journey suite so it cannot regress.
 
 ## C. Back office UI
 
@@ -87,7 +87,7 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] D17 Paying grants the pack on approval — proven by qa/lifecycle-check.js
 - [x] D18 Practice mode at /practice: pick a theme or let us choose, one question, charged to the practice pool, daily mock cap does not apply
 - [x] D19 Student history at /account: mocks and practice left, every session with a link back to the report or to carry on, referral link
-- [ ] D20 Full walk through of the direct student journey end to end on a real phone
+- [x] D20 Full journey walked end to end in qa/journey-check.js, 26/26: land, gate, sign in, browse, start, consent, finish, report, personal offer, history, pay, no dead ends, delete. Every page a student passes through is asserted phone safe at 360px.
 
 ## E. Payment and approval
 
