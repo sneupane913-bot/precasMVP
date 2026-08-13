@@ -1,13 +1,17 @@
 import { SiteHeader } from '@/components/SiteHeader';
+import { headerSession } from '@/lib/auth/header-session';
 import { SiteFooter } from '@/components/SiteFooter';
 
 export const metadata = { title: 'Terms of use | PreCAS Practice' };
 
 /** Working draft. Review with a Nepali legal adviser before a paid launch. */
-export default function TermsPage() {
+export default async function TermsPage() {
+  // Resolved on the server so the header never shows 'Sign in' to somebody
+  // who is already signed in. See components/HeaderSession.tsx.
+  const session = await headerSession();
   return (
     <>
-      <SiteHeader />
+      <SiteHeader session={session} />
       <main className="mx-auto max-w-2xl px-5 py-12">
         <h1 className="mb-2 font-serif text-3xl text-ink">Terms of use</h1>
         <p className="mb-8 text-sm text-slate-500">Working version. Last updated August 2026.</p>

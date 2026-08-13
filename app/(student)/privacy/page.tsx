@@ -1,4 +1,5 @@
 import { SiteHeader } from '@/components/SiteHeader';
+import { headerSession } from '@/lib/auth/header-session';
 import { SiteFooter } from '@/components/SiteFooter';
 
 export const metadata = { title: 'Privacy policy | PreCAS Practice' };
@@ -8,10 +9,13 @@ export const metadata = { title: 'Privacy policy | PreCAS Practice' };
  * and docs/MONEY.md. It must be reviewed by a Nepali legal adviser before a
  * public paid launch (Privacy Act 2075). Do not present as final legal advice.
  */
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  // Resolved on the server so the header never shows 'Sign in' to somebody
+  // who is already signed in. See components/HeaderSession.tsx.
+  const session = await headerSession();
   return (
     <>
-      <SiteHeader />
+      <SiteHeader session={session} />
       <main className="mx-auto max-w-2xl px-5 py-12">
         <h1 className="mb-2 font-serif text-3xl text-ink">Privacy policy</h1>
         <p className="mb-8 text-sm text-slate-500">Working version. Last updated August 2026.</p>

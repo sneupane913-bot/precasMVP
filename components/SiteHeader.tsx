@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { HeaderSession } from '@/components/HeaderSession';
+import { HeaderSession, type SessionSnapshot } from '@/components/HeaderSession';
 
 /**
  * Global header for the public marketing pages (home, universities, pricing,
@@ -8,8 +8,15 @@ import { HeaderSession } from '@/components/HeaderSession';
  *
  * Server component on purpose: no client state, so it stays fast on a cheap
  * phone. Nav links collapse on small screens to keep the primary action clear.
+ *
+ * `session` is optional and exists to kill the sign-in flash (see
+ * HeaderSession). A SERVER page reads the cookie itself and passes the answer
+ * in, so the very first paint is already correct. A CLIENT page cannot — this
+ * component gets bundled as a client component there and has no cookie access
+ * — so it omits the prop and HeaderSession shows a neutral placeholder for the
+ * moment it takes to ask. Neither ever shows the wrong state.
  */
-export function SiteHeader() {
+export function SiteHeader({ session }: { session?: SessionSnapshot } = {}) {
   const nav = [
     { label: 'Universities', href: '/universities' },
     { label: 'Practise one question', href: '/practice' },
@@ -46,7 +53,7 @@ export function SiteHeader() {
             in, so they live in a small client island rather than making the
             whole header client-side. */}
         <div className="flex items-center gap-2">
-          <HeaderSession />
+          <HeaderSession initial={session} />
         </div>
       </div>
     </header>

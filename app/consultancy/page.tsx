@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { BUNDLES } from '@/lib/data/plans';
+import { BUNDLES, SEAT_GRANT, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
 import { SiteFooter } from '@/components/SiteFooter';
 
 export const metadata = {
@@ -65,9 +65,22 @@ export default function ConsultancyPage() {
 
       <section className="mb-8 rounded-2xl border border-slate-200 bg-white p-6">
         <h2 className="mb-3 font-bold text-ink">What each seat gives a student</h2>
+        {/* M-10. These two numbers were HARD-CODED at 12 and 30 — the pre-13-Aug
+            pack — and stayed wrong after the price change, so this page promised
+            a consultancy 12 mocks a seat while the ledger granted 10. Over a
+            30-seat bundle that is 60 mocks sold and not delivered, on the page
+            somebody reads before spending NPR 9,000.
+
+            M-10 says a seat is DERIVED from the 799 pack so it can never drift.
+            That was enforced in the entitlement code and not here, which is
+            exactly how a page can lie while every suite stays green. Read from
+            SEAT_GRANT so the promise and the grant are the same number. */}
         <ul className="space-y-2 text-slate-700">
-          <li>12 full mock interviews of 17 questions each, camera on, timed</li>
-          <li>30 practice sessions for drilling single questions</li>
+          <li>
+            {SEAT_GRANT.mocks} full mock interviews of {FULL_MOCK_QUESTION_COUNT} questions each,
+            camera on, timed
+          </li>
+          <li>{SEAT_GRANT.practice} practice sessions for drilling single questions</li>
           <li>Feedback on what they actually said, in English with a Nepali summary</li>
           <li>Your logo and colours on the pages your students see</li>
         </ul>

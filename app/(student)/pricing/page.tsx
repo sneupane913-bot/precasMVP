@@ -1,5 +1,6 @@
 import { PricingPacks, PriceComparison } from '@/components/PricingPacks';
 import { SiteHeader } from '@/components/SiteHeader';
+import { headerSession } from '@/lib/auth/header-session';
 import { SiteFooter } from '@/components/SiteFooter';
 
 export const metadata = { title: 'Price | PreCAS Practice' };
@@ -14,10 +15,13 @@ export const metadata = { title: 'Price | PreCAS Practice' };
  * A student must never see a lower per-seat price and feel overcharged. B2B
  * pricing lives only on the unlisted /consultancy page.
  */
-export default function PricingPage() {
+export default async function PricingPage() {
+  // Resolved on the server so the header never shows 'Sign in' to somebody
+  // who is already signed in. See components/HeaderSession.tsx.
+  const session = await headerSession();
   return (
     <>
-      <SiteHeader />
+      <SiteHeader session={session} />
       <main className="px-4 py-8 sm:px-6">
         <div className="mx-auto max-w-4xl">
           <h1 className="mb-2 text-center font-serif text-3xl text-ink">Price</h1>

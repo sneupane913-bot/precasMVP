@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { ENTRY_PLAN } from '@/lib/data/plans';
 
 /**
  * The gate after question 10 (D13, D14, D15).
@@ -78,8 +79,9 @@ export function TrialGate({
         >
           See the packs
         </Link>
+        {/* Was hard-coded "From NPR 449". Derived now — see ENTRY_PLAN. */}
         <p className="mt-3 text-center text-xs text-emerald-800">
-          From NPR 449. Pay once, nothing to cancel.
+          From NPR {ENTRY_PLAN.priceNpr}. Pay once, nothing to cancel.
         </p>
       </div>
 

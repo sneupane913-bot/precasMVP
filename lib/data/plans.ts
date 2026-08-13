@@ -181,6 +181,29 @@ export const BUNDLES: Bundle[] = [
 export const COMPETITOR_PER_MOCK_NPR = { best: 143, typical: 175, worst: 199 };
 
 /**
+ * The competitor's ENTRY pack, which is the only competitor number the page
+ * still shows (M-12 withdrew the per-mock comparison).
+ *
+ * Declared here rather than typed into the table for two reasons. First, a
+ * claim about somebody else's price is the claim most likely to become false
+ * without us noticing, so it carries the date it was checked and where it came
+ * from, and the page prints that date (G-9).
+ *
+ * Second, and this is the sharp one: their entry pack is NPR 799 and OUR
+ * Serious pack is also NPR 799. Two identical numbers a few lines apart in the
+ * same table, one of ours and one of theirs. If our price ever changes and
+ * somebody updates "the 799 in the table", there is an even chance they change
+ * the wrong one and the page silently claims we match a competitor we do not.
+ * Naming them differently in code makes that mistake impossible to make by
+ * accident.
+ */
+export const COMPETITOR_ENTRY = {
+  priceNpr: 799,
+  checkedOn: '6 August 2026',
+  where: 'their public checkout',
+} as const;
+
+/**
  * The only packs a student may see or buy. QA-207: Starter and Pro were
  * displayed despite the client hiding them. Public pages MUST use this, never
  * PLANS directly.
@@ -192,6 +215,20 @@ export function publicPlans(): Plan[] {
 /** The trial: first 10 questions of the same 17-question sitting. */
 export const TRIAL_QUESTION_COUNT = 10;
 export const FULL_MOCK_QUESTION_COUNT = 17;
+
+/**
+ * The cheapest pack a student can actually buy — the "from" price.
+ *
+ * Exists because sales copy kept typing it. "From NPR 449" was hard-coded in
+ * TrialGate and in the comparison table, and the 13 Aug price change did not
+ * reach either of them. A price typed into a sentence is a price that will be
+ * wrong the first time it changes, and being wrong about OUR OWN price on the
+ * page that asks for money is the worst place to be wrong (G-9).
+ *
+ * Derived, never written down. If the client changes the pack tomorrow, every
+ * sentence that quotes it changes with it.
+ */
+export const ENTRY_PLAN: Plan = publicPlans().reduce((a, b) => (b.priceNpr < a.priceNpr ? b : a));
 
 export function getPlan(code: string): Plan | undefined {
   return PLANS.find((p) => p.code === code);

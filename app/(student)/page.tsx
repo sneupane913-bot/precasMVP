@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { PricingPacks } from '@/components/PricingPacks';
 import { SiteHeader } from '@/components/SiteHeader';
+import { headerSession } from '@/lib/auth/header-session';
 import { SiteFooter } from '@/components/SiteFooter';
 import { TrustedBy } from '@/components/TrustedBy';
+import { TRIAL_QUESTION_COUNT } from '@/lib/data/plans';
 
 /**
  * Home page.
@@ -12,10 +14,13 @@ import { TrustedBy } from '@/components/TrustedBy';
  * vouchers, community and application tracking, and the reaction to it was that
  * none of it was wanted. A scared student wants one thing: to start.
  */
-export default function HomePage() {
+export default async function HomePage() {
+  // Resolved on the server so the header never shows 'Sign in' to somebody
+  // who is already signed in. See components/HeaderSession.tsx.
+  const session = await headerSession();
   return (
     <>
-      <SiteHeader />
+      <SiteHeader session={session} />
       <main>
       {/* ---------------- Above the fold: one action ---------------- */}
       <section className="bg-ink px-5 pb-14 pt-12 text-white sm:pt-20">
@@ -49,7 +54,7 @@ export default function HomePage() {
           </div>
 
           <p className="mt-4 text-sm text-white/60">
-            No card, no payment. 10 real questions free.
+            No card, no payment. {TRIAL_QUESTION_COUNT} real questions free.
           </p>
         </div>
       </section>
@@ -188,7 +193,7 @@ export default function HomePage() {
             {[
               {
                 q: 'Is it really free to try?',
-                a: 'Yes. You get 10 real questions with real feedback, with no card and no payment. You only pay if you want to carry on after that.',
+                a: `Yes. You get ${TRIAL_QUESTION_COUNT} real questions with real feedback, with no card and no payment. You only pay if you want to carry on after that.`,
               },
               {
                 q: 'Are these the exact questions my university will ask?',

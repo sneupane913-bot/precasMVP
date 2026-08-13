@@ -4,6 +4,7 @@ import { store } from '@/lib/store';
 import { ownsSession } from '@/lib/owner-session';
 import { InstallPrompt } from '@/components/InstallPrompt';
 import { SiteHeader } from '@/components/SiteHeader';
+import { headerSession } from '@/lib/auth/header-session';
 import { SiteFooter } from '@/components/SiteFooter';
 import { BUILD_INFO } from '@/lib/build-info';
 import { weakestOf } from '@/lib/advice';
@@ -15,6 +16,12 @@ import { BAND_LABEL, CATEGORY_LABEL, FLAG_META, PEE_STEPS, type FlagType } from 
 export const dynamic = 'force-dynamic';
 
 export default async function ResultsPage({ params }: { params: Promise<{ sessionId: string }> }) {
+  // Resolved on the server so the header never shows 'Sign in' to somebody
+  // who is already signed in. See components/HeaderSession.tsx.
+  // Named headerState, not `session`: this file already has a `session`, which
+  // is the INTERVIEW session. Two different things called the same word in one
+  // file is how the wrong one gets rendered.
+  const headerState = await headerSession();
   const { sessionId } = await params;
   const session = await store.get(sessionId);
 
@@ -35,7 +42,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
 
   return (
     <>
-      <SiteHeader />
+      <SiteHeader session={headerState} />
       <main className="min-h-screen pb-16">
       {/* B23: header bar per docs/design-reference/results_report. The date and
           the university sit above the title, and the two things a student

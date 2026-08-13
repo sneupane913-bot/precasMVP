@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 /**
  * The right hand side of the header, and the only place in the product a
@@ -13,29 +12,76 @@ import { useRouter } from 'next/navigation';
  * students share a handful of machines, the session cookie lasts ninety days,
  * and the next student to sit down is already signed in as the last one. They
  * can read a stranger's report and spend a stranger's credits, and the student
- * who paid has no way to prevent it. It is also simply what people expect: a
- * product that can be signed into and not out of feels like a trap.
+ * who paid has no way to prevent it.
  *
- * A client island rather than making the whole header client-side, so the rest
- * of the header still renders instantly on a cheap phone.
+ * ---------------------------------------------------------------------------
+ * TESTED WALK, 14 Aug — the bug the client reported twice and I closed twice.
+ *
+ * The client signed in, landed on /universities, and the header showed
+ * "Sign in / Start free" as though nothing had happened. They reported it, I
+ * looked at the code, the code was right, and I closed it. They reported it
+ * again. Watching it happen in a browser took ten seconds to find.
+ *
+ * This component used to hold ONE piece of state — `signedIn: boolean | null` —
+ * and render with `if (signedIn !== true) return <SignedOut/>`. That single
+ * line collapses two completely different situations into one:
+ *
+ *     null  = "I have not asked the server yet"
+ *     false = "I asked, and nobody is signed in"
+ *
+ * and then renders both as SIGNED OUT. So on every page load, every signed-in
+ * student is told "Sign in" for as long as /api/me takes to answer. On this
+ * Mac, on localhost, that was over four seconds. On a mid-range Android on
+ * Nepali mobile data it is worse.
+ *
+ * The old comment above that line said "never flash Sign out at somebody who
+ * is not signed in", and it was right that the reverse would be bad. But the
+ * cure was worse than the disease: flashing "Sign in" at somebody who IS
+ * signed in tells them the product has forgotten them, which is the exact
+ * fear PILOT-01 was about, and it happens on every single navigation rather
+ * than in a rare edge case.
+ *
+ * It is the same mistake as G-1 in a different costume: **do not assert a
+ * state you have not established.** G-1 refuses to score an answer it could
+ * not hear. This now refuses to claim a session state it has not confirmed.
+ *
+ * Two fixes:
+ *   1. `unknown` is its own state and renders a neutral placeholder of the
+ *      same width, so nothing lies and nothing jumps.
+ *   2. Server-rendered pages pass the answer in as `initial`, so there is no
+ *      unknown phase at all and the first paint is already correct. Client
+ *      pages (/universities, /account, /practice) cannot do that — a server
+ *      component imported into a client page becomes a client component — so
+ *      they get the honest placeholder and resolve a moment later.
+ * ---------------------------------------------------------------------------
  */
-export function HeaderSession() {
-  const router = useRouter();
-  const [signedIn, setSignedIn] = useState<boolean | null>(null);
-  const [name, setName] = useState<string | null>(null);
+export interface SessionSnapshot {
+  signedIn: boolean;
+  name: string | null;
+}
+
+export function HeaderSession({ initial }: { initial?: SessionSnapshot }) {
+  // `undefined` means we genuinely do not know yet. It is never rendered as
+  // either signed in or signed out.
+  const [session, setSession] = useState<SessionSnapshot | undefined>(initial);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    // Still re-check even when the server told us, because the session may have
+    // been ended in another tab — a real case in a consultancy lab, where the
+    // point of Sign out is that it takes effect everywhere.
     let cancelled = false;
     fetch('/api/me')
       .then((r) => r.json())
       .then((j) => {
         if (cancelled) return;
-        setSignedIn(Boolean(j?.data?.signedIn));
-        setName(j?.data?.name ?? null);
+        setSession({ signedIn: Boolean(j?.data?.signedIn), name: j?.data?.name ?? null });
       })
       .catch(() => {
-        if (!cancelled) setSignedIn(false);
+        // A failed check is NOT evidence of being signed out. If the server
+        // told us at render time, keep believing it; only fall back to signed
+        // out when we never had an answer in the first place.
+        if (!cancelled) setSession((s) => s ?? { signedIn: false, name: null });
       });
     return () => {
       cancelled = true;
@@ -51,17 +97,24 @@ export function HeaderSession() {
       // cleared on the next successful request. Leaving them stuck on a page
       // that says "Signing out..." forever would be worse.
     }
-    setSignedIn(false);
-    setName(null);
+    setSession({ signedIn: false, name: null });
     setBusy(false);
     // A full navigation, not a soft push, so no cached page still shows the
     // previous student's name or numbers.
     window.location.href = '/';
   }
 
-  // While we do not yet know, show the neutral actions. Never flash "Sign out"
-  // at somebody who is not signed in.
-  if (signedIn !== true) {
+  // ---- unknown: say nothing, but hold the space so the header does not jump.
+  if (session === undefined) {
+    return (
+      <div
+        aria-hidden
+        className="h-[42px] w-[132px] animate-pulse rounded-xl bg-slate-200/60"
+      />
+    );
+  }
+
+  if (!session.signedIn) {
     return (
       <>
         <Link
@@ -84,9 +137,9 @@ export function HeaderSession() {
     <>
       {/* Their own name, so on a shared machine it is obvious at a glance
           whose account is open. */}
-      {name && (
+      {session.name && (
         <span className="hidden max-w-[9rem] truncate text-sm text-slate-500 md:inline">
-          {name}
+          {session.name}
         </span>
       )}
       <Link

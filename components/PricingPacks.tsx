@@ -1,5 +1,12 @@
 import Link from 'next/link';
-import { publicPlans, getPlan, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
+import {
+  publicPlans,
+  getPlan,
+  FULL_MOCK_QUESTION_COUNT,
+  TRIAL_QUESTION_COUNT,
+  ENTRY_PLAN,
+  COMPETITOR_ENTRY,
+} from '@/lib/data/plans';
 
 /**
  * The pricing block, shared by `/pricing` and the home page.
@@ -181,8 +188,11 @@ export function PricingPacks({
  * Every number here is checkable and dated. Two earlier claims had to be
  * retracted ("60% cheaper for the same thing" compared different pack sizes,
  * and "no other platform lets you try free" was simply untrue), so this
- * compares the one thing that is genuinely comparable: the price of a single
- * mock interview.
+ * compares the two things that are genuinely comparable and are the client's
+ * own argument: the ENTRY PRICE of each platform, and whether you can try it
+ * before paying. M-12 withdrew the per-mock rate — at NPR 449 for 3 mocks we
+ * are NPR 150 against their 143-160, so printing a per-mock number would have
+ * invited the one comparison we lose, and turned a true claim into a false one.
  */
 export function PriceComparison() {
   return (
@@ -204,20 +214,27 @@ export function PriceComparison() {
         <tbody className="divide-y divide-slate-100">
           <tr className="bg-emerald-50/50">
             <td className="px-5 py-3 font-semibold text-ink">PreCAS Practice</td>
-            <td className="px-3 py-3 font-bold tabular-nums text-emerald-700">NPR 449</td>
+            <td className="px-3 py-3 font-bold tabular-nums text-emerald-700">
+              {/* Ours. Derived — a hand-typed price is one the next price change misses. */}
+              NPR {ENTRY_PLAN.priceNpr}
+            </td>
             <td className="px-5 py-3 font-semibold text-emerald-700">
-              10 real questions, free
+              {TRIAL_QUESTION_COUNT} real questions, free
             </td>
           </tr>
           <tr>
             <td className="px-5 py-3 text-slate-600">Another Nepali platform</td>
-            <td className="px-3 py-3 tabular-nums text-slate-600">NPR 799</td>
+            <td className="px-3 py-3 tabular-nums text-slate-600">
+              {/* Theirs, not ours — and the same digits as our Serious pack, which is
+                  exactly why it is named rather than typed. See COMPETITOR_ENTRY. */}
+              NPR {COMPETITOR_ENTRY.priceNpr}
+            </td>
             <td className="px-5 py-3 text-slate-600">—</td>
           </tr>
         </tbody>
       </table>
       <p className="border-t border-slate-100 px-5 py-3 text-xs leading-relaxed text-slate-500">
-        Competitor prices taken from their public checkout on 6 August 2026. Packs contain different
+        Competitor prices taken from {COMPETITOR_ENTRY.where} on {COMPETITOR_ENTRY.checkedOn}. Packs contain different
         numbers of interviews, so this compares only the entry price and the free trial rather than
         claiming a cheaper rate per interview. Prices change, so please check theirs before you
         decide.

@@ -1,13 +1,17 @@
 import { SiteHeader } from '@/components/SiteHeader';
+import { headerSession } from '@/lib/auth/header-session';
 import { SiteFooter } from '@/components/SiteFooter';
 
 export const metadata = { title: 'Refunds | PreCAS Practice' };
 
 /** Working draft. Confirm the exact refund rule with the client before launch. */
-export default function RefundPage() {
+export default async function RefundPage() {
+  // Resolved on the server so the header never shows 'Sign in' to somebody
+  // who is already signed in. See components/HeaderSession.tsx.
+  const session = await headerSession();
   return (
     <>
-      <SiteHeader />
+      <SiteHeader session={session} />
       <main className="mx-auto max-w-2xl px-5 py-12">
         <h1 className="mb-2 font-serif text-3xl text-ink">Refunds</h1>
         <p className="mb-8 text-sm text-slate-500">Working version. Last updated August 2026.</p>

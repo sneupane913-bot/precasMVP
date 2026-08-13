@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { platform } from '@/lib/platform';
 import { SiteFooter } from '@/components/SiteFooter';
 import { TrustedBy } from '@/components/TrustedBy';
+import { TRIAL_QUESTION_COUNT } from '@/lib/data/plans';
 
 /**
  * Branded consultancy entry point.
@@ -78,7 +79,7 @@ export default async function ConsultancyEntryPage({
               Start free practice
             </Link>
             <p className="mt-4 text-sm text-slate-500">
-              No card, no payment. 10 real questions free.
+              No card, no payment. {TRIAL_QUESTION_COUNT} real questions free.
             </p>
           </div>
         </section>
