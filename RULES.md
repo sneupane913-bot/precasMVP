@@ -402,8 +402,8 @@ simply have mocks.
 | ID | Rule | Status |
 |---|---|---|
 | N-17 | The super admin **sees devices running many Google accounts** — the eighteen-Gmail case — as a queue, not a silent counter. | BUILT+PROVEN |
-| N-18 | They can **soft-block a device**. Soft, never a ban: there is always a way back. | TODO |
-| N-19 | A soft-blocked student gets a contact number and a **WhatsApp link pre-filled** with "my account is blocked, my name is …". | TODO |
+| N-18 | They can **soft-block a device**. Soft, never a ban: there is always a way back. | BUILT+PROVEN |
+| N-19 | A soft-blocked student gets a contact number and a **WhatsApp link pre-filled** with "my account is blocked, my name is …". | BUILT+PROVEN |
 | N-20 | That number is **editable by the super admin**. | BUILT+PROVEN |
 
 ## 12.4 What the super admin sees

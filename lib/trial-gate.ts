@@ -1,5 +1,5 @@
-import { repo } from '@/lib/db';
 import { platform } from '@/lib/platform';
+import { repo } from '@/lib/db';
 
 /**
  * The trial gate.
@@ -70,6 +70,26 @@ export async function evaluateTrial(input: RiskInput): Promise<GateDecision> {
   const allowlisted = await ipIsAllowlisted(input.ip);
   if (allowlisted) reasons.push('network is an approved consultancy');
 
+  /**
+   * N-18. A device the super admin has soft-blocked by hand.
+   *
+   * A human looked at the queue and decided. That outranks the heuristic in
+   * both directions: it denies where the counter had not yet noticed, and it
+   * is still only a SOFT deny, so the student keeps every report they earned
+   * and can still buy a pack. We never ban.
+   */
+  if (input.fingerprintHash) {
+    const settings = await platform.getSettings();
+    if ((settings.blockedDevices ?? []).includes(input.fingerprintHash)) {
+      return {
+        outcome: 'soft_denied',
+        riskScore: 100,
+        reasons: ['device soft-blocked by hand'],
+        message: blockedMessage(settings),
+      };
+    }
+  }
+
   if (input.fingerprintHash) {
     const since = new Date(Date.now() - WINDOW_HOURS * 3600 * 1000).toISOString();
     const distinctAccounts = await r.countClaimsByFingerprint(input.fingerprintHash, since);
@@ -105,4 +125,31 @@ export async function evaluateTrial(input: RiskInput): Promise<GateDecision> {
       ? 'We could not automatically confirm you are a new student on this device. You can still look around and buy a pack. To switch on your free questions, message us on WhatsApp and we will turn them on.'
       : null,
   };
+}
+
+
+/**
+ * N-19. What a soft-blocked student is told.
+ *
+ * Never "you are banned". They get the reason in plain words, a number, and a
+ * WhatsApp link with the message already written — because a student who has
+ * been wrongly flagged is upset, and asking them to compose an appeal in
+ * English on a phone is how a real customer gives up instead of contacting us.
+ */
+export function blockedMessage(settings: { supportWhatsapp?: string; contactPhone?: string }): string {
+  const num = settings.supportWhatsapp || settings.contactPhone || '';
+  return [
+    'We need to check something about this device before giving another free trial.',
+    'Nothing you have already done is lost, and you can still buy a pack.',
+    num ? `Message us on ${num} and we will sort it out.` : 'Please contact us and we will sort it out.',
+  ].join(' ');
+}
+
+/** N-19. The pre-filled WhatsApp link for a blocked student. */
+export function blockedWhatsappLink(settings: { supportWhatsapp?: string }, name: string | null): string {
+  const num = (settings.supportWhatsapp ?? '').replace(/\D/g, '');
+  const msg = encodeURIComponent(
+    `Hello, my free trial on PreCAS Practice is blocked on this device. My name is ${name ?? ''}. Please can you check it.`
+  );
+  return num ? `https://wa.me/${num}?text=${msg}` : '';
 }

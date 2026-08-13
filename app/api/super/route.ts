@@ -54,6 +54,13 @@ const Body = z.discriminatedUnion('action', [
    * N-11, N-20. Only the super admin may change where the money goes and who
    * answers the phone about it. No deploy, and no consultancy involvement.
    */
+  /** N-18. Soft-block or unblock one device fingerprint. */
+  z.object({
+    action: z.literal('setDeviceBlock'),
+    superKey: z.string().min(1),
+    fingerprint: z.string().min(4).max(200),
+    blocked: z.boolean(),
+  }),
   z.object({
     action: z.literal('setPaymentSettings'),
     superKey: z.string().min(1),
@@ -201,6 +208,24 @@ export async function POST(req: Request) {
         };
       }),
     });
+  }
+
+  if (body.action === 'setDeviceBlock') {
+    const cur = await platform.getSettings();
+    const set = new Set(cur.blockedDevices ?? []);
+    if (body.blocked) set.add(body.fingerprint);
+    else set.delete(body.fingerprint);
+    await platform.saveSettings({ ...cur, blockedDevices: [...set] });
+    await audit({
+      actorRole: 'super_admin',
+      actorId: 'super_admin',
+      action: 'set_device_block',
+      subjectId: body.fingerprint.slice(0, 16),
+      before: String((cur.blockedDevices ?? []).includes(body.fingerprint)),
+      after: String(body.blocked),
+      note: 'device soft-block toggled',
+    });
+    return NextResponse.json({ ok: true, data: { blocked: body.blocked, total: set.size } });
   }
 
   if (body.action === 'setPaymentSettings') {

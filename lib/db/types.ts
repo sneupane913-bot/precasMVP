@@ -146,7 +146,9 @@ export interface ApprovalAudit {
     /** J3: the student exercised their own right to be deleted. */
     | 'delete_my_data'
     /** N-11. Payment or support details changed by the super admin. */
-    | 'set_payment_settings';
+    | 'set_payment_settings'
+    /** N-18. A device soft-blocked or released by the super admin. */
+    | 'set_device_block';
   subjectId: string;
   before: string | null;
   after: string | null;

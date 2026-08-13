@@ -279,6 +279,39 @@ async function signIn(token, opts = {}) {
     !!mineQ && 'payerPhone' in mineQ && mineQ.payerPhoneSuffix === '4321',
     `queue item has payerPhone field and the last 4 digits (${mineQ?.payerPhoneSuffix})`);
 
+  console.log('\n=== DEVICE SOFT-BLOCK ===\n');
+
+  const blockedFp = `blocked-device-${S}`;
+  const before18 = await signIn(`n18a-${S}`, { fp: blockedFp });
+  const blk = await req('POST', '/api/super', { action: 'setDeviceBlock', superKey: SU, fingerprint: blockedFp, blocked: true });
+  const after18 = await signIn(`n18b-${S}`, { fp: blockedFp });
+  t('N-18', 'A hand-blocked device stops getting free trials',
+    blk.json?.ok === true &&
+    before18.res.json?.data?.trial?.outcome === 'granted' &&
+    after18.res.json?.data?.trial?.outcome === 'soft_denied',
+    `same device: before=${before18.res.json?.data?.trial?.outcome} after=${after18.res.json?.data?.trial?.outcome}`);
+
+  const msg = after18.res.json?.data?.trial?.message ?? '';
+  t('N-19', 'A blocked student is told how to reach us, never called a cheat',
+    /still buy a pack/i.test(msg) && !/ban|fraud|cheat/i.test(msg),
+    `"${msg.slice(0, 78)}..."`);
+
+  const stillIn = await req('GET', '/api/me', null, { ip: after18.ip, cookie: after18.jar });
+  t('N-18b', 'A soft block is SOFT: they are still signed in and can still pay',
+    stillIn.json?.data?.signedIn === true,
+    `blocked student still signed in (mocks ${stillIn.json?.data?.entitlement?.mocksLeft}), never banned`);
+
+  const unblk = await req('POST', '/api/super', { action: 'setDeviceBlock', superKey: SU, fingerprint: blockedFp, blocked: false });
+  const after19 = await signIn(`n18c-${S}`, { fp: blockedFp });
+  t('N-18c', 'Unblocking releases the device immediately',
+    unblk.json?.ok === true && after19.res.json?.data?.trial?.outcome === 'granted',
+    `after release -> ${after19.res.json?.data?.trial?.outcome}`);
+
+  const tg = fs.readFileSync('lib/trial-gate.ts', 'utf8');
+  t('N-19b', 'The WhatsApp appeal link is pre-filled',
+    /blockedWhatsappLink/.test(tg) && /wa\.me/.test(tg) && /My name is/.test(tg),
+    'a wrongly flagged student never has to compose an appeal in English on a phone');
+
   console.log('\n=== UPGRADE, RENEWAL AND INSTALL ===\n');
 
   const lowStu = await signIn(`n15-${S}`);

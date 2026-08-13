@@ -93,6 +93,16 @@ export interface PlatformSettings {
   payAccountName?: string;
   /** N-12, N-19. The number the pre-filled WhatsApp links open. */
   supportWhatsapp?: string;
+
+  /**
+   * N-18. Device fingerprints the super admin has SOFT-blocked.
+   *
+   * Soft, never a ban (G-7). A blocked device can still browse, still read a
+   * report it already earned, and still buy a pack — what it cannot do is
+   * claim another free trial. The student always gets a way back, because the
+   * signal is a heuristic and heuristics are wrong about real people.
+   */
+  blockedDevices?: string[];
 }
 
 export const DEFAULT_SETTINGS: PlatformSettings = {
@@ -110,6 +120,7 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   payWalletNumber: '',
   payAccountName: '',
   supportWhatsapp: '',
+  blockedDevices: [],
 };
 
 export interface PlatformStore {
