@@ -39,6 +39,21 @@ function UniversityBrowser() {
   /** Whether this student still has a free try to spend, so the cards can stop
    *  promising one to somebody who has already used theirs. */
   const [hasCredit, setHasCredit] = useState<boolean | null>(null);
+  /**
+   * An interview they already started and never finished.
+   *
+   * Held here so the page can offer it BEFORE they tap anything. The 14 Aug
+   * bug was not only that the credit looked spent — it was that nothing on
+   * this page mentioned the sitting sitting there, so the only thing the
+   * student could see was a wall telling them to pay.
+   */
+  const [inProgress, setInProgress] = useState<{
+    sessionId: string;
+    answered: number;
+    total: number;
+    institutionId: string;
+    isPractice: boolean;
+  } | null>(null);
   // QA B1: the catalogue let anyone start an interview without signing in.
   // We check once on load so the buttons can say "Sign in to start" instead of
   // failing after the tap.
@@ -54,6 +69,8 @@ function UniversityBrowser() {
         setHasCredit(
           j?.data?.signedIn ? Boolean(j?.data?.entitlement?.canStartMock) : true
         );
+        const ip = j?.data?.entitlement?.inProgress ?? null;
+        setInProgress(ip && !ip.isPractice ? ip : null);
       })
       .catch(() => {
         if (!cancelled) setSignedIn(false);
@@ -201,6 +218,36 @@ function UniversityBrowser() {
           </div>
         )}
 
+        {/* ------------------------------------------------------------------
+            RESUME. This banner is the fix for the worst bug of the 14 Aug walk.
+
+            The client answered one of ten free questions, pressed Back, and
+            this page told him "You have used your free questions. Buy a pack
+            to keep going." His interview was whole and one click away. The
+            product told a paying-in-future student it had taken his free trial
+            when it had not.
+
+            It sits ABOVE everything, before the search and the cards, because
+            a student who has an unfinished interview has exactly one sensible
+            next action and should not have to find it.
+            ------------------------------------------------------------------ */}
+        {inProgress && (
+          <div className="mb-6 rounded-2xl border-2 border-emerald-500 bg-emerald-50 p-5">
+            <p className="mb-1 font-bold text-ink">You have an interview in progress</p>
+            <p className="mb-4 leading-relaxed text-emerald-900">
+              {inProgress.answered > 0
+                ? `You answered ${inProgress.answered} of ${inProgress.total} questions. Nothing is lost — pick up exactly where you stopped.`
+                : `You started this interview and have not answered anything yet. Nothing is lost — go straight back in.`}
+            </p>
+            <Link
+              href={`/interview/${inProgress.sessionId}`}
+              className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-6 py-3.5 text-base font-bold text-white transition active:scale-[0.98]"
+            >
+              Continue your interview
+            </Link>
+          </div>
+        )}
+
         {results.length === 0 ? (
           /**
            * N-40. Never a dead end here.
@@ -248,7 +295,7 @@ function UniversityBrowser() {
           )}
           <ul className="grid gap-4 sm:grid-cols-2">
             {featured.map((i) => (
-              <UniCard key={i.id} i={i} starting={starting} signedIn={signedIn} hasCredit={hasCredit} onStart={start} />
+              <UniCard key={i.id} i={i} starting={starting} signedIn={signedIn} hasCredit={hasCredit} resuming={Boolean(inProgress)} onStart={start} />
             ))}
           </ul>
 
@@ -262,7 +309,7 @@ function UniversityBrowser() {
               </h2>
               <ul className="grid gap-4 sm:grid-cols-2">
                 {others.map((i) => (
-                  <UniCard key={i.id} i={i} starting={starting} signedIn={signedIn} hasCredit={hasCredit} onStart={start} />
+                  <UniCard key={i.id} i={i} starting={starting} signedIn={signedIn} hasCredit={hasCredit} resuming={Boolean(inProgress)} onStart={start} />
                 ))}
               </ul>
             </>
@@ -285,6 +332,7 @@ function UniCard({
   starting,
   signedIn,
   hasCredit,
+  resuming,
   onStart,
 }: {
   i: Institution;
@@ -292,6 +340,8 @@ function UniCard({
   signedIn: boolean | null;
   /** Null while we are still asking. False once we know they have none left. */
   hasCredit: boolean | null;
+  /** True when this student has an unfinished sitting anywhere. */
+  resuming: boolean;
   onStart: (slug: string) => void;
 }) {
   // WALK 1.11. Forty seven cards each promising a "free first try" to a student
@@ -330,10 +380,14 @@ function UniCard({
         </div>
         <span
           className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ${
-            locked ? 'bg-amber-50 text-amber-800' : 'bg-emerald-50 text-emerald-700'
+            resuming
+              ? 'bg-emerald-50 text-emerald-700'
+              : locked
+                ? 'bg-amber-50 text-amber-800'
+                : 'bg-emerald-50 text-emerald-700'
           }`}
         >
-          {locked ? 'Needs a pack' : 'Free first try'}
+          {resuming ? 'In progress' : locked ? 'Needs a pack' : 'Free first try'}
         </span>
       </div>
 
@@ -357,9 +411,14 @@ function UniCard({
           ? 'Starting...'
           : signedIn === false
             ? 'Sign in to start'
-            : locked
-              ? 'Buy a pack to start'
-              : 'Start interview'}
+            : /* An open sitting is resumed, never replaced — the server does
+                 this too, so the label must not promise a fresh start it will
+                 not give. */
+              resuming
+              ? 'Continue your interview'
+              : locked
+                ? 'Buy a pack to start'
+                : 'Start interview'}
       </button>
     </li>
   );

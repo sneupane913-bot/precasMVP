@@ -389,6 +389,30 @@ export function InterviewRoom({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLast]);
 
+  /**
+   * SKIP. Tell the server, then move.
+   *
+   * This used to be `next` on its own — a number moving in the browser and
+   * nobody else informed. So the skipped question came back on the next
+   * resume, and the browser index ran ahead of the server's idea of the
+   * session. The client saw the result printed in the header: "Q 8/10 · 1
+   * done, 9 left".
+   *
+   * We do NOT wait for the response before moving on. A student who has
+   * decided to pass should not be held still by our network — and if the call
+   * fails, the derived resume index simply offers them the question again,
+   * which is the safe direction to fail in.
+   */
+  const skip = useCallback(() => {
+    void fetch(`/api/session/${sessionId}/skip`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ questionId: question.id }),
+    }).catch(() => {});
+    next();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId, question?.id, next]);
+
   /** Close the session and release the camera. Shared by both endings. */
   const closeSession = useCallback(async () => {
     stopRecording();
@@ -680,7 +704,16 @@ export function InterviewRoom({
               {/* ---- Failure. Never auto-advance. The student chooses. ---- */}
               {phase === 'retry' && (
                 <div className="w-full animate-slideUp rounded-xl border-2 border-amber-300 bg-amber-50 p-4">
-                  <p className="mb-1 font-bold text-amber-900">We could not use that answer</p>
+                  {/* E-4: no error blames the student for OUR failure.
+                      In demo mode there is no speech-to-text key at all, so
+                      the answer was never listened to — saying "we could not
+                      use that answer" tells a student their speaking was the
+                      problem when the problem is a missing key of ours. The
+                      client hit this three times in a row and reasonably
+                      thought the product was broken. */}
+                  <p className="mb-1 font-bold text-amber-900">
+                    {demo?.stt ? 'Demo mode: we are not listening yet' : 'We could not use that answer'}
+                  </p>
                   <p className="mb-4 text-sm leading-relaxed text-amber-900/90">{message}</p>
 
                   {/* S-28. When the recording survived, sending it again is the
@@ -710,7 +743,7 @@ export function InterviewRoom({
                       {attemptsLeft > 0 && attemptsLeft < 3 ? ` (${attemptsLeft} left)` : ''}
                     </button>
                     <button
-                      onClick={next}
+                      onClick={skip}
                       className="flex-1 rounded-xl border-2 border-slate-300 px-5 py-3 text-base font-semibold text-slate-700"
                     >
                       Skip this question

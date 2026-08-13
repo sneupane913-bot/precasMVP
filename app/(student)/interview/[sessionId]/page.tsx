@@ -14,6 +14,9 @@ type Loaded = {
   questions: PublicQuestion[];
   institution: Institution;
   demo: { stt: boolean; evaluator: boolean; storage: boolean };
+  /** Derived server-side. See lib/resume.ts. */
+  resumeIndex: number;
+  answeredCount: number;
 };
 
 export default function InterviewPage() {
@@ -168,7 +171,10 @@ export default function InterviewPage() {
       sessionId={sessionId}
       institution={data.institution}
       questions={data.questions}
-      startIndex={data.session.currentIndex}
+      // Derived server-side from answers and skips, never the stored cursor.
+      // The stored cursor is what put the client on Q3 after he pressed record
+      // on Q2 and went Back with nothing recorded. See lib/resume.ts.
+      startIndex={data.resumeIndex ?? 0}
       demo={data.demo}
       // D13: the gate only applies to the capped free sitting. A paying
       // student finishing their 17 goes straight to the report.

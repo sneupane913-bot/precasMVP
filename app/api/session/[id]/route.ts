@@ -8,6 +8,7 @@ import { storeIsEphemeral } from '@/lib/store';
 import { ownsSession } from '@/lib/owner-session';
 import { platformDown } from '@/lib/platform';
 import { apiError, type ApiResult, type InterviewSession, type PublicQuestion } from '@/lib/types';
+import { resumeIndexOf, answeredCountOf } from '@/lib/resume';
 
 export const runtime = 'nodejs';
 
@@ -60,10 +61,15 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     questions: PublicQuestion[];
     institution: typeof institution;
     demo: { stt: boolean; evaluator: boolean; storage: boolean };
+    /** Derived, never stored. See lib/resume.ts for why. */
+    resumeIndex: number;
+    answeredCount: number;
   }> = {
     ok: true,
     data: {
       session: safeSession,
+      resumeIndex: resumeIndexOf(session),
+      answeredCount: answeredCountOf(session),
       questions,
       institution,
       // Surfaced so the UI can say plainly that transcripts are sample text.

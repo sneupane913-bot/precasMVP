@@ -130,6 +130,53 @@ export async function POST(req: Request) {
   // influence.
   const ent = await entitlementFor(student);
 
+  /**
+   * AN UNFINISHED SITTING IS RESUMED, NEVER REPLACED.
+   *
+   * 14 Aug. The client answered one of his ten free questions, pressed Back by
+   * mistake, and was told he had used his free trial. The credit is spent on
+   * the FIRST answer (see consume()), which is right — otherwise one credit
+   * buys seventeen questions across seventeen abandoned tabs — but it left the
+   * sitting stranded with no way back into it, and the balance said zero.
+   *
+   * So a student loses a whole mock, free or paid, by pressing the browser
+   * back button once. His rule, and it is the correct one: a sitting is not
+   * spent until it is finished.
+   *
+   * Creating a SECOND session here would be worse than refusing: it would take
+   * another credit for questions they have already paid to answer. Returning
+   * the open one costs nothing, loses nothing, and is what they meant to do.
+   *
+   * A different university is not a different decision — they still have one
+   * sitting open and one credit spent — so it resumes too, and the response
+   * says which institution it belongs to so the page can be honest about it.
+   */
+  if (ent.inProgress && (parsed.mode === 'practice') === ent.inProgress.isPractice) {
+    const open = await store.get(ent.inProgress.sessionId);
+    const openInst = open ? getInstitution(open.institutionId) : undefined;
+    if (open && openInst && open.studentId === student.id) {
+      const openQuestions = open.questionIds
+        .map((id) => getQuestion(id))
+        .filter((q): q is NonNullable<typeof q> => Boolean(q))
+        .map((q) => publicQuestion(q, openInst));
+      return NextResponse.json({
+        ok: true,
+        data: {
+          sessionId: open.id,
+          questions: openQuestions,
+          questionLimit: openQuestions.length,
+          // The page needs all three to be honest: that this is a resume, how
+          // far in they were, and which university it belongs to — because
+          // they may have tapped a different one.
+          resumed: true,
+          answered: ent.inProgress.answered,
+          institutionId: open.institutionId,
+          institutionName: openInst.name,
+        },
+      });
+    }
+  }
+
   const canStart = parsed.mode === 'practice' ? ent.canStartPractice : ent.canStartMock;
   if (!canStart) {
     return NextResponse.json(
@@ -168,6 +215,7 @@ export async function POST(req: Request) {
     status: 'device_check',
     questionIds,
     currentIndex: 0,
+    skippedQuestionIds: [],
     answers: [],
     flags: [],
     isTrial: !ent.hasPaid,

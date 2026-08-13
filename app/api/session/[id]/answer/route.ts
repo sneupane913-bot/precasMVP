@@ -179,10 +179,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     );
 
     const userMessage =
+      // 14 Aug. The client found that speaking quietly produced nothing at
+      // all, and the screen never told him WHY — the meter said "Very quiet"
+      // in the corner and the message only said to check the microphone was
+      // on. His microphone WAS on. The one thing he needed to be told was to
+      // speak up, and that is now the first sentence.
       stt.status === 'silent'
-        ? 'We could not hear your answer. Check that your microphone is on, then record again.'
+        ? 'We could not hear you — the recording came out too quiet. Your microphone is working, so please speak louder and a little closer to it, then record again. In the real interview the officer will need to hear you clearly too.'
         : stt.status === 'too_short'
-          ? 'That answer was too short for us to give you useful feedback. Try to speak for at least thirty seconds.'
+          ? 'We heard you, but that answer was too short for useful feedback. Aim for about thirty seconds — say your point, then one real detail to back it up.'
           : 'Something went wrong while listening to your answer. Please record it again.';
 
     const payload: ApiResult<{

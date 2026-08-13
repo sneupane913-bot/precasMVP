@@ -19,6 +19,37 @@ export interface Entitlement {
   canStartPractice: boolean;
   reason: string | null;
   practiceReason: string | null;
+  /**
+   * An unfinished sitting they can walk straight back into.
+   *
+   * THIS IS THE FIELD THE 14 AUG BUG NEEDED AND DID NOT HAVE.
+   *
+   * A credit is spent on the FIRST answer, not the last (see consume()), which
+   * is correct — it stops one credit buying seventeen questions across
+   * seventeen abandoned tabs. But it means an ABANDONED sitting and an
+   * EXHAUSTED balance produce exactly the same number: mocksLeft = 0.
+   *
+   * The client answered ONE of his ten free questions, pressed Back by
+   * mistake, and every page told him "You have used your free questions. Buy a
+   * pack to keep going." His session was sitting there, whole, one click away.
+   * The product told a student it had taken his free trial when it had not.
+   *
+   * It is the same defect as the header flash, one layer up: **we rendered a
+   * conclusion where we should have rendered a state.** mocksLeft = 0 is not a
+   * conclusion. "You have used your free questions" is, and it was wrong.
+   */
+  inProgress: InProgressSitting | null;
+}
+
+export interface InProgressSitting {
+  sessionId: string;
+  /** How many they have actually answered, so the offer can be specific. */
+  answered: number;
+  /** How many that sitting holds in total. */
+  total: number;
+  institutionId: string;
+  /** Practice drills resume differently from a full mock. */
+  isPractice: boolean;
 }
 
 export async function entitlementFor(student: Student): Promise<Entitlement> {
@@ -31,6 +62,29 @@ export async function entitlementFor(student: Student): Promise<Entitlement> {
 
   const hasPaid = ledger.some((e) => e.reason === 'pack_purchase' || e.reason === 'seat_allocation');
 
+  // The oldest unfinished sitting. Oldest, not newest, because the credit for
+  // it was already spent and leaving it stranded is what cost the client his
+  // trial. Never throws: a store hiccup here must not turn into "buy a pack".
+  let inProgress: InProgressSitting | null = null;
+  try {
+    const { store } = await import('@/lib/store');
+    const sessions = await store.listByStudent(student.id);
+    const open = sessions
+      .filter((x) => x.status === 'in_progress' || x.status === 'created')
+      .sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)))[0];
+    if (open) {
+      inProgress = {
+        sessionId: open.id,
+        answered: Array.isArray(open.answers) ? open.answers.length : 0,
+        total: Array.isArray(open.questionIds) ? open.questionIds.length : 0,
+        institutionId: open.institutionId,
+        isPractice: open.mode === 'practice',
+      };
+    }
+  } catch {
+    inProgress = null;
+  }
+
   // The locked rule: the trial is the first 10 questions of the SAME
   // 17-question sitting. Paying unlocks the remaining 7 of that sitting and
   // grants a package of full 17-question mocks.
@@ -41,14 +95,21 @@ export async function entitlementFor(student: Student): Promise<Entitlement> {
     practiceLeft,
     questionsAllowed,
     hasPaid,
-    canStartMock: mocksLeft > 0,
-    canStartPractice: practiceLeft > 0,
+    inProgress,
+    // An unfinished sitting IS a startable mock — it is the one they already
+    // paid for. Anything that gates on canStartMock must let them back in.
+    canStartMock: mocksLeft > 0 || Boolean(inProgress && !inProgress.isPractice),
+    canStartPractice: practiceLeft > 0 || Boolean(inProgress?.isPractice),
     reason:
-      mocksLeft > 0
+      // Order matters. The resumable case is checked FIRST, because it is the
+      // only case where "you have used your free questions" is a lie.
+      inProgress
         ? null
-        : hasPaid
-          ? 'You have used all the mock interviews in your pack.'
-          : 'You have used your free questions. Buy a pack to keep going.',
+        : mocksLeft > 0
+          ? null
+          : hasPaid
+            ? 'You have used all the mock interviews in your pack.'
+            : 'You have used your free questions. Buy a pack to keep going.',
     /**
      * Practice needs its own sentence. The free trial contains no practice
      * questions at all, so telling that student they have "used all" of theirs

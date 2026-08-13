@@ -227,8 +227,29 @@ export interface InterviewSession {
   status: SessionStatus;
   /** Fixed at creation so a resume is deterministic. */
   questionIds: string[];
+  /**
+   * DEPRECATED as a resume pointer. Kept so old stored sessions still parse.
+   *
+   * 14 Aug: this was a stored cursor, and a stored cursor drifts. The client
+   * pressed record on Q2, went Back, came in again and was put on Q3 — Q2 was
+   * gone and he had answered nothing. The header read "Q 8/10 · 1 done, 9
+   * left", which is the drift printed on screen: a client-side index that had
+   * walked forward eight times against one real answer.
+   *
+   * The resume point is now DERIVED (see resumeIndexOf) from what actually
+   * exists: answers given and skips taken. Derived state cannot drift.
+   */
   currentIndex: number;
   answers: Answer[];
+  /**
+   * Questions the student deliberately passed on.
+   *
+   * Recorded on the SERVER. Skip used to advance a number in the browser and
+   * tell nobody, so a skipped question came back on the next resume and a
+   * student could never get past it — or, worse, the browser index ran ahead
+   * of the server and questions were silently lost.
+   */
+  skippedQuestionIds: string[];
   flags: SessionFlag[];
   /** Trial sessions are capped below the institution's full question count. */
   isTrial: boolean;
