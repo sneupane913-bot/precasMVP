@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { currentStudent, clearStudentSession } from '@/lib/auth/session';
 import { entitlementFor } from '@/lib/entitlement';
+import { activeOfferFor } from '@/lib/rewards';
 import { store } from '@/lib/store';
 import { repo } from '@/lib/db';
 import { getInstitution } from '@/lib/data/institutions';
@@ -30,9 +31,10 @@ export async function GET() {
     );
   }
 
-  const [sessions, ent] = await Promise.all([
+  const [sessions, ent, offer] = await Promise.all([
     store.listByStudent(student.id),
     entitlementFor(student),
+    activeOfferFor(student.id),
   ]);
 
   return NextResponse.json({
@@ -42,6 +44,7 @@ export async function GET() {
       email: student.email,
       referralCode: student.referralCode,
       entitlement: ent,
+      offer,
       sessions: sessions.map((s) => {
         const inst = getInstitution(s.institutionId);
         return {

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { currentStudent, clearStudentSession } from '@/lib/auth/session';
 import { entitlementFor } from '@/lib/entitlement';
+import { activeOfferFor } from '@/lib/rewards';
 import { repo } from '@/lib/db';
 import { apiError, type ApiResult } from '@/lib/types';
 
@@ -15,6 +16,10 @@ export async function GET() {
   }
 
   const ent = await entitlementFor(student);
+  // I9. The deadline comes from the server so the browser can only render it,
+  // never invent one. Null means there is genuinely nothing to offer, which is
+  // a better answer than a fake countdown.
+  const offer = await activeOfferFor(student.id);
   const ledger = await repo().listLedger(student.id);
   const referrals = ledger.filter((e) => e.reason === 'referral_reward').length;
 
@@ -26,6 +31,7 @@ export async function GET() {
     referralsRewarded: number;
     profileComplete: boolean;
     entitlement: typeof ent;
+    offer: typeof offer;
   }> = {
     ok: true,
     data: {
@@ -39,6 +45,7 @@ export async function GET() {
       // funnel mistake the marketing analyst correctly pushed back on.
       profileComplete: Boolean(student.name && student.attributionConsultancy),
       entitlement: ent,
+      offer,
     },
   };
   return NextResponse.json(result);

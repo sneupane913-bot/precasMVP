@@ -1,5 +1,6 @@
 import { repo, type PaymentOrder, type ApprovalAudit } from '@/lib/db';
 import { grantPack, rewardReferral } from '@/lib/entitlement';
+import { activeOfferFor, consumeOffer } from '@/lib/rewards';
 
 /**
  * Approving and rejecting a payment, in ONE place.
@@ -61,7 +62,15 @@ export async function approvePayment(
     };
   }
 
-  const granted = await grantPack(order.studentId, order.packCode, order.id);
+  // I9. The bonus promised on screen is worked out again HERE, at the moment
+  // the money is confirmed, so what the student was shown is what they get. If
+  // their window expired while they were paying, the bonus is simply zero and
+  // the pack is still granted in full.
+  const offer = await activeOfferFor(order.studentId);
+  const bonusMocks = offer ? (offer.bonusMocksByPack[order.packCode] ?? 0) : 0;
+
+  const granted = await grantPack(order.studentId, order.packCode, order.id, bonusMocks);
+  if (offer && bonusMocks > 0) await consumeOffer(order.studentId, offer.ruleId);
   await r.updateOrder(order.id, {
     state: 'verified',
     verifiedBy: actor.id,

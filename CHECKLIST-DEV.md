@@ -85,7 +85,7 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] D15 Paid features clearly locked for a trial student, with a plain reason — `LockedNotice`, always states what is locked and what unlocks it, never a bare disabled control
 - [x] D16 Paying lifts the sitting from 10 to 17 questions — proven by qa/lifecycle-check.js
 - [x] D17 Paying grants the pack on approval — proven by qa/lifecycle-check.js
-- [ ] D18 Practice mode (single question drilling)
+- [x] D18 Practice mode at /practice: pick a theme or let us choose, one question, charged to the practice pool, daily mock cap does not apply
 - [x] D19 Student history at /account: mocks and practice left, every session with a link back to the report or to carry on, referral link
 - [ ] D20 Full walk through of the direct student journey end to end on a real phone
 

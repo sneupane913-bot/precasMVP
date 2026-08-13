@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
+import { OfferCountdown, type Offer } from '@/components/OfferCountdown';
 
 /**
  * The student's own account.
@@ -32,6 +33,7 @@ interface Account {
   referralCode: string;
   entitlement: { mocksLeft: number; practiceLeft: number; isTrial: boolean };
   sessions: Session[];
+  offer?: Offer | null;
 }
 
 const BAND_LABEL: Record<string, string> = {
@@ -114,6 +116,14 @@ export default function AccountPage() {
 
         {data && (
           <>
+            {/* I9. Only rendered when the server says there is a real, unexpired
+                offer. Never invented here. */}
+            {data.offer && (
+              <div className="mb-8">
+                <OfferCountdown offer={data.offer} />
+              </div>
+            )}
+
             {/* What they have left */}
             <section className="mb-8 grid gap-4 sm:grid-cols-2">
               <div className="rounded-2xl border border-slate-200 bg-white p-5">
