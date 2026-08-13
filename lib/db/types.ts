@@ -173,7 +173,9 @@ export interface ApprovalAudit {
     /** N-11. Payment or support details changed by the super admin. */
     | 'set_payment_settings'
     /** N-18. A device soft-blocked or released by the super admin. */
-    | 'set_device_block';
+    | 'set_device_block'
+    /** N-25. A question added to the live bank. */
+    | 'add_question';
   subjectId: string;
   before: string | null;
   after: string | null;

@@ -4,7 +4,7 @@ import { currentStudent, clearStudentSession } from '@/lib/auth/session';
 import { entitlementFor } from '@/lib/entitlement';
 import { activeOfferFor } from '@/lib/rewards';
 import { repo } from '@/lib/db';
-import { platformDown } from '@/lib/platform';
+import { platformDown, platform } from '@/lib/platform';
 import { apiError, type ApiResult } from '@/lib/types';
 import { withStoreErrors } from '@/lib/api-errors';
 
@@ -79,6 +79,19 @@ export async function GET() {
   });
 }
 
+/**
+ * N-28. A student on the NPR 799 pack can add their own questions.
+ *
+ * A student who knows their weak spot — or who has a list from their
+ * consultancy, or a photograph of one — should be able to drill exactly that.
+ * Restricted to the top pack because it is the pack's headline benefit, and
+ * because unbounded free text from anonymous accounts is a moderation problem
+ * we do not need on day one.
+ */
+const AddQuestions = z.object({
+  ownQuestions: z.array(z.string().min(10).max(300)).min(1).max(20),
+});
+
 const Patch = z.object({
   name: z.string().min(1).max(120).optional(),
   /**
@@ -109,9 +122,46 @@ export async function POST(req: Request) {
     );
   }
 
+  const raw = await req.json().catch(() => null);
+
+  // N-28. Own questions, top pack only.
+  const own = AddQuestions.safeParse(raw);
+  if (own.success) {
+    const ledger = await repo().listLedger(student.id);
+    const onTopPack = ledger.some(
+      (e) => e.reason === 'pack_purchase' && e.kind === 'mock' && e.delta >= 10
+    );
+    if (!onTopPack) {
+      return NextResponse.json(
+        apiError(
+          'NOT_ON_TOP_PACK',
+          'own questions are a Serious pack feature',
+          'Adding your own questions comes with the bigger pack. Everything else you have keeps working.'
+        ),
+        { status: 402 }
+      );
+    }
+    const cur = await platform.getSettings();
+    const added = own.data.ownQuestions.map((text) => ({
+      id: `own-${crypto.randomUUID().slice(0, 8)}`,
+      category: 'conversational',
+      text: text.trim(),
+      intent: 'A question this student asked us to drill.',
+      addedAt: new Date().toISOString(),
+      // Recorded against the student so their questions stay theirs and never
+      // leak into another student's paper.
+      addedBy: `student:${student.id}`,
+    }));
+    await platform.saveSettings({
+      ...cur,
+      extraQuestions: [...(cur.extraQuestions ?? []), ...added],
+    });
+    return NextResponse.json({ ok: true, data: { added: added.length } });
+  }
+
   let body: z.infer<typeof Patch>;
   try {
-    body = Patch.parse(await req.json());
+    body = Patch.parse(raw);
   } catch {
     return NextResponse.json(
       apiError('BAD_REQUEST', 'invalid body', 'Please check the details you entered.'),

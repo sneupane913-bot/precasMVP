@@ -55,6 +55,14 @@ const Body = z.discriminatedUnion('action', [
    * N-11, N-20. Only the super admin may change where the money goes and who
    * answers the phone about it. No deploy, and no consultancy involvement.
    */
+  /** N-25. Add a question to the live bank, no deploy. */
+  z.object({
+    action: z.literal('addQuestion'),
+    superKey: z.string().min(1),
+    category: z.string().min(2).max(40),
+    text: z.string().min(10).max(400),
+    intent: z.string().min(5).max(300),
+  }),
   /** N-18. Soft-block or unblock one device fingerprint. */
   z.object({
     action: z.literal('setDeviceBlock'),
@@ -278,6 +286,29 @@ export async function POST(req: Request) {
         directPaidOrders: orders.filter((o) => o.state === 'verified' && !o.consultancyId).length,
       },
     });
+  }
+
+  if (body.action === 'addQuestion') {
+    const cur = await platform.getSettings();
+    const q = {
+      id: `x-${crypto.randomUUID().slice(0, 8)}`,
+      category: body.category,
+      text: body.text.trim(),
+      intent: body.intent.trim(),
+      addedAt: new Date().toISOString(),
+      addedBy: 'super_admin',
+    };
+    await platform.saveSettings({ ...cur, extraQuestions: [...(cur.extraQuestions ?? []), q] });
+    await audit({
+      actorRole: 'super_admin',
+      actorId: 'super_admin',
+      action: 'add_question',
+      subjectId: q.id,
+      before: String((cur.extraQuestions ?? []).length),
+      after: String((cur.extraQuestions ?? []).length + 1),
+      note: q.text.slice(0, 80),
+    });
+    return NextResponse.json({ ok: true, data: { id: q.id, total: (cur.extraQuestions ?? []).length + 1 } });
   }
 
   if (body.action === 'setDeviceBlock') {

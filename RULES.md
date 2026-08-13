@@ -419,10 +419,10 @@ simply have mocks.
 
 | ID | Rule | Status |
 |---|---|---|
-| N-25 | The super admin can **add questions** without a deploy. | TODO |
+| N-25 | The super admin can **add questions** without a deploy. | BUILT+PROVEN |
 | N-26 | **Ten students starting a trial get ten different sets.** No two trials identical. | BUILT+PROVEN |
 | N-27 | Randomised **only within questions that really appear** in Pre-CAS and UKVI credibility interviews. A student who practises three mocks and then meets nothing familiar has been cheated, and "it was random" is not a defence. | TODO |
-| N-28 | A student on the **NPR 799 pack can add their own questions** — photograph a list, upload an image, or type them — and have the interviewer ask those. | TODO |
+| N-28 | A student on the **NPR 799 pack can add their own questions** — photograph a list, upload an image, or type them — and have the interviewer ask those. | BUILT+PROVEN |
 | N-29 | Question research is a **named deliverable with sources**, not a bank somebody invented. Until it exists, no page may claim the questions are what universities ask. | TODO |
 
 ## 12.6 Feedback that is not generic

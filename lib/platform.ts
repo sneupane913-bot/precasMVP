@@ -103,6 +103,23 @@ export interface PlatformSettings {
    * signal is a heuristic and heuristics are wrong about real people.
    */
   blockedDevices?: string[];
+
+  /**
+   * N-25. Questions added by the super admin WITHOUT a deploy.
+   *
+   * The bank is the product. Waiting for a code release to add a question a
+   * student just reported from a real interview is how the bank goes stale,
+   * and a stale bank is the one thing that would make this product useless
+   * while still appearing to work.
+   */
+  extraQuestions?: {
+    id: string;
+    category: string;
+    text: string;
+    intent: string;
+    addedAt: string;
+    addedBy: string;
+  }[];
 }
 
 export const DEFAULT_SETTINGS: PlatformSettings = {
@@ -121,6 +138,7 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   payAccountName: '',
   supportWhatsapp: '',
   blockedDevices: [],
+  extraQuestions: [],
 };
 
 export interface PlatformStore {

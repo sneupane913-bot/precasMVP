@@ -279,6 +279,43 @@ async function signIn(token, opts = {}) {
     !!mineQ && 'payerPhone' in mineQ && mineQ.payerPhoneSuffix === '4321',
     `queue item has payerPhone field and the last 4 digits (${mineQ?.payerPhoneSuffix})`);
 
+  console.log('\n=== QUESTION AUTHORING ===\n');
+
+  const addQ = await req('POST', '/api/super',
+    { action: 'addQuestion', superKey: SU, category: 'finance',
+      text: 'Who exactly is paying your tuition, and where is that money now?',
+      intent: 'Checks the funding story holds together and names a real source.' });
+  t('N-25', 'The super admin adds a question with no deploy',
+    addQ.json?.ok === true && typeof addQ.json?.data?.total === 'number',
+    `added ${addQ.json?.data?.id}, bank now has ${addQ.json?.data?.total} extra question(s)`);
+
+  const junk = await req('POST', '/api/super', { action: 'addQuestion', superKey: SU, category: 'x', text: 'no', intent: 'no' });
+  t('N-25b', 'A half-written question is refused', junk.code === 400,
+    `two-character question -> ${junk.code}`);
+
+  const poor = await signIn(`n28a-${S}`);
+  const poorTry = await req('POST', '/api/me',
+    { ownQuestions: ['Why did you choose to study in the United Kingdom rather than Australia?'] },
+    { ip: poor.ip, cookie: poor.jar });
+  t('N-28', 'Own questions are refused below the top pack',
+    poorTry.json?.error?.code === 'NOT_ON_TOP_PACK' &&
+    /keeps working/i.test(poorTry.json?.error?.userMessage ?? ''),
+    `trial student -> ${poorTry.json?.error?.code}, and told nothing else is taken away`);
+
+  const rich = await signIn(`n28b-${S}`);
+  const richOrd = await req('POST', '/api/payment', { action: 'create', packCode: 'serious' }, { ip: rich.ip, cookie: rich.jar });
+  await req('POST', '/api/payment',
+    { action: 'submit', orderId: richOrd.json?.data?.orderId, walletTxnId: `N28${S}`, payerName: 'Top Pack', payerPhoneSuffix: '9090' },
+    { ip: rich.ip, cookie: rich.jar });
+  await req('POST', '/api/super',
+    { action: 'verifyPayment', superKey: SU, orderId: richOrd.json?.data?.orderId, confirmedInWalletLedger: true });
+  const richTry = await req('POST', '/api/me',
+    { ownQuestions: ['Why did you choose to study in the United Kingdom rather than Australia?'] },
+    { ip: rich.ip, cookie: rich.jar });
+  t('N-28b', 'A student on the 799 pack can add their own questions',
+    richTry.json?.ok === true && richTry.json?.data?.added === 1,
+    `after buying the top pack -> added ${richTry.json?.data?.added}`);
+
   console.log('\n=== PRACTICE ===\n');
 
   const advSrc = fs.readFileSync('lib/advice.ts', 'utf8');
