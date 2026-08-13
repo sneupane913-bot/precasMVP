@@ -221,6 +221,29 @@ async function signIn(token, opts = {}) {
     payingMe.json?.data?.seatBacked === false,
     `direct student seatBacked=${payingMe.json?.data?.seatBacked} (so they still see prices)`);
 
+  // N-5. The consultancy tops a student up, and it costs them a seat.
+  const before = await req('POST', '/api/admin', { action: 'login', slug: cs, passcode: 'n1pass123' });
+  const seatsUsedBefore = before.json?.data?.stats?.seatsUsed;
+  const target = (before.json?.data?.students ?? []).find((x) => x.mocksLeft === 7);
+  const renew = await req('POST', '/api/admin',
+    { action: 'renewStudent', slug: cs, passcode: 'n1pass123', studentId: target?.id, seatSize: 'seat3' });
+  const after = await req('POST', '/api/admin', { action: 'login', slug: cs, passcode: 'n1pass123' });
+  const renewed = (after.json?.data?.students ?? []).find((x) => x.id === target?.id);
+  t('N-5', 'A consultancy renewal ADDS credits and costs one seat',
+    renew.json?.ok === true && renewed?.mocksLeft === 10 &&
+    after.json?.data?.stats?.seatsUsed === seatsUsedBefore + 1,
+    `student 7 -> ${renewed?.mocksLeft} mocks (7 kept + 3 added, never replaced); seats ${seatsUsedBefore} -> ${after.json?.data?.stats?.seatsUsed}`);
+
+  const otherCs = `n5o-${S}`;
+  const mk2 = await req('POST', '/api/platform',
+    { action: 'createConsultancy', superKey: SU, name: otherCs, slug: otherCs, seatsTotal: 5, paidNpr: 6000, passcode: 'n5pass123' });
+  await req('POST', '/api/platform',
+    { action: 'setConsultancyStatus', superKey: SU, consultancyId: mk2.json?.data?.id, status: 'approved' });
+  const cross = await req('POST', '/api/admin',
+    { action: 'renewStudent', slug: otherCs, passcode: 'n5pass123', studentId: target?.id });
+  t('N-5b', 'One consultancy cannot top up another\'s student', cross.code === 404,
+    `renewing a stranger's student -> ${cross.code}`);
+
   console.log('\n=== PRICING ===\n');
 
   const plans = fs.readFileSync('lib/data/plans.ts', 'utf8');

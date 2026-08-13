@@ -380,7 +380,11 @@ export class SupabaseRepo implements Repo {
   }
 
   // seats
-  async allocateSeat(a: SeatAllocation, seatsTotal: number) {
+  async allocateSeat(
+    a: SeatAllocation,
+    seatsTotal: number,
+    _opts?: { renewal?: boolean }
+  ) {
     const existing = await selectRows(
       `seat_allocations?consultancy_id=eq.${encodeURIComponent(a.consultancyId)}&select=id`
     );

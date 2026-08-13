@@ -379,7 +379,7 @@ simply have mocks.
 | N-2 | **Sign-in is Google, always. There are no passwords anywhere in this product.** The admin issues a *link*, not credentials. Signing in through that link binds the student to that consultancy, server-side. One identity system, nothing to store, nothing to reset, nothing to leak. | BUILT+PROVEN |
 | N-3 | A seated student sees the seat's mocks **plus the free trial**. A 3-mock seat shows **4**. | BUILT+PROVEN |
 | N-4 | **A consultancy student is shown no price, no QR and no pay button** while their consultancy's mocks last. | BUILT+PROVEN |
-| N-5 | When their mocks run out they have **two routes, and they choose**: ask their consultancy to renew, which **costs that consultancy one seat**; or upgrade themselves by paying us directly. | TODO |
+| N-5 | When their mocks run out they have **two routes, and they choose**: ask their consultancy to renew, which **costs that consultancy one seat**; or upgrade themselves by paying us directly. | BUILT+PROVEN |
 | N-6 | An admin near the end of their seats is shown a renewal option and buys more the way a student does: QR, details, screenshot, **super-admin** approval. | TODO |
 | N-7 | **An admin never approves a student payment.** Removed entirely, and `C-12` is retired. Admins pay *us*; how they collect from their own students — cash, their own link, or free — is their business and never touches our system. | BUILT+PROVEN |
 | N-8 | How a consultancy charges its own students is invisible to us. We hold no record of it and take no position on it. | BUILT+PROVEN |

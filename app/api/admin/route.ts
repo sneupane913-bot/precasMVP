@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { platform, type Consultancy, platformDown } from '@/lib/platform';
 import { repo } from '@/lib/db';
 import { approvePayment, rejectPayment, type Actor } from '@/lib/payments';
+import { renewSeat } from '@/lib/entitlement';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
 import { apiError } from '@/lib/types';
 
@@ -34,6 +35,20 @@ const Body = z.discriminatedUnion('action', [
      */
     confirmedReceived: z.literal(true),
     note: z.string().max(500).optional(),
+  }),
+  /**
+   * N-5. The consultancy tops a student back up. Costs them ONE seat.
+   *
+   * This is the route a seat-backed student takes when their mocks run out and
+   * they do not want to pay us themselves. The consultancy decides; we only
+   * check that they have a seat left and that the student is theirs.
+   */
+  z.object({
+    action: z.literal('renewStudent'),
+    slug: z.string().min(1).max(60),
+    passcode: z.string().min(1).max(60),
+    studentId: z.string().min(1).max(64),
+    seatSize: z.string().max(20).optional(),
   }),
   z.object({
     action: z.literal('rejectPayment'),
@@ -148,6 +163,49 @@ export async function POST(req: Request) {
                   : 'Approved. Your student can carry on straight away.',
             }
           : { message: 'Rejected. Your student has been told to check their transaction number.' },
+    });
+  }
+
+  // N-5. Renew one of our own students, consuming a seat.
+  if (body.action === 'renewStudent') {
+    const r1 = repo();
+    const student = await r1.getStudent(body.studentId);
+    // Ownership first. Without this any approved consultancy could top up any
+    // student on the platform by guessing an id.
+    if (!student || student.consultancyId !== c.id) {
+      return NextResponse.json(
+        apiError('NOT_FOUND', 'no student or not this consultancy', 'We could not find that student.'),
+        { status: 404 }
+      );
+    }
+
+    const seats = await r1.listSeats(c.id);
+    const used = seats.filter((x) => !x.revokedAt).length;
+    if (used >= c.seatsTotal) {
+      return NextResponse.json(
+        apiError(
+          'NO_SEATS_LEFT',
+          `${used}/${c.seatsTotal} seats used`,
+          'You have used all your seats. Buy more to keep topping students up.'
+        ),
+        { status: 402 }
+      );
+    }
+
+    const res = await renewSeat(student.id, c.id, c.seatsTotal, `renew:${c.slug}`, body.seatSize);
+    if (!res.seated) {
+      return NextResponse.json(
+        apiError('NO_SEATS_LEFT', 'allocation refused', 'You have used all your seats.'),
+        { status: 402 }
+      );
+    }
+    return NextResponse.json({
+      ok: true,
+      data: {
+        granted: { mocks: res.mocks, practice: res.practice },
+        seatsLeft: Math.max(0, c.seatsTotal - (used + 1)),
+        message: `Topped up with ${res.mocks} more mock interviews. One seat used.`,
+      },
     });
   }
 

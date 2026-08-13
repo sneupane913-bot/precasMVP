@@ -291,11 +291,12 @@ export class BlobRepo implements Repo {
    */
   async allocateSeat(
     a: SeatAllocation,
-    seatsTotal: number
+    seatsTotal: number,
+    opts?: { renewal?: boolean }
   ): Promise<{ ok: boolean; seatsUsed: number }> {
     const existing = await this.listSeats(a.consultancyId);
     const live = existing.filter((s) => !s.revokedAt);
-    if (live.some((s) => s.studentId === a.studentId)) {
+    if (!opts?.renewal && live.some((s) => s.studentId === a.studentId)) {
       return { ok: true, seatsUsed: live.length }; // idempotent
     }
     for (let i = 0; i < seatsTotal; i++) {

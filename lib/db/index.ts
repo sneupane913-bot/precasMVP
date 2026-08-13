@@ -74,7 +74,16 @@ export interface Repo {
   claimWalletTxnId(walletTxnId: string, orderId: string): Promise<boolean>;
 
   // seats
-  allocateSeat(a: SeatAllocation, seatsTotal: number): Promise<{ ok: boolean; seatsUsed: number }>;
+  /**
+   * `renewal: true` skips the per-student idempotency check.
+   *
+   * That check is correct for a SIGNUP — a retried signup must not hand over
+   * two seats. A renewal is the opposite: a deliberate second grant, months
+   * later, decided by a human. Without this flag a renewal silently gave the
+   * student credits without consuming a seat, so a consultancy could top the
+   * same student up forever on one seat.
+   */
+  allocateSeat(a: SeatAllocation, seatsTotal: number, opts?: { renewal?: boolean }): Promise<{ ok: boolean; seatsUsed: number }>;
   listSeats(consultancyId: string): Promise<SeatAllocation[]>;
 
   // audit and notifications

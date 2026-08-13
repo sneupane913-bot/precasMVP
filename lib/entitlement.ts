@@ -201,6 +201,58 @@ export async function grantSeat(
 }
 
 /**
+ * N-5. Top a student back up, consuming another seat.
+ *
+ * Distinct from `grantSeat` in one way that matters: `grantSeat` refuses to pay
+ * out twice, because a retried SIGNUP must not hand over two seats. A renewal
+ * is the opposite — it is a deliberate second grant, months later, decided by a
+ * human at the consultancy. So the ledger guard is dropped here and the seat
+ * claim itself is what stops it running away.
+ *
+ * Credits ADD to whatever is left rather than replacing it. A student with one
+ * mock still unused who is topped up has eleven, not ten. Anything else would
+ * quietly take something they already owned.
+ */
+export async function renewSeat(
+  studentId: string,
+  consultancyId: string,
+  seatsTotal: number,
+  allocatedBy: string,
+  sizeCode?: string
+): Promise<{ seated: boolean; mocks: number; practice: number }> {
+  const r = repo();
+  const size = (sizeCode && getSeatSize(sizeCode)) || DEFAULT_SEAT_SIZE;
+
+  const res = await r.allocateSeat(
+    {
+      id: crypto.randomUUID(),
+      consultancyId,
+      studentId,
+      allocatedBy,
+      allocatedAt: new Date().toISOString(),
+      revokedAt: null,
+      mocks: size.mocks,
+      practice: size.practice,
+    },
+    seatsTotal,
+    { renewal: true }
+  );
+  if (!res.ok) return { seated: false, mocks: 0, practice: 0 };
+
+  await r.appendLedger(
+    entry(studentId, 'mock', size.mocks, 'seat_allocation', {
+      note: `renewal: ${size.label} seat at ${consultancyId}`,
+    })
+  );
+  await r.appendLedger(
+    entry(studentId, 'practice', size.practice, 'seat_allocation', {
+      note: `renewal: ${size.label} seat at ${consultancyId}`,
+    })
+  );
+  return { seated: true, mocks: size.mocks, practice: size.practice };
+}
+
+/**
  * Consumption. Called from the server when a sitting actually starts, never
  * from the browser.
  *
