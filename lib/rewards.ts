@@ -59,6 +59,57 @@ export async function rulesOrDefaults(): Promise<RewardRule[]> {
 }
 
 /**
+ * Change the post-trial offer.
+ *
+ * `RewardRule` is documented as "a reward rule the super admin controls", and
+ * until now nothing anywhere could write one: `upsertRewardRule` had no callers,
+ * so the offer was frozen at DEFAULT_RULES and the super admin controlled
+ * nothing. Same fault as `consume()` and `allocateSeat()`, in the one place
+ * where being unable to change it costs sales rather than money.
+ *
+ * Two guards that are not negotiable, because this is the honest-countdown
+ * feature and a lever that can turn it into a dark pattern is worse than no
+ * lever at all:
+ *
+ *   1. The window is capped. A "finish today" offer that runs for a week is a
+ *      lie, and a one minute window is pressure rather than a reward.
+ *   2. `publicReason` is what a student is shown next to a real deadline, so
+ *      it has to name a real reason. It cannot be blank.
+ *
+ * Existing offers already issued to students are NOT touched. Their deadline
+ * was a promise made at a moment, and moving it afterwards is exactly the trick
+ * this whole module exists to refuse.
+ */
+export async function setPostTrialRule(input: {
+  active: boolean;
+  windowMinutes: number;
+  publicReason: string;
+  bonusMocksByPack: Record<string, number>;
+  updatedBy: string;
+}): Promise<RewardRule> {
+  const existing = (await rulesOrDefaults()).find((r) => r.kind === 'post_trial_window');
+  const base = existing ?? {
+    ...DEFAULT_RULES[0]!,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    updatedBy: null,
+  };
+
+  const windowMinutes = Math.max(15, Math.min(24 * 60, Math.round(input.windowMinutes)));
+  const reason = input.publicReason.trim();
+
+  return repo().upsertRewardRule({
+    ...base,
+    active: input.active,
+    windowMinutes,
+    publicReason: reason.length >= 10 ? reason : base.publicReason,
+    bonusMocksByPack: input.bonusMocksByPack,
+    updatedAt: new Date().toISOString(),
+    updatedBy: input.updatedBy,
+  });
+}
+
+/**
  * Called when a student finishes their free questions. Starts their personal
  * window ONCE. If they already had one, we do not start another, because that
  * is exactly the "timer resets on every visit" trick we refuse to do.

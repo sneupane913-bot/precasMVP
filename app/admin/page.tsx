@@ -2,6 +2,11 @@
 
 import { useCallback, useState } from 'react';
 import { PasscodeInput } from '@/components/PasscodeInput';
+// Never type a price, a mock count or a practice count by hand. `copy-check`
+// fails the build for it, and rightly: the seat copy said "12 mock interviews
+// and 30 practice questions ... NPR 799" as literal text, so changing the
+// Serious pack would have left this page quietly lying to consultancies.
+import { SEAT_GRANT, getPlan } from '@/lib/data/plans';
 
 /**
  * Consultancy portal, rebuilt to docs/design-reference/consultancy_admin_dashboard.
@@ -52,6 +57,23 @@ interface Order {
   verifiedAt: string | null;
 }
 
+interface Bundle {
+  code: string;
+  name: string;
+  seats: number;
+  priceNpr: number;
+}
+
+/** What buySeats hands back: the amount, and where to send it. */
+interface SeatOrder {
+  orderId: string;
+  amountNpr: number;
+  seats: number;
+  bundleName: string;
+  payTo: { walletName: string; walletNumber: string; qrImageUrl: string | null };
+  supportWhatsapp: string;
+}
+
 interface AdminData {
   consultancy: {
     id: string;
@@ -65,6 +87,9 @@ interface AdminData {
   students: Student[];
   notifications: Notification[];
   orders: Order[];
+  /** Their OWN seat purchases. Never theirs to approve. */
+  seatOrders: Order[];
+  bundles: Bundle[];
   stats: {
     studentCount: number;
     activeStudents: number;
@@ -73,6 +98,7 @@ interface AdminData {
     seatsLeft: number;
     paidOrders: number;
     ordersAwaiting: number;
+    seatPaymentPending: boolean;
   };
 }
 
@@ -84,30 +110,61 @@ export default function AdminPage() {
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
   const [deciding, setDeciding] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  /** The seat purchase in flight on this screen, if they have started one. */
+  const [seatOrder, setSeatOrder] = useState<SeatOrder | null>(null);
+  const [seatTxn, setSeatTxn] = useState('');
+  const [seatPayer, setSeatPayer] = useState('');
+  const [seatSuffix, setSeatSuffix] = useState('');
+  const [renewing, setRenewing] = useState<string | null>(null);
+  const [brandOpen, setBrandOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState('');
+  const [colour, setColour] = useState('#0d1b2a');
+
+  /**
+   * One place every call goes through.
+   *
+   * It clears BOTH banners at the start. The super admin screen showed
+   * "Too many attempts" directly above "Payment verified", because a reload set
+   * the error while the success was still on screen, and two contradictory
+   * outcomes at once is worse than either alone. This page must not repeat it.
+   */
+  const call = useCallback(
+    async (body: Record<string, unknown>): Promise<unknown | null> => {
+      setBusy(true);
+      setError(null);
+      setNotice(null);
+      try {
+        const res = await fetch('/api/admin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slug, passcode, ...body }),
+        });
+        const json = await res.json();
+        if (!json.ok) {
+          setError(json.error.userMessage);
+          setNotice(null);
+          return null;
+        }
+        return json.data;
+      } catch {
+        setError('Could not reach the server. Check your connection and try again.');
+        return null;
+      } finally {
+        setBusy(false);
+      }
+    },
+    [slug, passcode]
+  );
 
   const login = useCallback(async () => {
-    setBusy(true);
-    setError(null);
-    try {
-      const res = await fetch('/api/admin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'login', slug, passcode }),
-      });
-      const json = (await res.json()) as
-        | { ok: true; data: AdminData }
-        | { ok: false; error: { userMessage: string } };
-      if (!json.ok) {
-        setError(json.error.userMessage);
-        return;
-      }
-      setData(json.data);
-    } catch {
-      setError('Could not reach the server. Check your connection and try again.');
-    } finally {
-      setBusy(false);
+    const d = (await call({ action: 'login' })) as AdminData | null;
+    if (d) {
+      setData(d);
+      setLogoUrl(d.consultancy.logoUrl ?? '');
+      setColour(d.consultancy.primaryColor || '#0d1b2a');
     }
-  }, [slug, passcode]);
+  }, [call]);
 
   /**
    * Approve or reject one of their own students' payments.
@@ -133,31 +190,92 @@ export default function AdminPage() {
         return;
 
       setDeciding(order.id);
-      setError(null);
-      try {
-        const res = await fetch('/api/admin', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(
-            approve
-              ? { action: 'approvePayment', slug, passcode, orderId: order.id, confirmedReceived: true }
-              : { action: 'rejectPayment', slug, passcode, orderId: order.id, reason: reason?.trim() }
-          ),
-        });
-        const json = await res.json();
-        if (!json.ok) {
-          setError(json.error.userMessage);
-          return;
-        }
+      const ok = await call(
+        approve
+          ? { action: 'approvePayment', orderId: order.id, confirmedReceived: true }
+          : { action: 'rejectPayment', orderId: order.id, reason: reason?.trim() }
+      );
+      setDeciding(null);
+      if (ok) {
         await login(); // refresh the queue so it cannot show a stale state
-      } catch {
-        setError('Could not reach the server. Check your connection and try again.');
-      } finally {
-        setDeciding(null);
+        setNotice(
+          approve
+            ? 'Approved. Your student can carry on straight away.'
+            : 'Marked as not confirmed. Your student has been asked to check their number.'
+        );
       }
     },
-    [slug, passcode, login]
+    [call, login]
   );
+
+  /**
+   * N-5. Top a student back up out of the consultancy's own seats.
+   *
+   * Confirmed first, and the confirmation says the price in SEATS, because
+   * that is the currency the admin actually spends here. "Renew" reads free.
+   */
+  const renew = useCallback(
+    async (student: Student) => {
+      if (
+        !window.confirm(
+          `Top up ${student.name || student.email || 'this student'}?\n\nThis uses ONE of your seats and cannot be undone. You have ${data?.stats.seatsLeft ?? 0} left.`
+        )
+      )
+        return;
+      setRenewing(student.id);
+      const ok = await call({ action: 'renewStudent', studentId: student.id });
+      setRenewing(null);
+      if (ok) {
+        await login();
+        setNotice(`${student.name || 'Your student'} has been topped up. One seat used.`);
+      }
+    },
+    [call, login, data?.stats.seatsLeft]
+  );
+
+  /** N-6, first half: pick a bundle and see where to send the money. */
+  const startSeatPurchase = useCallback(
+    async (bundleCode: string) => {
+      const d = (await call({ action: 'buySeats', bundleCode })) as SeatOrder | null;
+      if (d) {
+        setSeatOrder(d);
+        setSeatTxn('');
+        setSeatPayer('');
+        setSeatSuffix('');
+      }
+    },
+    [call]
+  );
+
+  /** N-6, second half: tell us the transaction number. */
+  const submitSeatPayment = useCallback(async () => {
+    if (!seatOrder) return;
+    const ok = (await call({
+      action: 'submitSeatPayment',
+      orderId: seatOrder.orderId,
+      walletTxnId: seatTxn.trim(),
+      payerName: seatPayer.trim(),
+      payerPhoneSuffix: seatSuffix.trim(),
+    })) as { message?: string } | null;
+    if (ok) {
+      setSeatOrder(null);
+      await login();
+      setNotice(ok.message ?? 'Thank you. We are checking your payment now.');
+    }
+  }, [call, login, seatOrder, seatTxn, seatPayer, seatSuffix]);
+
+  const saveBranding = useCallback(async () => {
+    const ok = await call({
+      action: 'updateBranding',
+      logoUrl: logoUrl.trim() || null,
+      primaryColor: colour,
+    });
+    if (ok) {
+      await login();
+      setBrandOpen(false);
+      setNotice('Saved. Your students see this on your own link straight away.');
+    }
+  }, [call, login, logoUrl, colour]);
 
   // ------------------------------------------------------------- sign in ---
   if (!data) {
@@ -231,9 +349,15 @@ export default function AdminPage() {
       </header>
 
       <main className="mx-auto max-w-6xl px-5 py-8">
+        {/* Never both at once. `call()` clears each before it sets the other. */}
         {error && (
           <p className="mb-4 rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3 font-medium text-red-800">
             {error}
+          </p>
+        )}
+        {notice && !error && (
+          <p className="mb-4 rounded-xl border-2 border-emerald-200 bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
+            {notice}
           </p>
         )}
 
@@ -343,6 +467,140 @@ export default function AdminPage() {
           />
         </section>
 
+        {/* --------------------------------------------------- buy seats ---
+            N-6. The server could create a seat order from the day it was
+            written and no screen ever called it, so a consultancy could not buy
+            seats at all without us doing it for them. The second half, telling
+            us the transaction number, did not exist on the server either: they
+            could be shown a QR, send NPR 9,000, and have no way to say so.
+
+            Deliberately the SAME shape as a student paying: QR, wallet number,
+            transaction id, super admin approval. One approval queue and one set
+            of money guarantees, rather than a special B2B path where a
+            different mistake could happen. */}
+        <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="font-serif text-lg font-bold text-ink">Buy more seats</h2>
+            <span className={`text-sm font-semibold ${s.seatsLeft === 0 ? 'text-amber-700' : 'text-slate-500'}`}>
+              {s.seatsLeft} of {s.seatsTotal} left
+            </span>
+          </div>
+
+          {s.seatPaymentPending ? (
+            <div className="rounded-xl border-2 border-sky-200 bg-sky-50 p-4">
+              <p className="font-bold text-sky-900">We are checking your seat payment</p>
+              <p className="mt-1 text-sm leading-relaxed text-sky-900/90">
+                A person checks this against our bank record, so it can take a little while. Your
+                seats appear here the moment it is approved. There is no need to send it again.
+              </p>
+            </div>
+          ) : seatOrder ? (
+            <div className="rounded-xl border-2 border-ink p-4">
+              <p className="mb-1 text-sm text-slate-500">
+                {seatOrder.bundleName}, {seatOrder.seats} seats
+              </p>
+              <p className="mb-4 text-3xl font-black text-ink">
+                NPR {seatOrder.amountNpr.toLocaleString()}
+              </p>
+
+              {seatOrder.payTo.qrImageUrl && (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={seatOrder.payTo.qrImageUrl}
+                  alt={`${seatOrder.payTo.walletName} payment QR code`}
+                  className="mx-auto mb-3 h-48 w-48 rounded-xl border-2 border-slate-200 bg-white object-contain p-2"
+                />
+              )}
+              <div className="mb-4 rounded-xl bg-slate-50 p-4 text-sm">
+                <p className="text-slate-500">
+                  {seatOrder.payTo.qrImageUrl ? 'Or send to' : 'Send to'}
+                </p>
+                <p className="font-bold text-ink">{seatOrder.payTo.walletName}</p>
+                <p className="font-mono text-lg font-bold text-ink">
+                  {seatOrder.payTo.walletNumber || 'contact us for details'}
+                </p>
+              </div>
+
+              <p className="mb-3 text-sm leading-relaxed text-slate-600">
+                After you have sent it, copy the transaction number from your receipt. eSewa calls it
+                a Transaction Code, a bank calls it a Transaction ID or Reference Code. Any of those
+                is the right one.
+              </p>
+              <input
+                value={seatTxn}
+                onChange={(e) => setSeatTxn(e.target.value)}
+                placeholder="Transaction number, e.g. 1NOH8C2"
+                className="mb-2 w-full rounded-xl border-2 border-slate-200 px-4 py-3 font-mono outline-none focus:border-ink"
+              />
+              <input
+                value={seatPayer}
+                onChange={(e) => setSeatPayer(e.target.value)}
+                placeholder="Name you paid with"
+                className="mb-2 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+              />
+              <input
+                value={seatSuffix}
+                onChange={(e) => setSeatSuffix(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                placeholder="Last 4 digits of your phone number"
+                className="mb-3 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+              />
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <button
+                  onClick={submitSeatPayment}
+                  disabled={busy || seatTxn.trim().length < 4 || !seatPayer.trim() || seatSuffix.length < 2}
+                  className="flex-1 rounded-xl bg-emerald-600 px-5 py-3.5 font-bold text-white disabled:bg-slate-300"
+                >
+                  {busy ? 'Sending...' : 'I have paid'}
+                </button>
+                <button
+                  onClick={() => setSeatOrder(null)}
+                  className="rounded-xl border-2 border-slate-300 px-5 py-3.5 font-semibold text-slate-700"
+                >
+                  Not now
+                </button>
+              </div>
+              {(seatTxn.trim().length < 4 || !seatPayer.trim() || seatSuffix.length < 2) && (
+                <p className="mt-2 text-sm font-semibold text-red-600">
+                  Fill in the transaction number, the name you paid with, and the last 4 digits.
+                </p>
+              )}
+            </div>
+          ) : (
+            <>
+              <p className="mb-4 text-sm leading-relaxed text-slate-600">
+                A seat gives one student the full pack: {SEAT_GRANT.mocks} mock interviews and{' '}
+                {SEAT_GRANT.practice} practice questions, exactly what a student gets for NPR{' '}
+                {(getPlan('serious')?.priceNpr ?? 0).toLocaleString()} on their own.
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {(data.bundles ?? []).map((b) => (
+                  <button
+                    key={b.code}
+                    onClick={() => startSeatPurchase(b.code)}
+                    disabled={busy}
+                    className="rounded-xl border-2 border-slate-200 p-4 text-left transition hover:border-ink disabled:opacity-50"
+                  >
+                    <p className="font-bold text-ink">{b.name}</p>
+                    <p className="font-serif text-2xl font-black text-ink">
+                      NPR {b.priceNpr.toLocaleString()}
+                    </p>
+                    <p className="text-sm text-slate-500">
+                      NPR {Math.round(b.priceNpr / b.seats)} a seat
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          {(data.seatOrders ?? []).filter((o) => o.state === 'verified').length > 0 && (
+            <p className="mt-4 text-xs text-slate-500">
+              {(data.seatOrders ?? []).filter((o) => o.state === 'verified').length} seat purchase(s)
+              approved so far.
+            </p>
+          )}
+        </section>
+
         {/* Share link */}
         <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5">
           <h2 className="mb-1 font-serif text-lg font-bold text-ink">Your student link</h2>
@@ -364,6 +622,67 @@ export default function AdminPage() {
             >
               {copied ? 'Copied' : 'Copy link'}
             </button>
+          </div>
+
+          {/* Branding. `updateBranding` has existed since the portal was first
+              written and no screen ever called it, so every consultancy's own
+              landing page carried our default navy and no logo. It is their
+              link, given to their students, with their name on it. */}
+          <div className="mt-5 border-t border-slate-100 pt-4">
+            {!brandOpen ? (
+              <button
+                onClick={() => setBrandOpen(true)}
+                className="text-sm font-semibold text-ink underline underline-offset-2"
+              >
+                Change how your page looks
+              </button>
+            ) : (
+              <>
+                <p className="mb-3 text-sm text-slate-600">
+                  This is what your students see on your own link. Leave the logo blank and we show
+                  your name instead.
+                </p>
+                <label className="mb-1 block text-sm font-semibold text-ink">
+                  Logo web address <span className="font-normal text-slate-500">(optional)</span>
+                </label>
+                <input
+                  value={logoUrl}
+                  onChange={(e) => setLogoUrl(e.target.value)}
+                  placeholder="https://your-site.com/logo.png"
+                  className="mb-3 w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm outline-none focus:border-ink"
+                />
+                <label className="mb-1 block text-sm font-semibold text-ink">Your colour</label>
+                <div className="mb-4 flex items-center gap-3">
+                  <input
+                    type="color"
+                    value={colour}
+                    onChange={(e) => setColour(e.target.value)}
+                    className="h-11 w-16 cursor-pointer rounded-lg border-2 border-slate-200"
+                    aria-label="Your brand colour"
+                  />
+                  <code className="rounded-lg bg-slate-50 px-3 py-2 text-sm text-ink">{colour}</code>
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <button
+                    onClick={saveBranding}
+                    disabled={busy}
+                    className="rounded-xl bg-ink px-5 py-3 font-bold text-white disabled:opacity-50"
+                  >
+                    {busy ? 'Saving...' : 'Save'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setBrandOpen(false);
+                      setLogoUrl(data.consultancy.logoUrl ?? '');
+                      setColour(data.consultancy.primaryColor || '#0d1b2a');
+                    }}
+                    className="rounded-xl border-2 border-slate-300 px-5 py-3 font-semibold text-slate-700"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </section>
 
@@ -393,7 +712,8 @@ export default function AdminPage() {
                     <th className="px-3 py-3 font-semibold">Mocks left</th>
                     <th className="px-3 py-3 font-semibold">Practice left</th>
                     <th className="px-3 py-3 font-semibold">Last active</th>
-                    <th className="px-5 py-3 font-semibold">Status</th>
+                    <th className="px-3 py-3 font-semibold">Status</th>
+                    <th className="px-5 py-3 font-semibold">Top up</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -408,7 +728,7 @@ export default function AdminPage() {
                       <td className="px-3 py-3 text-slate-600">
                         {new Date(st.lastSeenAt).toLocaleDateString()}
                       </td>
-                      <td className="px-5 py-3">
+                      <td className="px-3 py-3">
                         <span
                           className={`rounded-full px-2.5 py-1 text-xs font-bold ${
                             st.status === 'active'
@@ -418,6 +738,29 @@ export default function AdminPage() {
                         >
                           {st.status}
                         </span>
+                      </td>
+                      {/* N-5. The consultancy tops a student back up out of
+                          their own seats. `renewStudent` worked on the server
+                          from the day it was written and no screen called it,
+                          so when a seat-backed student ran out the only route
+                          was to message us. Disabled with a REASON when there
+                          are no seats, never a bare grey button. */}
+                      <td className="px-5 py-3">
+                        {st.mocksLeft > 0 ? (
+                          <span className="text-xs text-slate-400">not needed yet</span>
+                        ) : s.seatsLeft > 0 ? (
+                          <button
+                            onClick={() => renew(st)}
+                            disabled={renewing === st.id || busy}
+                            className="rounded-lg bg-ink px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
+                          >
+                            {renewing === st.id ? 'Working...' : 'Use a seat'}
+                          </button>
+                        ) : (
+                          <span className="text-xs font-semibold text-amber-700">
+                            no seats left
+                          </span>
+                        )}
                       </td>
                     </tr>
                   ))}

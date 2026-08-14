@@ -12,6 +12,10 @@ import {
 } from '@/lib/rate-limit';
 import { approvePayment, rejectPayment } from '@/lib/payments';
 import { apiError } from '@/lib/types';
+import { setPostTrialRule, rulesOrDefaults } from '@/lib/rewards';
+import { sttIsMocked } from '@/lib/ai/stt';
+import { evaluatorIsMocked } from '@/lib/ai/evaluate';
+import { spendState, maxPaidCallsPerMonth } from '@/lib/rate-limit';
 import { BUILD_INFO } from '@/lib/build-info';
 
 export const runtime = 'nodejs';
@@ -70,6 +74,19 @@ const Body = z.discriminatedUnion('action', [
     intent: z.string().min(5).max(300),
   }),
   /** N-18. Soft-block or unblock one device fingerprint. */
+  /**
+   * The post-trial offer. Documented as super-admin controlled since it was
+   * written, and until now nothing could write it.
+   */
+  z.object({
+    action: z.literal('setRewardRule'),
+    superKey: z.string().min(1),
+    active: z.boolean(),
+    windowMinutes: z.number().int().min(15).max(1440),
+    publicReason: z.string().min(10).max(300),
+    bonusPrep: z.number().int().min(0).max(10),
+    bonusSerious: z.number().int().min(0).max(10),
+  }),
   z.object({
     action: z.literal('setDeviceBlock'),
     superKey: z.string().min(1),
@@ -249,6 +266,44 @@ export async function POST(req: Request) {
             supportWhatsapp: st.supportWhatsapp ?? '',
           };
         })(),
+        /**
+         * The live post-trial offer, so the form shows what is ACTUALLY in
+         * force rather than the defaults. Sending the defaults to a screen
+         * that can edit them is how an admin saves a change they never made.
+         */
+        rewardRule: await (async () => {
+          const rule = (await rulesOrDefaults()).find((x) => x.kind === 'post_trial_window');
+          return {
+            active: rule?.active ?? false,
+            windowMinutes: rule?.windowMinutes ?? 60,
+            publicReason: rule?.publicReason ?? '',
+            bonusPrep: rule?.bonusMocksByPack?.prep ?? 0,
+            bonusSerious: rule?.bonusMocksByPack?.serious ?? 0,
+          };
+        })(),
+        /**
+         * Is the AI actually switched on, and what is it costing.
+         *
+         * Until now the only way to answer "is speech to text live" was to sit
+         * an interview and look for the demo banner. That is the wrong person
+         * doing the wrong test: the owner needs to know before a student finds
+         * out. Keys are NEVER returned, only whether one is present.
+         *
+         * The spend counter is per process, so on Netlify the real figure is
+         * this times the number of running instances. Said plainly here rather
+         * than quietly presented as exact.
+         */
+        ai: {
+          sttLive: !sttIsMocked(),
+          evaluatorLive: !evaluatorIsMocked(),
+          sttProvider: process.env.GROQ_API_KEY
+            ? 'Groq Whisper large v3'
+            : process.env.DEEPGRAM_API_KEY
+              ? 'Deepgram Nova 3'
+              : null,
+          callsThisMonth: spendState().calls,
+          callCap: maxPaidCallsPerMonth(),
+        },
         // A12 / LIVE-004: an entire audit round was wasted on a stale deploy.
         // QA can now read the live revision straight off this dashboard.
         build: BUILD_INFO,
@@ -280,7 +335,28 @@ export async function POST(req: Request) {
            * another screen is how a payment sits unapproved overnight while a
            * student assumes they have been robbed.
            */
-          payerPhone: st?.phoneE164 ?? null,
+          /**
+           * The number the student actually gave us, and it was reading the
+           * wrong field.
+           *
+           * `phoneE164` is only ever written by Firebase PHONE auth. Everybody
+           * signs in with Google, which carries no number, so `phoneE164` is
+           * null for every real student and this column was empty on every
+           * single payment. Meanwhile the number the student volunteers at
+           * checkout is stored as `whatsappNumber`, three lines away, and the
+           * directory branch above already reads it correctly.
+           *
+           * So the client opened the payments queue, asked "why is there no
+           * phone number here", and was right: the server was sending a field
+           * that is never populated. Same fault as the payer phone, the seat
+           * numbers and the payment settings before it, only this time the two
+           * halves were in the same file.
+           *
+           * Ordered by how much we trust it: what they typed for us, then a
+           * verified phone-auth number if one ever exists.
+           */
+          payerPhone: st?.whatsappNumber ?? st?.phoneE164 ?? null,
+          payerPhoneWhatsappConfirmed: st?.whatsappConfirmed ?? null,
           payerPhoneSuffix: o.payerPhoneSuffix,
         };
       }),
@@ -377,6 +453,34 @@ export async function POST(req: Request) {
       note: q.text.slice(0, 80),
     });
     return NextResponse.json({ ok: true, data: { id: q.id, total: (cur.extraQuestions ?? []).length + 1 } });
+  }
+
+  if (body.action === 'setRewardRule') {
+    const rule = await setPostTrialRule({
+      active: body.active,
+      windowMinutes: body.windowMinutes,
+      publicReason: body.publicReason,
+      bonusMocksByPack: { prep: body.bonusPrep, serious: body.bonusSerious },
+      updatedBy: 'super_admin',
+    });
+    await audit({
+      actorRole: 'super_admin',
+      actorId: 'super_admin',
+      action: 'reward_rule_change',
+      subjectId: rule.id,
+      before: null,
+      after: `${rule.active ? 'on' : 'off'}, ${rule.windowMinutes}m, prep +${body.bonusPrep}, serious +${body.bonusSerious}`,
+      note: rule.publicReason.slice(0, 120),
+    });
+    return NextResponse.json({
+      ok: true,
+      data: {
+        active: rule.active,
+        windowMinutes: rule.windowMinutes,
+        publicReason: rule.publicReason,
+        bonusMocksByPack: rule.bonusMocksByPack,
+      },
+    });
   }
 
   if (body.action === 'setDeviceBlock') {

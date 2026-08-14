@@ -114,6 +114,34 @@ function answer(sessionId, questionId, jar, ip) {
   t('CS-02', 'Whole sitting costs exactly one credit', me1.json?.data?.entitlement?.mocksLeft === 0,
     `mocksLeft after 10 answers = ${me1.json?.data?.entitlement?.mocksLeft}`);
 
+  /**
+   * CS-04a. The Back button case, and it is checked BEFORE the sitting is
+   * finished on purpose, because that is the only moment it can be checked.
+   *
+   * They have answered all ten and not completed. Asking to start again is not
+   * a request for a second free mock, it is the Back button, and the product
+   * hands the same sitting back rather than charging them twice. That rule
+   * exists because Back had already cost a real student a mock and a trial.
+   */
+  const resume = await req('POST', '/api/session/create', { institution: 'bpp-university', mode: 'test' }, { ip: a.ip, cookie: a.jar });
+  t('CS-04a', 'An unfinished sitting is handed back, not sold again',
+    resume.code === 200 && resume.json?.data?.sessionId === sid && resume.json?.data?.resumed === true,
+    `sitting still open -> ${resume.code}, same session ${resume.json?.data?.sessionId === sid}, resumed ${resume.json?.data?.resumed}`);
+
+  // A different university is still the same one open sitting, and must not
+  // quietly become a second one.
+  const resumeElsewhere = await req('POST', '/api/session/create', { institution: 'coventry-university', mode: 'test' }, { ip: a.ip, cookie: a.jar });
+  t('CS-04b', 'Tapping a DIFFERENT university resumes too, and says so',
+    resumeElsewhere.json?.data?.sessionId === sid && resumeElsewhere.json?.data?.resumed === true &&
+      typeof resumeElsewhere.json?.data?.institutionName === 'string',
+    `-> same session ${resumeElsewhere.json?.data?.sessionId === sid}, names the university it belongs to: ${resumeElsewhere.json?.data?.institutionName}`);
+
+  // Now they finish it properly. The jar here matters: the session is bound to
+  // an owner cookie set at create time, so completing with anything less than
+  // the merged jar 404s, and the sitting would look open for ever.
+  const done = await req('POST', `/api/session/${sid}/complete`, {}, { ip: a.ip, cookie: a.jar });
+  t('CS-04c', 'They can finish the sitting they started', done.code === 200, `complete -> ${done.code}`);
+
   // ---------------------------------------------------------------- CS-03
   // THE CLIENT'S CASE. "He is very clever. He logs out and logs back in and
   // gets another ten." That must not happen.
@@ -125,7 +153,7 @@ function answer(sessionId, questionId, jar, ip) {
 
   const second = await req('POST', '/api/session/create', { institution: 'bpp-university', mode: 'test' }, { ip: a.ip, cookie: back.jar });
   t('CS-04', 'Exhausted student cannot start a second mock', second.code === 402,
-    `create after trial spent -> ${second.code} with "${second.json?.error?.userMessage?.slice(0, 40) ?? ''}..."`);
+    `create after the trial is spent AND finished -> ${second.code} with "${second.json?.error?.userMessage?.slice(0, 48) ?? ''}..."`);
 
   // ---------------------------------------------------------------- CS-05
   // A trial FARM: many Google accounts on one device.

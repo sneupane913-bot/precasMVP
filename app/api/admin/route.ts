@@ -70,6 +70,28 @@ const Body = z.discriminatedUnion('action', [
     passcode: z.string().min(1).max(60),
     bundleCode: z.string().min(2).max(20),
   }),
+  /**
+   * The other half of N-6, and it was missing.
+   *
+   * `buySeats` created the order and showed the QR, and there was no way to
+   * tell us the transaction number afterwards. A consultancy could therefore
+   * send us NPR 9,000 and had no route to say so, and the order sat in
+   * `created` for ever while they waited for seats that could never arrive.
+   *
+   * It mirrors the student submit exactly, including the two guarantees that
+   * cost real money to get wrong: one transaction number can be claimed once,
+   * and the same details sent twice is the same request, answered calmly,
+   * rather than a red error at somebody who has already paid.
+   */
+  z.object({
+    action: z.literal('submitSeatPayment'),
+    slug: z.string().min(1).max(60),
+    passcode: z.string().min(1).max(60),
+    orderId: z.string().min(1).max(64),
+    walletTxnId: z.string().min(4).max(64),
+    payerName: z.string().min(1).max(120),
+    payerPhoneSuffix: z.string().min(2).max(6),
+  }),
   z.object({
     action: z.literal('rejectPayment'),
     slug: z.string().min(1).max(60),
@@ -156,11 +178,30 @@ export async function POST(req: Request) {
   if (body.action === 'approvePayment' || body.action === 'rejectPayment') {
     const r0 = repo();
     const order = await r0.getOrder(body.orderId);
-    if (!order || order.consultancyId !== c.id) {
-      // Same 404 either way, so this cannot be used to discover which order
-      // ids exist on other consultancies.
+    /**
+     * Two ownership tests, and the second one is money.
+     *
+     * `consultancyId === c.id` stops them touching another consultancy's
+     * orders. But their OWN seat purchase also carries their consultancy id,
+     * and letting them approve that would mean a consultancy could order
+     * twenty seats, claim to have paid, approve themselves, and take NPR 6,000
+     * of seats on nothing but their own say-so. Approving a student's payment
+     * is vouching for somebody else and is merely optimistic; approving their
+     * own is simply taking the stock.
+     *
+     * A seat order is the one with no student on it, so that is the test. Only
+     * the super admin, who can see our wallet, approves those.
+     *
+     * The 404 is the same for all three cases on purpose, so order ids cannot
+     * be probed to learn what exists.
+     */
+    if (!order || order.consultancyId !== c.id || !order.studentId) {
       return NextResponse.json(
-        apiError('NOT_FOUND', 'no order or not this consultancy', 'We could not find that payment.'),
+        apiError(
+          'NOT_FOUND',
+          'no order, not this consultancy, or their own seat purchase',
+          'We could not find that payment.'
+        ),
         { status: 404 }
       );
     }
@@ -247,12 +288,88 @@ export async function POST(req: Request) {
         orderId: order.id,
         amountNpr: order.amountNpr,
         seats: bundle.seats,
+        bundleName: bundle.name,
         payTo: {
           walletName: settings.payWalletName || process.env.PAY_WALLET_NAME || 'eSewa',
           walletNumber: settings.payWalletNumber || process.env.PAY_WALLET_NUMBER || '',
           qrImageUrl: settings.payQrImageUrl || process.env.PAY_QR_IMAGE_URL || null,
         },
         supportWhatsapp: settings.supportWhatsapp || '',
+      },
+    });
+  }
+
+  // ------------------------------------------------- submitSeatPayment ----
+  if (body.action === 'submitSeatPayment') {
+    const r3 = repo();
+    const order = await r3.getOrder(body.orderId);
+    // Ownership, and it must be a SEAT order. Without the `studentId` check a
+    // consultancy could submit a transaction number against one of their own
+    // students' pack orders and put words in that student's mouth.
+    if (!order || order.consultancyId !== c.id || order.studentId) {
+      return NextResponse.json(
+        apiError('NOT_FOUND', 'no seat order for this consultancy', 'We could not find that payment. Please start again.'),
+        { status: 404 }
+      );
+    }
+
+    // The bad-connection case. The same number sent again is the same request.
+    if (order.state === 'submitted' && order.walletTxnId === body.walletTxnId.trim().toUpperCase()) {
+      return NextResponse.json({
+        ok: true,
+        data: {
+          state: order.state,
+          message: 'Thank you. We already have these details and we are checking your payment now.',
+        },
+      });
+    }
+    if (order.state !== 'created') {
+      return NextResponse.json(
+        apiError(
+          'BAD_STATE',
+          `order is ${order.state}`,
+          order.state === 'verified'
+            ? 'This payment has already been approved and your seats have been added.'
+            : 'We already have a payment from you and we are checking it. Please do not send it again.'
+        ),
+        { status: 409 }
+      );
+    }
+    if (new Date(order.expiresAt).getTime() < Date.now()) {
+      await r3.updateOrder(order.id, { state: 'expired' });
+      return NextResponse.json(
+        apiError('EXPIRED', 'order expired', 'This payment request has expired. Please start a new one.'),
+        { status: 409 }
+      );
+    }
+
+    // One wallet transaction, one order, ever. Shared with the student path,
+    // so a consultancy cannot claim a number a student already used.
+    const claimed = await r3.claimWalletTxnId(body.walletTxnId, order.id);
+    if (!claimed) {
+      return NextResponse.json(
+        apiError(
+          'TXN_ALREADY_USED',
+          'wallet txn id already claimed',
+          'That transaction number has already been used. Please check the number, or contact us if you think this is wrong.'
+        ),
+        { status: 409 }
+      );
+    }
+
+    await r3.updateOrder(order.id, {
+      state: 'submitted',
+      walletTxnId: body.walletTxnId.trim().toUpperCase(),
+      payerName: body.payerName,
+      payerPhoneSuffix: body.payerPhoneSuffix,
+    });
+
+    return NextResponse.json({
+      ok: true,
+      data: {
+        state: 'submitted',
+        message:
+          'Thank you. We are checking your payment against our bank record. Your seats appear here as soon as it is approved.',
       },
     });
   }
@@ -358,7 +475,7 @@ export async function POST(req: Request) {
    * money.
    */
   const byId = new Map(mine.map((s) => [s.id, s]));
-  const visibleOrders = orders.map((o) => ({
+  const shape = (o: (typeof orders)[number]) => ({
     id: o.id,
     studentName: byId.get(o.studentId)?.name ?? null,
     studentEmail: byId.get(o.studentId)?.email ?? null,
@@ -372,7 +489,22 @@ export async function POST(req: Request) {
     rejectedReason: o.rejectedReason,
     createdAt: o.createdAt,
     verifiedAt: o.verifiedAt,
-  }));
+  });
+
+  /**
+   * A consultancy's own seat purchase is NOT theirs to approve.
+   *
+   * Seat orders carry this consultancy id and no student id, so without this
+   * split they would land in the same queue as their students' payments, with
+   * an Approve button on them. A consultancy approving its own NPR 9,000 seat
+   * payment is not an approval, it is a self-declaration, and it would hand
+   * out twenty seats on nothing but their say-so. Only the super admin, who
+   * can see our wallet, approves those.
+   */
+  const studentOrders = orders.filter((o) => o.studentId);
+  const seatOrders = orders.filter((o) => !o.studentId);
+  const visibleOrders = studentOrders.map(shape);
+  const mySeatOrders = seatOrders.map(shape);
 
   return NextResponse.json({
     ok: true,
@@ -381,6 +513,8 @@ export async function POST(req: Request) {
       students,
       notifications,
       orders: visibleOrders,
+      seatOrders: mySeatOrders,
+      bundles: BUNDLES.map((b) => ({ code: b.code, name: b.name, seats: b.seats, priceNpr: b.priceNpr })),
       stats: {
         studentCount: mine.length,
         activeStudents: mine.filter((s) => s.status === 'active').length,
@@ -392,8 +526,13 @@ export async function POST(req: Request) {
         seatsUsed: liveSeats,
         seatsLeft: Math.max(0, c.seatsTotal - liveSeats),
         paidOrders: paid.length,
-        /** How many of their students are waiting on them right now. */
-        ordersAwaiting: orders.filter((o) => o.state === 'submitted').length,
+        /**
+         * How many of their STUDENTS are waiting on them right now. Their own
+         * seat payment is waiting on us, not on them, and counting it here
+         * would show a task badge for something they cannot action.
+         */
+        ordersAwaiting: studentOrders.filter((o) => o.state === 'submitted').length,
+        seatPaymentPending: seatOrders.some((o) => o.state === 'submitted'),
       },
     },
   });

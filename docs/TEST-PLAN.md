@@ -3,7 +3,7 @@
 **This is the release gate for PreCAS Practice. Nothing ships until this
 document has been walked from the top.**
 
-Last updated: 13 August 2026.
+Last updated: 14 August 2026.
 
 ---
 
@@ -68,9 +68,12 @@ equal seriousness:
 
 ### 1.1 The automated suites
 
-Six suites live in `qa/`. They run against a local dev server. **Each suite
-needs a freshly started server**, because the per IP throttles are real and a
-suite that inherits a used bucket will report throttling as failure.
+Seventeen suites live in `qa/`. Ten need a local dev server; seven read the
+source directly and need nothing.
+
+**Each server-backed suite needs a FRESHLY STARTED server.** The per IP
+throttles are real, and a suite that inherits a used bucket reports throttling
+as failure. Two suites back to back on one server is the most that is safe.
 
 ```
 cd /tmp/precas
@@ -78,14 +81,27 @@ npx next dev -p 3060 &          # wait ~25 seconds for first compile
 QA_PORT=3060 node qa/walk-check.js
 ```
 
-| Suite | What it proves | Size |
-|---|---|---|
-| `walk-check.js` | Every actor walked click by click, in order, with the wrong turns | 78 steps |
-| `adversarial-check.js` | The specific ways a student tries to cheat or is disappointed | 18 |
-| `lifecycle-check.js` | Each guarantee in isolation | 20 |
-| `journey-check.js` | The direct student journey step by step, plus 360px layout | 26 |
-| `fraud-check.js` | Trial farming, forged fields, role separation | 19 |
-| `tenant-check.js` | One consultancy can never see or touch another | 12 |
+| Suite | What it proves | Size | Server |
+|---|---|---|---|
+| `walk-check.js` | Every actor walked click by click, in order, with the wrong turns | 78 | yes |
+| `pilot-check.js` | The pilot lifecycles the client named, end to end | 32 | yes |
+| `model-check.js` | The business model holds: seats, phones, payment settings, questions | 70 | yes |
+| `rules-check.js` | Every named rule in the spec has a test behind it | 59 | yes |
+| `journey-check.js` | The direct student journey step by step, plus 360px layout | 26 | yes |
+| `contract-check.mjs` | The AI prompt contract: what the model is told and forbidden | 25 | no |
+| `fraud-check.js` | Trial farming, forged fields, role separation | 19 | yes |
+| `adversarial-check.js` | The specific ways a student tries to cheat or is disappointed | 18 | yes |
+| `backoffice-ui-check.js` | The ten features that had no screen actually work end to end | 18 | yes |
+| `ai-check.js` | **No fabricated score ever reaches a student** | 17 | yes |
+| `lifecycle-check.js` | Each guarantee in isolation | 20 | yes |
+| `backoffice-check.js` | The back office used the way the client uses it, in sequence | 12 | yes |
+| `tenant-check.js` | One consultancy can never see or touch another | 12 | yes |
+| `copy-check.js` | No price, mock count or practice count typed by hand | 8 | no |
+| `header-check.js` | The header never claims a session state it has not established | 8 | no |
+| `reachable-check.js` | **Every server feature has a door a human can open** | 6 | no |
+| `route-check.js` | Every route the app serves is accounted for | 5 | no |
+
+**Total: 453 checks across 17 suites.**
 
 **`walk-check.js` is the important one.** The others prove that individual
 guarantees hold. Only the walks prove that each step actually leads to the next,
@@ -99,8 +115,9 @@ cannot see:
 - a control that only appears after JavaScript loads
 - a page that renders but is unreadable on a 360px phone
 - a button that is present but does nothing because a handler is not wired
-- stale client state, which is where the two most recent defects live
+- stale client state, which is where the two most recent defects lived
 - anything about how it looks
+- a screen that renders but reads the wrong field, so a column is always empty
 
 So **every release also gets a browser pass** using the Claude in Chrome tools,
 walking Part A below screen by screen. Ask the client for a real Google sign in
@@ -324,6 +341,11 @@ does this automatically and must stay green.
 | "Cannot confirm" | Require a reason, tell the student | |
 | An order belonging to another consultancy | 404 | |
 | Messages for you | Show notifications, including approvals and rejections we made | |
+| Buy more seats: bundle | Show the amount and the QR, and create ONE order | Write a new order per click |
+| Buy more seats: "I have paid" | Accept the transaction number, once | Turn red on a second identical tap |
+| Their OWN seat payment | Appear as "we are checking it", with no Approve button | **Ever be approvable by them.** That is taking stock on their own say-so |
+| "Change how your page looks" | Save logo and colour, shown on their `/c/slug` | |
+| "Use a seat" on a student | Top that student up, costing one seat, confirmed first | Work when no seats are left, or silently do nothing |
 | Student table | Name, email, credits, last active, status | Any transcript or answer content |
 | Seats bought, used, left | Agree with the seat allocation rows | Count revoked seats as used |
 | Student link, "Copy link" | Copy `/c/slug` | |
@@ -346,6 +368,14 @@ does this automatically and must stay green.
 | Grant credit by hand | Audit it as `grant_credit` | File it as something else |
 | Export CSV | Download | Include transcript content |
 | Audit tab | Show who did what, newest first | |
+| Consultancies tab: Create | Make one, PENDING, doing nothing until approved | Be live on creation |
+| Consultancies tab: Approve | Their link and portal start working | |
+| Consultancies tab: Suspend | Their portal stops opening; students keep everything | Take credits from students |
+| Questions tab: Add | Enter the live bank with no deploy | |
+| Students tab: Give credit | Ask kind, amount and why, then audit it as `grant_credit` | Grant without a reason |
+| Flagged tab: Stop free trials from this device | Soft-block that fingerprint only | Ban the person, or block a shared lab machine's ability to browse and buy |
+| Payment details: the offer | Save window, bonuses and the public reason | Accept a window under 15 minutes or over 24 hours |
+| Dashboard: AI panel | Say plainly whether speech and feedback are live, and the month's spend | Show a key |
 
 ### 3.14 `/owner`
 
@@ -711,65 +741,35 @@ Run every time, from the top, forever. This list is not ticked once.
 
 ## 6. Part D. Open defects
 
-**These are open right now. They were found by the client, in a browser, after
-the automated suites were green. That is the point of the browser pass.**
+**Nothing is open in code right now.** The four defects that were listed here on
+13 August are all closed and each has a test that fails if it returns.
 
-### D-01. `/start` does not know you are already signed in
+| Was | Now |
+|---|---|
+| D-01 `/start` ignored an existing session, so a signed-in student was shown the Google chooser again | Closed. `/start` checks `/api/me` on load and redirects to `next`. |
+| D-02 "Sign in to start" persisted after signing in | Closed. `HeaderSession` now has three states, not two: unknown renders a neutral placeholder rather than claiming signed out. `header-check.js` guards it. |
+| D-03 No visible confirmation of who is signed in | Closed. The header shows the name, and there is a sign out control and a `/signout` page that works with no JavaScript. |
+| D-04 Client side state was untested everywhere | Partly closed. `header-check.js` and `reachable-check.js` catch the static half. **The browser pass in section 1.2 is still required and still the only thing that catches the rest.** |
 
-**Severity: high. Confirmed by reading `app/(student)/start/page.tsx`: there is
-no call to `/api/me` anywhere in the file.**
+### What is still genuinely open
 
-A signed in student who taps "My practice", or "Sign in", or any link that
-routes through `/start`, is shown the Google chooser again. The client's words:
-"you're already signed in, but if you again click into my practice page, you'll
-directly be taken to that."
+**O-1. The AI is not switched on.** `GROQ_API_KEY` and `GEMINI_API_KEY` are not
+set, so students see clearly marked sample text and no score is ever invented
+from it. The super admin dashboard now says so in an amber panel rather than
+leaving the owner to find out from a student. Setting the keys is a host change
+and a redeploy, deliberately: an API key that can be typed into a web form can
+be read by anyone who gets into that form.
 
-Expected: `/start` checks the session on load. If a student is already signed
-in, it redirects to `next` immediately without showing the button.
+**O-2. The Nepali-accent benchmark has not been run.** Groq Whisper was chosen
+on price, which is verified. That it is more accurate than Deepgram on
+Nepali-accented English was asserted without evidence. It needs real student
+audio on a real mid-range Android before it is treated as a quality decision.
+Deepgram is one environment variable away.
 
-Test to add to `walk-check.js`:
-```
-sign in, then GET /start?next=/account
-  -> must redirect or render the account page, never the Google button
-```
-
-### D-02. "Sign in to start" persists after signing in
-
-**Severity: high.**
-
-The catalogue asks `/api/me` once on mount and stores `signedIn`. After signing
-in and returning, the cards can still read "Sign in to start", and tapping them
-sends the student back to sign in again. The client's words: "I've just signed
-in, but it still says the same thing."
-
-Two things to check and fix together:
-
-1. Does the catalogue refetch `/api/me` when it regains focus or when the route
-   changes? Right now it does not.
-2. Is the Next client router cache serving a stale segment after the sign in
-   navigation? `router.push(next)` may not remount.
-
-Expected: after signing in, the very next screen reflects the signed in state,
-with no reload.
-
-### D-03. There is no visible confirmation of who is signed in
-
-**Severity: medium.** Raised by the client: "there has to be login details of
-who has signed in. I don't see that anywhere."
-
-A student cannot tell which account they are in. On a shared machine that is a
-privacy problem as much as a usability one. The header now shows the name and a
-Sign out button, but this needs confirming in a browser, and `/account` should
-show the email prominently.
-
-### D-04. Client side state is untested everywhere
-
-**Severity: high, and it is the reason D-01 and D-02 were missed.**
-
-Every suite drives the API and reads server rendered HTML. Not one of them
-loads the JavaScript. Every defect the client has found in the last two rounds
-lives in client state. Until the browser pass in section 1.2 is a standing part
-of the gate, this class of bug will keep shipping.
+**O-3. Six items need a real handset or real students.** PWA install, the device
+check screen, the interview room on a real phone, and durable rate limits
+(currently per process, so the real ceiling is the limit times the number of
+Netlify instances). All are built; none can be signed off from here.
 
 ---
 
@@ -800,6 +800,39 @@ Earlier round, four defects, all still covered by `adversarial-check.js`:
 | High | The trial did not end. A second interview could be opened with zero credits |
 | High | Student sign in shared the passcode brute force limit, locking out a 30 student lab |
 | Medium | A trial student was told they had used practice questions they never had |
+
+---
+
+## 7b. The defect class that keeps coming back
+
+**Seven times now, a feature has existed on the server with nothing on any
+screen calling it.** It is worth naming, because it passes every test suite that
+tests endpoints and it is invisible in code review, since the code is correct.
+
+| # | What was built | What a person could do with it |
+|---|---|---|
+| 1 | `consume()` debited credits | Nothing. No callers, so one NPR 449 pack bought unlimited mocks |
+| 2 | `allocateSeat()` allocated seats | Nothing. A consultancy could buy 100 seats and the dashboard showed none used |
+| 3 | `/api/admin` could approve a payment | Nothing. The portal page had no button, so the only person allowed to approve could not see the payment |
+| 4 | `setPaymentSettings` changed the wallet QR | Nothing. No form called it, so the QR needed a redeploy |
+| 5 | The payments queue rendered `payerPhone` | Nothing. It was filled from `phoneE164`, which Google sign-in never sets, so the column was empty on every payment |
+| 6 | Ten more actions: create a consultancy, approve one, buy seats, branding, top up, give credit, block a device, add a question, read the audit, change the offer | Nothing. No screens at all |
+| 7 | `upsertRewardRule` | Nothing. So `RewardRule`'s own comment, "a reward rule the super admin controls", was untrue from the day it was written |
+
+**The guard.** `qa/reachable-check.js` now fails when:
+
+- an API action has no caller in any page or component
+- a method on the data layer has no caller
+- a tab exists in a nav with no branch that renders it
+
+Anything genuinely screenless must be listed in `NO_SCREEN_NEEDED` **with a
+reason a person would accept**. An empty reason fails the suite, because "we
+meant to do that" is exactly what was said about the first four.
+
+**What the guard does NOT catch**, and why the browser pass still exists: a
+button that is present, calls the right action, and does nothing useful because
+the screen reads a field the server never fills. That is number 5 above, and
+only running the flow found it.
 
 ---
 

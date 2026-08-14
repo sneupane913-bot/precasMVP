@@ -41,8 +41,24 @@ interface Overview {
     whatsappConfirmed: boolean | null;
   }[];
   paySettings: PaySettings;
+  /** The post-trial offer actually in force, not the defaults. */
+  rewardRule: {
+    active: boolean;
+    windowMinutes: number;
+    publicReason: string;
+    bonusPrep: number;
+    bonusSerious: number;
+  };
   attribution: { name: string; count: number }[];
   referralLeaderboard: { code: string; name: string | null; paid: number }[];
+  /** Is the AI switched on, and what has it cost this month. Never a key. */
+  ai: {
+    sttLive: boolean;
+    evaluatorLive: boolean;
+    sttProvider: string | null;
+    callsThisMonth: number;
+    callCap: number;
+  };
   build?: { shortSha: string; context: string; builtAt: string; branch: string };
 }
 
@@ -57,6 +73,8 @@ interface Order {
   payerName: string | null;
   /** The student's own number, so an approver can ring them. N-13. */
   payerPhone: string | null;
+  /** Null when they never told us either way. False means they said no. */
+  payerPhoneWhatsappConfirmed?: boolean | null;
   /** Last 4 they typed, to check against the wallet ledger. */
   payerPhoneSuffix: string | null;
   state: string;
@@ -70,9 +88,62 @@ interface FlaggedTrial {
   studentEmail: string | null;
   reason: string | null;
   createdAt: string;
+  /** The API spreads the whole claim, so these arrive already. */
+  fingerprintHash?: string | null;
+  riskReasons?: string[];
+  ip?: string | null;
 }
 
-type Tab = 'dashboard' | 'students' | 'payments' | 'flagged' | 'settings';
+/** N-21, N-24. The richer view, from the `directory` action. */
+interface DirectoryStudent {
+  id: string;
+  name: string | null;
+  email: string | null;
+  level: string | null;
+  targetUniversity: string | null;
+  whatsappNumber: string | null;
+  whatsappConfirmed: boolean | null;
+  city: string | null;
+  source: string;
+  consultancyId: string | null;
+  status: string;
+  createdAt: string;
+  lastSeenAt: string;
+  mocksLeft: number;
+}
+
+interface DirectoryConsultancy {
+  id: string;
+  name: string;
+  slug: string;
+  status: string;
+  seatsTotal: number;
+  seatsGivenOut: number;
+  seatsLeft: number;
+  renewals: number;
+  studentsFromLink: number;
+  paidNpr: number;
+}
+
+interface Directory {
+  students: DirectoryStudent[];
+  consultancies: DirectoryConsultancy[];
+  directPaidOrders: number;
+}
+
+interface AuditRow {
+  id: string;
+  actorRole: string;
+  actorId: string;
+  action: string;
+  subjectId: string;
+  before: string | null;
+  after: string | null;
+  note: string | null;
+  createdAt: string;
+}
+
+type Tab = 'dashboard' | 'students' | 'payments' | 'flagged' | 'consultancies' | 'questions' | 'audit' | 'settings';
 
 export default function SuperAdminPage() {
   const [key, setKey] = useState('');
@@ -80,6 +151,8 @@ export default function SuperAdminPage() {
   const [data, setData] = useState<Overview | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [flagged, setFlagged] = useState<FlaggedTrial[]>([]);
+  const [directory, setDirectory] = useState<Directory | null>(null);
+  const [auditRows, setAuditRows] = useState<AuditRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -127,7 +200,101 @@ export default function SuperAdminPage() {
     if (o) setOrders(o);
     const f = (await call({ action: 'flaggedTrials' })) as FlaggedTrial[] | null;
     if (f) setFlagged(f);
+    /**
+     * The `directory` action has existed since N-21 and no screen ever called
+     * it, so the richer view the client asked for - level, target university,
+     * city, and the per-consultancy seat rollups - was built and unreachable.
+     */
+    const dir = (await call({ action: 'directory' })) as Directory | null;
+    if (dir) setDirectory(dir);
+    const au = (await call({ action: 'audit' })) as AuditRow[] | null;
+    if (au) setAuditRows(au);
   }, [call]);
+
+  // -------------------------------------------------------- consultancies --
+  //
+  // `createConsultancy` and `setConsultancyStatus` live on /api/platform and
+  // had no screen at all, which meant the entire consultancy channel could
+  // only be opened by someone hand-writing an HTTP request. That is not a
+  // missing nicety on a product whose growth plan IS consultancies.
+  const platformCall = useCallback(
+    async (body: Record<string, unknown>): Promise<unknown | null> => {
+      setBusy(true);
+      setError(null);
+      setNotice(null);
+      try {
+        const res = await fetch('/api/platform', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ superKey: key, ...body }),
+        });
+        const json = await res.json();
+        if (!json.ok) {
+          setError(json.error.userMessage);
+          setNotice(null);
+          return null;
+        }
+        return json.data;
+      } catch {
+        setError('Could not reach the server. Check your connection and try again.');
+        return null;
+      } finally {
+        setBusy(false);
+      }
+    },
+    [key]
+  );
+
+  async function setConsultancyStatus(c: DirectoryConsultancy, status: string) {
+    const verb = status === 'approved' ? 'Approve' : status === 'suspended' ? 'Suspend' : 'Set back to pending for';
+    if (
+      !window.confirm(
+        `${verb} ${c.name}?\n\n` +
+          (status === 'approved'
+            ? 'Their link starts working, their students bind to them, and seats can be taken.'
+            : status === 'suspended'
+              ? 'Their portal stops opening immediately. Students who already signed up keep everything they have.'
+              : 'They lose access until you approve them again.')
+      )
+    )
+      return;
+    const ok = await platformCall({ action: 'setConsultancyStatus', consultancyId: c.id, status });
+    if (ok) {
+      await loadAll();
+      setNotice(`${c.name} is now ${status}.`);
+    }
+  }
+
+  async function blockDevice(fingerprint: string, who: string | null) {
+    if (
+      !window.confirm(
+        `Stop free trials from this device?\n\n` +
+          `Seen on ${who || 'this account'}.\n\n` +
+          'Nobody is banned. This device simply stops receiving free questions. Anyone on it can still look around and buy a pack, which matters because it may be a shared consultancy machine with real students on it tomorrow.'
+      )
+    )
+      return;
+    const ok = await call({ action: 'setDeviceBlock', fingerprint, blocked: true });
+    if (ok) {
+      await loadAll();
+      setNotice('That device will not be given free trials. It can still browse and buy.');
+    }
+  }
+
+  async function grantCredit(studentId: string, name: string) {
+    const kind = window.prompt(`Give ${name} credit.\n\nType "mock" or "practice".`, 'mock');
+    if (!kind || (kind !== 'mock' && kind !== 'practice')) return;
+    const raw = window.prompt(`How many ${kind} credits? (1 to 50)`, '1');
+    const amount = Number(raw);
+    if (!Number.isInteger(amount) || amount < 1 || amount > 50) return;
+    const note = window.prompt('Why? This is recorded in the audit trail.', 'support fix');
+    if (!note) return;
+    const ok = await call({ action: 'grantCredit', studentId, kind, amount, note });
+    if (ok) {
+      await loadAll();
+      setNotice(`Gave ${name} ${amount} ${kind} credit. Recorded against you.`);
+    }
+  }
 
   async function savePaySettings(next: PaySettings): Promise<boolean> {
     const ok = await call({ action: 'setPaymentSettings', ...next });
@@ -253,12 +420,21 @@ export default function SuperAdminPage() {
   // rather than only what is still waiting.
   const approvedCount = orders.filter((o) => o.state === 'verified').length;
   const rejectedCount = orders.filter((o) => o.state === 'rejected').length;
+  const pendingConsultancies = (directory?.consultancies ?? []).filter(
+    (c) => c.status === 'pending'
+  ).length;
 
   const nav: { id: Tab; label: string }[] = [
     { id: 'dashboard', label: 'Dashboard' },
     { id: 'students', label: 'Students' },
     { id: 'payments', label: `Payments${awaiting.length ? ` (${awaiting.length})` : ''}` },
     { id: 'flagged', label: `Flagged${flagged.length ? ` (${flagged.length})` : ''}` },
+    {
+      id: 'consultancies',
+      label: `Consultancies${pendingConsultancies ? ` (${pendingConsultancies})` : ''}`,
+    },
+    { id: 'questions', label: 'Questions' },
+    { id: 'audit', label: 'Audit' },
     { id: 'settings', label: 'Payment details' },
   ];
 
@@ -321,6 +497,26 @@ export default function SuperAdminPage() {
         )}
 
         {/* ------------------------------------------------- dashboard --- */}
+        {tab === 'dashboard' && data.ai && !data.ai.sttLive && (
+          /* The loudest thing on the page when it matters, and gone entirely
+             when it does not. A student in demo mode is shown sample text and
+             told plainly it is not their voice, but the OWNER should never
+             find that out from a student. */
+          <section className="mb-6 rounded-2xl border-2 border-amber-300 bg-amber-50 p-5">
+            <h2 className="mb-1 font-bold text-amber-900">
+              The AI is not switched on yet
+            </h2>
+            <p className="text-sm leading-relaxed text-amber-900/90">
+              Nobody is being listened to. Students see clearly marked sample text instead of their
+              own words, and no score is ever invented from it. To switch it on, set{' '}
+              <code className="rounded bg-white/70 px-1 font-mono">GROQ_API_KEY</code> for speech and{' '}
+              <code className="rounded bg-white/70 px-1 font-mono">GEMINI_API_KEY</code> for the
+              feedback, then redeploy. Keys live in the host, never in this screen, so nobody who
+              gets into this dashboard can read or steal them.
+            </p>
+          </section>
+        )}
+
         {tab === 'dashboard' && (
           <>
             <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -342,6 +538,40 @@ export default function SuperAdminPage() {
                 accent={c.ordersAwaiting > 0}
               />
             </section>
+
+            {/* What the AI is doing and what it is costing. The spend counter
+                is what stands between a runaway and a real bill, so it belongs
+                where the owner already looks rather than in a log file. */}
+            {data.ai && (
+              <section className="mb-6 grid gap-4 sm:grid-cols-3">
+                <Stat
+                  label="Speech to text"
+                  value={data.ai.sttLive ? 'Live' : 'Not on'}
+                  hint={data.ai.sttProvider ?? 'students see sample text, clearly marked'}
+                  accent={!data.ai.sttLive}
+                />
+                <Stat
+                  label="Feedback"
+                  value={data.ai.evaluatorLive ? 'Live' : 'Not on'}
+                  hint={
+                    data.ai.evaluatorLive
+                      ? 'real marking'
+                      : 'sample feedback, never a made-up score'
+                  }
+                  accent={!data.ai.evaluatorLive}
+                />
+                <Stat
+                  label="Paid calls this month"
+                  value={`${data.ai.callsThisMonth} of ${data.ai.callCap}`}
+                  hint={
+                    data.ai.callsThisMonth >= data.ai.callCap
+                      ? 'ceiling reached, paid calls are paused'
+                      : 'counted per server, so the true figure may be higher'
+                  }
+                  accent={data.ai.callsThisMonth >= data.ai.callCap}
+                />
+              </section>
+            )}
 
             <div className="grid gap-6 lg:grid-cols-3">
               <section className="rounded-2xl border border-slate-200 bg-white lg:col-span-2">
@@ -432,6 +662,7 @@ export default function SuperAdminPage() {
                       <th className="px-3 py-3 font-semibold">Phone</th>
                       <th className="px-3 py-3 font-semibold">Source</th>
                       <th className="px-3 py-3 font-semibold">Applying through</th>
+                      <th className="px-3 py-3 font-semibold">Mocks left</th>
                       <th className="px-3 py-3 font-semibold">Status</th>
                       <th className="px-5 py-3 font-semibold">Action</th>
                     </tr>
@@ -464,7 +695,13 @@ export default function SuperAdminPage() {
                           {s.consultancyId ? 'Consultancy' : 'Direct'}
                         </td>
                         <td className="px-3 py-3 capitalize text-slate-600">
-                          {s.attributionConsultancy || '—'}
+                          {s.attributionConsultancy || 'not said'}
+                        </td>
+                        {/* Giving credit without seeing what they already
+                            have is guessing. This comes from the directory,
+                            which is now loaded alongside the overview. */}
+                        <td className="px-3 py-3 tabular-nums text-slate-700">
+                          {directory?.students.find((d) => d.id === s.id)?.mocksLeft ?? '-'}
                         </td>
                         <td className="px-3 py-3">
                           <span
@@ -478,14 +715,27 @@ export default function SuperAdminPage() {
                           </span>
                         </td>
                         <td className="px-5 py-3">
-                          <button
-                            onClick={() =>
-                              setStudentStatus(s.id, s.status === 'active' ? 'disabled' : 'active')
-                            }
-                            className="rounded-lg border-2 border-slate-300 px-3 py-1.5 text-xs font-bold text-slate-700"
-                          >
-                            {s.status === 'active' ? 'Disable' : 'Enable'}
-                          </button>
+                          <div className="flex flex-wrap gap-1.5">
+                            {/* The support fix. A student whose payment went
+                                wrong, or who was soft-denied unfairly, could
+                                only be helped by a redeploy before this. The
+                                action existed the whole time. */}
+                            <button
+                              onClick={() => grantCredit(s.id, s.name || s.email || 'this student')}
+                              disabled={busy}
+                              className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
+                            >
+                              Give credit
+                            </button>
+                            <button
+                              onClick={() =>
+                                setStudentStatus(s.id, s.status === 'active' ? 'disabled' : 'active')
+                              }
+                              className="rounded-lg border-2 border-slate-300 px-3 py-1.5 text-xs font-bold text-slate-700"
+                            >
+                              {s.status === 'active' ? 'Disable' : 'Enable'}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -564,6 +814,15 @@ export default function SuperAdminPage() {
                               paid from ...{o.payerPhoneSuffix}
                             </span>
                           )}
+                          {/* Knowing the number is not the same as knowing it
+                              will reach them. If they told us it is not on
+                              WhatsApp, a message will vanish and the payment
+                              sits unapproved while they wait. Ring it. */}
+                          {o.payerPhone && o.payerPhoneWhatsappConfirmed === false && (
+                            <span className="block text-[11px] font-semibold text-amber-700">
+                              not on WhatsApp, call instead
+                            </span>
+                          )}
                         </td>
                         <td className="px-3 py-3">
                           <span
@@ -609,9 +868,415 @@ export default function SuperAdminPage() {
           </section>
         )}
 
+        {/* -------------------------------------------- consultancies ---
+            `createConsultancy` and `setConsultancyStatus` existed on the server
+            with NO screen anywhere, so the only way to open the consultancy
+            channel was to hand-write an HTTP request. On a product whose whole
+            growth plan is consultancies, that is not a missing nicety. */}
+        {tab === 'consultancies' && (
+          <section>
+            <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-5">
+              <h2 className="mb-1 font-serif text-lg font-bold text-ink">Add a consultancy</h2>
+              <p className="mb-4 text-sm leading-relaxed text-slate-600">
+                They get their own link and their own portal. Nothing works until you approve them
+                below, so it is safe to set one up before the money arrives.
+              </p>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const f = new FormData(e.currentTarget as HTMLFormElement);
+                  const ok = await platformCall({
+                    action: 'createConsultancy',
+                    name: String(f.get('name') ?? '').trim(),
+                    slug: String(f.get('slug') ?? '').trim(),
+                    contactName: String(f.get('contactName') ?? '').trim(),
+                    contactPhone: String(f.get('contactPhone') ?? '').trim(),
+                    seatsTotal: Number(f.get('seatsTotal') ?? 0),
+                    paidNpr: Number(f.get('paidNpr') ?? 0),
+                    passcode: String(f.get('passcode') ?? ''),
+                  });
+                  if (ok) {
+                    (e.target as HTMLFormElement).reset();
+                    await loadAll();
+                    setNotice('Consultancy created, and waiting for you to approve it below.');
+                  }
+                }}
+                className="grid gap-3 sm:grid-cols-2"
+              >
+                <Field name="name" label="Their name" placeholder="Kathmandu Education Hub" required />
+                <Field
+                  name="slug"
+                  label="Short name for their link"
+                  placeholder="kathmandu-hub"
+                  hint="lower case, letters, numbers and dashes"
+                  required
+                />
+                <Field name="contactName" label="Who we deal with" placeholder="Sita Sharma" />
+                <Field name="contactPhone" label="Their phone" placeholder="+977 98..." />
+                <Field name="seatsTotal" label="Seats they have paid for" type="number" placeholder="0" />
+                <Field name="paidNpr" label="What they paid, NPR" type="number" placeholder="0" />
+                <Field
+                  name="passcode"
+                  label="Portal passcode"
+                  placeholder="at least 4 characters"
+                  hint="give this to them; they use it with their short name"
+                  required
+                />
+                <div className="flex items-end">
+                  <button
+                    type="submit"
+                    disabled={busy}
+                    className="w-full rounded-xl bg-ink px-5 py-3 font-bold text-white disabled:opacity-50"
+                  >
+                    {busy ? 'Working...' : 'Create'}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+              <div className="border-b border-slate-200 p-5">
+                <h2 className="font-serif text-lg font-bold text-ink">Consultancies</h2>
+                <p className="text-sm text-slate-600">
+                  Seats given out, seats left, and how many students came through their link.
+                </p>
+              </div>
+              {(directory?.consultancies ?? []).length === 0 ? (
+                <p className="p-10 text-center text-slate-500">None yet.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                      <tr>
+                        <th className="px-5 py-3 font-semibold">Consultancy</th>
+                        <th className="px-3 py-3 font-semibold">Seats</th>
+                        <th className="px-3 py-3 font-semibold">Students</th>
+                        <th className="px-3 py-3 font-semibold">Paid</th>
+                        <th className="px-3 py-3 font-semibold">Status</th>
+                        <th className="px-5 py-3 font-semibold">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {(directory?.consultancies ?? []).map((c) => (
+                        <tr key={c.id}>
+                          <td className="px-5 py-3">
+                            <p className="font-semibold text-ink">{c.name}</p>
+                            <p className="font-mono text-xs text-slate-500">/c/{c.slug}</p>
+                          </td>
+                          <td className="px-3 py-3 tabular-nums text-slate-700">
+                            {c.seatsGivenOut} of {c.seatsTotal}
+                            <span className="block text-xs text-slate-500">
+                              {c.seatsLeft} left
+                              {c.renewals > 0 ? `, ${c.renewals} top ups` : ''}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 tabular-nums text-slate-700">
+                            {c.studentsFromLink}
+                          </td>
+                          <td className="px-3 py-3 tabular-nums text-slate-700">
+                            NPR {c.paidNpr.toLocaleString()}
+                          </td>
+                          <td className="px-3 py-3">
+                            <span
+                              className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                                c.status === 'approved'
+                                  ? 'bg-emerald-100 text-emerald-800'
+                                  : c.status === 'pending'
+                                    ? 'bg-amber-100 text-amber-800'
+                                    : 'bg-red-100 text-red-800'
+                              }`}
+                            >
+                              {c.status}
+                            </span>
+                          </td>
+                          <td className="px-5 py-3">
+                            <div className="flex flex-wrap gap-2">
+                              {c.status !== 'approved' && (
+                                <button
+                                  onClick={() => setConsultancyStatus(c, 'approved')}
+                                  disabled={busy}
+                                  className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
+                                >
+                                  Approve
+                                </button>
+                              )}
+                              {c.status === 'approved' && (
+                                <button
+                                  onClick={() => setConsultancyStatus(c, 'suspended')}
+                                  disabled={busy}
+                                  className="rounded-lg border-2 border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 disabled:opacity-50"
+                                >
+                                  Suspend
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* ------------------------------------------------- questions ---
+            N-25. Add a question to the live bank with no deploy. The action
+            worked from the day it was written; nothing ever called it. */}
+        {tab === 'questions' && (
+          <section className="rounded-2xl border border-slate-200 bg-white p-5">
+            <h2 className="mb-1 font-serif text-lg font-bold text-ink">Add a question</h2>
+            <p className="mb-4 text-sm leading-relaxed text-slate-600">
+              It goes into the live bank straight away, with no deploy. Write what a real
+              interviewer would ask, and say what a good answer has to show, because that is what
+              the marking uses.
+            </p>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const f = new FormData(e.currentTarget as HTMLFormElement);
+                const ok = (await call({
+                  action: 'addQuestion',
+                  category: String(f.get('category') ?? '').trim(),
+                  text: String(f.get('text') ?? '').trim(),
+                  intent: String(f.get('intent') ?? '').trim(),
+                })) as { total?: number } | null;
+                if (ok) {
+                  (e.target as HTMLFormElement).reset();
+                  setNotice(`Added. The bank now has ${ok.total ?? '?'} extra questions.`);
+                }
+              }}
+            >
+              <Field
+                name="category"
+                label="Category"
+                placeholder="finances, course choice, intentions..."
+                required
+              />
+              <label className="mb-1 mt-3 block text-sm font-semibold text-ink">The question</label>
+              <textarea
+                name="text"
+                required
+                minLength={10}
+                maxLength={400}
+                rows={2}
+                placeholder="Who is paying for your studies, and how do you know they can?"
+                className="mb-3 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+              />
+              <label className="mb-1 block text-sm font-semibold text-ink">
+                What a good answer must show
+              </label>
+              <textarea
+                name="intent"
+                required
+                minLength={5}
+                maxLength={300}
+                rows={2}
+                placeholder="A named person, their real occupation, and awareness of the actual amount."
+                className="mb-4 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+              />
+              <button
+                type="submit"
+                disabled={busy}
+                className="rounded-xl bg-ink px-5 py-3 font-bold text-white disabled:opacity-50"
+              >
+                {busy ? 'Adding...' : 'Add to the bank'}
+              </button>
+            </form>
+          </section>
+        )}
+
+        {/* ----------------------------------------------------- audit ---
+            Every approval, rejection, grant and status change, with who did
+            it. The action existed and nothing displayed it, so the paper trail
+            that justifies letting consultancies approve payments was invisible
+            to the one person it protects. */}
+        {tab === 'audit' && (
+          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+            <div className="border-b border-slate-200 p-5">
+              <h2 className="font-serif text-lg font-bold text-ink">Who did what</h2>
+              <p className="text-sm text-slate-600">
+                Newest first. This is the record that makes letting a consultancy approve their own
+                students safe to allow.
+              </p>
+            </div>
+            {auditRows.length === 0 ? (
+              <p className="p-10 text-center text-slate-500">Nothing recorded yet.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                    <tr>
+                      <th className="px-5 py-3 font-semibold">When</th>
+                      <th className="px-3 py-3 font-semibold">Who</th>
+                      <th className="px-3 py-3 font-semibold">Did what</th>
+                      <th className="px-5 py-3 font-semibold">Details</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {auditRows.map((a) => (
+                      <tr key={a.id}>
+                        <td className="whitespace-nowrap px-5 py-3 text-xs text-slate-500">
+                          {new Date(a.createdAt).toLocaleString()}
+                        </td>
+                        <td className="px-3 py-3">
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-xs font-bold ${
+                              a.actorRole === 'admin'
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-slate-100 text-slate-700'
+                            }`}
+                          >
+                            {a.actorRole === 'admin' ? 'consultancy' : a.actorRole}
+                          </span>
+                        </td>
+                        <td className="px-3 py-3 font-medium text-ink">
+                          {a.action.replace(/_/g, ' ')}
+                          {a.before !== null && a.after !== null && (
+                            <span className="block text-xs text-slate-500">
+                              {a.before} to {a.after}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-5 py-3 text-xs text-slate-600">{a.note}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        )}
+
         {/* ------------------------------------------- payment details --- */}
         {tab === 'settings' && data && (
-          <PaySettingsForm initial={data.paySettings} onSave={savePaySettings} busy={busy} />
+          <>
+            <PaySettingsForm initial={data.paySettings} onSave={savePaySettings} busy={busy} />
+
+            {/* ------------------------------------------ the offer ---
+                `RewardRule` has said "a reward rule the super admin controls"
+                since it was written, and `upsertRewardRule` had no callers, so
+                the offer was frozen at the defaults and the super admin
+                controlled nothing.
+
+                The two limits below are not decoration. This is the honest
+                countdown feature: the deadline a student sees is a real server
+                timestamp tied to a named reason. A lever that could turn it
+                into a fake urgency banner would be worse than no lever. */}
+            <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
+              <h2 className="mb-1 font-serif text-lg font-bold text-ink">
+                The offer after the free questions
+              </h2>
+              <p className="mb-4 text-sm leading-relaxed text-slate-600">
+                When a student finishes their free ten, they get one real deadline and extra mocks if
+                they buy inside it. The deadline is theirs, it is set once, and it is never reissued
+                or restarted.
+              </p>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const f = new FormData(e.currentTarget as HTMLFormElement);
+                  const ok = await call({
+                    action: 'setRewardRule',
+                    active: f.get('active') === 'on',
+                    windowMinutes: Number(f.get('windowMinutes')),
+                    publicReason: String(f.get('publicReason') ?? '').trim(),
+                    bonusPrep: Number(f.get('bonusPrep')),
+                    bonusSerious: Number(f.get('bonusSerious')),
+                  });
+                  if (ok) {
+                    await loadAll();
+                    setNotice('Offer saved. Students who finish from now on see this.');
+                  }
+                }}
+              >
+                <label className="mb-4 flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="active"
+                    defaultChecked={data.rewardRule.active}
+                    className="h-5 w-5 accent-emerald-600"
+                  />
+                  <span className="text-sm font-semibold text-ink">Offer switched on</span>
+                </label>
+
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div>
+                    <label htmlFor="windowMinutes" className="mb-1 block text-sm font-semibold text-ink">
+                      How long, in minutes
+                    </label>
+                    <input
+                      id="windowMinutes"
+                      name="windowMinutes"
+                      type="number"
+                      min={15}
+                      max={1440}
+                      defaultValue={data.rewardRule.windowMinutes}
+                      className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm outline-none focus:border-ink"
+                    />
+                    <p className="mt-1 text-xs text-slate-500">
+                      15 minutes to 24 hours. Shorter is pressure, longer is not a real deadline.
+                    </p>
+                  </div>
+                  <div>
+                    <label htmlFor="bonusPrep" className="mb-1 block text-sm font-semibold text-ink">
+                      Extra mocks with Prep
+                    </label>
+                    <input
+                      id="bonusPrep"
+                      name="bonusPrep"
+                      type="number"
+                      min={0}
+                      max={10}
+                      defaultValue={data.rewardRule.bonusPrep}
+                      className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm outline-none focus:border-ink"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="bonusSerious" className="mb-1 block text-sm font-semibold text-ink">
+                      Extra mocks with Serious
+                    </label>
+                    <input
+                      id="bonusSerious"
+                      name="bonusSerious"
+                      type="number"
+                      min={0}
+                      max={10}
+                      defaultValue={data.rewardRule.bonusSerious}
+                      className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm outline-none focus:border-ink"
+                    />
+                  </div>
+                </div>
+
+                <label htmlFor="publicReason" className="mb-1 mt-3 block text-sm font-semibold text-ink">
+                  What the student is told
+                </label>
+                <textarea
+                  id="publicReason"
+                  name="publicReason"
+                  rows={2}
+                  minLength={10}
+                  maxLength={300}
+                  defaultValue={data.rewardRule.publicReason}
+                  className="mb-1 w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm outline-none focus:border-ink"
+                />
+                <p className="mb-4 text-xs leading-relaxed text-slate-500">
+                  This sits next to a real countdown, so it has to name a real reason. Never invent
+                  scarcity, and never say a price is going up when it is not. We add value, we do
+                  not discount, so a student who paid yesterday was not overcharged.
+                </p>
+
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="rounded-xl bg-ink px-5 py-3 font-bold text-white disabled:opacity-50"
+                >
+                  {busy ? 'Saving...' : 'Save the offer'}
+                </button>
+              </form>
+            </section>
+          </>
         )}
 
         {/* --------------------------------------------------- flagged --- */}
@@ -634,8 +1299,13 @@ export default function SuperAdminPage() {
                       <p className="font-semibold text-ink">{f.studentName || 'Unnamed student'}</p>
                       <p className="text-xs text-slate-500">{f.studentEmail || ''}</p>
                       <p className="mt-1 text-sm text-red-700">
-                        {f.reason || 'Flagged automatically'}
+                        {f.reason || (f.riskReasons ?? []).join('; ') || 'Flagged automatically'}
                       </p>
+                      {f.fingerprintHash && (
+                        <p className="mt-0.5 font-mono text-[11px] text-slate-400">
+                          device {f.fingerprintHash.slice(0, 18)}
+                        </p>
+                      )}
                     </div>
                     <div className="flex gap-2">
                       <button
@@ -652,6 +1322,23 @@ export default function SuperAdminPage() {
                       >
                         Keep held
                       </button>
+                      {/* N-18. Stop this DEVICE, not this person.
+                          `setDeviceBlock` existed with no screen, so the only
+                          answer to a farm running twenty accounts off one
+                          laptop was to hold each account back one at a time,
+                          for ever. This is still soft: a blocked device gets
+                          no free trial and can still browse and buy, because
+                          the machine may be a shared lab PC with real students
+                          on it tomorrow. */}
+                      {f.fingerprintHash && (
+                        <button
+                          onClick={() => blockDevice(f.fingerprintHash as string, f.studentName)}
+                          disabled={busy}
+                          className="rounded-lg border-2 border-amber-300 px-3 py-2 text-xs font-bold text-amber-800 disabled:opacity-50"
+                        >
+                          Stop free trials from this device
+                        </button>
+                      )}
                     </div>
                   </li>
                 ))}
@@ -695,6 +1382,45 @@ function Stat({
       <p className={`mt-1 text-xs ${accent ? 'font-semibold text-emerald-800' : 'text-slate-500'}`}>
         {hint}
       </p>
+    </div>
+  );
+}
+
+/**
+ * One labelled field. The forms above would otherwise repeat this markup a
+ * dozen times, and the day somebody fixes the focus ring they would fix it in
+ * one place and miss eleven.
+ */
+function Field({
+  name,
+  label,
+  placeholder,
+  hint,
+  type = 'text',
+  required = false,
+}: {
+  name: string;
+  label: string;
+  placeholder?: string;
+  hint?: string;
+  type?: string;
+  required?: boolean;
+}) {
+  return (
+    <div>
+      <label htmlFor={name} className="mb-1 block text-sm font-semibold text-ink">
+        {label}
+        {!required && <span className="font-normal text-slate-500"> (optional)</span>}
+      </label>
+      <input
+        id={name}
+        name={name}
+        type={type}
+        required={required}
+        placeholder={placeholder}
+        className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm outline-none focus:border-ink"
+      />
+      {hint && <p className="mt-1 text-xs text-slate-500">{hint}</p>}
     </div>
   );
 }

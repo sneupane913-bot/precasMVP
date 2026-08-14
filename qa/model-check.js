@@ -301,9 +301,29 @@ async function signIn(token, opts = {}) {
     pos('Transaction number') < pos('Picture of the receipt') &&
     pos('Picture of the receipt') < pos('I have paid'),
     'QR -> wallet number -> details -> optional photo -> pay, in that order');
+  /**
+   * N-9b. This used to search the checkout source for the literal sentence
+   * "Something wrong? Message us on WhatsApp". That inline markup was replaced
+   * by <ContactUs/>, which is strictly better, and the test went red while the
+   * product got safer. A test that matches a string rather than a guarantee
+   * fails the day somebody improves the thing it was protecting.
+   *
+   * So it now checks the guarantee itself, in two halves: the escape hatch is
+   * BELOW the button that can fail, and the escape hatch is not merely a
+   * button. A WhatsApp link is a bet that one app on one phone opens. If it
+   * does not, a student who has just sent real money has nothing. The number
+   * has to be on the screen as dialable text as well.
+   */
+  const contact = fs.readFileSync('components/ContactUs.tsx', 'utf8');
+  // `pos` is indexOf, and the FIRST <ContactUs/> on this page is the one on the
+  // money-in-flight screen, which sits above the form. The guarantee is that
+  // there is ALSO one after the button, so search forward from the button.
   t('N-9b', 'The WhatsApp escape sits under the button that might fail',
-    /Something wrong\? Message us on WhatsApp/.test(co) && pos('I have paid') < pos('Message us on WhatsApp'),
+    co.indexOf('<ContactUs', pos('I have paid')) !== -1,
     'a student who has sent money and hit a problem does not have to hunt for us');
+  t('N-9c', 'And the escape is not just a button: the number is dialable text',
+    /href={`tel:\+\$\{digits\}`}/.test(contact) && /wa\.me\/\$\{digits\}/.test(contact),
+    'if WhatsApp does not open, a button is nothing. The number must be readable and callable.');
 
   console.log('\n=== SEATS FOR CONSULTANCIES (N-6) ===\n');
 

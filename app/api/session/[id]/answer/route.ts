@@ -190,21 +190,34 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
           ? 'We heard you, but that answer was too short for useful feedback. Aim for about thirty seconds — say your point, then one real detail to back it up.'
           : 'Something went wrong while listening to your answer. Please record it again.';
 
+    /**
+     * `userMessage` lives INSIDE data.
+     *
+     * It used to be spread in beside `data` as a sibling, so an `ok: true`
+     * response carried a user-facing field that the `ApiResult` type does not
+     * describe. It worked, because the one component that reads it happened to
+     * know, but every other route in this codebase puts user-facing text inside
+     * `data` or inside `error`, and a field that exists only by convention is
+     * one refactor away from silently disappearing. The student would then be
+     * told nothing at all about why their answer was not used.
+     */
     const payload: ApiResult<{
       transcriptStatus: typeof stt.status;
       canRetry: boolean;
       attemptsLeft: number;
+      userMessage: string;
     }> = {
       ok: true,
       data: {
         transcriptStatus: stt.status,
         canRetry: priorAttempts + 1 < LIMITS.maxAttemptsPerQuestion,
         attemptsLeft: LIMITS.maxAttemptsPerQuestion - priorAttempts - 1,
+        userMessage,
       },
     };
     // 200, not an error status: this is an expected outcome the UI must handle,
     // not an exception. The student sees a retry prompt, never a dead end.
-    return NextResponse.json({ ...payload, userMessage });
+    return NextResponse.json(payload);
   }
 
   const institution = getInstitution(session.institutionId);

@@ -333,7 +333,7 @@ export function InterviewRoom({
         // The competitor auto-advances here and destroys the answer.
         // We stop, explain, and let the student choose. Never auto-advance.
         setAttemptsLeft(json.data.attemptsLeft ?? 0);
-        setMessage(json.userMessage ?? 'We could not hear your answer. Please record it again.');
+        setMessage(json.data.userMessage ?? 'We could not hear your answer. Please record it again.');
         setPhase('retry');
         return;
       }
@@ -377,7 +377,7 @@ export function InterviewRoom({
       }
       if (json.data.transcriptStatus !== 'ok') {
         setAttemptsLeft(json.data.attemptsLeft ?? 0);
-        setMessage(json.userMessage ?? 'We could not hear your answer. Please record it again.');
+        setMessage(json.data.userMessage ?? 'We could not hear your answer. Please record it again.');
         setPhase('retry');
         return;
       }
@@ -1007,9 +1007,10 @@ function Spinner() {
 type UploadResponse =
   | {
       ok: true;
-      userMessage?: string;
       data: {
         transcriptStatus: 'ok' | 'silent' | 'too_short' | 'failed';
+        /** Why we could not use it, in words the student can act on. */
+        userMessage?: string;
         transcript?: string;
         evaluationFailed?: boolean;
         attemptsLeft?: number;
