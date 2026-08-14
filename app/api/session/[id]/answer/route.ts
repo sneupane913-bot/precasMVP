@@ -165,7 +165,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
   const buffer = await file.arrayBuffer();
   recordPaidCall();
-  const stt = await transcribe(buffer, file.type || 'audio/webm');
+  const stt = await transcribe(buffer, file.type || 'audio/webm', durationSeconds);
 
   // === The guard. No transcript, no score. Ever. ===
   if (stt.status !== 'ok') {
@@ -248,6 +248,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     durationSeconds,
     transcript,
     transcriptStatus: 'ok',
+    /**
+     * We heard them, but clearly not all of them.
+     *
+     * Recorded on the answer so the report can carry the same honesty as the
+     * room, rather than the student being told once and then shown a score
+     * later with no context.
+     */
+    partialCapture: stt.partial,
     evaluation, // may be null if the evaluator failed. Still never fabricated.
     createdAt: new Date().toISOString(),
   };
@@ -268,6 +276,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     transcript: string;
     evaluation: typeof evaluation;
     evaluationFailed: boolean;
+    partialCapture: boolean;
+    partialMessage: string | null;
   }> = {
     ok: true,
     data: {
@@ -275,6 +285,20 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       transcript,
       evaluation,
       evaluationFailed: evaluation === null,
+      /**
+       * We heard them, but not all of them.
+       *
+       * The wording matters more than the flag. It takes the blame in OUR name
+       * and never theirs, it does not use the word accent, and it does not tell
+       * them to speak better English. It tells them the one mechanical thing
+       * that actually helps: get closer to the microphone. Then it makes clear
+       * the feedback covers only the part we caught, so a thin score is
+       * explained rather than quietly accepted as a verdict on them.
+       */
+      partialCapture: stt.partial,
+      partialMessage: stt.partial
+        ? 'We only caught part of what you said. That is our microphone and our listening, not your English. Speak a little closer to the microphone next time and we will hear all of it. The feedback below is only about the part we did hear.'
+        : null,
     },
   };
   return NextResponse.json(result);

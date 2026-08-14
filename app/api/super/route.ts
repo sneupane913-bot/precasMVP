@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { isSuperAdmin, platform, platformDown } from '@/lib/platform';
+import { isSuperAdminAsync, platform, platformDown, secretEquals } from '@/lib/platform';
 import { repo, type ApprovalAudit } from '@/lib/db';
 import { grantPack, rewardReferral, adminGrant } from '@/lib/entitlement';
 import {
@@ -93,6 +93,23 @@ const Body = z.discriminatedUnion('action', [
     fingerprint: z.string().min(4).max(200),
     blocked: z.boolean(),
   }),
+  /**
+   * The super admin changes their own passcode.
+   *
+   * Until now it could only be changed by editing an environment variable and
+   * redeploying, which in practice means it never gets changed: not when a
+   * laptop is lost, not when somebody leaves, not after it has been read out
+   * over the phone to get somebody unstuck.
+   *
+   * The old one is required. It is already in the body of every request to
+   * this route, but requiring it EXPLICITLY as `passcode` means a stale open
+   * tab cannot silently change it, and it reads as a deliberate act.
+   */
+  z.object({
+    action: z.literal('changeSuperPasscode'),
+    superKey: z.string().min(1),
+    newPasscode: z.string().min(10).max(80),
+  }),
   z.object({
     action: z.literal('setPaymentSettings'),
     superKey: z.string().min(1),
@@ -101,6 +118,8 @@ const Body = z.discriminatedUnion('action', [
     payWalletNumber: z.string().max(40).optional(),
     payAccountName: z.string().max(120).optional(),
     supportWhatsapp: z.string().max(40).optional(),
+    /** Hours a student is told to allow. Honest, and changeable at Dashain. */
+    approvalWaitHours: z.number().int().min(1).max(72).optional(),
   }),
 ]);
 
@@ -143,7 +162,7 @@ export async function POST(req: Request) {
     });
   }
 
-  if (!isSuperAdmin(body.superKey)) {
+  if (!(await isSuperAdminAsync(body.superKey))) {
     // ONLY a wrong passcode spends from the brute-force budget.
     rateLimitPenalise(`super:${clientIp(req)}`, RL.auth);
     return NextResponse.json(apiError('FORBIDDEN', 'bad super key', 'Not allowed.'), { status: 403 });
@@ -264,6 +283,7 @@ export async function POST(req: Request) {
             payWalletNumber: st.payWalletNumber ?? '',
             payAccountName: st.payAccountName ?? '',
             supportWhatsapp: st.supportWhatsapp ?? '',
+            approvalWaitHours: st.approvalWaitHours ?? 4,
           };
         })(),
         /**
@@ -501,11 +521,95 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, data: { blocked: body.blocked, total: set.size } });
   }
 
+  if (body.action === 'changeSuperPasscode') {
+    if (secretEquals(body.newPasscode, body.superKey)) {
+      return NextResponse.json(
+        apiError('SAME_PASSCODE', 'new equals old', 'Please choose a passcode different from your current one.'),
+        { status: 400 }
+      );
+    }
+    if (/^[0-9]+$/.test(body.newPasscode) || /^(.)\1+$/.test(body.newPasscode)) {
+      return NextResponse.json(
+        apiError(
+          'WEAK_PASSCODE',
+          'digits only or one repeated character',
+          'Please use letters as well as numbers. This one passcode opens every student record we hold.'
+        ),
+        { status: 400 }
+      );
+    }
+
+    const cur = await platform.getSettings();
+    await platform.saveSettings({
+      ...cur,
+      superPasscode: body.newPasscode,
+      superPasscodeChangedAt: new Date().toISOString(),
+      // Stamp which deploy key this was chosen against, so rotating that key
+      // in the host really does hand access back. See isSuperAdminAsync.
+      superPasscodeSetAgainst: process.env.SUPER_ADMIN_PASSCODE ?? '',
+    });
+    await audit({
+      actorRole: 'super_admin',
+      actorId: 'super_admin',
+      action: 'change_passcode',
+      subjectId: 'super_admin',
+      before: cur.superPasscode ? 'own passcode' : 'the one set at deploy',
+      after: 'own passcode',
+      // Never the passcode itself. An audit trail holding secrets is a second
+      // copy of the secret, in a place more people can read.
+      note: 'super admin changed their own passcode',
+    });
+
+    return NextResponse.json({
+      ok: true,
+      data: {
+        message:
+          'Saved. Use the new passcode from now on. If you ever forget it, change SUPER_ADMIN_PASSCODE in Netlify and redeploy: that overrides this one and lets you back in.',
+      },
+    });
+  }
+
   if (body.action === 'setPaymentSettings') {
     const cur = await platform.getSettings();
     const next = { ...cur };
-    for (const k of ['payQrImageUrl', 'payWalletName', 'payWalletNumber', 'payAccountName', 'supportWhatsapp'] as const) {
-      if (body[k] !== undefined) next[k] = body[k];
+    /**
+     * Record WHICH fields changed, not just the wallet number.
+     *
+     * The audit row used to write the old and new wallet number and a fixed
+     * note, so changing the QR image or the support number left a row that
+     * said nothing changed. Where the money goes and who answers the phone
+     * about it are the two settings most worth being able to reconstruct
+     * afterwards, and "payment or support details changed" reconstructs
+     * nothing.
+     *
+     * The QR is a data URL and can be hundreds of kilobytes, so the audit
+     * records THAT it changed, never the value.
+     */
+    const changed: string[] = [];
+    const LABELS = {
+      payQrImageUrl: 'the QR image',
+      payWalletName: 'the wallet name',
+      payWalletNumber: 'the wallet number',
+      payAccountName: 'the account name',
+      supportWhatsapp: 'the support number',
+      approvalWaitHours: 'how long students are told to wait',
+    } as const;
+    // Written one key at a time rather than in a loop: the settings object mixes
+    // strings and a number, and a loop over mixed types either loses the types
+    // or needs a cast that would hide a real mistake later.
+    const STRING_KEYS = ['payQrImageUrl', 'payWalletName', 'payWalletNumber', 'payAccountName', 'supportWhatsapp'] as const;
+    for (const k of STRING_KEYS) {
+      if (body[k] !== undefined && body[k] !== cur[k]) {
+        changed.push(LABELS[k]);
+        next[k] = body[k];
+      }
+    }
+    if (body.approvalWaitHours !== undefined && body.approvalWaitHours !== cur.approvalWaitHours) {
+      changed.push(LABELS.approvalWaitHours);
+      next.approvalWaitHours = body.approvalWaitHours;
+    }
+    if (changed.length === 0) {
+      return NextResponse.json({ ok: true, data: { saved: true, changed: [] } });
     }
     await platform.saveSettings(next);
     await audit({
@@ -513,11 +617,12 @@ export async function POST(req: Request) {
       actorId: 'super_admin',
       action: 'set_payment_settings',
       subjectId: 'platform',
-      before: cur.payWalletNumber ?? '',
-      after: next.payWalletNumber ?? '',
-      note: 'payment or support details changed',
+      // Short, readable values only. Never the QR data URL.
+      before: [cur.payWalletNumber, cur.supportWhatsapp].filter(Boolean).join(' / ') || 'not set',
+      after: [next.payWalletNumber, next.supportWhatsapp].filter(Boolean).join(' / ') || 'not set',
+      note: `changed ${changed.join(', ')}`,
     });
-    return NextResponse.json({ ok: true, data: { saved: true } });
+    return NextResponse.json({ ok: true, data: { saved: true, changed } });
   }
 
   // ---------------------------------------------------------- verifyPayment

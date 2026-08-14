@@ -59,12 +59,16 @@ const OVERSUBSCRIBE = 6;
   for (const c of [A, B]) {
     const made = await call('/api/platform', {
       action: 'createConsultancy', superKey: SUPER,
-      name: c.slug, slug: c.slug, seatsTotal: SEATS, paidNpr: 6000, passcode: c.passcode,
+      name: c.slug, slug: c.slug, seatsTotal: SEATS, paidNpr: 6000, passcode: `handover-${c.slug}`,
     }, { ip: '10.9.9.1' });
     c.id = made.json?.data?.id;
     await call('/api/platform', {
       action: 'setConsultancyStatus', superKey: SUPER, consultancyId: c.id, status: 'approved',
     }, { ip: '10.9.9.2' });
+    // First login replaces the handover code, as a real admin must.
+    await call('/api/admin', {
+      action: 'changePasscode', slug: c.slug, passcode: `handover-${c.slug}`, newPasscode: c.passcode,
+    }, { ip: '10.9.9.3' });
   }
   t('setup', !!A.id && !!B.id, `two approved consultancies with ${SEATS} seats each`);
 

@@ -177,6 +177,55 @@ export async function POST(req: Request) {
     }
   }
 
+  /**
+   * The sitting they opened and have not answered yet.
+   *
+   * `inProgress` above only covers sittings where a credit has actually been
+   * spent, which is deliberate: before the first answer nothing has been paid
+   * for and nothing can be lost, so being forced back into a university they no
+   * longer want would be wrong.
+   *
+   * But a student who opens BPP, loses signal, and taps BPP again should not
+   * quietly leave an orphan session behind every time. So an open, unanswered
+   * sitting for the SAME mode and the SAME university is handed back. Same
+   * fault as the checkout writing a new order on every visit, same fix.
+   *
+   * A DIFFERENT university still gets a fresh sitting, because they changed
+   * their mind and it has cost them nothing.
+   */
+  {
+    const mineOpen = await store.listByStudent(student.id);
+    const untouched = mineOpen.find(
+      (x) =>
+        x.institutionId === institution.id &&
+        x.mode === parsed.mode &&
+        (x.answers?.length ?? 0) === 0 &&
+        x.status !== 'completed' &&
+        x.status !== 'abandoned'
+    );
+    if (untouched) {
+      const uq = untouched.questionIds
+        .map((id) => getQuestion(id))
+        .filter((q): q is NonNullable<typeof q> => Boolean(q))
+        .map((q) => publicQuestion(q, institution));
+      return NextResponse.json({
+        ok: true,
+        data: {
+          sessionId: untouched.id,
+          questions: uq,
+          questionLimit: uq.length,
+          // Not `resumed`: there is nothing to resume, they simply have the
+          // same sitting back. Saying "resumed" would make the screen tell
+          // them they were part way through when they had not started.
+          reopened: true,
+          answered: 0,
+          institutionId: untouched.institutionId,
+          institutionName: institution.name,
+        },
+      });
+    }
+  }
+
   const canStart = parsed.mode === 'practice' ? ent.canStartPractice : ent.canStartMock;
   if (!canStart) {
     return NextResponse.json(

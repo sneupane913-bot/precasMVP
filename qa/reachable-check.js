@@ -47,6 +47,8 @@ function t(id, name, ok, detail = '') {
  * Keep this list short. Every entry is a promise that nobody needs a button.
  */
 const NO_SCREEN_NEEDED = {
+  to:
+    'the dev-only deploy-key rotation helper, which returns 404 in production and exists purely so the lockout escape hatch can be exercised by a test rather than hoped about',
   status:
     'polled by the checkout page in a loop rather than called from a control, so it is reached without a button',
   DELETE:

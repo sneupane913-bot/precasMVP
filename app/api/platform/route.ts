@@ -3,7 +3,7 @@ import { z } from 'zod';
 import {
   platform,
   isOwner,
-  isSuperAdmin,
+  isSuperAdminAsync,
   revenueSummary,
   DEFAULT_SETTINGS,
   type Consultancy,
@@ -139,7 +139,7 @@ export async function POST(req: Request) {
   }
 
   // ---- Everything below is super admin. ----
-  if (!isSuperAdmin(body.superKey)) {
+  if (!(await isSuperAdminAsync(body.superKey))) {
     return NextResponse.json(apiError('FORBIDDEN', 'bad super key', 'Not allowed.'), {
       status: 403,
     });
@@ -200,6 +200,13 @@ export async function POST(req: Request) {
     createdAt: new Date().toISOString(),
     approvedAt: null,
     passcode: body.passcode,
+    /**
+     * A HANDOVER code, not their passcode. We know it, because we just typed
+     * it, so it gets them in once and the portal refuses to show them anything
+     * until they replace it with one only they know.
+     */
+    passcodeIsTemporary: true,
+    passcodeChangedAt: null,
   };
   await platform.saveConsultancy(created);
   return NextResponse.json({ ok: true, data: created });

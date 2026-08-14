@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import { PasscodeInput } from '@/components/PasscodeInput';
+import { PasscodeChangeForm } from '@/components/PasscodeChangeForm';
 // Never type a price, a mock count or a practice count by hand. `copy-check`
 // fails the build for it, and rightly: the seat copy said "12 mock interviews
 // and 30 practice questions ... NPR 799" as literal text, so changing the
@@ -75,6 +76,8 @@ interface SeatOrder {
 }
 
 interface AdminData {
+  /** True while they are still on the handover code we set for them. */
+  passcodeIsTemporary?: boolean;
   consultancy: {
     id: string;
     slug: string;
@@ -118,6 +121,8 @@ export default function AdminPage() {
   const [seatSuffix, setSeatSuffix] = useState('');
   const [renewing, setRenewing] = useState<string | null>(null);
   const [brandOpen, setBrandOpen] = useState(false);
+  const [mustChange, setMustChange] = useState(false);
+  const [passOpen, setPassOpen] = useState(false);
   const [logoUrl, setLogoUrl] = useState('');
   const [colour, setColour] = useState('#0d1b2a');
 
@@ -157,10 +162,24 @@ export default function AdminPage() {
     [slug, passcode]
   );
 
+  const changePasscode = useCallback(
+    async (newPasscode: string): Promise<boolean> => {
+      const ok = (await call({ action: 'changePasscode', newPasscode })) as { message?: string } | null;
+      if (!ok) return false;
+      // The passcode in state is now wrong; every later call would 403.
+      setPasscode(newPasscode);
+      setMustChange(false);
+      setNotice(ok.message ?? 'Saved. Use your new passcode from now on.');
+      return true;
+    },
+    [call]
+  );
+
   const login = useCallback(async () => {
     const d = (await call({ action: 'login' })) as AdminData | null;
     if (d) {
       setData(d);
+      setMustChange(Boolean(d.passcodeIsTemporary));
       setLogoUrl(d.consultancy.logoUrl ?? '');
       setColour(d.consultancy.primaryColor || '#0d1b2a');
     }
@@ -278,6 +297,38 @@ export default function AdminPage() {
   }, [call, login, logoUrl, colour]);
 
   // ------------------------------------------------------------- sign in ---
+  /**
+   * The handover code got them in. Nothing else happens until they replace it.
+   *
+   * Deliberately a whole screen and not a dismissible banner. A banner leaves
+   * the shared secret in force for as long as they ignore it, and the server
+   * refuses every other action anyway, so a portal behind a banner would just
+   * throw errors at them with no explanation.
+   */
+  if (data && mustChange) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-paper px-5 py-10">
+        <div className="w-full max-w-md">
+          <p className="mb-1 font-serif text-xl font-bold text-ink">{data.consultancy.name}</p>
+          <p className="mb-6 text-sm text-slate-500">One thing before you start</p>
+          {error && (
+            <p className="mb-4 rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3 font-medium text-red-800">
+              {error}
+            </p>
+          )}
+          <PasscodeChangeForm
+            forced
+            title="Choose your own passcode"
+            explanation="We set the first one for you, which means we know it. Your student list should be yours alone, so please pick a passcode only your team knows. You will use it with your short name from now on."
+            minLength={8}
+            busy={busy}
+            onSave={changePasscode}
+          />
+        </div>
+      </main>
+    );
+  }
+
   if (!data) {
     return (
       <main className="grid min-h-screen place-items-center bg-paper px-5">
@@ -630,12 +681,20 @@ export default function AdminPage() {
               link, given to their students, with their name on it. */}
           <div className="mt-5 border-t border-slate-100 pt-4">
             {!brandOpen ? (
-              <button
-                onClick={() => setBrandOpen(true)}
-                className="text-sm font-semibold text-ink underline underline-offset-2"
-              >
-                Change how your page looks
-              </button>
+              <div className="flex flex-wrap gap-4">
+                <button
+                  onClick={() => setBrandOpen(true)}
+                  className="text-sm font-semibold text-ink underline underline-offset-2"
+                >
+                  Change how your page looks
+                </button>
+                <button
+                  onClick={() => setPassOpen((v) => !v)}
+                  className="text-sm font-semibold text-ink underline underline-offset-2"
+                >
+                  {passOpen ? 'Hide passcode settings' : 'Change your passcode'}
+                </button>
+              </div>
             ) : (
               <>
                 <p className="mb-3 text-sm text-slate-600">
@@ -682,6 +741,18 @@ export default function AdminPage() {
                   </button>
                 </div>
               </>
+            )}
+
+            {passOpen && (
+              <div className="mt-5">
+                <PasscodeChangeForm
+                  title="Change your passcode"
+                  explanation="Do this whenever somebody leaves your team, or if you have read it out to anybody. You stay signed in on this screen."
+                  minLength={8}
+                  busy={busy}
+                  onSave={changePasscode}
+                />
+              </div>
             )}
           </div>
         </section>

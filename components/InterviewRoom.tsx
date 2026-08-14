@@ -340,10 +340,23 @@ export function InterviewRoom({
 
       setFinalTranscript(json.data.transcript ?? '');
       setAnsweredIds((prev) => new Set(prev).add(question.id));
+      /**
+       * Order matters. A student who was only half heard AND whose review
+       * failed should be told the thing they can act on, which is the
+       * microphone, not the thing they cannot.
+       *
+       * The partial message never uses the word accent and never suggests
+       * their English is the problem. Many students here speak quietly or
+       * hesitantly and some of what they say will not be picked up: that is our
+       * limitation, so we say so in our own name and tell them the one
+       * mechanical fix that helps.
+       */
       setMessage(
-        json.data.evaluationFailed
-          ? 'We saved your answer, but our coach could not review it just now. You will still see it in your results.'
-          : null
+        json.data.partialCapture
+          ? (json.data.partialMessage ?? null)
+          : json.data.evaluationFailed
+            ? 'We saved your answer, but our coach could not review it just now. You will still see it in your results.'
+            : null
       );
       setPhase('reviewed');
     } catch {
@@ -449,17 +462,68 @@ export function InterviewRoom({
     router.push(`/results/${sessionId}`);
   }, [router, sessionId, isTrial, closeSession]);
 
-  // Warn before leaving mid-interview.
+  /**
+   * LEAVING MID-INTERVIEW.
+   *
+   * Two separate things had to be fixed here, and the second one is the one the
+   * client asked for.
+   *
+   * 1. The browser warning only fired while `recording` or `uploading`. A
+   *    student sitting on question four with three answers already given could
+   *    close the tab in total silence. Their answers survive, because the
+   *    server keeps them, but nothing told them that, so the sensible
+   *    assumption is that they have just lost everything.
+   *
+   * 2. The browser warning does NOT fire for the in-app Back button, which is
+   *    the one people actually press. Next handles that navigation itself, so
+   *    `beforeunload` never runs. That is exactly how the client lost a mock.
+   *
+   * The framing is deliberate and is the client's: treat it as the real
+   * interview. A student who trains themselves to stop halfway is practising
+   * the wrong thing, and a real Pre-CAS interview has no back button. So the
+   * warning is not "you will lose your work" — that would be a lie now that the
+   * state is kept — it is "this is meant to be one sitting".
+   */
+  const midInterview =
+    answeredIds.size > 0 && phase !== 'trial_gate' && phase !== 'finishing';
+
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
-      if (phase === 'recording' || phase === 'uploading') {
+      if (phase === 'recording' || phase === 'uploading' || midInterview) {
         e.preventDefault();
         e.returnValue = '';
       }
     };
     window.addEventListener('beforeunload', handler);
     return () => window.removeEventListener('beforeunload', handler);
-  }, [phase]);
+  }, [phase, midInterview]);
+
+  /**
+   * The in-app Back button, which `beforeunload` cannot see.
+   *
+   * A history entry is pushed so the first Back lands back here rather than
+   * leaving. If they confirm, we go for real. If they do not, the entry is
+   * pushed again so a second Back is caught too.
+   */
+  useEffect(() => {
+    if (!midInterview) return;
+    window.history.pushState({ precasGuard: true }, '');
+    const onPop = () => {
+      const leave = window.confirm(
+        'Leave this interview?\n\n' +
+          'Treat this like the real thing: a Pre-CAS interview is one sitting, and stopping halfway is the habit you do not want on the day.\n\n' +
+          'Your answers so far are saved, so you can come back and carry on from where you are. Nothing is lost and nothing extra is charged.'
+      );
+      if (leave) {
+        window.removeEventListener('popstate', onPop);
+        window.history.back();
+      } else {
+        window.history.pushState({ precasGuard: true }, '');
+      }
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [midInterview]);
 
   const answeredCount = answeredIds.size;
 
@@ -1013,6 +1077,9 @@ type UploadResponse =
         userMessage?: string;
         transcript?: string;
         evaluationFailed?: boolean;
+        /** We heard them, but clearly not all of them. Ours to own, not theirs. */
+        partialCapture?: boolean;
+        partialMessage?: string | null;
         attemptsLeft?: number;
         canRetry?: boolean;
       };

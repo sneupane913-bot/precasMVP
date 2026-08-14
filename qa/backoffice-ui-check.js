@@ -30,13 +30,19 @@ const t=(n,c,d='')=>{if(c){ok++;console.log('  ok   '+n)}else{bad++;console.log(
 (async()=>{
  const S=Date.now().toString(36);
  console.log('\n--- consultancy channel, opened from the screen ---');
- const made=await req('POST','/api/platform',{action:'createConsultancy',superKey:SU,name:'New Hub '+S,slug:'newhub-'+S,contactName:'Sita',contactPhone:'+97798',seatsTotal:0,paidNpr:0,passcode:'hubpass1'});
+ const made=await req('POST','/api/platform',{action:'createConsultancy',superKey:SU,name:'New Hub '+S,slug:'newhub-'+S,contactName:'Sita',contactPhone:'+97798',seatsTotal:0,paidNpr:0,passcode:'handover-hub1'});
  t('super admin can create a consultancy', made.code===200, `${made.code} ${made.body.slice(0,120)}`);
  const cid=made.json?.data?.id;
- const beforeApproval=await req('POST','/api/admin',{action:'login',slug:'newhub-'+S,passcode:'hubpass1'});
+ const beforeApproval=await req('POST','/api/admin',{action:'login',slug:'newhub-'+S,passcode:'handover-hub1'});
  t('and it does nothing until approved', beforeApproval.code===403, `${beforeApproval.code}`);
  const appr=await req('POST','/api/platform',{action:'setConsultancyStatus',superKey:SU,consultancyId:cid,status:'approved'});
  t('super admin can approve it', appr.code===200, `${appr.code}`);
+ // The code we set them is a HANDOVER code: it opens the door once and shows
+ // them nothing, because until they replace it we and they share one secret.
+ const stillGated=await req('POST','/api/admin',{action:'login',slug:'newhub-'+S,passcode:'handover-hub1'});
+ t('an approved consultancy still cannot read anything on our handover code', stillGated.json?.error?.code==='PASSCODE_MUST_CHANGE', `${stillGated.code} ${stillGated.json?.error?.code}`);
+ const chose=await req('POST','/api/admin',{action:'changePasscode',slug:'newhub-'+S,passcode:'handover-hub1',newPasscode:'hubpass1'});
+ t('they can choose their own passcode', chose.code===200, `${chose.code} ${chose.body.slice(0,120)}`);
  const login=await req('POST','/api/admin',{action:'login',slug:'newhub-'+S,passcode:'hubpass1'});
  t('the portal then opens', login.code===200, `${login.code}`);
  t('and the portal is told which bundles it can buy', (login.json?.data?.bundles??[]).length===2, JSON.stringify(login.json?.data?.bundles));
@@ -50,6 +56,11 @@ const t=(n,c,d='')=>{if(c){ok++;console.log('  ok   '+n)}else{bad++;console.log(
  const dup=await req('POST','/api/admin',{action:'submitSeatPayment',slug:'newhub-'+S,passcode:'hubpass1',orderId:oid,walletTxnId:'SEAT'+S,payerName:'Sita',payerPhoneSuffix:'1234'});
  t('sending it twice on bad wifi is calm, not red', dup.code===200, `${dup.code}`);
  const login2=await req('POST','/api/admin',{action:'login',slug:'newhub-'+S,passcode:'hubpass1'});
+ // Guard the guard. This line once used a stale passcode, so the login 403d,
+ // `orders` was undefined, and "the queue is empty" passed for the wrong
+ // reason. An assertion that is satisfied by getting NOTHING back is not an
+ // assertion, so prove we are actually logged in before believing the queue.
+ t('we really are inside the portal before judging what it shows', login2.code===200 && Array.isArray(login2.json?.data?.orders), `${login2.code}`);
  t('their own seat payment is NOT in their approval queue', (login2.json?.data?.orders??[]).length===0, JSON.stringify((login2.json?.data?.orders??[]).map(o=>o.state)));
  t('it shows as their own purchase, waiting on us', login2.json?.data?.stats?.seatPaymentPending===true, JSON.stringify(login2.json?.data?.stats));
  const sneak=await req('POST','/api/admin',{action:'approvePayment',slug:'newhub-'+S,passcode:'hubpass1',orderId:oid,confirmedReceived:true});

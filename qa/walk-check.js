@@ -419,11 +419,11 @@ async function buyPack(packCode = 'prep', txn = 'WALK-' + Date.now() + Math.floo
     let keep = { ...jar };
     await staff('/api/platform', {
       action: 'createConsultancy', superKey: SUPER,
-      name: 'Walk Hub', slug: 'walk-hub', passcode: 'walk-pass', seatsTotal: 20,
+      name: 'Walk Hub', slug: 'walk-hub', passcode: 'handover-walk', seatsTotal: 20,
     });
     await staff('/api/platform', {
       action: 'createConsultancy', superKey: SUPER,
-      name: 'Rival Hub', slug: 'rival-hub', passcode: 'rival-pass', seatsTotal: 20,
+      name: 'Rival Hub', slug: 'rival-hub', passcode: 'handover-rival', seatsTotal: 20,
     });
     const list = J((await staff('/api/platform', { action: 'overview', superKey: SUPER })).body);
     const cs = list?.data?.consultancies ?? [];
@@ -435,6 +435,19 @@ async function buyPack(packCode = 'prep', txn = 'WALK-' + Date.now() + Math.floo
           action: 'setConsultancyStatus', superKey: SUPER, consultancyId: c.id, status: 'approved',
         });
       }
+    }
+
+    // A consultancy is handed a HANDOVER code and the portal shows them nothing
+    // until they replace it, so the suite does what a real admin does on their
+    // first login. Creating with a throwaway code and immediately choosing the
+    // one the rest of this file uses keeps every later line unchanged.
+    for (const [slug, handover, chosen] of [
+      ['walk-hub', 'handover-walk', 'walk-pass'],
+      ['rival-hub', 'handover-rival', 'rival-pass'],
+    ]) {
+      await staff('/api/admin', {
+        action: 'changePasscode', slug, passcode: handover, newPasscode: chosen,
+      });
     }
     jar = keep;
 

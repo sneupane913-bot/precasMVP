@@ -270,11 +270,15 @@ function answer(sessionId, questionId, jar, ip) {
   const B = { slug: `pb-${S}`, passcode: 'passB1234' };
   for (const cc of [A, B]) {
     const mk = await req('POST', '/api/platform',
-      { action: 'createConsultancy', superKey: SUPER, name: cc.slug, slug: cc.slug, seatsTotal: 5, paidNpr: 6000, passcode: cc.passcode },
+      { action: 'createConsultancy', superKey: SUPER, name: cc.slug, slug: cc.slug, seatsTotal: 5, paidNpr: 6000, passcode: `handover-${cc.slug}` },
       { ip: nextIp() });
     cc.id = mk.json?.data?.id;
     await req('POST', '/api/platform',
       { action: 'setConsultancyStatus', superKey: SUPER, consultancyId: cc.id, status: 'approved' }, { ip: nextIp() });
+    // First login replaces the handover code, exactly as a real admin must.
+    await req('POST', '/api/admin',
+      { action: 'changePasscode', slug: cc.slug, passcode: `handover-${cc.slug}`, newPasscode: cc.passcode },
+      { ip: nextIp() });
   }
 
   // Students arriving three different ways.

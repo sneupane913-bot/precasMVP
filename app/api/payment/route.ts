@@ -153,6 +153,8 @@ export async function POST(req: Request) {
       mocks: number;
       practice: number;
       expiresAt: string;
+      /** How long a person takes to check it. A number they can plan around. */
+      waitHours: number;
       supportWhatsapp: string;
       supportMessage: string;
       payTo: {
@@ -170,6 +172,7 @@ export async function POST(req: Request) {
         mocks: plan.mockInterviews,
         practice: plan.practiceSessions,
         expiresAt: order.expiresAt,
+        waitHours: settings.approvalWaitHours ?? 4,
         /**
          * N-12. A worried student should never have to compose a message.
          *
@@ -341,6 +344,17 @@ export async function POST(req: Request) {
       { status: 404 }
     );
   }
+  /**
+   * The status poll now carries the REASON and the wait.
+   *
+   * Both were already computed and neither reached the student. The checkout
+   * screen read `state` and threw the rest away, so a rejected student saw a
+   * generic "we could not match that payment" while the approver's actual
+   * words - "the number is one digit short" - sat unused in the response.
+   * Telling somebody no without telling them why is what makes them message
+   * us instead of fixing it themselves.
+   */
+  const settings = await platform.getSettings();
   return NextResponse.json({
     ok: true,
     data: {
@@ -348,6 +362,8 @@ export async function POST(req: Request) {
       amountNpr: order.amountNpr,
       packCode: order.packCode,
       rejectedReason: order.rejectedReason,
+      waitHours: settings.approvalWaitHours ?? 4,
+      supportWhatsapp: settings.supportWhatsapp ?? process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? '',
     },
   });
 }

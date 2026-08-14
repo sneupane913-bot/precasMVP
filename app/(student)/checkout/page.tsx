@@ -27,6 +27,8 @@ interface CreatedOrder {
   mocks: number;
   practice: number;
   expiresAt: string;
+  /** How long a person takes to check a payment. Shown, not guessed at. */
+  waitHours: number;
   /** N-12. Set by the super admin, with the message already written. */
   supportWhatsapp?: string;
   supportMessage?: string;
@@ -86,6 +88,8 @@ function Checkout() {
   const [busy, setBusy] = useState(false);
   const [shotName, setShotName] = useState<string | null>(null);
   const [shotNote, setShotNote] = useState<string | null>(null);
+  /** The approver's own words when a payment could not be matched. */
+  const [rejectedReason, setRejectedReason] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   /**
@@ -196,7 +200,14 @@ function Checkout() {
       });
       const json = await res.json();
       if (json.ok && json.data.state === 'verified') setState('verified');
-      if (json.ok && json.data.state === 'rejected') setState('rejected');
+      if (json.ok && json.data.state === 'rejected') {
+        // The reason was already in this response and was thrown away, so a
+        // rejected student saw a generic sentence while the approver's actual
+        // words sat unused. Telling somebody no without telling them why is
+        // what makes them message us instead of fixing it themselves.
+        setRejectedReason(json.data.rejectedReason ?? null);
+        setState('rejected');
+      }
     }, 8000);
     return () => clearInterval(id);
   }, [state, order]);
@@ -298,9 +309,10 @@ function Checkout() {
         <div className="rounded-2xl border-2 border-sky-300 bg-sky-50 p-5">
           <p className="mb-1 font-bold text-sky-900">We have your payment details</p>
           <p className="mb-3 text-sm leading-relaxed text-sky-900/90">
-            We are checking your transaction number against our bank record. This is a person, not a
-            machine, so it can take a little time. You do not need to pay again, and you do not need
-            to stay on this page.
+            A person checks this against our bank record, so please allow up to{' '}
+            <strong>{order?.waitHours ?? 4} hours</strong>. You do not need to pay again, and you do
+            not need to stay on this page. Your credits switch on by themselves the moment it is
+            approved.
           </p>
           {/* The client's point: a student who has sent real money and heard
               nothing has exactly one question — "who do I call" — and this
@@ -348,21 +360,43 @@ function Checkout() {
 
       {state === 'rejected' && (
         <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-5">
-          <p className="mb-1 font-bold text-amber-900">We could not match that payment</p>
+          <p className="mb-1 font-bold text-amber-900">We could not match that payment yet</p>
+
+          {/* The approver's own words. "The number is one digit short" is
+              something a student can act on; "we could not match it" is not. */}
+          {rejectedReason && (
+            <p className="mb-3 rounded-xl bg-white/70 px-4 py-3 text-sm font-medium text-amber-900">
+              What we found: {rejectedReason}
+            </p>
+          )}
+
           <p className="mb-4 text-sm leading-relaxed text-amber-900/90">
-            This usually means the transaction number was typed slightly wrong. Nothing has been
-            taken from you by us. Please check the number in your wallet app and try again.
+            This is almost always the transaction number typed slightly wrong. Nothing has been
+            taken from you by us, and nothing is closed off. Check the number in your wallet app and
+            send it again. If you are sure it is right, message or call us and we will look properly
+            with you.
           </p>
           <button
             onClick={() => {
               setState('choosing');
               setTxn('');
+              setRejectedReason(null);
               void createOrder();
             }}
-            className="w-full rounded-xl bg-ink px-5 py-3 font-bold text-white"
+            className="mb-3 w-full rounded-xl bg-ink px-5 py-3 font-bold text-white"
           >
-            Try again
+            Check the number and try again
           </button>
+
+          {/* A refusal must never be a dead end. This is the client's rule:
+              always a soft rejection, never one they cannot work around. */}
+          {order && (
+            <ContactUs
+              urgent
+              whatsapp={order.supportWhatsapp}
+              message={order.supportMessage ?? undefined}
+            />
+          )}
         </div>
       )}
 

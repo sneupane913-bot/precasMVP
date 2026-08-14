@@ -291,9 +291,11 @@ const PUBLIC_PAGES = ['/', '/pricing', '/universities', '/consultancy', '/privac
 
   const A = { slug: `rc-${S}`, passcode: 'rulesA123' };
   const mk = await req('POST', '/api/platform',
-    { action: 'createConsultancy', superKey: SUPER, name: A.slug, slug: A.slug, seatsTotal: 2, paidNpr: 6000, passcode: A.passcode });
+    { action: 'createConsultancy', superKey: SUPER, name: A.slug, slug: A.slug, seatsTotal: 2, paidNpr: 6000, passcode: `handover-${A.slug}` });
   A.id = mk.json?.data?.id;
   await req('POST', '/api/platform', { action: 'setConsultancyStatus', superKey: SUPER, consultancyId: A.id, status: 'approved' });
+  await req('POST', '/api/admin',
+    { action: 'changePasscode', slug: A.slug, passcode: `handover-${A.slug}`, newPasscode: A.passcode });
 
   // C-7 a forged link is attribution only, never entitlement.
   const forged = await signIn(`rf-${S}`, { via: 'no-such-consultancy-' + S });

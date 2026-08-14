@@ -161,6 +161,12 @@ export interface ApprovalAudit {
     | 'approve_admin_student'
     /** A super admin adding credit by hand. Its own act, its own name. */
     | 'grant_credit'
+    /**
+     * Somebody chose their own passcode. The passcode itself is NEVER written
+     * here, only that it changed and who changed it. An audit trail that
+     * records secrets is a second copy of the secret.
+     */
+    | 'change_passcode'
     | 'grant_trial_override'
     | 'decline_trial_override'
     | 'enable_student'

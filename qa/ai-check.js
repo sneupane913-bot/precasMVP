@@ -73,12 +73,12 @@ const merge = (a, b) => {
 };
 
 /** Record an answer with audio of a chosen size, so each STT branch is hit. */
-function answer(sid, qid, cookie, ip, kb) {
+function answer(sid, qid, cookie, ip, kb, durationSeconds = 30) {
   const b = '----ai' + Math.random();
   const audio = Buffer.alloc(Math.round(kb * 1024), 1);
   const payload = Buffer.concat([
     Buffer.from(`--${b}\r\nContent-Disposition: form-data; name="questionId"\r\n\r\n${qid}\r\n`),
-    Buffer.from(`--${b}\r\nContent-Disposition: form-data; name="durationSeconds"\r\n\r\n30\r\n`),
+    Buffer.from(`--${b}\r\nContent-Disposition: form-data; name="durationSeconds"\r\n\r\n${durationSeconds}\r\n`),
     Buffer.from(
       `--${b}\r\nContent-Disposition: form-data; name="audio"; filename="a.webm"\r\nContent-Type: audio/webm\r\n\r\n`
     ),
@@ -195,6 +195,62 @@ function answer(sid, qid, cookie, ip, kb) {
     t('AI-5', 'No evaluation returned, so nothing was invented', true, 'evaluator declined, which is the safe outcome');
     pass += 2; // AI-6, AI-7 cannot apply and must not be counted as failures
   }
+
+  // ------------------------------------------------------- AI-18 partial
+  /**
+   * The case the client raised, and the one that decides whether a nervous
+   * student trusts this product: they spoke for forty seconds and we caught
+   * six words.
+   *
+   * The wrong answers are (a) score the fragment silently, which tells them
+   * their English is far worse than it is, and (b) call it silence, which tells
+   * them they did not speak. The right answer is to say plainly that WE missed
+   * it, tell them the one mechanical fix, and still give them whatever the part
+   * we heard supports.
+   *
+   * Driven, not read: a long recording that yields few words.
+   */
+  const longQuiet = await answer(sid, qs[2].id, jar, ip, 30, 90);
+  const lq = longQuiet.json?.data ?? {};
+  t(
+    'AI-18',
+    'Speaking for a long time and being barely heard is detected',
+    lq.partialCapture === true,
+    `partialCapture=${lq.partialCapture} for a 90 second answer. If this is false, a student who was half heard is silently graded on the fragment.`
+  );
+  t(
+    'AI-19',
+    'And we take the blame, in our own name',
+    typeof lq.partialMessage === 'string' && /our (microphone|listening)|not your English/i.test(lq.partialMessage),
+    `message: "${lq.partialMessage}"`
+  );
+  t(
+    'AI-20',
+    'The message never blames their accent or their English',
+    !/accent|poor english|bad english|your english is/i.test(lq.partialMessage ?? ''),
+    `message: "${lq.partialMessage}". Telling a nervous student their English is the problem is the one thing this product must never do.`
+  );
+  t(
+    'AI-21',
+    'And it tells them the one thing that actually helps',
+    /closer to the microphone/i.test(lq.partialMessage ?? ''),
+    'sympathy without a fix is just sympathy'
+  );
+  t(
+    'AI-22',
+    'They are still given the feedback we CAN stand behind',
+    lq.transcriptStatus === 'ok',
+    `status ${lq.transcriptStatus}. Being half heard must not cost them the answer entirely.`
+  );
+
+  // A normal length answer at normal speed is NOT flagged as partial.
+  const normal = await answer(sid, qs[3].id, jar, ip, 40, 30);
+  t(
+    'AI-23',
+    'A normal answer is not wrongly told we missed some of it',
+    normal.json?.data?.partialCapture === false,
+    `partialCapture=${normal.json?.data?.partialCapture}. Crying wolf here would train students to ignore it.`
+  );
 
   // ------------------------------------------------------------------ AI-8
   // The report must never print a score for an answer we never heard.

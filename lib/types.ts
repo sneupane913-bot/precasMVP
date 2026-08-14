@@ -134,6 +134,16 @@ export interface Answer {
   durationSeconds: number;
   transcript: string;
   transcriptStatus: TranscriptStatus;
+  /**
+   * True when we caught clearly less than they said.
+   *
+   * Many Nepali students speak quietly, hesitantly, or with an accent the model
+   * handles poorly, so some of what they say will not be picked up. That is our
+   * limitation and not theirs, and a product that quietly grades the fragment it
+   * heard is telling a student their English is worse than it is. Recorded here
+   * so the report can say so in the same words the room did.
+   */
+  partialCapture?: boolean;
   /** null whenever transcriptStatus !== 'ok'. Never fabricate a score. */
   evaluation: Evaluation | null;
   createdAt: string;

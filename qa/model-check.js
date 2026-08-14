@@ -186,12 +186,15 @@ async function signIn(token, opts = {}) {
   const SU = 'super-dev';
   const cs = `n1-${S}`;
   const mk = await req('POST', '/api/platform',
-    { action: 'createConsultancy', superKey: SU, name: cs, slug: cs, seatsTotal: 20, paidNpr: 6000, passcode: 'n1pass123' });
+    { action: 'createConsultancy', superKey: SU, name: cs, slug: cs, seatsTotal: 20, paidNpr: 6000, passcode: 'handover-n1' });
   // 20, not 5: this block signs up seven students and an earlier version ran
   // the consultancy out of seats halfway through, so seat10 came back as the
   // bare trial and looked like a broken seat size. It was a broken test.
   await req('POST', '/api/platform',
     { action: 'setConsultancyStatus', superKey: SU, consultancyId: mk.json?.data?.id, status: 'approved' });
+  // The handover code opens the door once and nothing else. Replace it first.
+  await req('POST', '/api/admin',
+    { action: 'changePasscode', slug: cs, passcode: 'handover-n1', newPasscode: 'n1pass123' });
 
   // Three students through three DIFFERENT seat-size links from one consultancy.
   const sizes = [['seat3', 3], ['seat6', 6], ['seat10', 10]];
@@ -249,9 +252,11 @@ async function signIn(token, opts = {}) {
 
   const otherCs = `n5o-${S}`;
   const mk2 = await req('POST', '/api/platform',
-    { action: 'createConsultancy', superKey: SU, name: otherCs, slug: otherCs, seatsTotal: 5, paidNpr: 6000, passcode: 'n5pass123' });
+    { action: 'createConsultancy', superKey: SU, name: otherCs, slug: otherCs, seatsTotal: 5, paidNpr: 6000, passcode: 'handover-n5' });
   await req('POST', '/api/platform',
     { action: 'setConsultancyStatus', superKey: SU, consultancyId: mk2.json?.data?.id, status: 'approved' });
+  await req('POST', '/api/admin',
+    { action: 'changePasscode', slug: otherCs, passcode: 'handover-n5', newPasscode: 'n5pass123' });
   const cross = await req('POST', '/api/admin',
     { action: 'renewStudent', slug: otherCs, passcode: 'n5pass123', studentId: target?.id });
   t('N-5b', 'One consultancy cannot top up another\'s student', cross.code === 404,

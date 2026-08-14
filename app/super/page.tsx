@@ -3,6 +3,7 @@
 import { useCallback, useState } from 'react';
 import { PasscodeInput } from '@/components/PasscodeInput';
 import { PaySettingsForm, type PaySettings } from '@/components/PaySettingsForm';
+import { PasscodeChangeForm } from '@/components/PasscodeChangeForm';
 
 /**
  * Super admin, rebuilt to docs/design-reference/super_admin_dashboard.
@@ -263,6 +264,23 @@ export default function SuperAdminPage() {
       await loadAll();
       setNotice(`${c.name} is now ${status}.`);
     }
+  }
+
+  /**
+   * Change the one passcode that opens every student record we hold.
+   *
+   * `key` is updated in state the moment it succeeds, because every later call
+   * on this screen sends it and would otherwise start returning 403 while the
+   * admin sat looking at a working-looking dashboard.
+   */
+  async function changeSuperPasscode(newPasscode: string): Promise<boolean> {
+    const ok = (await call({ action: 'changeSuperPasscode', newPasscode })) as
+      | { message?: string }
+      | null;
+    if (!ok) return false;
+    setKey(newPasscode);
+    setNotice(ok.message ?? 'Saved. Use the new passcode from now on.');
+    return true;
   }
 
   async function blockDevice(fingerprint: string, who: string | null) {
@@ -1153,6 +1171,21 @@ export default function SuperAdminPage() {
         {tab === 'settings' && data && (
           <>
             <PaySettingsForm initial={data.paySettings} onSave={savePaySettings} busy={busy} />
+
+            {/* -------------------------------------- your passcode ---
+                It could previously only be changed by editing an environment
+                variable and redeploying, which in practice means never: not
+                when a laptop is lost, not when somebody leaves, not after it
+                has been read out over the phone to unstick somebody. */}
+            <div className="mt-6">
+              <PasscodeChangeForm
+                title="Change your passcode"
+                explanation="This one passcode opens every student record we hold, so it is worth changing after anyone has seen it. If you ever forget it, change SUPER_ADMIN_PASSCODE in Netlify and redeploy, which clears this one and lets you back in."
+                minLength={10}
+                busy={busy}
+                onSave={changeSuperPasscode}
+              />
+            </div>
 
             {/* ------------------------------------------ the offer ---
                 `RewardRule` has said "a reward rule the super admin controls"

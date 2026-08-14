@@ -8,6 +8,8 @@ export interface PaySettings {
   payWalletNumber: string;
   payAccountName: string;
   supportWhatsapp: string;
+  /** Hours a waiting student is told to allow. Honest, not vague. */
+  approvalWaitHours: number;
 }
 
 /**
@@ -172,6 +174,29 @@ export function PaySettingsForm({
           <p className="mt-1 text-xs text-slate-500">
             Every WhatsApp link and every &ldquo;call us&rdquo; number in the product uses this.
             Change it here when the sales number takes over.
+          </p>
+        </div>
+        <div>
+          <label className={label}>Hours a student is told to wait</label>
+          <input
+            type="number"
+            min={1}
+            max={72}
+            value={v.approvalWaitHours}
+            onChange={(e) => {
+              setSaved(false);
+              const n = Math.max(1, Math.min(72, Number(e.target.value) || 1));
+              setV((p) => ({ ...p, approvalWaitHours: n }));
+            }}
+            className={field}
+          />
+          {/* "This can take a little time" tells a student nothing. They cannot
+              tell ten minutes from tomorrow, so they message us, or worse, they
+              pay a second time. A number they can plan around is kinder and
+              cheaper. Raise it during Dashain rather than quietly missing it. */}
+          <p className="mt-1 text-xs text-slate-500">
+            Shown to anyone waiting on a payment. Be honest: a promise you miss costs more than a
+            longer one you keep.
           </p>
         </div>
       </div>

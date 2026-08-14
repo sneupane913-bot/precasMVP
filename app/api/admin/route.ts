@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { platform, type Consultancy, platformDown } from '@/lib/platform';
+import { platform, secretEquals, type Consultancy, platformDown } from '@/lib/platform';
 import { repo } from '@/lib/db';
 import { approvePayment, rejectPayment, type Actor } from '@/lib/payments';
 import { renewSeat } from '@/lib/entitlement';
@@ -21,6 +21,24 @@ const Body = z.discriminatedUnion('action', [
     action: z.literal('login'),
     slug: z.string().min(1).max(60),
     passcode: z.string().min(1).max(60),
+  }),
+  /**
+   * The consultancy chooses its own passcode.
+   *
+   * The super admin sets the first one, so the super admin knows it. A secret
+   * two organisations both know is not a password: if a consultancy's student
+   * list leaked, neither side could say which of them leaked it. So the first
+   * code is a HANDOVER CODE that gets them in once, and the portal shows them
+   * nothing until they replace it.
+   *
+   * The old one is required even for a voluntary change, so somebody who walks
+   * up to an unattended logged-in browser cannot lock the real admin out.
+   */
+  z.object({
+    action: z.literal('changePasscode'),
+    slug: z.string().min(1).max(60),
+    passcode: z.string().min(1).max(60),
+    newPasscode: z.string().min(8).max(60),
   }),
   z.object({
     action: z.literal('updateBranding'),
@@ -148,7 +166,7 @@ export async function POST(req: Request) {
   }
 
   const c = await platform.getConsultancy(body.slug);
-  if (!c || c.passcode !== body.passcode) {
+  if (!c || !secretEquals(body.passcode, c.passcode)) {
     // Same message either way, so the response cannot be used to discover
     // which consultancy slugs exist.
     rateLimitPenalise(`admin-auth:${clientIp(req)}`, RL.auth);
@@ -166,6 +184,32 @@ export async function POST(req: Request) {
         c.status === 'pending'
           ? 'Your account is waiting for approval. You will be contacted shortly.'
           : 'This account has been suspended. Please get in touch.'
+      ),
+      { status: 403 }
+    );
+  }
+
+  /**
+   * The handover code gets them IN, and nothing further.
+   *
+   * The super admin set this passcode, so the super admin knows it. Until the
+   * consultancy replaces it, two organisations share one secret, and a shared
+   * secret cannot establish who did what: if a student list leaked, neither
+   * side could say which of them leaked it.
+   *
+   * So every action except changing it is refused while it is temporary. Not a
+   * nag banner they can dismiss, because a nag would leave the shared secret in
+   * force for as long as they ignored it.
+   *
+   * Deliberately AFTER the approved check, so a pending consultancy is told it
+   * is pending rather than being sent to change a passcode it cannot yet use.
+   */
+  if (c.passcodeIsTemporary && body.action !== 'changePasscode') {
+    return NextResponse.json(
+      apiError(
+        'PASSCODE_MUST_CHANGE',
+        'temporary handover code still in force',
+        'Please choose your own passcode before you carry on. We set the first one for you, which means we know it, and your student list should be yours alone.'
       ),
       { status: 403 }
     );
@@ -417,6 +461,52 @@ export async function POST(req: Request) {
     });
   }
 
+  if (body.action === 'changePasscode') {
+    // Reject the obvious non-changes before anything else, so the error names
+    // the real problem rather than "that did not work".
+    if (secretEquals(body.newPasscode, body.passcode)) {
+      return NextResponse.json(
+        apiError('SAME_PASSCODE', 'new equals old', 'Please choose a passcode different from your current one.'),
+        { status: 400 }
+      );
+    }
+    if (/^[0-9]+$/.test(body.newPasscode) || /^(.)\1+$/.test(body.newPasscode)) {
+      return NextResponse.json(
+        apiError(
+          'WEAK_PASSCODE',
+          'digits only or one repeated character',
+          'Please use letters as well as numbers. Digits alone are guessed quickly.'
+        ),
+        { status: 400 }
+      );
+    }
+
+    await platform.saveConsultancy({
+      ...c,
+      passcode: body.newPasscode,
+      passcodeIsTemporary: false,
+      passcodeChangedAt: new Date().toISOString(),
+    });
+
+    // Recorded, but the passcode itself is NEVER written to the audit trail.
+    await repo().appendAudit({
+      id: crypto.randomUUID(),
+      actorRole: 'admin',
+      actorId: c.id,
+      action: 'change_passcode',
+      subjectId: c.id,
+      before: c.passcodeIsTemporary === false ? 'own passcode' : 'handover code',
+      after: 'own passcode',
+      note: `${c.name} (${c.slug}) set their own passcode`,
+      createdAt: new Date().toISOString(),
+    });
+
+    return NextResponse.json({
+      ok: true,
+      data: { message: 'Saved. Use your new passcode from now on.' },
+    });
+  }
+
   if (body.action === 'updateBranding') {
     const updated: Consultancy = {
       ...c,
@@ -510,6 +600,7 @@ export async function POST(req: Request) {
     ok: true,
     data: {
       consultancy: publicView(c),
+      passcodeIsTemporary: Boolean(c.passcodeIsTemporary),
       students,
       notifications,
       orders: visibleOrders,

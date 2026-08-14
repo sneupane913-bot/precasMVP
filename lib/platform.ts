@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'crypto';
 import type { InterviewSession } from '@/lib/types';
 
 /**
@@ -28,6 +29,20 @@ export interface Consultancy {
   approvedAt: string | null;
   /** Passcode for their admin portal. MVP only, replaced by real auth later. */
   passcode: string;
+  /**
+   * True until they have chosen their own passcode.
+   *
+   * The super admin sets the first one, which means the super admin knows it,
+   * and a shared secret between two organisations is not a password. So the
+   * first one is a HANDOVER CODE, not a passcode: it gets them in once, and
+   * the portal then refuses to show them anything until they replace it.
+   *
+   * Undefined on consultancies created before this existed. Those are treated
+   * as already changed, because forcing a change on somebody mid-pilot with no
+   * warning would lock them out of their own students.
+   */
+  passcodeIsTemporary?: boolean;
+  passcodeChangedAt?: string | null;
 }
 
 export interface StudentRecord {
@@ -87,6 +102,52 @@ export interface PlatformSettings {
    * A consultancy admin can change NONE of these: the money arrives in our
    * wallet, so only we may say where it goes or who answers about it.
    */
+  /**
+   * The super admin's own passcode, once they have changed it.
+   *
+   * Absent means "still using the environment variable", which is how the
+   * first login works and how the client recovers if they forget it: change
+   * the env var and redeploy, which is a deliberate act only somebody with
+   * host access can perform.
+   *
+   * Yes, this is a secret in the settings document. It is the same secret that
+   * was already in an environment variable readable by the same code, so this
+   * does not widen who can read it. What it does widen is who can CHANGE it,
+   * which is the point: a password nobody can change is not a password.
+   */
+  superPasscode?: string;
+  superPasscodeChangedAt?: string | null;
+  /**
+   * The DEPLOY key that was in force when the stored passcode was set.
+   *
+   * This is the whole recovery story, and without it the recovery story was a
+   * lie. The comment used to say "if you forget it, change the environment
+   * variable and redeploy". That would not have worked: the stored passcode
+   * took precedence unconditionally, so changing the env var would have
+   * changed nothing and the owner would have been locked out of their own
+   * product with no way back in.
+   *
+   * Now the stored passcode is only honoured while the deploy key is still the
+   * one it was set against. Change SUPER_ADMIN_PASSCODE in the host and the
+   * stored one is ignored, which is exactly the "I have host access, let me
+   * back in" escape hatch it was always claimed to be.
+   */
+  superPasscodeSetAgainst?: string | null;
+
+  /**
+   * How long a student should expect to wait for a person to check their
+   * payment, in hours.
+   *
+   * A student who has sent real money and is told "this can take a little
+   * time" has been told nothing. They cannot tell ten minutes from tomorrow,
+   * so they message us, or worse, they pay again. A number they can plan
+   * around is kinder AND cheaper than a vague reassurance.
+   *
+   * Editable without a deploy, because the honest answer changes: four hours
+   * on a normal weekday, longer over Dashain.
+   */
+  approvalWaitHours?: number;
+
   payQrImageUrl?: string;
   payWalletName?: string;
   payWalletNumber?: string;
@@ -261,10 +322,55 @@ export function isOwner(key: string | undefined | null): boolean {
   return Boolean(key) && key === expected;
 }
 
+/**
+ * The super admin passcode.
+ *
+ * It can now be CHANGED from the dashboard, so it is no longer read straight
+ * from the environment. The order is deliberate:
+ *
+ *   1. A passcode stored in settings, if one has ever been set. Changing it
+ *      must actually change it, otherwise the button is a lie.
+ *   2. Otherwise the environment variable, which is how the very first login
+ *      happens and how the client recovers if they forget it: change the env
+ *      var, redeploy, and the stored one is cleared by that same act.
+ *   3. Otherwise the dev fallback, never in production.
+ *
+ * Compared with timingSafeEqual rather than ===, because a passcode is a short
+ * secret and === leaks its length and prefix through timing. That is a small
+ * risk and a smaller cost to remove.
+ */
+export async function isSuperAdminAsync(key: string | undefined | null): Promise<boolean> {
+  if (!key) return false;
+  const s = await platform.getSettings();
+
+  const deployKey = process.env.SUPER_ADMIN_PASSCODE ?? '';
+  const storedIsCurrent =
+    Boolean(s.superPasscode) && (s.superPasscodeSetAgainst ?? '') === deployKey;
+
+  // A passcode they chose, and the deploy key has not been rotated since.
+  if (storedIsCurrent) return secretEquals(key, s.superPasscode as string);
+
+  // Either they never changed it, or somebody with host access rotated the
+  // deploy key to get back in. Either way the environment wins.
+  return isSuperAdmin(key);
+}
+
+/** Constant-time compare that does not throw on differing lengths. */
+export function secretEquals(a: string, b: string): boolean {
+  const ab = Buffer.from(String(a));
+  const bb = Buffer.from(String(b));
+  if (ab.length !== bb.length) {
+    // Still burn a comparison so the early return is not itself a signal.
+    timingSafeEqual(ab, ab);
+    return false;
+  }
+  return timingSafeEqual(ab, bb);
+}
+
 export function isSuperAdmin(key: string | undefined | null): boolean {
   const expected = process.env.SUPER_ADMIN_PASSCODE;
   if (!expected) return process.env.NODE_ENV !== 'production' && key === 'super-dev';
-  return Boolean(key) && key === expected;
+  return Boolean(key) && secretEquals(String(key), expected);
 }
 
 /**
