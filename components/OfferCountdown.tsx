@@ -59,15 +59,15 @@ export function OfferCountdown({ offer }: { offer: Offer | null }) {
   const best = Math.max(0, ...Object.values(offer.bonusMocksByPack));
 
   return (
-    <div className="rounded-2xl border-2 border-emerald-300 bg-emerald-50 p-5">
+    <div className="rounded-card border-2 border-go/40 bg-go-tint p-5">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-        <p className="font-bold text-emerald-900">{offer.name}</p>
-        <span className="rounded-full bg-emerald-600 px-3 py-1 text-sm font-bold tabular-nums text-white">
+        <p className="font-bold text-go-dark">{offer.name}</p>
+        <span className="rounded-full bg-go px-3 py-1 text-sm font-bold tabular-nums text-white">
           {label}
         </span>
       </div>
 
-      <p className="mb-4 leading-relaxed text-emerald-900/90">
+      <p className="mb-4 leading-relaxed text-go-dark/90">
         {offer.publicReason}
         {best > 0 && (
           <>
@@ -80,12 +80,12 @@ export function OfferCountdown({ offer }: { offer: Offer | null }) {
 
       <Link
         href="/pricing"
-        className="inline-flex w-full items-center justify-center rounded-xl bg-ink px-6 py-3.5 font-bold text-white sm:w-auto"
+        className="inline-flex w-full items-center justify-center rounded-control bg-ink px-6 py-3.5 font-bold text-white sm:w-auto"
       >
         See the packs
       </Link>
 
-      <p className="mt-3 text-xs text-emerald-800/80">
+      <p className="mt-3 text-micro text-go-dark/80">
         The price never changes. This adds mocks, it does not discount.
       </p>
     </div>

@@ -18,8 +18,8 @@ const LOGOS = [
 
 export function TrustedBy() {
   return (
-    <section className="border-y border-slate-200 bg-white py-8">
-      <p className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.15em] text-slate-400">
+    <section className="border-y border-line bg-surface py-8">
+      <p className="mb-6 text-center text-micro font-semibold uppercase tracking-[0.15em] text-ink-quiet">
         Trusted by students applying to top UK universities
       </p>
       <div className="group relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">

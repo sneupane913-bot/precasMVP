@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PreCAS Practice - Choose your university</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&amp;family=Noto+Serif:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed": "#d6e4f9",
+                    "surface-tint": "#525f71",
+                    "on-primary": "#ffffff",
+                    "surface-bright": "#f8f9fc",
+                    "on-background": "#191c1e",
+                    "on-secondary": "#ffffff",
+                    "surface": "#f8f9fc",
+                    "tertiary-container": "#281804",
+                    "on-tertiary-container": "#9a7f61",
+                    "on-tertiary-fixed-variant": "#584329",
+                    "on-primary-fixed": "#0f1c2c",
+                    "on-error-container": "#93000a",
+                    "outline": "#74777d",
+                    "primary-fixed-dim": "#bac8dc",
+                    "tertiary-fixed-dim": "#e0c1a0",
+                    "on-primary-container": "#778598",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "inverse-surface": "#2e3133",
+                    "inverse-primary": "#bac8dc",
+                    "tertiary": "#000000",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#feddba",
+                    "background": "#f8f9fc",
+                    "on-secondary-container": "#007347",
+                    "secondary-container": "#82fab7",
+                    "secondary": "#006d42",
+                    "primary": "#000000",
+                    "surface-variant": "#e1e2e5",
+                    "primary-container": "#0f1c2c",
+                    "on-surface": "#191c1e",
+                    "error": "#ba1a1a",
+                    "on-error": "#ffffff",
+                    "surface-container": "#edeef1",
+                    "surface-dim": "#d9dadd",
+                    "surface-container-low": "#f2f3f6",
+                    "surface-container-high": "#e7e8eb",
+                    "secondary-fixed": "#82fab7",
+                    "on-surface-variant": "#44474c",
+                    "secondary-fixed-dim": "#65dd9c",
+                    "outline-variant": "#c4c6cc",
+                    "on-secondary-fixed-variant": "#005231",
+                    "on-secondary-fixed": "#002111",
+                    "on-tertiary-fixed": "#281804",
+                    "surface-container-highest": "#e1e2e5",
+                    "on-primary-fixed-variant": "#3a4859",
+                    "inverse-on-surface": "#f0f1f4"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "4px",
+                    "md": "24px",
+                    "container-max": "1120px",
+                    "xs": "8px",
+                    "gutter": "20px",
+                    "lg": "40px",
+                    "sm": "16px",
+                    "xl": "64px"
+            },
+            "fontFamily": {
+                    "label-md": ["Hanken Grotesk"],
+                    "headline-md": ["Noto Serif"],
+                    "display-mobile": ["Noto Serif"],
+                    "body-md": ["Hanken Grotesk"],
+                    "headline-lg": ["Noto Serif"],
+                    "body-sm": ["Hanken Grotesk"],
+                    "label-sm": ["Hanken Grotesk"],
+                    "headline-sm": ["Noto Serif"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "display": ["Noto Serif"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                    "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                    "display-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                    "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                    "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                    "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                    "label-sm": ["12px", { "lineHeight": "1", "fontWeight": "500" }],
+                    "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                    "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                    "display": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .soft-shadow { box-shadow: 0 1px 2px rgba(13,27,42,.04); }
+        .deep-shadow { box-shadow: 0 8px 24px rgba(13,27,42,.06); }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-surface sticky top-0 w-full z-50 flex justify-between items-center px-md py-xs max-w-container-max mx-auto border-b border-outline-variant">
+<div class="flex items-center gap-lg">
+<a class="font-headline-md text-headline-md text-primary" href="#">PreCAS Practice</a>
+<div class="hidden md:flex gap-sm">
+<a class="font-label-md text-label-md text-primary border-b-2 border-secondary pb-1" href="#">Universities</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Practice</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Pricing</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">FAQ</a>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200">Log In</button>
+<button class="bg-primary text-on-primary px-sm py-xs rounded-full font-label-md text-label-md hover:bg-surface-tint transition-colors duration-200">Sign Up</button>
+</div>
+</nav>
+<main class="flex-grow w-full max-w-container-max mx-auto px-md py-lg md:py-xl flex flex-col gap-lg">
+<!-- Header Section -->
+<header class="text-center max-w-2xl mx-auto flex flex-col gap-sm">
+<h1 class="font-display text-display text-primary">Choose your university</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Questions are built from the credibility themes universities publish, not from any leaked question list.</p>
+</header>
+<!-- Resume Banner -->
+<section class="bg-[#eaf7f0] border-2 border-[#0f9d63] rounded-xl p-md flex flex-col md:flex-row items-center justify-between gap-md soft-shadow">
+<div class="flex flex-col gap-base">
+<p class="font-label-md text-label-md text-primary">You have an interview in progress</p>
+<p class="font-body-md text-body-md text-on-surface-variant">You answered 1 of 10 questions. Nothing is lost — pick up exactly where you stopped.</p>
+</div>
+<button class="bg-[#0f9d63] text-on-primary px-md py-xs rounded-lg font-label-md text-label-md whitespace-nowrap hover:opacity-90 transition-opacity">Continue your interview</button>
+</section>
+<!-- Search & Filters -->
+<section class="flex flex-col gap-md">
+<div class="relative w-full max-w-xl mx-auto">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-surface border border-outline-variant rounded-full py-sm pl-xl pr-sm font-body-md text-body-md text-primary focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent focus:bg-surface-sunk transition-all" placeholder="Search for universities, cities..." type="text"/>
+</div>
+<div class="flex flex-wrap justify-center gap-xs">
+<button class="bg-[#0f9d63] text-on-primary px-sm py-xs rounded-full font-label-sm text-label-sm">All</button>
+<button class="bg-surface border border-outline-variant text-on-surface-variant px-sm py-xs rounded-full font-label-sm text-label-sm hover:bg-surface-variant transition-colors">Pre-CAS</button>
+<button class="bg-surface border border-outline-variant text-on-surface-variant px-sm py-xs rounded-full font-label-sm text-label-sm hover:bg-surface-variant transition-colors">CAS</button>
+<button class="bg-surface border border-outline-variant text-on-surface-variant px-sm py-xs rounded-full font-label-sm text-label-sm hover:bg-surface-variant transition-colors">Pre-Admission</button>
+</div>
+</section>
+<!-- Most Applied Section -->
+<section class="flex flex-col gap-md pt-lg border-t border-line">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[#0f9d63]" style="font-variation-settings: 'FILL' 1;">star</span>
+<h2 class="font-headline-sm text-headline-sm text-primary">Most applied</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Card 1 -->
+<div class="bg-surface rounded-[16px] p-md flex flex-col gap-md soft-shadow border border-outline-variant">
+<div class="flex items-start gap-md">
+<img alt="BPP University Logo" class="w-16 h-16 rounded-lg object-contain bg-surface-container-low p-xs" src="https://lh3.googleusercontent.com/aida/AP1WRLtL_-dIE94dNNiJBvmnxZxbCg6xViUQagW6_QLvUeYY1736zAIzf7-w0OCBMs2cfUGDuF7L8IUVrqoBXGcxtbHdzHk8Mt8fCZPNbFkv2YpWfYFkQQheogcomRlVfj5dJLsSqaQMJ8ZTPIIlVUDiIHyn0kNeQnEILZW2seOqReGmu2G5-iI5GcgSXCjy_sveReodSpHQRI8HhYOMrg4k1z0zl1-wvD2v7MfOKLQQMXHx9_9W8s_3Sct_MAk"/>
+<div class="flex-grow flex flex-col items-start gap-xs">
+<h3 class="font-headline-sm text-headline-sm text-primary">BPP University</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">London</p>
+<span class="bg-[#eaf7f0] text-secondary-fixed-dim px-xs py-base rounded font-label-sm text-label-sm mt-xs">In progress</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm">
+<div class="bg-surface-container-low p-sm rounded-lg flex flex-col gap-base">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Duration</span>
+<span class="font-body-md text-body-md text-primary">30 mins</span>
+</div>
+<div class="bg-surface-container-low p-sm rounded-lg flex flex-col gap-base">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Questions</span>
+<span class="font-body-md text-body-md text-primary">17 Qs</span>
+</div>
+</div>
+<button class="bg-primary text-on-primary w-full py-sm rounded-lg font-label-md text-label-md mt-auto hover:bg-surface-tint transition-colors">Continue your interview</button>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface rounded-[16px] p-md flex flex-col gap-md soft-shadow border border-outline-variant">
+<div class="flex items-start gap-md">
+<img alt="University of East London Logo" class="w-16 h-16 rounded-lg object-contain bg-surface-container-low p-xs" src="https://lh3.googleusercontent.com/aida/AP1WRLv1ld4gSXd4Dnvty7FzcCnggMTl3JEEayd_H0yy1sJlHLsid8FFW3kLLxhCD4goWZAmaKyktJ_vKcYkW9SB69gS73Cj7OiBG8W5LGEl66-jMHXyspyZTp7O6wQexdewewRM-w2V2Dj9w0gTOAL_8aRKyacuCWeyFsMaU8G_uv3hPHtXvDMKEFIiO21oOWZV-ez4eWtWUqCkF6Vljj7aeT2YgUBIwcfOUevkFtz2XLGaQBRPuJ7Ang2NnFs"/>
+<div class="flex-grow flex flex-col items-start gap-xs">
+<h3 class="font-headline-sm text-headline-sm text-primary">University of East London</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">London</p>
+<span class="bg-[#eaf7f0] text-secondary-fixed-dim px-xs py-base rounded font-label-sm text-label-sm mt-xs">Free first try</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm">
+<div class="bg-surface-container-low p-sm rounded-lg flex flex-col gap-base">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Duration</span>
+<span class="font-body-md text-body-md text-primary">30 mins</span>
+</div>
+<div class="bg-surface-container-low p-sm rounded-lg flex flex-col gap-base">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Questions</span>
+<span class="font-body-md text-body-md text-primary">17 Qs</span>
+</div>
+</div>
+<button class="bg-primary text-on-primary w-full py-sm rounded-lg font-label-md text-label-md mt-auto hover:bg-surface-tint transition-colors">Start interview</button>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface rounded-[16px] p-md flex flex-col gap-md soft-shadow border border-outline-variant">
+<div class="flex items-start gap-md">
+<img alt="University of West London Logo" class="w-16 h-16 rounded-lg object-contain bg-surface-container-low p-xs" src="https://lh3.googleusercontent.com/aida/AP1WRLtECk4A6Lxcr3soyKmVzoMJqs0hPRs76GNTEcuA4erPsW6iJ96xIrYHZ3ZaPI7dLy439hsLAK9jcMJX9JlFk-LhI3kIZXLgHMnzJF_Wnb5TzxAiymtGzCWuZNfT0deg_2kADZJLpjmCh1FJ-OIbj9GgsZZFYFnZkrkaI36cdesXUHwFjDHGZ93k6QxiSyfIcbDm_Xg27HQOpuEldLJamAoYYe_3WewsvayzOr6-2v2p8x37bf9gkI-Opw"/>
+<div class="flex-grow flex flex-col items-start gap-xs">
+<h3 class="font-headline-sm text-headline-sm text-primary">University of West London</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">London</p>
+<span class="bg-[#fdf5e7] text-on-tertiary-fixed-variant px-xs py-base rounded font-label-sm text-label-sm mt-xs">Needs a pack</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm">
+<div class="bg-surface-container-low p-sm rounded-lg flex flex-col gap-base">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Duration</span>
+<span class="font-body-md text-body-md text-primary">30 mins</span>
+</div>
+<div class="bg-surface-container-low p-sm rounded-lg flex flex-col gap-base">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Questions</span>
+<span class="font-body-md text-body-md text-primary">17 Qs</span>
+</div>
+</div>
+<button class="bg-primary text-on-primary w-full py-sm rounded-lg font-label-md text-label-md mt-auto hover:bg-surface-tint transition-colors">Buy a pack to start</button>
+</div>
+<!-- Card 4 -->
+<div class="bg-surface rounded-[16px] p-md flex flex-col gap-md soft-shadow border border-outline-variant">
+<div class="flex items-start gap-md">
+<img alt="Coventry University Logo" class="w-16 h-16 rounded-lg object-contain bg-surface-container-low p-xs" src="https://lh3.googleusercontent.com/aida/AP1WRLvum5ROOzYA5ME5IFsIjzNry4kyWmjdB5l1Bu-K0-IDmeMhKq70Xk8sw5ZfAtpcRW2j0we3pLrfq4NQWZJngd_Y_5uVsEEnBVUHgkSqCY-8ZVoqhpnTzzqdreoXOzVkjokFlbdy1SVzOG0OPX09zFHIFmV8VKlEhUMy20-QuryPo37V7ia5RxDU1d9lEfjjwI7uMR58BWSWfJl8fSK6BevILzEUwMrwZHv1A1D4iReUMJ8KedJthXOcSZ0"/>
+<div class="flex-grow flex flex-col items-start gap-xs">
+<h3 class="font-headline-sm text-headline-sm text-primary">Coventry University</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Coventry</p>
+<span class="bg-[#eaf7f0] text-secondary-fixed-dim px-xs py-base rounded font-label-sm text-label-sm mt-xs">Free first try</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm">
+<div class="bg-surface-container-low p-sm rounded-lg flex flex-col gap-base">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Duration</span>
+<span class="font-body-md text-body-md text-primary">30 mins</span>
+</div>
+<div class="bg-surface-container-low p-sm rounded-lg flex flex-col gap-base">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Questions</span>
+<span class="font-body-md text-body-md text-primary">17 Qs</span>
+</div>
+</div>
+<button class="bg-primary text-on-primary w-full py-sm rounded-lg font-label-md text-label-md mt-auto hover:bg-surface-tint transition-colors">Sign in to start</button>
+</div>
+</div>
+</section>
+<!-- All Universities Section -->
+<section class="flex flex-col gap-md pt-lg border-t border-line">
+<h2 class="font-headline-sm text-headline-sm text-primary">All UK universities (164)</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Card 5 -->
+<div class="bg-surface rounded-[16px] p-md flex flex-col gap-md soft-shadow border border-outline-variant">
+<div class="flex items-start gap-md">
+<img alt="Wolverhampton University Logo" class="w-16 h-16 rounded-lg object-contain bg-surface-container-low p-xs" src="https://lh3.googleusercontent.com/aida/AP1WRLt4QHYXVQkaePtDMqjCG7kBwwpaggg1MlY70Ov0EuNgJT9nFCoiyOSfR0hRVGK6p2X-_EJfJzlbpQAMm0-ZIVvtmuqqi4645QBQ2EEhLF7GJOjfw1hmekhrH3yovkt1f3kyNAHN_Dh4mvyRCdajJdMWM423jsbPZHqamJ84Gv_WvwWM0v44939XXzO60fZg-SvLjAhOM7cSKnohVDLbFFEb9voLNq1td3St2Gv6-NVpUq9AQZfv2Hf4UXA"/>
+<div class="flex-grow flex flex-col items-start gap-xs">
+<h3 class="font-headline-sm text-headline-sm text-primary">University of Wolverhampton</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Wolverhampton</p>
+<span class="bg-[#fdf5e7] text-on-tertiary-fixed-variant px-xs py-base rounded font-label-sm text-label-sm mt-xs">Needs a pack</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm">
+<div class="bg-surface-container-low p-sm rounded-lg flex flex-col gap-base">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Duration</span>
+<span class="font-body-md text-body-md text-primary">30 mins</span>
+</div>
+<div class="bg-surface-container-low p-sm rounded-lg flex flex-col gap-base">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Questions</span>
+<span class="font-body-md text-body-md text-primary">17 Qs</span>
+</div>
+</div>
+<button class="bg-primary text-on-primary w-full py-sm rounded-lg font-label-md text-label-md mt-auto hover:bg-surface-tint transition-colors">Buy a pack to start</button>
+</div>
+<!-- Card 6 -->
+<div class="bg-surface rounded-[16px] p-md flex flex-col gap-md soft-shadow border border-outline-variant">
+<div class="flex items-start gap-md">
+<img alt="Ravensbourne University Logo" class="w-16 h-16 rounded-lg object-contain bg-surface-container-low p-xs" src="https://lh3.googleusercontent.com/aida/AP1WRLs3CSQxjRRDBJ1MlOSIUH-QEkfQbdIrFQU74Vr0wzbNfAbJWve_ZwRq87uC01vuE-punUPa4f50LrXAVDzB77edPUswH0cR6pHlVD7vetQqAjP3P2-zIQyKkTJRXvT7uy-UUUfl69GKk9VN7Gxj_tuVNKl8qDShbPQd9PVkZ2s0Ab4VgRnEaTeg93G5Hli_yr1DenXiqMi28wnBXfH4WRlxwSTTMicwa0AJwZDKPbyUJZo4IBKrqrkO6Rg"/>
+<div class="flex-grow flex flex-col items-start gap-xs">
+<h3 class="font-headline-sm text-headline-sm text-primary">Ravensbourne University</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">London</p>
+<span class="bg-[#fdf5e7] text-on-tertiary-fixed-variant px-xs py-base rounded font-label-sm text-label-sm mt-xs">Needs a pack</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm">
+<div class="bg-surface-container-low p-sm rounded-lg flex flex-col gap-base">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Duration</span>
+<span class="font-body-md text-body-md text-primary">30 mins</span>
+</div>
+<div class="bg-surface-container-low p-sm rounded-lg flex flex-col gap-base">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Questions</span>
+<span class="font-body-md text-body-md text-primary">17 Qs</span>
+</div>
+</div>
+<button class="bg-primary text-on-primary w-full py-sm rounded-lg font-label-md text-label-md mt-auto hover:bg-surface-tint transition-colors">Buy a pack to start</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant mt-auto">
+<div class="w-full py-xl px-md flex flex-col md:flex-row justify-between items-start max-w-container-max mx-auto gap-lg">
+<div class="flex flex-col gap-sm">
+<span class="font-headline-sm text-headline-sm text-primary">PreCAS Practice</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">© 2024 PreCAS Practice. All rights reserved.</p>
+</div>
+<div class="flex flex-col md:flex-row gap-md">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">About Us</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">WhatsApp Support</a>
+</div>
+</div>
+</footer>
+</body></html>

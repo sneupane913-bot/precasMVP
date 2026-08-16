@@ -58,8 +58,8 @@ export default function InterviewPage() {
     return (
       <div className="grid min-h-screen place-items-center px-6 text-center">
         <div>
-          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-ink" />
-          <p className="text-slate-600">Getting your interview ready...</p>
+          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-line border-t-ink" />
+          <p className="text-ink-soft">Getting your interview ready...</p>
         </div>
       </div>
     );
@@ -129,21 +129,21 @@ export default function InterviewPage() {
     return (
       <main className="mx-auto max-w-lg p-5 sm:p-6">
         <h1 className="mb-2 text-2xl font-bold text-ink">Before you start</h1>
-        <p className="mb-5 leading-relaxed text-slate-600">
+        <p className="mb-5 leading-relaxed text-ink-soft">
           This works like the real interview, so please read these four things.
         </p>
 
         <ul className="mb-6 space-y-3">
           {CONSENT_POINTS.map(([t, d]) => (
-            <li key={t} className="rounded-xl border border-slate-200 bg-white p-4">
+            <li key={t} className="rounded-control border border-line bg-surface p-4">
               <p className="mb-0.5 font-semibold text-ink">{t}</p>
-              <p className="text-sm leading-relaxed text-slate-600">{d}</p>
+              <p className="text-sm leading-relaxed text-ink-soft">{d}</p>
             </li>
           ))}
         </ul>
 
         {consentError && (
-          <p className="mb-3 rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3 font-medium text-red-800">
+          <p className="mb-3 rounded-control border-2 border-stop/30 bg-stop-tint px-4 py-3 font-medium text-stop">
             {consentError}
           </p>
         )}
@@ -151,11 +151,11 @@ export default function InterviewPage() {
         <button
           onClick={acceptConsent}
           disabled={consentBusy}
-          className="w-full rounded-xl bg-ink px-6 py-4 text-lg font-bold text-white disabled:bg-slate-300"
+          className="w-full rounded-control bg-ink px-6 py-4 text-lg font-bold text-white disabled:bg-line-strong"
         >
           {consentBusy ? 'Saving...' : 'I understand, continue'}
         </button>
-        <p className="mt-3 text-center text-xs text-slate-400">
+        <p className="mt-3 text-center text-micro text-ink-quiet">
           We record that you agreed, and when. Version {CONSENT_VERSION}.
         </p>
       </main>

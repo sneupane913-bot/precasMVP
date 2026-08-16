@@ -13,6 +13,7 @@ import { isDemoTranscript } from '@/lib/ai/stt';
 import { getInstitution } from '@/lib/data/institutions';
 import { getQuestion, resolvedQuestion , primeExtraQuestions} from '@/lib/data/questions';
 import { BAND_LABEL, CATEGORY_LABEL, FLAG_META, PEE_STEPS, type FlagType } from '@/lib/types';
+import { BAND, Card, Chip, ButtonLink, Eyebrow, type Band } from '@/components/ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,7 +57,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
       <header className="px-4 pt-8 sm:px-6">
         <div className="mx-auto flex max-w-3xl flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-ink-quiet">
               {institution.name}
               {session.completedAt
                 ? ` · ${new Date(session.completedAt).toLocaleDateString()}`
@@ -68,7 +69,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
           </div>
           <Link
             href="/practice"
-            className="rounded-xl bg-ink px-5 py-3 text-sm font-bold text-white"
+            className="rounded-control bg-ink px-5 py-3 text-sm font-bold text-white"
           >
             Practise your weakest answer
           </Link>
@@ -77,7 +78,21 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
 
       <div className="mx-auto max-w-3xl space-y-5 px-4 py-6 sm:px-6">
         {/* ---------- Verdict. Label first, number second. ---------- */}
-        <section className="rounded-2xl border-2 border-slate-200 bg-white p-6 text-center">
+        {/* ------------------------------------------------------------------
+            THE BAND. The client asked for the report to be colour coded by
+            section, and this is the anchor: the whole card takes the colour of
+            the result, so the verdict is legible before a single word is read.
+
+            The colour NEVER travels alone (D-9). The band word sits inside it
+            at full size, so the card reads identically in greyscale and to a
+            colour-blind student — which, for a report about their future, is
+            not a detail.
+            ------------------------------------------------------------------ */}
+        <section
+          className={`rounded-card border-2 p-6 text-center shadow-card ${
+            summary.band ? BAND[summary.band as Band]?.shell ?? 'border-line bg-surface' : 'border-line bg-surface'
+          }`}
+        >
           {demoOnly ? (
             /* D-27. With no speech key set the transcripts are a sample, not the
                student's words. The interview room says so loudly; this page,
@@ -92,20 +107,20 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
               <p className="mb-2 mt-2 font-serif text-2xl leading-snug text-ink">
                 We were not listening yet, so this attempt has not been scored
               </p>
-              <p className="mx-auto max-w-md leading-relaxed text-slate-600">
+              <p className="mx-auto max-w-md leading-relaxed text-ink-soft">
                 The answers shown below are <strong>sample text, not your voice</strong>, so there is
                 no score and no judgement of your English anywhere on this page. Everything else here
                 is real: the questions you were asked, how long you took, and how you behaved on
                 camera.
               </p>
-              <p className="mt-3 text-sm text-slate-500">
+              <p className="mt-3 text-sm text-ink-quiet">
                 You answered {summary.answeredCount} of {summary.totalCount} questions
               </p>
             </>
           ) : scored.length === 0 ? (
             <>
               <p className="mb-2 text-2xl font-bold text-ink">We could not score this attempt</p>
-              <p className="mx-auto max-w-md leading-relaxed text-slate-600">
+              <p className="mx-auto max-w-md leading-relaxed text-ink-soft">
                 We did not hear enough of your answers to give you honest feedback. We will not give
                 you a score for answers we could not hear. Please check your microphone and try
                 again.
@@ -114,23 +129,36 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
           ) : (
             <>
               <p
-                className={`mb-1 inline-block rounded-full px-4 py-1.5 text-sm font-bold ${
-                  summary.band === 'ready'
-                    ? 'bg-emerald-100 text-emerald-800'
-                    : summary.band === 'almost_ready'
-                      ? 'bg-sky-100 text-sky-800'
-                      : summary.band === 'needs_practice'
-                        ? 'bg-amber-100 text-amber-800'
-                        : 'bg-red-100 text-red-800'
+                className={`font-serif text-[2.5rem] font-bold leading-none ${
+                  BAND[summary.band as Band]?.text ?? 'text-ink'
                 }`}
               >
                 {BAND_LABEL[summary.band]}
               </p>
-              <p className="mb-2 mt-2 font-serif text-2xl leading-snug text-ink">
+              <p className="mt-4 font-serif text-title leading-snug text-ink">
                 {summary.headline}
               </p>
-              <p className="text-5xl font-black text-ink">{summary.overallScore}%</p>
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-6 font-serif text-[3rem] font-bold leading-none text-ink">
+                {summary.overallScore}%
+              </p>
+              {/* A number needs context or it is just a number. The gauge shows
+                  which band the score sits in, so 62% reads as a position
+                  rather than as a mark out of a hundred. */}
+              <div className="mx-auto mt-4 max-w-sm">
+                <div className="flex h-2 overflow-hidden rounded-full">
+                  <span className="w-1/4 bg-stop/40" />
+                  <span className="w-1/4 bg-warn/40" />
+                  <span className="w-1/4 bg-line-strong" />
+                  <span className="w-1/4 bg-go/50" />
+                </div>
+                <div className="mt-1.5 flex justify-between text-micro text-ink-quiet">
+                  <span>At risk</span>
+                  <span>Needs practice</span>
+                  <span>Almost</span>
+                  <span>Ready</span>
+                </div>
+              </div>
+              <p className="mt-4 text-sm text-ink-quiet">
                 You answered {summary.answeredCount} of {summary.totalCount} questions
               </p>
             </>
@@ -146,22 +174,19 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
           const weakest = scored.length > 0 ? weakestOf(summary.subScores) : null;
           if (!weakest) return null;
           return (
-            <section className="rounded-2xl border-2 border-ink bg-white p-6">
-              <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-emerald-700">
+            <section className="rounded-card bg-ink p-6 text-white shadow-card md:p-8">
+              <p className="text-micro font-bold uppercase tracking-[0.08em] text-go">
                 Do this before your next interview
               </p>
-              <h2 className="mb-2 font-serif text-xl font-bold text-ink">{weakest.label}</h2>
-              <p className="mb-5 leading-relaxed text-slate-700">{weakest.advice}</p>
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <Link
-                  href="/practice"
-                  className="flex-1 rounded-xl bg-ink px-5 py-3.5 text-center font-bold text-white"
-                >
+              <h2 className="mb-2 mt-2 font-serif text-title font-bold">{weakest.label}</h2>
+              <p className="mb-6 leading-relaxed text-white/80">{weakest.advice}</p>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <ButtonLink href="/practice" className="flex-1">
                   Practise this now
-                </Link>
+                </ButtonLink>
                 <Link
                   href="/universities"
-                  className="flex-1 rounded-xl border-2 border-slate-300 px-5 py-3.5 text-center font-semibold text-slate-700"
+                  className="inline-flex min-h-tap flex-1 items-center justify-center rounded-control border border-white/25 px-5 py-3 text-base font-bold text-white transition-colors duration-tap ease-move hover:bg-surface/10"
                 >
                   Take another full interview
                 </Link>
@@ -180,44 +205,62 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
               ['Behaviour', summary.subScores.interviewBehaviour, 'How you followed the rules'],
             ] as [string, number | null, string][]
           ).map(([label, value, hint]) => (
-            <div key={label} className="rounded-xl border border-slate-200 bg-white p-4">
+            /* Each sub-score is banded on its OWN value, so a student can see
+               at a glance WHICH part let them down rather than only the total.
+               A null shows an em dash and the words "Not assessed" — never a
+               zero, because zero is a judgement and null is the truth that we
+               could not tell (G-1). */
+            <div
+              key={label}
+              className={`overflow-hidden rounded-card border border-line bg-surface p-4 shadow-card border-l-4 ${
+                value === null
+                  ? 'border-l-line-strong'
+                  : value >= 75
+                    ? 'border-l-go'
+                    : value >= 60
+                      ? 'border-l-line-strong'
+                      : value >= 45
+                        ? 'border-l-warn'
+                        : 'border-l-stop'
+              }`}
+            >
               {value === null ? (
-                <p className="text-base font-bold leading-tight text-slate-400">Not assessed</p>
+                <p className="font-serif text-title font-bold leading-none text-ink-quiet">&mdash;</p>
               ) : (
-                <p className="text-2xl font-black text-ink">{value}%</p>
+                <p className="font-serif text-title font-bold leading-none text-ink">{value}%</p>
               )}
-              <p className="text-sm font-semibold text-ink">{label}</p>
-              <p className="mt-0.5 text-xs leading-snug text-slate-500">
-                {value === null ? 'We could not hear you' : hint}
+              <p className="mt-2 text-sm font-semibold text-ink">{label}</p>
+              <p className="mt-0.5 text-micro leading-snug text-ink-quiet">
+                {value === null ? 'Not assessed — we could not hear enough to judge this' : hint}
               </p>
             </div>
           ))}
         </section>
 
         {/* ---------- Behaviour table ---------- */}
-        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <div className="border-b border-slate-200 p-5">
+        <section className="overflow-hidden rounded-card border border-line bg-surface">
+          <div className="border-b border-line p-5">
             <h2 className="font-bold text-ink">How you behaved in the interview</h2>
-            <p className="text-sm text-slate-600">These are the same things a real interviewer watches.</p>
+            <p className="text-sm text-ink-soft">These are the same things a real interviewer watches.</p>
           </div>
           {/* B27: at 360px this table pushed the whole page wider than the
               screen. Scrolling the table beats scrolling the page sideways. */}
           <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+            <thead className="bg-surface-sunk text-micro uppercase tracking-wide text-ink-quiet">
               <tr>
                 <th className="px-5 py-2.5 font-semibold">What we checked</th>
                 <th className="px-3 py-2.5 font-semibold">Result</th>
                 <th className="px-5 py-2.5 font-semibold">What this means</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-line">
               <tr>
                 <td className="px-5 py-3 font-semibold text-ink">Questions answered</td>
                 <td className="px-3 py-3 font-bold tabular-nums">
                   {summary.answeredCount}/{summary.totalCount}
                 </td>
-                <td className="px-5 py-3 text-slate-600">
+                <td className="px-5 py-3 text-ink-soft">
                   {summary.answeredCount === summary.totalCount
                     ? 'You answered everything. Well done.'
                     : 'Try to answer every question next time, even if you are unsure.'}
@@ -226,7 +269,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
               <tr>
                 <td className="px-5 py-3 font-semibold text-ink">Rule problems</td>
                 <td className="px-3 py-3 font-bold tabular-nums">{summary.violationCount}</td>
-                <td className="px-5 py-3 text-slate-600">
+                <td className="px-5 py-3 text-ink-soft">
                   {summary.violationCount === 0
                     ? 'No problems at all. Exactly right.'
                     : summary.violationCount < 5
@@ -236,9 +279,9 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
               </tr>
               {[...flagCounts.entries()].map(([type, count]) => (
                 <tr key={type}>
-                  <td className="px-5 py-3 text-slate-700">{FLAG_META[type].label}</td>
+                  <td className="px-5 py-3 text-ink-soft">{FLAG_META[type].label}</td>
                   <td className="px-3 py-3 font-bold tabular-nums">{count}</td>
-                  <td className="px-5 py-3 text-slate-600">{FLAG_META[type].studentMessage}</td>
+                  <td className="px-5 py-3 text-ink-soft">{FLAG_META[type].studentMessage}</td>
                 </tr>
               ))}
             </tbody>
@@ -247,11 +290,11 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
         </section>
 
         {/* ---------- What went well ---------- */}
-        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
-          <h2 className="mb-2 font-bold text-emerald-900">What you did well</h2>
+        <section className="rounded-card border border-go/30 bg-go-tint p-5">
+          <h2 className="mb-2 font-bold text-go-dark">What you did well</h2>
           <ul className="space-y-1.5">
             {summary.strengths.map((s) => (
-              <li key={s} className="flex gap-2 text-emerald-900">
+              <li key={s} className="flex gap-2 text-go-dark">
                 <span className="font-bold">✓</span>
                 <span className="leading-relaxed">{s}</span>
               </li>
@@ -272,31 +315,31 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
             return (
               <article
                 key={`${a.questionId}-${a.attemptNumber}`}
-                className="overflow-hidden rounded-2xl border border-slate-200 bg-white"
+                className="overflow-hidden rounded-card border border-line bg-surface"
               >
-                <div className="border-b border-slate-100 p-5">
+                <div className="border-b border-line p-5">
                   <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <span className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-slate-600">
+                    <span className="rounded-md bg-surface-sunk px-2.5 py-1 text-micro font-bold uppercase tracking-wide text-ink-soft">
                       Question {a.orderIndex + 1}
                     </span>
-                    <span className="rounded-md bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-500">
+                    <span className="rounded-md bg-surface-sunk px-2.5 py-1 text-micro font-semibold text-ink-quiet">
                       {CATEGORY_LABEL[q.category]}
                     </span>
                     {/* D-27. A per-question "Almost ready · 75%" badge is the same
                         claim as the headline, made twelve more times. Withheld
                         for sample answers. */}
                     {ev && isDemoTranscript(a.transcript) ? (
-                      <span className="rounded-md bg-violet-100 px-2.5 py-1 text-xs font-bold text-violet-800">
+                      <span className="rounded-md bg-violet-100 px-2.5 py-1 text-micro font-bold text-violet-800">
                         Sample answer, not scored
                       </span>
                     ) : ev ? (
                       <span
-                        className={`rounded-md px-2.5 py-1 text-xs font-bold ${
+                        className={`rounded-md px-2.5 py-1 text-micro font-bold ${
                           ev.score >= 65
-                            ? 'bg-emerald-100 text-emerald-800'
+                            ? 'bg-go-tint text-go-dark'
                             : ev.score >= 40
-                              ? 'bg-amber-100 text-amber-800'
-                              : 'bg-red-100 text-red-800'
+                              ? 'bg-warn-tint text-warn'
+                              : 'bg-stop-tint text-stop'
                         }`}
                       >
                         {BAND_LABEL[ev.band]} · {ev.score}%
@@ -307,21 +350,21 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
                 </div>
 
                 <div className="p-5">
-                  <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-slate-500">
+                  <p className="mb-1.5 text-micro font-bold uppercase tracking-wide text-ink-quiet">
                     What you said
                   </p>
 
                   {a.transcriptStatus === 'ok' ? (
-                    <blockquote className="mb-5 rounded-xl bg-slate-50 p-4 leading-relaxed text-slate-800">
+                    <blockquote className="mb-5 rounded-control bg-surface-sunk p-4 leading-relaxed text-ink">
                       {a.transcript}
                     </blockquote>
                   ) : (
                     /* No transcript, so no score. This is the whole product. */
-                    <div className="mb-5 rounded-xl border-2 border-amber-200 bg-amber-50 p-4">
-                      <p className="font-semibold text-amber-900">
+                    <div className="mb-5 rounded-control border-2 border-warn/40 bg-warn-tint p-4">
+                      <p className="font-semibold text-warn">
                         We could not hear this answer, so we did not score it
                       </p>
-                      <p className="mt-1 text-sm leading-relaxed text-amber-900/90">
+                      <p className="mt-1 text-sm leading-relaxed text-warn/90">
                         Giving you a number for an answer we never heard would be dishonest. Practise
                         this question again with your microphone closer to you.
                       </p>
@@ -330,8 +373,8 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
 
                   {/* PEE plus wrap-up, the same four steps shown while answering */}
                   {ev && (
-                    <div className="mb-5 rounded-xl border border-slate-200 p-4">
-                      <p className="mb-3 text-xs font-bold uppercase tracking-wide text-slate-500">
+                    <div className="mb-5 rounded-control border border-line p-4">
+                      <p className="mb-3 text-micro font-bold uppercase tracking-wide text-ink-quiet">
                         Did your answer have all four parts?
                       </p>
                       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -340,27 +383,27 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
                           return (
                             <div
                               key={s.label}
-                              className={`rounded-lg px-3 py-2.5 text-center ${
-                                done ? 'bg-emerald-50' : 'bg-red-50'
+                              className={`rounded-control px-3 py-2.5 text-center ${
+                                done ? 'bg-go-tint' : 'bg-stop-tint'
                               }`}
                             >
                               <span
                                 className={`mx-auto mb-1 grid h-7 w-7 place-items-center rounded-md text-sm font-black text-white ${
-                                  done ? 'bg-emerald-600' : 'bg-red-400'
+                                  done ? 'bg-go' : 'bg-stop'
                                 }`}
                               >
                                 {s.letter}
                               </span>
                               <p
                                 className={`text-sm font-bold ${
-                                  done ? 'text-emerald-800' : 'text-red-800'
+                                  done ? 'text-go-dark' : 'text-stop'
                                 }`}
                               >
                                 {s.label}
                               </p>
                               <p
                                 className={`text-micro ${
-                                  done ? 'text-emerald-700' : 'text-red-700'
+                                  done ? 'text-go-dark' : 'text-stop'
                                 }`}
                               >
                                 {done ? 'Yes' : 'Missing'}
@@ -370,7 +413,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
                         })}
                       </div>
                       {ev.pee && !ev.pee.explanation && (
-                        <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm leading-relaxed text-amber-900">
+                        <p className="mt-3 rounded-control bg-warn-tint px-3 py-2 text-sm leading-relaxed text-warn">
                           Explanation is the step most students miss. Saying a fact is not enough.
                           You must say why that fact matters to you.
                         </p>
@@ -381,29 +424,29 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
                   {ev && (
                     <div className="grid gap-5 sm:grid-cols-2">
                       <div>
-                        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+                        <p className="mb-2 text-micro font-bold uppercase tracking-wide text-ink-quiet">
                           What the interviewer noticed
                         </p>
                         {ev.quotedBack && (
-                          <p className="mb-2 rounded-lg bg-sky-50 px-3 py-2 text-sm text-sky-900">
+                          <p className="mb-2 rounded-control bg-surface-sunk px-3 py-2 text-sm text-brand-light">
                             You said: “{ev.quotedBack}”
                           </p>
                         )}
                         {ev.whatWentWell && (
-                          <p className="mb-2 text-sm leading-relaxed text-emerald-800">
+                          <p className="mb-2 text-sm leading-relaxed text-go-dark">
                             {ev.whatWentWell}
                           </p>
                         )}
                         {ev.soundsMemorised && (
-                          <p className="mb-2 rounded-lg bg-amber-50 px-3 py-2 text-sm font-medium text-amber-900">
+                          <p className="mb-2 rounded-control bg-warn-tint px-3 py-2 text-sm font-medium text-warn">
                             This sounded learned by heart. A real interviewer will change the words
                             of the question to test you.
                           </p>
                         )}
                         <ul className="space-y-1.5">
                           {ev.fixes.map((f) => (
-                            <li key={f} className="flex gap-2 text-sm leading-relaxed text-slate-700">
-                              <span className="font-bold text-slate-400">→</span>
+                            <li key={f} className="flex gap-2 text-sm leading-relaxed text-ink-soft">
+                              <span className="font-bold text-ink-quiet">→</span>
                               <span>{f}</span>
                             </li>
                           ))}
@@ -411,21 +454,21 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
                       </div>
 
                       <div>
-                        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+                        <p className="mb-2 text-micro font-bold uppercase tracking-wide text-ink-quiet">
                           A better way to say it
                         </p>
-                        <div className="rounded-xl border border-slate-200 p-4">
-                          <p className="text-sm italic leading-relaxed text-slate-700">
+                        <div className="rounded-control border border-line p-4">
+                          <p className="text-sm italic leading-relaxed text-ink-soft">
                             {ev.modelAnswer}
                           </p>
                         </div>
-                        <p className="mt-2 text-xs leading-relaxed text-slate-500">
+                        <p className="mt-2 text-micro leading-relaxed text-ink-quiet">
                           This is a shape to follow with your own true details. Do not memorise it
                           word for word, because that is exactly what the interviewer is trained to
                           spot.
                         </p>
                         {ev.nepaliHint && (
-                          <p className="mt-3 rounded-lg bg-ink px-4 py-3 text-sm leading-relaxed text-white">
+                          <p className="mt-3 rounded-control bg-ink px-4 py-3 text-sm leading-relaxed text-white">
                             {ev.nepaliHint}
                           </p>
                         )}
@@ -439,12 +482,12 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
         </section>
 
         {/* ---------- Next steps ---------- */}
-        <section className="rounded-2xl border-2 border-ink bg-white p-6">
+        <section className="rounded-card border-2 border-ink bg-surface p-6">
           <h2 className="mb-3 font-bold text-ink">What to do next</h2>
           <ul className="mb-5 space-y-2">
             {summary.nextSteps.map((s) => (
-              <li key={s} className="flex gap-2 leading-relaxed text-slate-700">
-                <span className="font-bold text-slate-400">→</span>
+              <li key={s} className="flex gap-2 leading-relaxed text-ink-soft">
+                <span className="font-bold text-ink-quiet">→</span>
                 <span>{s}</span>
               </li>
             ))}
@@ -452,12 +495,12 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
 
           {summary.weakestCategories.length > 0 && (
             <>
-              <p className="mb-2 text-sm font-semibold text-slate-600">Your weakest areas</p>
+              <p className="mb-2 text-sm font-semibold text-ink-soft">Your weakest areas</p>
               <div className="mb-5 flex flex-wrap gap-2">
                 {summary.weakestCategories.map((c) => (
                   <span
                     key={c}
-                    className="rounded-full bg-amber-50 px-3.5 py-1.5 text-sm font-semibold text-amber-800"
+                    className="rounded-full bg-warn-tint px-3.5 py-1.5 text-sm font-semibold text-warn"
                   >
                     {CATEGORY_LABEL[c]}
                   </span>
@@ -468,7 +511,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
 
           <Link
             href="/universities"
-            className="flex w-full items-center justify-center rounded-xl bg-ink px-6 py-4 text-lg font-bold text-white"
+            className="flex w-full items-center justify-center rounded-control bg-ink px-6 py-4 text-lg font-bold text-white"
           >
             Practise again
           </Link>
@@ -477,13 +520,13 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
         {/* Asked only after the student has seen their results, never on arrival. */}
         <InstallPrompt show />
 
-        <p className="px-2 text-center text-xs leading-relaxed text-slate-400">
+        <p className="px-2 text-center text-micro leading-relaxed text-ink-quiet">
           This is practice feedback only. It is not immigration advice and it does not predict your
           real result. Always check official facts with your university and a licensed adviser.
         </p>
         {/* LIVE-004: a whole audit round was spent on a stale deployment
             because nothing proved which revision was live. */}
-        <p className="px-2 text-center text-micro text-slate-300">build {BUILD_INFO.shortSha}</p>
+        <p className="px-2 text-center text-micro text-ink-quiet">build {BUILD_INFO.shortSha}</p>
       </div>
       </main>
       <SiteFooter />

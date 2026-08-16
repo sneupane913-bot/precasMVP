@@ -25,7 +25,7 @@ export default async function SignOutPage() {
         {student ? (
           <>
             <h1 className="mb-2 font-serif text-2xl text-ink">Sign out?</h1>
-            <p className="mb-6 leading-relaxed text-slate-600">
+            <p className="mb-6 leading-relaxed text-ink-soft">
               You are signed in as{' '}
               <span className="font-semibold text-ink">
                 {student.name || student.email || 'this account'}
@@ -38,7 +38,7 @@ export default async function SignOutPage() {
             <form action="/api/signout" method="post">
               <button
                 type="submit"
-                className="w-full rounded-xl bg-ink px-6 py-4 text-lg font-bold text-white"
+                className="w-full rounded-control bg-ink px-6 py-4 text-lg font-bold text-white"
               >
                 Sign out
               </button>
@@ -46,12 +46,12 @@ export default async function SignOutPage() {
 
             <Link
               href="/account"
-              className="mt-3 block rounded-xl border-2 border-slate-300 px-6 py-3.5 text-center font-semibold text-slate-700"
+              className="mt-3 block rounded-control border-2 border-line-strong px-6 py-3.5 text-center font-semibold text-ink-soft"
             >
               Stay signed in
             </Link>
 
-            <p className="mt-6 text-sm leading-relaxed text-slate-500">
+            <p className="mt-6 text-sm leading-relaxed text-ink-quiet">
               If you are on a shared computer at your consultancy, please sign out before you leave
               it. Otherwise the next person can see your report.
             </p>
@@ -59,18 +59,18 @@ export default async function SignOutPage() {
         ) : (
           <>
             <h1 className="mb-2 font-serif text-2xl text-ink">You are signed out</h1>
-            <p className="mb-6 leading-relaxed text-slate-600">
+            <p className="mb-6 leading-relaxed text-ink-soft">
               Nobody is signed in on this browser.
             </p>
             <Link
               href="/start"
-              className="block rounded-xl bg-ink px-6 py-4 text-center text-lg font-bold text-white"
+              className="block rounded-control bg-ink px-6 py-4 text-center text-lg font-bold text-white"
             >
               Sign in
             </Link>
             <Link
               href="/"
-              className="mt-3 block rounded-xl border-2 border-slate-300 px-6 py-3.5 text-center font-semibold text-slate-700"
+              className="mt-3 block rounded-control border-2 border-line-strong px-6 py-3.5 text-center font-semibold text-ink-soft"
             >
               Go to the home page
             </Link>

@@ -130,7 +130,7 @@ export function HeaderSession({ initial }: { initial?: SessionSnapshot }) {
     return (
       <div
         aria-hidden
-        className="h-[42px] w-[132px] animate-pulse rounded-xl bg-slate-200/60"
+        className="h-[44px] w-[132px] animate-pulse rounded-control bg-line"
       />
     );
   }
@@ -140,13 +140,13 @@ export function HeaderSession({ initial }: { initial?: SessionSnapshot }) {
       <>
         <Link
           href="/start"
-          className="hidden text-sm font-semibold text-ink transition hover:opacity-70 sm:inline"
+          className="hidden text-sm font-semibold text-ink-soft transition-colors duration-tap ease-move hover:text-ink sm:inline"
         >
           Sign in
         </Link>
         <Link
           href="/start"
-          className="inline-flex items-center justify-center rounded-xl bg-ink px-4 py-2.5 text-sm font-bold text-white transition active:scale-[0.98]"
+          className="inline-flex min-h-tap items-center justify-center rounded-control bg-ink px-5 py-2.5 text-sm font-bold text-white transition-opacity duration-tap ease-move hover:opacity-90 active:scale-[0.99]"
         >
           Start free
         </Link>
@@ -159,7 +159,7 @@ export function HeaderSession({ initial }: { initial?: SessionSnapshot }) {
       {/* Their own name, so on a shared machine it is obvious at a glance
           whose account is open. */}
       {session.name && (
-        <span className="hidden max-w-[9rem] truncate text-sm text-slate-500 md:inline">
+        <span className="hidden max-w-[9rem] truncate text-sm text-ink-soft md:inline">
           {session.name}
         </span>
       )}
@@ -175,10 +175,10 @@ export function HeaderSession({ initial }: { initial?: SessionSnapshot }) {
         <Link
           href="/account"
           title={`${session.mocksLeft} mock interviews and ${session.practiceLeft ?? 0} practice questions left`}
-          className={`hidden rounded-full px-3 py-1 text-xs font-bold transition sm:inline ${
+          className={`hidden rounded-full border px-3 py-1.5 text-micro font-bold transition-colors duration-tap ease-move sm:inline ${
             session.mocksLeft <= 1
-              ? 'bg-amber-100 text-amber-800 hover:bg-amber-200'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              ? 'border-warn/30 bg-warn-tint text-warn hover:bg-warn-tint/70'
+              : 'border-line bg-surface-sunk text-ink-soft hover:bg-surface'
           }`}
         >
           {session.mocksLeft === 0
@@ -188,14 +188,14 @@ export function HeaderSession({ initial }: { initial?: SessionSnapshot }) {
       )}
       <Link
         href="/account"
-        className="hidden text-sm font-semibold text-slate-600 transition hover:text-ink sm:inline"
+        className="hidden text-sm font-semibold text-ink-soft transition-colors duration-tap ease-move hover:text-ink sm:inline"
       >
         My practice
       </Link>
       <button
         onClick={signOut}
         disabled={busy}
-        className="inline-flex items-center justify-center rounded-xl border-2 border-slate-300 px-4 py-2.5 text-sm font-bold text-slate-700 transition active:scale-[0.98] disabled:opacity-50"
+        className="inline-flex min-h-tap items-center justify-center rounded-control border border-line bg-surface px-5 py-2.5 text-sm font-bold text-ink transition-colors duration-tap ease-move hover:bg-surface-sunk active:scale-[0.99] disabled:opacity-50"
       >
         {busy ? 'Signing out...' : 'Sign out'}
       </button>

@@ -32,16 +32,16 @@ export function MonitorPanel({
 
   return (
     <section
-      className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+      className="rounded-card border border-line bg-surface p-4 shadow-sm"
       aria-label="Interview monitor"
     >
       <header className="mb-3 flex items-center justify-between">
-        <h2 className="text-sm font-semibold tracking-wide text-slate-700">Monitor</h2>
-        <span className="flex items-center gap-2 text-xs font-medium text-slate-500">
+        <h2 className="text-sm font-semibold tracking-wide text-ink-soft">Monitor</h2>
+        <span className="flex items-center gap-2 text-micro font-medium text-ink-quiet">
           Recording
           <span className="relative flex h-2.5 w-2.5">
-            <span className="absolute inline-flex h-full w-full animate-pulseRing rounded-full bg-red-500" />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-600" />
+            <span className="absolute inline-flex h-full w-full animate-pulseRing rounded-full bg-stop" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-stop" />
           </span>
         </span>
       </header>
@@ -59,14 +59,14 @@ export function MonitorPanel({
       </div>
 
       <div className="mb-3">
-        <div className="mb-1 flex items-center justify-between text-micro text-slate-500">
+        <div className="mb-1 flex items-center justify-between text-micro text-ink-quiet">
           <span>Sound level</span>
           <span>{noiseLevel > 0.045 ? 'Noisy room' : noiseLevel > 0.01 ? 'Good' : 'Very quiet'}</span>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-surface-sunk">
           <div
             className={`h-full rounded-full transition-all duration-100 ${
-              noiseLevel > 0.045 ? 'bg-amber-500' : 'bg-emerald-500'
+              noiseLevel > 0.045 ? 'bg-warn' : 'bg-go'
             }`}
             style={{ width: `${Math.min(100, noiseLevel * 320)}%` }}
           />
@@ -74,7 +74,7 @@ export function MonitorPanel({
       </div>
 
       {rows.length === 0 ? (
-        <p className="rounded-lg bg-emerald-50 px-3 py-2.5 text-micro leading-snug text-emerald-800">
+        <p className="rounded-control bg-go-tint px-3 py-2.5 text-micro leading-snug text-go-dark">
           No problems so far. Keep looking at the camera and stay on this screen.
         </p>
       ) : (
@@ -83,15 +83,15 @@ export function MonitorPanel({
             const meta = FLAG_META[type];
             const tone =
               meta.severity === 'critical'
-                ? 'border-red-300 bg-red-50 text-red-900'
+                ? 'border-stop/40 bg-stop-tint text-stop'
                 : meta.severity === 'moderate'
-                  ? 'border-amber-300 bg-amber-50 text-amber-900'
-                  : 'border-slate-200 bg-slate-50 text-slate-700';
+                  ? 'border-warn/40 bg-warn-tint text-warn'
+                  : 'border-line bg-surface-sunk text-ink-soft';
             return (
-              <li key={type} className={`rounded-lg border-l-4 px-3 py-2 text-micro ${tone}`}>
+              <li key={type} className={`rounded-control border-l-4 px-3 py-2 text-micro ${tone}`}>
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="font-semibold">{meta.label}</span>
-                  <span className="shrink-0 rounded-full bg-white/70 px-2 py-0.5 text-micro font-bold">
+                  <span className="shrink-0 rounded-full bg-surface/70 px-2 py-0.5 text-micro font-bold">
                     {count}
                   </span>
                 </div>
@@ -117,12 +117,12 @@ function Stat({
   warn?: boolean;
 }) {
   const tone = good
-    ? 'bg-emerald-50 text-emerald-700'
+    ? 'bg-go-tint text-go-dark'
     : warn
-      ? 'bg-amber-50 text-amber-700'
-      : 'bg-red-50 text-red-700';
+      ? 'bg-warn-tint text-warn'
+      : 'bg-stop-tint text-stop';
   return (
-    <div className={`rounded-lg px-2 py-1.5 ${tone}`}>
+    <div className={`rounded-control px-2 py-1.5 ${tone}`}>
       <div className="text-micro font-medium uppercase tracking-wide opacity-70">{label}</div>
       <div className="text-sm font-bold">{value}</div>
     </div>

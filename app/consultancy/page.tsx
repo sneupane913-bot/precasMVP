@@ -27,10 +27,10 @@ export default async function ConsultancyPage() {
       {/* B21: this page had no shell at all, so a partner who landed here could
           not get anywhere. It deliberately does NOT use SiteHeader, because that
           header sells to students; this one is for a business buyer. */}
-      <header className="border-b border-slate-200 bg-white">
+      <header className="border-b border-line bg-surface">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-500 font-black text-white">
+            <span className="grid h-8 w-8 place-items-center rounded-control bg-go font-black text-white">
               P
             </span>
             <span className="font-serif text-lg text-ink">PreCAS Practice</span>
@@ -42,30 +42,30 @@ export default async function ConsultancyPage() {
       </header>
 
       <main className="mx-auto max-w-3xl px-5 py-10">
-      <p className="mb-2 inline-block rounded-full bg-slate-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-slate-600">
+      <p className="mb-2 inline-block rounded-full bg-surface-sunk px-3 py-1 text-micro font-bold uppercase tracking-wide text-ink-soft">
         For consultancies
       </p>
       <h1 className="mb-2 font-serif text-3xl text-ink">Give your students the practice</h1>
-      <p className="mb-8 max-w-xl leading-relaxed text-slate-600">
+      <p className="mb-8 max-w-xl leading-relaxed text-ink-soft">
         Buy seats in bulk, put your own logo on it, and give your students their own link. You keep
         the difference between what you pay and what you charge them.
       </p>
 
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
         {BUNDLES.map((b) => (
-          <div key={b.code} className="rounded-2xl border-2 border-slate-200 bg-white p-6">
-            <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500">{b.name}</h2>
+          <div key={b.code} className="rounded-card border-2 border-line bg-surface p-6">
+            <h2 className="text-sm font-bold uppercase tracking-wide text-ink-quiet">{b.name}</h2>
             <p className="mt-1 text-3xl font-black text-ink">NPR {b.priceNpr.toLocaleString()}</p>
-            <p className="mb-3 text-sm text-slate-500">one time</p>
+            <p className="mb-3 text-sm text-ink-quiet">one time</p>
             <p className="font-semibold text-ink">{b.seats} student seats</p>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-ink-quiet">
               about NPR {Math.round(b.priceNpr / b.seats)} per student
             </p>
           </div>
         ))}
       </div>
 
-      <section className="mb-8 rounded-2xl border border-slate-200 bg-white p-6">
+      <section className="mb-8 rounded-card border border-line bg-surface p-6">
         <h2 className="mb-3 font-bold text-ink">What each seat gives a student</h2>
         {/* M-10. These two numbers were HARD-CODED at 12 and 30 — the pre-13-Aug
             pack — and stayed wrong after the price change, so this page promised
@@ -77,7 +77,7 @@ export default async function ConsultancyPage() {
             That was enforced in the entitlement code and not here, which is
             exactly how a page can lie while every suite stays green. Read from
             SEAT_GRANT so the promise and the grant are the same number. */}
-        <ul className="space-y-2 text-slate-700">
+        <ul className="space-y-2 text-ink-soft">
           <li>
             {SEAT_GRANT.mocks} full mock interviews of {FULL_MOCK_QUESTION_COUNT} questions each,
             camera on, timed
@@ -88,13 +88,13 @@ export default async function ConsultancyPage() {
         </ul>
       </section>
 
-      <section className="mb-8 rounded-2xl bg-paper p-6">
+      <section className="mb-8 rounded-card bg-paper p-6">
         <h2 className="mb-3 font-bold text-ink">What you can and cannot see</h2>
-        <p className="mb-3 leading-relaxed text-slate-700">
+        <p className="mb-3 leading-relaxed text-ink-soft">
           You see which of your students are practising, how much of their pack is left, and how
           they are progressing overall.
         </p>
-        <p className="leading-relaxed text-slate-700">
+        <p className="leading-relaxed text-ink-soft">
           You do <strong>not</strong> see what they actually said. Their answers cover family
           income, visa history and personal circumstances, and those belong to the student. We think
           that is the right line, and we would rather tell you plainly than let you find out later.
@@ -104,13 +104,13 @@ export default async function ConsultancyPage() {
       <div className="flex flex-col gap-3 sm:flex-row">
         <a
           href={`https://wa.me/${wa}`}
-          className="flex-1 rounded-xl bg-emerald-600 px-6 py-4 text-center text-lg font-bold text-white"
+          className="flex-1 rounded-control bg-go px-6 py-4 text-center text-lg font-bold text-white"
         >
           Talk to us on WhatsApp
         </a>
         <Link
           href="/admin"
-          className="flex-1 rounded-xl border-2 border-ink px-6 py-4 text-center text-lg font-bold text-ink"
+          className="flex-1 rounded-control border-2 border-ink px-6 py-4 text-center text-lg font-bold text-ink"
         >
           I already have an account
         </Link>

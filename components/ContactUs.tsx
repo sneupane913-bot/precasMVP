@@ -50,7 +50,7 @@ export function ContactUs({
   const pretty = digits.length > 10 ? `+${digits.slice(0, digits.length - 10)} ${digits.slice(-10)}` : digits;
 
   return (
-    <div className={`rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-5 ${className}`}>
+    <div className={`rounded-card border-2 border-go/30 bg-go-tint p-5 ${className}`}>
       <div className="mb-3 flex items-center gap-2.5">
         <WhatsAppMark />
         <p className="font-bold text-ink">
@@ -58,7 +58,7 @@ export function ContactUs({
         </p>
       </div>
 
-      <p className="mb-4 text-sm leading-relaxed text-emerald-900">
+      <p className="mb-4 text-sm leading-relaxed text-go-dark">
         {urgent
           ? 'You do not have to wait. Message or call us and we will look at your payment straight away.'
           : 'A real person answers. Message us on WhatsApp, or call the number below.'}
@@ -68,7 +68,7 @@ export function ContactUs({
         href={`https://wa.me/${digits}${message ? `?text=${encodeURIComponent(message)}` : ''}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-4 text-base font-bold text-white transition active:scale-[0.98]"
+        className="mb-3 flex w-full items-center justify-center gap-2 rounded-control bg-go px-6 py-4 text-base font-bold text-white transition active:scale-[0.98]"
       >
         <WhatsAppMark className="h-5 w-5" light />
         Message us on WhatsApp
@@ -76,7 +76,7 @@ export function ContactUs({
 
       {/* The number in plain, selectable, dialable text. This is the part that
           was missing, and it is the part that works when nothing else does. */}
-      <p className="text-center text-sm text-emerald-900">
+      <p className="text-center text-sm text-go-dark">
         Or call{' '}
         <a href={`tel:+${digits}`} className="font-mono font-bold text-ink underline underline-offset-2">
           {pretty}

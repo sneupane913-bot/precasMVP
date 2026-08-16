@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Practice One Question</title>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Noto+Serif:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-fixed": "#002111",
+                      "surface-container-high": "#e7e8eb",
+                      "surface-container": "#edeef1",
+                      "on-secondary-container": "#007347",
+                      "tertiary": "#000000",
+                      "tertiary-fixed-dim": "#e0c1a0",
+                      "primary": "#000000",
+                      "background": "#f8f9fc",
+                      "surface-dim": "#d9dadd",
+                      "tertiary-container": "#281804",
+                      "inverse-on-surface": "#f0f1f4",
+                      "error": "#ba1a1a",
+                      "on-tertiary-fixed-variant": "#584329",
+                      "on-tertiary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "on-error-container": "#93000a",
+                      "surface-variant": "#e1e2e5",
+                      "inverse-primary": "#bac8dc",
+                      "surface": "#f8f9fc",
+                      "tertiary-fixed": "#feddba",
+                      "secondary": "#006d42",
+                      "on-background": "#191c1e",
+                      "surface-tint": "#525f71",
+                      "on-tertiary-container": "#9a7f61",
+                      "on-error": "#ffffff",
+                      "primary-fixed": "#d6e4f9",
+                      "surface-container-highest": "#e1e2e5",
+                      "primary-fixed-dim": "#bac8dc",
+                      "on-primary": "#ffffff",
+                      "on-primary-fixed": "#0f1c2c",
+                      "inverse-surface": "#2e3133",
+                      "on-surface-variant": "#44474c",
+                      "on-primary-container": "#778598",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-container": "#0f1c2c",
+                      "surface-bright": "#f8f9fc",
+                      "secondary-fixed": "#82fab7",
+                      "on-surface": "#191c1e",
+                      "on-secondary": "#ffffff",
+                      "secondary-fixed-dim": "#65dd9c",
+                      "on-tertiary-fixed": "#281804",
+                      "on-primary-fixed-variant": "#3a4859",
+                      "outline-variant": "#c4c6cc",
+                      "on-secondary-fixed-variant": "#005231",
+                      "secondary-container": "#82fab7",
+                      "surface-container-low": "#f2f3f6",
+                      "outline": "#74777d"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base": "4px",
+                      "lg": "40px",
+                      "gutter": "20px",
+                      "container-max": "1120px",
+                      "md": "24px",
+                      "xl": "64px",
+                      "xs": "8px",
+                      "sm": "16px"
+              },
+              "fontFamily": {
+                      "label-sm": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-md": [
+                              "Noto Serif"
+                      ],
+                      "body-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-sm": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-lg": [
+                              "Noto Serif"
+                      ],
+                      "display-mobile": [
+                              "Noto Serif"
+                      ],
+                      "display": [
+                              "Noto Serif"
+                      ],
+                      "label-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-sm": [
+                              "Noto Serif"
+                      ],
+                      "body-lg": [
+                              "Hanken Grotesk"
+                      ]
+              },
+              "fontSize": {
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "1",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-mobile": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display": [
+                              "40px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background h-full font-body-md antialiased flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-container-lowest w-full top-0 sticky border-b border-outline-variant dark:border-outline z-40 transition-all duration-200 ease-in-out">
+<div class="flex justify-between items-center w-full px-sm md:px-lg py-xs max-w-container-max mx-auto">
+<!-- Brand -->
+<div class="flex items-center gap-sm">
+<span class="font-display-mobile text-display-mobile dark:text-primary-fixed font-bold tracking-tight text-primary">Sikshya</span>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-xs">
+<button aria-label="notifications" class="p-xs text-on-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container transition-colors rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+<button aria-label="help" class="p-xs text-on-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container transition-colors rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden ml-xs border border-outline-variant cursor-pointer">
+<img alt="Student profile avatar" class="w-full h-full object-cover" data-alt="A professional headshot of a student in a bright, modern setting, looking confident and approachable. Natural daylight illumination." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIW9Mt3FBf9B-CnlZ0nLRn1ntbrK7SaM06dVYbF3HckQrPifh65yHmCXjZCFRne3CYxTFNs8AE14BwhE88w5EKZv_O_tuiwqWVhttXizRvUJCQMQySggq6Xw8f1PV62U2NdtCstQ14wD3S-X-FwY6pEECP5SpnyBAoMLe56nTItftbJk3-OQKRlltFb5FNYH2h9D6D0t9KKupYD38NWyReFCIEv_a9DxuzGCMMUOuK81Vwncbly1o6"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar (Hidden on Mobile) -->
+<nav class="bg-surface-container-low dark:bg-surface-container h-full w-64 hidden md:flex flex-col border-r border-outline-variant dark:border-outline z-30 shrink-0">
+<div class="p-md flex items-center gap-sm border-b border-outline-variant dark:border-outline mb-sm">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A secondary professional headshot of a student in a bright, modern setting, looking confident and approachable. Natural daylight illumination." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0ryUEGxIOcgdNPfazH8eyRurBKxkUrTChU9C4RDv93p9mRTb8JtvqohIW72zagJtyG6UaQKo_JEs_3aBs1BRMweIRWXVcs4Pn8sOUsa7pka2nuZA5jXQ5kG3ulmy92NlBjmP7kfgTsukGaOF_Dthy1t4Oj0e-3LeLXyjFxelDZSHoAyxuXhkMQGowtkHGBRHTBmS_Fcy0R9uogrK48SeEfHOFpX0uB13PDUzps73ZvMkhUKs_YkUv"/>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Student Portal</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Kathmandu, Nepal</p>
+</div>
+</div>
+<div class="flex flex-col gap-xs p-md flex-1">
+<!-- Dashboard (Active) -->
+<a class="flex items-center gap-sm px-sm py-xs text-primary dark:text-primary-fixed font-bold bg-surface-container-highest dark:bg-surface-container-high rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<!-- Interviews -->
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">assignment</span>
+<span class="font-label-md text-label-md">Interviews</span>
+</a>
+<!-- Referrals -->
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">group_add</span>
+<span class="font-label-md text-label-md">Referrals</span>
+</a>
+<!-- Settings -->
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+<div class="p-md mt-auto">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-xs rounded-lg hover:bg-inverse-surface transition-colors shadow-sm">
+                    Book a Mock
+                </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto relative w-full flex flex-col">
+<div class="flex-1 max-w-container-max mx-auto w-full px-sm md:px-lg py-lg md:py-xl flex flex-col items-center justify-center min-h-[calc(100vh-64px)]">
+<!-- Header Section -->
+<div class="text-center mb-xl w-full max-w-2xl">
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-xs">Practise one question</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">One question at a time, aimed at whatever your last report said you should work on.</p>
+</div>
+<!-- Central Interactive Area -->
+<div class="w-full max-w-3xl flex flex-col items-center relative z-10">
+<!-- Top Chip -->
+<div class="inline-flex items-center gap-2 px-4 py-2 bg-[#eff4ff] text-[#0f1c2c] rounded-full mb-8 shadow-sm border border-[#bac8dc]/30">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">target</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Working on: real detail in your answers</span>
+</div>
+<!-- Question Card -->
+<div class="w-full bg-surface-container-lowest rounded-xl shadow-[0_8px_24px_rgba(13,27,42,.06)] border border-outline-variant/50 p-xl mb-xl text-center flex items-center justify-center min-h-[240px]">
+<h2 class="font-headline-md md:font-headline-lg text-headline-md md:text-headline-lg text-primary font-bold">
+                            "Why have you chosen to study in the UK instead of your home country?"
+                        </h2>
+</div>
+<!-- Recording Controls -->
+<div class="flex flex-col items-center justify-center gap-md w-full mb-xl">
+<button aria-label="Start recording" class="w-[72px] h-[72px] rounded-full bg-[#0f9d63] text-white flex items-center justify-center shadow-[0_8px_24px_rgba(15,157,99,.25)] hover:bg-[#007347] hover:scale-105 active:scale-95 transition-all duration-300 ease-out group">
+<span class="material-symbols-outlined text-[32px] group-hover:scale-110 transition-transform" style="font-variation-settings: 'FILL' 1;">mic</span>
+</button>
+<p class="font-label-md text-label-md text-on-surface-variant text-center max-w-[200px]">
+                            Tap to start. Tap again when you have finished.
+                        </p>
+</div>
+<!-- Secondary Actions -->
+<div class="flex flex-col items-center gap-lg w-full">
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors underline-offset-4 hover:underline">
+                            Skip to another question
+                        </button>
+<p class="font-label-sm text-label-sm text-outline tracking-wider uppercase mt-md">
+                            14 practice questions left.
+                        </p>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="bg-surface dark:bg-surface-container-lowest fixed bottom-0 w-full z-50 md:hidden border-t border-outline-variant dark:border-outline bg-surface/90 backdrop-blur-md shadow-sm transition-all duration-300">
+<div class="flex justify-around items-center pt-xs pb-safe px-sm w-full h-[64px]">
+<!-- Home (Active as Dashboard fallback) -->
+<a class="flex flex-col items-center justify-center text-primary dark:text-secondary-fixed-dim font-bold active:bg-surface-container-high p-2 rounded-lg flex-1" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm-mobile">Home</span>
+</a>
+<!-- Reports -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline active:bg-surface-container-high p-2 rounded-lg flex-1" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">description</span>
+<span class="font-label-sm text-label-sm-mobile">Reports</span>
+</a>
+<!-- Refer -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline active:bg-surface-container-high p-2 rounded-lg flex-1" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">share</span>
+<span class="font-label-sm text-label-sm-mobile">Refer</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline active:bg-surface-container-high p-2 rounded-lg flex-1" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-sm text-label-sm-mobile">Profile</span>
+</a>
+</div>
+</nav>
+</body></html>

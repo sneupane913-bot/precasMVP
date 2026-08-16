@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sikshya - Super Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&amp;family=Noto+Serif:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#584329",
+                        "on-background": "#191c1e",
+                        "surface-bright": "#f8f9fc",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#bac8dc",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e1e2e5",
+                        "tertiary-fixed": "#feddba",
+                        "primary-container": "#0f1c2c",
+                        "on-tertiary-fixed": "#281804",
+                        "tertiary": "#000000",
+                        "surface": "#f8f9fc",
+                        "on-secondary-fixed-variant": "#005231",
+                        "on-secondary-container": "#007347",
+                        "surface-tint": "#525f71",
+                        "primary": "#000000",
+                        "on-tertiary-container": "#9a7f61",
+                        "surface-dim": "#d9dadd",
+                        "background": "#f8f9fc",
+                        "tertiary-fixed-dim": "#e0c1a0",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#d6e4f9",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c4c6cc",
+                        "secondary-fixed-dim": "#65dd9c",
+                        "on-primary": "#ffffff",
+                        "secondary": "#006d42",
+                        "tertiary-container": "#281804",
+                        "outline": "#74777d",
+                        "on-primary-fixed-variant": "#3a4859",
+                        "inverse-surface": "#2e3133",
+                        "on-primary-container": "#778598",
+                        "surface-container-high": "#e7e8eb",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#82fab7",
+                        "secondary-fixed": "#82fab7",
+                        "surface-container-highest": "#e1e2e5",
+                        "on-secondary-fixed": "#002111",
+                        "inverse-primary": "#bac8dc",
+                        "surface-container": "#edeef1",
+                        "on-surface-variant": "#44474c",
+                        "on-surface": "#191c1e",
+                        "inverse-on-surface": "#f0f1f4",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#0f1c2c",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f2f3f6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "64px",
+                        "container-max": "1120px",
+                        "sm": "16px",
+                        "base": "4px",
+                        "md": "24px",
+                        "gutter": "20px",
+                        "xs": "8px",
+                        "lg": "40px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Hanken Grotesk"],
+                        "display-mobile": ["Noto Serif"],
+                        "label-sm": ["Hanken Grotesk"],
+                        "body-sm": ["Hanken Grotesk"],
+                        "display": ["Noto Serif"],
+                        "headline-sm": ["Noto Serif"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-md": ["Noto Serif"],
+                        "headline-lg": ["Noto Serif"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "display-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "display": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #f8f9fc; color: #191c1e; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        @media (min-width: 768px) { body { flex-direction: row; } }
+    </style>
+</head>
+<body>
+<!-- SideNavBar (Desktop) -->
+<nav class="bg-surface-container-low dark:bg-surface-container text-primary dark:text-primary-fixed font-label-md text-label-md h-screen w-64 hidden md:flex flex-col border-r border-outline-variant dark:border-outline shrink-0">
+<div class="p-md border-b border-outline-variant flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-variant flex items-center justify-center shrink-0">
+<img alt="User profile" class="object-cover w-full h-full" data-alt="A professional headshot of a student in a modern, well-lit academic setting. The lighting is soft and natural, emphasizing a serious and focused demeanor. The background is slightly blurred but suggests a high-end educational environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcY5lDuchaUrE1mrYNf3RumSPF59A5YGjh1kXIQdvLgoK85qRt270NoQ7-On6U4AyI-gwF1N7U9QSEuSqAY7doRup3mY06Dv_i8OiJVJmVhhxgPTSkbpN1NCd9kDoIr8TiV8ucNVVZt5x2GvT2cDhYW9ZaUonElKEJqIU1bua4hHW24zbNnf1i6Iq1oP9CJKbEyeNATy5SqnZTVS7kLovlQIS-2nIBIHyp2Fd-I0f5I7UeZ76Dsfvo"/>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Student Portal</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Kathmandu, Nepal</p>
+</div>
+</div>
+<div class="flex flex-col gap-xs p-md flex-grow">
+<!-- Dashboard is Active -->
+<a class="flex items-center gap-sm px-sm py-xs text-primary dark:text-primary-fixed font-bold bg-surface-container-highest dark:bg-surface-container-high rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">assignment</span>
+                Interviews
+            </a>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">group_add</span>
+                Referrals
+            </a>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+</div>
+<div class="p-md mt-auto border-t border-outline-variant">
+<button class="w-full bg-primary text-on-primary rounded-lg py-sm font-label-md text-label-md hover:bg-on-background transition-colors shadow-sm">
+                Book a Mock
+            </button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<div class="flex-grow flex flex-col w-full min-h-screen">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-container-lowest text-primary dark:text-primary-fixed font-headline-sm text-headline-sm-mobile md:text-headline-sm w-full top-0 sticky border-b border-outline-variant dark:border-outline transition-all duration-200 ease-in-out z-40 shadow-sm md:shadow-none">
+<div class="flex justify-between items-center w-full px-sm md:px-lg py-xs max-w-container-max mx-auto">
+<div class="flex items-center gap-sm">
+<span class="font-display-mobile text-display-mobile dark:text-primary-fixed font-bold tracking-tight">Sikshya</span>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-full p-xs">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-full p-xs">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-variant hidden md:block border border-outline-variant">
+<img alt="Student profile avatar" class="object-cover w-full h-full" data-alt="A small circular avatar showing a professional looking student in a well lit environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBz90ORmWIunBrL1NENzcGYVTNPPVnprewTbsH3EvHEQNnk4q9OV--u06m6m1q7qWl8TZplB4PBhyJaIpXLaLCZOL3B7IdlmU5nUYKwkzMlPKUawODWWbrOhdpybOQvST62IFKeb9P6aW_aAk-8ohclDNVL5KhzwsJqimriElWFVRCCEMonycEwa3awT3R5juH3kIXE_VrTh_ZNnzCv5UKx43uEl1SelFy2KhmRbDb490ElaPo2uS36"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow p-md md:p-lg lg:p-xl max-w-container-max mx-auto w-full flex flex-col gap-xl">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-sm mb-sm border-b border-outline-variant pb-md">
+<div>
+<h1 class="font-display text-display text-primary">Super Admin</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-xs">Manage all payments and student applications across the platform.</p>
+</div>
+<div class="flex gap-sm">
+<button class="bg-surface text-on-surface border border-outline-variant rounded-lg px-md py-xs font-label-md text-label-md hover:bg-surface-container-low transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm">download</span>
+                        Export CSV
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Layout for Tables -->
+<div class="grid grid-cols-1 gap-lg">
+<!-- Payments Section -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant overflow-hidden flex flex-col relative z-10">
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface">
+<h2 class="font-headline-md text-headline-md text-primary flex items-center gap-xs">
+<span class="material-symbols-outlined text-on-surface-variant">payments</span>
+                            Recent Payments
+                        </h2>
+<div class="flex gap-sm items-center">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 transform -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="pl-xl pr-sm py-xs rounded-lg border-line bg-surface-sunk focus:bg-surface focus:ring-primary focus:border-primary font-body-sm text-body-sm w-64" placeholder="Search ID or Phone" type="text"/>
+</div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="p-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Student</th>
+<th class="p-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Pack</th>
+<th class="p-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Amount</th>
+<th class="p-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Transaction Info</th>
+<th class="p-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">State</th>
+<th class="p-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md divide-y divide-outline-variant">
+<!-- Row 1: Pending -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="p-sm">
+<div class="font-label-md text-label-md text-on-surface">Aarav Sharma</div>
+<div class="text-on-surface-variant text-sm mt-1">aarav@example.com</div>
+</td>
+<td class="p-sm text-on-surface">Ivy League Mock</td>
+<td class="p-sm font-label-md text-label-md text-primary">$499</td>
+<td class="p-sm">
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-1">TXN-88921-X</div>
+<a class="text-secondary hover:underline font-label-md text-label-md flex items-center gap-1" href="tel:+9779801234567">
+<span class="material-symbols-outlined text-[16px]">call</span> +977 9801234567
+                                        </a>
+<div class="text-on-surface-variant text-xs mt-1">paid from ...5222</div>
+</td>
+<td class="p-sm">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-tertiary-fixed text-on-tertiary-fixed border border-outline-variant">
+                                            Pending
+                                        </span>
+</td>
+<td class="p-sm text-right flex justify-end gap-2">
+<button class="bg-surface text-on-surface border border-outline-variant rounded-md px-3 py-1 font-label-sm text-label-sm hover:bg-surface-container-low transition-colors" title="Reject">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+<button class="bg-primary text-on-primary rounded-md px-3 py-1 font-label-sm text-label-sm hover:bg-on-background transition-colors flex items-center gap-1" title="Approve">
+<span class="material-symbols-outlined text-sm">check</span>
+                                            Approve
+                                        </button>
+</td>
+</tr>
+<!-- Row 2: Approved -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="p-sm">
+<div class="font-label-md text-label-md text-on-surface">Priya Patel</div>
+<div class="text-on-surface-variant text-sm mt-1">priya.p@edu.np</div>
+</td>
+<td class="p-sm text-on-surface">Standard Consult</td>
+<td class="p-sm font-label-md text-label-md text-primary">$150</td>
+<td class="p-sm">
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-1">TXN-77342-B</div>
+<a class="text-secondary hover:underline font-label-md text-label-md flex items-center gap-1" href="tel:+9779812345678">
+<span class="material-symbols-outlined text-[16px]">call</span> +977 9812345678
+                                        </a>
+<div class="text-on-surface-variant text-xs mt-1">paid from ...1189</div>
+</td>
+<td class="p-sm">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-secondary-fixed text-on-secondary-fixed border border-secondary-fixed-dim">
+                                            Approved
+                                        </span>
+</td>
+<td class="p-sm text-right">
+<button class="text-on-surface-variant hover:text-on-surface p-1 rounded-md transition-colors" title="View Receipt">
+<span class="material-symbols-outlined">receipt_long</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Students Section -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant overflow-hidden flex flex-col">
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface">
+<h2 class="font-headline-md text-headline-md text-primary flex items-center gap-xs">
+<span class="material-symbols-outlined text-on-surface-variant">school</span>
+                            Student Directory
+                        </h2>
+<button class="text-secondary font-label-md text-label-md hover:underline flex items-center gap-xs">
+                            View All <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="p-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Student</th>
+<th class="p-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Phone</th>
+<th class="p-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Source</th>
+<th class="p-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Applying Through</th>
+<th class="p-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Status</th>
+<th class="p-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-right">Action</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="p-sm">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-label-md text-label-md font-bold shrink-0">
+                                                RS
+                                            </div>
+<div>
+<div class="font-label-md text-label-md text-on-surface">Rohan Shrestha</div>
+<div class="text-on-surface-variant text-xs mt-1">Reg: 24 Oct</div>
+</div>
+</div>
+</td>
+<td class="p-sm"><a class="text-on-surface hover:text-secondary transition-colors" href="tel:+9779841223344">+977 9841223344</a></td>
+<td class="p-sm text-on-surface-variant">Organic Search</td>
+<td class="p-sm font-label-md text-label-md text-on-surface">Direct</td>
+<td class="p-sm">
+<span class="inline-flex items-center gap-1 text-on-surface-variant text-sm">
+<span class="w-2 h-2 rounded-full bg-secondary"></span> Active
+                                        </span>
+</td>
+<td class="p-sm text-right">
+<button class="bg-surface text-on-surface border border-outline-variant rounded-md px-3 py-1 font-label-sm text-label-sm hover:bg-surface-container-low transition-colors">
+                                            View Profile
+                                        </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</main>
+</div>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="bg-surface dark:bg-surface-container-lowest text-primary dark:text-primary-fixed font-label-sm text-label-sm-mobile fixed bottom-0 w-full z-50 md:hidden border-t border-outline-variant dark:border-outline bg-surface/90 backdrop-blur-md shadow-sm transition-all duration-300 left-0 flex justify-around items-center pt-xs pb-safe px-sm">
+<a class="flex flex-col items-center justify-center text-primary dark:text-secondary-fixed-dim font-bold active:bg-surface-container-high p-xs rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span>Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline active:bg-surface-container-high p-xs rounded-lg" href="#">
+<span class="material-symbols-outlined">description</span>
+<span>Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline active:bg-surface-container-high p-xs rounded-lg" href="#">
+<span class="material-symbols-outlined">share</span>
+<span>Refer</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline active:bg-surface-container-high p-xs rounded-lg" href="#">
+<span class="material-symbols-outlined">person</span>
+<span>Profile</span>
+</a>
+</nav>
+</body></html>

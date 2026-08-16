@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PreCAS Practice - Universities</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&amp;family=Noto+Serif:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "primary-fixed": "#d6e4f9",
+                            "surface-tint": "#525f71",
+                            "on-primary": "#ffffff",
+                            "surface-bright": "#f8f9fc",
+                            "on-background": "#191c1e",
+                            "on-secondary": "#ffffff",
+                            "surface": "#f8f9fc",
+                            "tertiary-container": "#281804",
+                            "on-tertiary-container": "#9a7f61",
+                            "on-tertiary-fixed-variant": "#584329",
+                            "on-primary-fixed": "#0f1c2c",
+                            "on-error-container": "#93000a",
+                            "outline": "#74777d",
+                            "primary-fixed-dim": "#bac8dc",
+                            "tertiary-fixed-dim": "#e0c1a0",
+                            "on-primary-container": "#778598",
+                            "surface-container-lowest": "#ffffff",
+                            "on-tertiary": "#ffffff",
+                            "inverse-surface": "#2e3133",
+                            "inverse-primary": "#bac8dc",
+                            "tertiary": "#000000",
+                            "error-container": "#ffdad6",
+                            "tertiary-fixed": "#feddba",
+                            "background": "#f8f9fc",
+                            "on-secondary-container": "#007347",
+                            "secondary-container": "#82fab7",
+                            "secondary": "#006d42",
+                            "primary": "#000000",
+                            "surface-variant": "#e1e2e5",
+                            "primary-container": "#0f1c2c",
+                            "on-surface": "#191c1e",
+                            "error": "#ba1a1a",
+                            "on-error": "#ffffff",
+                            "surface-container": "#edeef1",
+                            "surface-dim": "#d9dadd",
+                            "surface-container-low": "#f2f3f6",
+                            "surface-container-high": "#e7e8eb",
+                            "secondary-fixed": "#82fab7",
+                            "on-surface-variant": "#44474c",
+                            "secondary-fixed-dim": "#65dd9c",
+                            "outline-variant": "#c4c6cc",
+                            "on-secondary-fixed-variant": "#005231",
+                            "on-secondary-fixed": "#002111",
+                            "on-tertiary-fixed": "#281804",
+                            "surface-container-highest": "#e1e2e5",
+                            "on-primary-fixed-variant": "#3a4859",
+                            "inverse-on-surface": "#f0f1f4"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "base": "4px",
+                            "md": "24px",
+                            "container-max": "1120px",
+                            "xs": "8px",
+                            "gutter": "20px",
+                            "lg": "40px",
+                            "sm": "16px",
+                            "xl": "64px"
+                    },
+                    "fontFamily": {
+                            "label-md": ["Hanken Grotesk"],
+                            "headline-md": ["Noto Serif"],
+                            "display-mobile": ["Noto Serif"],
+                            "body-md": ["Hanken Grotesk"],
+                            "headline-lg": ["Noto Serif"],
+                            "body-sm": ["Hanken Grotesk"],
+                            "label-sm": ["Hanken Grotesk"],
+                            "headline-sm": ["Noto Serif"],
+                            "body-lg": ["Hanken Grotesk"],
+                            "display": ["Noto Serif"]
+                    },
+                    "fontSize": {
+                            "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                            "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                            "display-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                            "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                            "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                            "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                            "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                            "headline-sm": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                            "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                            "display": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #f7f8fb; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .soft-shadow { box-shadow: 0 1px 2px rgba(13,27,42,.04); }
+        .deep-shadow { box-shadow: 0 8px 24px rgba(13,27,42,.06); }
+    </style>
+</head>
+<body class="text-on-surface antialiased flex flex-col min-h-screen">
+<!-- TopNavBar (Web: Hidden on md-, flex on md+) -->
+<header class="bg-surface dark:bg-surface-container-low font-headline-sm text-headline-sm font-label-md text-label-md docked full-width top-0 border-b border-outline-variant dark:border-outline flat no shadows scale-95 active:opacity-80 transition-all sticky top-0 w-full z-50 flex justify-between items-center px-md py-xs max-w-container-max mx-auto hidden md:flex">
+<div class="font-headline-md text-headline-md text-primary dark:text-on-surface">PreCAS Practice</div>
+<nav class="flex gap-md">
+<a class="text-primary dark:text-on-surface border-b-2 border-secondary pb-1" href="#">Universities</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-200" href="#">Practice</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-200" href="#">Pricing</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-200" href="#">FAQ</a>
+</nav>
+<div class="flex gap-sm items-center hidden">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</div>
+<div class="flex gap-sm">
+<button class="font-label-md text-label-md bg-transparent text-primary hover:text-secondary px-sm py-xs">Log In</button>
+<button class="font-label-md text-label-md bg-primary text-on-primary rounded-lg px-sm py-xs">Sign Up</button>
+</div>
+</header>
+<!-- Mobile Top Header (Since TopNavBar is md:flex, we need a mobile version for the title) -->
+<div class="md:hidden w-full px-md py-sm flex justify-between items-center border-b border-surface-variant bg-surface sticky top-0 z-40">
+<div class="font-headline-md text-headline-md text-primary">PreCAS Practice</div>
+</div>
+<main class="flex-grow w-full max-w-[400px] mx-auto md:max-w-container-max px-md py-md md:py-xl flex flex-col gap-lg">
+<!-- RESUME BANNER -->
+<div class="w-full bg-[#eaf7f0] border-2 border-[#0f9d63] rounded-lg p-sm flex items-center justify-between shadow-sm cursor-pointer hover:bg-secondary-container transition-colors">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider mb-base">Resume application</span>
+<span class="font-body-sm text-body-sm text-on-surface font-semibold">BPP University - September Intake</span>
+</div>
+<span class="material-symbols-outlined text-secondary">arrow_forward_ios</span>
+</div>
+<section class="flex flex-col gap-sm">
+<h1 class="font-display-mobile text-display-mobile md:font-display md:text-display text-primary">Choose your university</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Select an institution to begin practicing their specific Pre-CAS interview questions.</p>
+</section>
+<!-- Search & Filters -->
+<div class="flex flex-col gap-sm sticky top-[60px] md:static bg-[#f7f8fb] z-30 py-xs -mx-md px-md md:mx-0 md:px-0">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-[40px] pr-sm py-sm rounded-xl border border-outline-variant bg-surface focus:bg-surface-sunk focus:outline-none focus:border-primary font-body-sm text-body-sm text-on-surface placeholder:text-outline transition-colors" placeholder="Search universities..." type="text"/>
+</div>
+<div class="flex gap-xs overflow-x-auto hide-scrollbar pb-xs">
+<button class="whitespace-nowrap px-sm py-xs rounded-full bg-primary text-on-primary font-label-sm text-label-sm">All</button>
+<button class="whitespace-nowrap px-sm py-xs rounded-full bg-surface border border-outline-variant text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-variant transition-colors">London</button>
+<button class="whitespace-nowrap px-sm py-xs rounded-full bg-surface border border-outline-variant text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-variant transition-colors">Business</button>
+<button class="whitespace-nowrap px-sm py-xs rounded-full bg-surface border border-outline-variant text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-variant transition-colors">Healthcare</button>
+<button class="whitespace-nowrap px-sm py-xs rounded-full bg-surface border border-outline-variant text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-variant transition-colors">Top Ranked</button>
+</div>
+</div>
+<!-- Most Applied Section -->
+<div class="flex flex-col gap-md">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<h2 class="font-headline-sm text-headline-sm text-primary">Most Applied</h2>
+</div>
+<!-- Card List -->
+<div class="flex flex-col gap-md">
+<!-- Card 1: BPP -->
+<div class="bg-surface rounded-[16px] soft-shadow p-sm flex flex-col gap-sm border border-transparent hover:border-outline-variant transition-colors">
+<div class="flex gap-sm items-start">
+<div class="w-[60px] h-[60px] rounded-lg bg-surface-container flex items-center justify-center shrink-0 border border-outline-variant overflow-hidden">
+<img alt="BPP Monogram" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLtL_-dIE94dNNiJBvmnxZxbCg6xViUQagW6_QLvUeYY1736zAIzf7-w0OCBMs2cfUGDuF7L8IUVrqoBXGcxtbHdzHk8Mt8fCZPNbFkv2YpWfYFkQQheogcomRlVfj5dJLsSqaQMJ8ZTPIIlVUDiIHyn0kNeQnEILZW2seOqReGmu2G5-iI5GcgSXCjy_sveReodSpHQRI8HhYOMrg4k1z0zl1-wvD2v7MfOKLQQMXHx9_9W8s_3Sct_MAk"/>
+</div>
+<div class="flex flex-col flex-grow">
+<h3 class="font-headline-sm text-headline-sm text-primary">BPP University</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-base">
+<span class="material-symbols-outlined text-[16px]">location_on</span> London, UK
+                            </p>
+</div>
+<div class="shrink-0">
+<span class="inline-flex items-center px-xs py-base rounded-md bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">High Success</span>
+</div>
+</div>
+<div class="h-[1px] w-full bg-surface-variant my-xs"></div>
+<div class="flex justify-between items-center">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline">Modules</span>
+<span class="font-body-sm text-body-sm text-primary">4 Available</span>
+</div>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-md py-xs rounded-lg hover:bg-on-primary-fixed transition-colors w-full md:w-auto text-center">Start Practice</button>
+</div>
+</div>
+<!-- Card 2: UEL -->
+<div class="bg-surface rounded-[16px] soft-shadow p-sm flex flex-col gap-sm border border-transparent hover:border-outline-variant transition-colors">
+<div class="flex gap-sm items-start">
+<div class="w-[60px] h-[60px] rounded-lg bg-surface-container flex items-center justify-center shrink-0 border border-outline-variant overflow-hidden">
+<img alt="UEL Monogram" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLv1ld4gSXd4Dnvty7FzcCnggMTl3JEEayd_H0yy1sJlHLsid8FFW3kLLxhCD4goWZAmaKyktJ_vKcYkW9SB69gS73Cj7OiBG8W5LGEl66-jMHXyspyZTp7O6wQexdewewRM-w2V2Dj9w0gTOAL_8aRKyacuCWeyFsMaU8G_uv3hPHtXvDMKEFIiO21oOWZV-ez4eWtWUqCkF6Vljj7aeT2YgUBIwcfOUevkFtz2XLGaQBRPuJ7Ang2NnFs"/>
+</div>
+<div class="flex flex-col flex-grow">
+<h3 class="font-headline-sm text-headline-sm text-primary">University of East London</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-base">
+<span class="material-symbols-outlined text-[16px]">location_on</span> London, UK
+                            </p>
+</div>
+</div>
+<div class="h-[1px] w-full bg-surface-variant my-xs"></div>
+<div class="flex justify-between items-center">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline">Modules</span>
+<span class="font-body-sm text-body-sm text-primary">3 Available</span>
+</div>
+<button class="bg-surface border border-outline-variant text-primary font-label-md text-label-md px-md py-xs rounded-lg hover:bg-surface-variant transition-colors w-full md:w-auto text-center">Start Practice</button>
+</div>
+</div>
+<!-- Card 3: UWL -->
+<div class="bg-surface rounded-[16px] soft-shadow p-sm flex flex-col gap-sm border border-transparent hover:border-outline-variant transition-colors">
+<div class="flex gap-sm items-start">
+<div class="w-[60px] h-[60px] rounded-lg bg-surface-container flex items-center justify-center shrink-0 border border-outline-variant overflow-hidden">
+<img alt="UWL Monogram" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLtECk4A6Lxcr3soyKmVzoMJqs0hPRs76GNTEcuA4erPsW6iJ96xIrYHZ3ZaPI7dLy439hsLAK9jcMJX9JlFk-LhI3kIZXLgHMnzJF_Wnb5TzxAiymtGzCWuZNfT0deg_2kADZJLpjmCh1FJ-OIbj9GgsZZFYFnZkrkaI36cdesXUHwFjDHGZ93k6QxiSyfIcbDm_Xg27HQOpuEldLJamAoYYe_3WewsvayzOr6-2v2p8x37bf9gkI-Opw"/>
+</div>
+<div class="flex flex-col flex-grow">
+<h3 class="font-headline-sm text-headline-sm text-primary">University of West London</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-base">
+<span class="material-symbols-outlined text-[16px]">location_on</span> London, UK
+                            </p>
+</div>
+</div>
+<div class="h-[1px] w-full bg-surface-variant my-xs"></div>
+<div class="flex justify-between items-center">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline">Modules</span>
+<span class="font-body-sm text-body-sm text-primary">2 Available</span>
+</div>
+<button class="bg-surface border border-outline-variant text-primary font-label-md text-label-md px-md py-xs rounded-lg hover:bg-surface-variant transition-colors w-full md:w-auto text-center">Start Practice</button>
+</div>
+</div>
+<!-- Card 4: Coventry -->
+<div class="bg-surface rounded-[16px] soft-shadow p-sm flex flex-col gap-sm border border-transparent hover:border-outline-variant transition-colors opacity-75">
+<div class="flex gap-sm items-start">
+<div class="w-[60px] h-[60px] rounded-lg bg-surface-container flex items-center justify-center shrink-0 border border-outline-variant overflow-hidden">
+<img alt="Coventry Monogram" class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida/AP1WRLvum5ROOzYA5ME5IFsIjzNry4kyWmjdB5l1Bu-K0-IDmeMhKq70Xk8sw5ZfAtpcRW2j0we3pLrfq4NQWZJngd_Y_5uVsEEnBVUHgkSqCY-8ZVoqhpnTzzqdreoXOzVkjokFlbdy1SVzOG0OPX09zFHIFmV8VKlEhUMy20-QuryPo37V7ia5RxDU1d9lEfjjwI7uMR58BWSWfJl8fSK6BevILzEUwMrwZHv1A1D4iReUMJ8KedJthXOcSZ0"/>
+</div>
+<div class="flex flex-col flex-grow">
+<h3 class="font-headline-sm text-headline-sm text-primary">Coventry University</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-base">
+<span class="material-symbols-outlined text-[16px]">location_on</span> Coventry, UK
+                            </p>
+</div>
+<div class="shrink-0">
+<span class="inline-flex items-center px-xs py-base rounded-md bg-surface-variant text-on-surface-variant font-label-sm text-label-sm">Coming Soon</span>
+</div>
+</div>
+<div class="h-[1px] w-full bg-surface-variant my-xs"></div>
+<div class="flex justify-between items-center">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline">Modules</span>
+<span class="font-body-sm text-body-sm text-outline">In Development</span>
+</div>
+<button class="bg-surface-variant text-on-surface-variant font-label-md text-label-md px-md py-xs rounded-lg cursor-not-allowed w-full md:w-auto text-center" disabled="">Notify Me</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-dim font-body-sm text-body-sm font-label-sm text-label-sm full-width border-t border-outline-variant dark:border-outline flat no shadows opacity-90 hover:opacity-100 w-full py-xl px-md flex flex-col md:flex-row justify-between items-start max-w-container-max mx-auto gap-lg mt-auto">
+<div class="flex flex-col gap-xs">
+<div class="font-headline-sm text-headline-sm text-primary dark:text-on-surface">PreCAS Practice</div>
+<p class="text-on-surface-variant">© 2024 PreCAS Practice. All rights reserved.</p>
+</div>
+<div class="flex flex-col md:flex-row gap-md">
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">About Us</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors flex items-center gap-xs" href="#">
+<span class="material-symbols-outlined text-[16px]">chat</span> WhatsApp Support
+            </a>
+</div>
+</footer>
+</body></html>

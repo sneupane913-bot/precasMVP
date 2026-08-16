@@ -33,7 +33,7 @@ export default async function ConsultancyEntryPage({
     <>
       <main>
         {/* Branded header. Their logo, their colour, our product. */}
-        <header className="border-b border-slate-200 bg-white">
+        <header className="border-b border-line bg-surface">
           <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4">
             <div className="flex items-center gap-3">
               {c.logoUrl ? (
@@ -41,7 +41,7 @@ export default async function ConsultancyEntryPage({
                 <img src={c.logoUrl} alt={c.name} className="h-9 w-auto object-contain" />
               ) : (
                 <span
-                  className="grid h-9 w-9 place-items-center rounded-lg font-black text-white"
+                  className="grid h-9 w-9 place-items-center rounded-control font-black text-white"
                   style={{ backgroundColor: accent }}
                 >
                   {c.name.slice(0, 1).toUpperCase()}
@@ -51,7 +51,7 @@ export default async function ConsultancyEntryPage({
             </div>
             <Link
               href={`/start?via=${encodeURIComponent(c.slug)}&next=/universities`}
-              className="rounded-xl px-4 py-2.5 text-sm font-bold text-white"
+              className="rounded-control px-4 py-2.5 text-sm font-bold text-white"
               style={{ backgroundColor: accent }}
             >
               Start free
@@ -61,24 +61,24 @@ export default async function ConsultancyEntryPage({
 
         <section className="px-5 py-14 text-center" style={{ backgroundColor: '#eff4ff' }}>
           <div className="mx-auto max-w-2xl">
-            <p className="mb-4 inline-block rounded-full bg-white px-4 py-1.5 text-sm font-medium text-slate-600">
+            <p className="mb-4 inline-block rounded-full bg-surface px-4 py-1.5 text-sm font-medium text-ink-soft">
               Provided to you by {c.name}
             </p>
             <h1 className="mb-4 font-serif text-3xl font-bold leading-tight text-ink sm:text-4xl">
               Practise your UK interview before it counts
             </h1>
-            <p className="mx-auto mb-8 max-w-lg leading-relaxed text-slate-600">
+            <p className="mx-auto mb-8 max-w-lg leading-relaxed text-ink-soft">
               Sit a real mock Pre-CAS interview for your own university. We listen to your answers
               and tell you exactly what to fix.
             </p>
             <Link
               href={`/start?via=${encodeURIComponent(c.slug)}&next=/universities`}
-              className="inline-flex w-full items-center justify-center rounded-xl px-8 py-4 text-lg font-bold text-white shadow-lg transition active:scale-[0.98] sm:w-auto sm:px-10"
+              className="inline-flex w-full items-center justify-center rounded-control px-8 py-4 text-lg font-bold text-white shadow-lg transition active:scale-[0.98] sm:w-auto sm:px-10"
               style={{ backgroundColor: accent }}
             >
               Start free practice
             </Link>
-            <p className="mt-4 text-sm text-slate-500">
+            <p className="mt-4 text-sm text-ink-quiet">
               No card, no payment. {TRIAL_QUESTION_COUNT} real questions free.
             </p>
           </div>
@@ -105,12 +105,12 @@ export default async function ConsultancyEntryPage({
                 d: 'We tell you what you actually said and how to say it better.',
               },
             ].map((s) => (
-              <div key={s.n} className="rounded-2xl border border-slate-200 bg-white p-6">
-                <div className="mb-4 grid h-10 w-10 place-items-center rounded-xl bg-surface-sunk font-bold text-ink">
+              <div key={s.n} className="rounded-card border border-line bg-surface p-6">
+                <div className="mb-4 grid h-10 w-10 place-items-center rounded-control bg-surface-sunk font-bold text-ink">
                   {s.n}
                 </div>
                 <h3 className="mb-2 font-serif text-lg font-bold text-ink">{s.t}</h3>
-                <p className="text-sm leading-relaxed text-slate-600">{s.d}</p>
+                <p className="text-sm leading-relaxed text-ink-soft">{s.d}</p>
               </div>
             ))}
           </div>

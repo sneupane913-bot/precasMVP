@@ -25,7 +25,7 @@ export default async function PricingPage() {
       <main className="px-4 py-8 sm:px-6">
         <div className="mx-auto max-w-4xl">
           <h1 className="mb-2 text-center font-serif text-3xl text-ink">Price</h1>
-          <p className="mx-auto mb-8 max-w-lg text-center leading-relaxed text-slate-600">
+          <p className="mx-auto mb-8 max-w-lg text-center leading-relaxed text-ink-soft">
             Pay once. No monthly bill, nothing to cancel. Your credits do not expire.
           </p>
 

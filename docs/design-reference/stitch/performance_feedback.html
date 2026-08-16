@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Detailed Feedback — Mock Session #04 | PreCAS Practice</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&amp;family=Noto+Serif:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#c4c6cc",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#007347",
+                        "outline": "#74777d",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#e7e8eb",
+                        "tertiary-fixed": "#feddba",
+                        "secondary-fixed": "#82fab7",
+                        "surface-container-highest": "#e1e2e5",
+                        "on-tertiary-fixed-variant": "#584329",
+                        "surface-container": "#edeef1",
+                        "inverse-primary": "#bac8dc",
+                        "primary-container": "#0f1c2c",
+                        "tertiary": "#000000",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#005231",
+                        "on-surface": "#191c1e",
+                        "on-surface-variant": "#44474c",
+                        "inverse-surface": "#2e3133",
+                        "surface-tint": "#525f71",
+                        "surface": "#f8f9fc",
+                        "secondary-fixed-dim": "#65dd9c",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#bac8dc",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed": "#0f1c2c",
+                        "surface-dim": "#d9dadd",
+                        "on-secondary-fixed": "#002111",
+                        "on-tertiary-container": "#9a7f61",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#82fab7",
+                        "on-secondary": "#ffffff",
+                        "primary": "#000000",
+                        "on-primary-container": "#778598",
+                        "tertiary-fixed-dim": "#e0c1a0",
+                        "primary-fixed": "#d6e4f9",
+                        "surface-container-low": "#f2f3f6",
+                        "surface-bright": "#f8f9fc",
+                        "surface-variant": "#e1e2e5",
+                        "on-primary-fixed-variant": "#3a4859",
+                        "on-tertiary-fixed": "#281804",
+                        "secondary": "#006d42",
+                        "background": "#f8f9fc",
+                        "tertiary-container": "#281804",
+                        "on-background": "#191c1e",
+                        "inverse-on-surface": "#f0f1f4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "64px",
+                        "base": "4px",
+                        "sm": "16px",
+                        "container-max": "1120px",
+                        "md": "24px",
+                        "xs": "8px",
+                        "gutter": "20px",
+                        "lg": "40px"
+                    },
+                    "fontFamily": {
+                        "display-mobile": ["Noto Serif"],
+                        "body-sm": ["Hanken Grotesk"],
+                        "label-sm": ["Hanken Grotesk"],
+                        "display": ["Noto Serif"],
+                        "headline-lg": ["Noto Serif"],
+                        "body-md": ["Hanken Grotesk"],
+                        "label-md": ["Hanken Grotesk"],
+                        "headline-sm": ["Noto Serif"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "headline-md": ["Noto Serif"]
+                    },
+                    "fontSize": {
+                        "display-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "display": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface border-b border-outline-variant w-full top-0 z-40 transition-colors duration-200">
+<div class="flex justify-between items-center w-full px-sm md:px-lg max-w-container-max mx-auto h-16">
+<div class="font-display text-display-mobile font-bold text-primary flex items-center">
+<span>PreCAS Practice</span>
+</div>
+<!-- Desktop Nav -->
+<nav class="hidden md:flex items-center space-x-8 h-full">
+<a class="h-full flex items-center text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Dashboard</a>
+<a class="h-full flex items-center text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Interviews</a>
+<a class="h-full flex items-center text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Schedule</a>
+<a class="h-full flex items-center text-primary font-bold border-b-2 border-primary pb-1 opacity-80 transition-opacity duration-150" href="#">Progress</a>
+</nav>
+<div class="flex items-center space-x-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors duration-200 flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-container-low">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors duration-200 flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-container-low">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-container-max mx-auto px-gutter md:px-lg py-xl flex flex-col items-center">
+<!-- Header Section -->
+<section class="w-full max-w-3xl mb-xl text-center md:text-left flex flex-col items-center md:items-start">
+<div class="flex items-center space-x-2 text-on-surface-variant font-label-md text-label-md mb-xs uppercase tracking-widest">
+<span>Progress Report</span>
+<span class="text-outline">•</span>
+<span>Oct 24, 2023</span>
+</div>
+<h1 class="font-display text-display text-primary mb-md">Detailed Feedback — Mock Session #04</h1>
+<!-- Summary Lead -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl shadow-sm max-w-3xl relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary"></div>
+<p class="font-body-lg text-body-lg text-on-surface">
+                    "Your understanding of course modules is strong. Focus on articulating your post-study career plans in Nepal more clearly."
+                 </p>
+</div>
+</section>
+<!-- Scoring Breakdown (Bento Style) -->
+<section class="w-full max-w-5xl mb-xl">
+<h2 class="font-headline-sm text-headline-sm text-primary mb-md border-b border-line pb-xs">Assessment Breakdown</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Credibility (Strong) -->
+<div class="bg-secondary-container text-on-secondary-container p-md rounded-xl flex flex-col shadow-sm">
+<div class="flex justify-between items-start mb-sm">
+<span class="material-symbols-outlined text-[32px]">verified</span>
+<span class="font-label-md text-label-md bg-surface-container-lowest text-secondary px-2 py-1 rounded-full shadow-sm">Strong</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-xs">Credibility</h3>
+<p class="font-body-sm text-body-sm opacity-90">Excellent eye contact and confident tone throughout the interview.</p>
+</div>
+<!-- Academic History (Adequate) -->
+<div class="bg-surface-container-lowest border border-outline-variant text-on-surface p-md rounded-xl flex flex-col shadow-sm">
+<div class="flex justify-between items-start mb-sm">
+<span class="material-symbols-outlined text-[32px] text-surface-tint">school</span>
+<span class="font-label-md text-label-md bg-surface-container text-on-surface-variant px-2 py-1 rounded-full">Adequate</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-xs">Academic History</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Clear progression, but could tie past studies more tightly to current goals.</p>
+</div>
+<!-- Financial Logic (Needs Work) -->
+<div class="bg-error-container text-on-error-container p-md rounded-xl flex flex-col shadow-sm">
+<div class="flex justify-between items-start mb-sm">
+<span class="material-symbols-outlined text-[32px]">account_balance</span>
+<span class="font-label-md text-label-md bg-surface-container-lowest text-error px-2 py-1 rounded-full shadow-sm">Needs Focus</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-xs">Financial Logic</h3>
+<p class="font-body-sm text-body-sm opacity-90">Sponsor details were vague. Require concrete numbers regarding tuition and living expenses.</p>
+</div>
+</div>
+</section>
+<!-- Key Improvement Areas & Action -->
+<section class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-3 gap-xl">
+<!-- Advice List -->
+<div class="lg:col-span-2">
+<h2 class="font-headline-sm text-headline-sm text-primary mb-md border-b border-line pb-xs">Key Improvement Areas</h2>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+<ul class="divide-y divide-outline-variant">
+<li class="p-md flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary-container mt-1">lightbulb</span>
+<div>
+<h4 class="font-label-md text-label-md text-primary mb-xs">Career Progression Alignment</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Connect how specifically the 'Strategic Management' module will prepare you for a managerial role upon returning home.</p>
+</div>
+</li>
+<li class="p-md flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary-container mt-1">monetization_on</span>
+<div>
+<h4 class="font-label-md text-label-md text-primary mb-xs">Financial Clarity</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Practice explaining the exact source of your sponsor's income and how it comfortably covers your entire duration of study.</p>
+</div>
+</li>
+<li class="p-md flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary-container mt-1">record_voice_over</span>
+<div>
+<h4 class="font-label-md text-label-md text-primary mb-xs">Pacing Under Pressure</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">When asked unexpected questions, pause for a second before answering. Avoid rushing into a response to fill the silence.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<!-- CTA Card -->
+<div class="lg:col-span-1 flex flex-col justify-start">
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-md shadow-sm flex flex-col items-center text-center">
+<div class="w-16 h-16 bg-surface-container-highest rounded-full flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-primary text-[32px]">event_available</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary mb-xs">Ready to try again?</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-md">Apply this feedback in your next session to ensure readiness.</p>
+<button class="w-full bg-[#0f9d63] text-on-primary font-label-md text-label-md py-3 px-6 rounded-lg shadow-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                        Schedule Next Mock
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden bg-surface border-t border-outline-variant shadow-sm fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-xs pb-safe transition-colors">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors w-full h-full" href="#">
+<span class="material-symbols-outlined mb-1">dashboard</span>
+<span class="font-label-sm text-label-sm">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors w-full h-full" href="#">
+<span class="material-symbols-outlined mb-1">video_chat</span>
+<span class="font-label-sm text-label-sm">Interviews</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors w-full h-full" href="#">
+<span class="material-symbols-outlined mb-1">calendar_today</span>
+<span class="font-label-sm text-label-sm">Schedule</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary font-bold hover:bg-surface-container-low transition-colors w-full h-full scale-95 duration-200" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-label-sm text-label-sm">Progress</span>
+</a>
+</nav>
+</body></html>

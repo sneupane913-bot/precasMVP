@@ -18,9 +18,9 @@ export default async function PrivacyPage() {
       <SiteHeader session={session} />
       <main className="mx-auto max-w-2xl px-5 py-12">
         <h1 className="mb-2 font-serif text-3xl text-ink">Privacy policy</h1>
-        <p className="mb-8 text-sm text-slate-500">Working version. Last updated August 2026.</p>
+        <p className="mb-8 text-sm text-ink-quiet">Working version. Last updated August 2026.</p>
 
-        <div className="space-y-6 leading-relaxed text-slate-700">
+        <div className="space-y-6 leading-relaxed text-ink-soft">
           <section>
             <h2 className="mb-2 text-lg font-bold text-ink">What we collect</h2>
             <p>

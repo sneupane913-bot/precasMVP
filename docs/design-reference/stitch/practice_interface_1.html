@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PreCAS Practice - Active Practice Interface</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&amp;family=Noto+Serif:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#c4c6cc",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#007347",
+                        "outline": "#74777d",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#e7e8eb",
+                        "tertiary-fixed": "#feddba",
+                        "secondary-fixed": "#82fab7",
+                        "surface-container-highest": "#e1e2e5",
+                        "on-tertiary-fixed-variant": "#584329",
+                        "surface-container": "#edeef1",
+                        "inverse-primary": "#bac8dc",
+                        "primary-container": "#0f1c2c",
+                        "tertiary": "#000000",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#005231",
+                        "on-surface": "#191c1e",
+                        "on-surface-variant": "#44474c",
+                        "inverse-surface": "#2e3133",
+                        "surface-tint": "#525f71",
+                        "surface": "#f8f9fc",
+                        "secondary-fixed-dim": "#65dd9c",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#bac8dc",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed": "#0f1c2c",
+                        "surface-dim": "#d9dadd",
+                        "on-secondary-fixed": "#002111",
+                        "on-tertiary-container": "#9a7f61",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#82fab7",
+                        "on-secondary": "#ffffff",
+                        "primary": "#000000",
+                        "on-primary-container": "#778598",
+                        "tertiary-fixed-dim": "#e0c1a0",
+                        "primary-fixed": "#d6e4f9",
+                        "surface-container-low": "#f2f3f6",
+                        "surface-bright": "#f8f9fc",
+                        "surface-variant": "#e1e2e5",
+                        "on-primary-fixed-variant": "#3a4859",
+                        "on-tertiary-fixed": "#281804",
+                        "secondary": "#006d42",
+                        "background": "#f8f9fc",
+                        "tertiary-container": "#281804",
+                        "on-background": "#191c1e",
+                        "inverse-on-surface": "#f0f1f4",
+                        "go": "#0f9d63", // Added from prompt instruction
+                        "ink": "#191c1e",
+                        "ink-soft": "#44474c",
+                        "line": "#e6e9ef"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "card": "16px"
+                    },
+                    "spacing": {
+                        "xl": "64px",
+                        "base": "4px",
+                        "sm": "16px",
+                        "container-max": "1120px",
+                        "md": "24px",
+                        "xs": "8px",
+                        "gutter": "20px",
+                        "lg": "40px",
+                        "safe": "env(safe-area-inset-bottom)"
+                    },
+                    "fontFamily": {
+                        "display-mobile": ["Noto Serif", "serif"],
+                        "body-sm": ["Hanken Grotesk", "sans-serif"],
+                        "label-sm": ["Hanken Grotesk", "sans-serif"],
+                        "display": ["Noto Serif", "serif"],
+                        "headline-lg": ["Noto Serif", "serif"],
+                        "body-md": ["Hanken Grotesk", "sans-serif"],
+                        "label-md": ["Hanken Grotesk", "sans-serif"],
+                        "headline-sm": ["Noto Serif", "serif"],
+                        "body-lg": ["Hanken Grotesk", "sans-serif"],
+                        "headline-md": ["Noto Serif", "serif"]
+                    },
+                    "fontSize": {
+                        "display-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "display": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }]
+                    },
+                    boxShadow: {
+                        'soft': '0 1px 2px rgba(13,27,42,.04)',
+                        'deep': '0 8px 24px rgba(13,27,42,.06)'
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+            font-family: 'Hanken Grotesk', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-inverse-surface text-primary dark:text-inverse-primary border-b border-outline-variant dark:border-outline flex justify-between items-center w-full px-sm md:px-lg max-w-container-max mx-auto h-16 sticky top-0 z-50">
+<div class="flex items-center">
+<span class="font-display text-display-mobile font-bold text-primary dark:text-primary-fixed-dim tracking-tight">PreCAS Practice</span>
+</div>
+<nav class="hidden md:flex gap-md h-full items-end">
+<!-- Navigation intent fallback mapping: Active Practice maps to "Interviews" or simply highlight nothing if it's a focus task. It's a focus task so we suppress standard nav active states, but keep the shell for escape if needed, though instructions say "task-focused implies temporary departure... hide shell". However, TopNavBar is requested. We will show standard tabs but none strictly active as this is a transactional focus page, or highlight Interviews. Let's highlight Interviews. -->
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 font-label-md text-label-md pb-1 flex items-center h-full" href="#">Dashboard</a>
+<a class="text-primary dark:text-inverse-primary font-bold border-b-2 border-primary dark:border-inverse-primary pb-1 hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 font-label-md text-label-md flex items-center h-full" href="#">Interviews</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 font-label-md text-label-md pb-1 flex items-center h-full" href="#">Schedule</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 font-label-md text-label-md pb-1 flex items-center h-full" href="#">Progress</a>
+</nav>
+<div class="flex items-center gap-sm">
+<button aria-label="Notifications" class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button aria-label="Account" class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-container-max mx-auto px-gutter py-lg md:py-xl grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Left Column: Video & Controls (8 cols on desktop) -->
+<div class="md:col-span-8 flex flex-col gap-md">
+<!-- Video Area -->
+<div class="relative w-full aspect-video bg-surface-container-high rounded-card overflow-hidden shadow-soft border border-line">
+<!-- Large Interviewer Placeholder -->
+<img class="w-full h-full object-cover" data-alt="A professional, high-quality photograph of an academic admissions interviewer sitting in a well-lit, modern university office. The lighting is soft and natural, emphasizing a serious, institutional, and confident tone. The overall aesthetic aligns with a premium, quiet, and reliable academic environment, using subtle cool tones and deep blacks." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCruySIcSEMDPeghWFLt1Pq_t65VZBWKYXLnL24DC5skcxh8f_g0z6hH2rh3VWLMXYdrW6-CDXKtysNG8e48NaPtRRgWo09XSa5PgSbd0zhSBsWF8b35hio3f23PAdjFrE0Oj7slyyrT9wDCfggvoKjno5CSNY-unwvPVOVq0mmQfDduw58jV0KFqSQ2mPdkJ3s0wGmTknVwSSVEUmNl3WL4o1pA6QNNDJibs3OFWoIDHEBWQs2KEn"/>
+<!-- Status Overlay -->
+<div class="absolute top-sm left-sm bg-surface-sunk/90 backdrop-blur-sm px-3 py-1 rounded-full border border-line flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-error animate-pulse"></div>
+<span class="font-label-sm text-label-sm text-ink-quiet">Recording</span>
+</div>
+<!-- Self View (Picture-in-Picture) -->
+<div class="absolute bottom-sm right-sm w-1/4 aspect-video bg-surface-container-highest rounded-lg overflow-hidden border-2 border-surface shadow-deep">
+<img class="w-full h-full object-cover" data-alt="A clean, minimalist headshot of a focused university applicant looking directly into the camera. The background is a plain, softly lit white wall. The image conveys a serious, professional demeanor suitable for a high-stakes interview setting. The lighting is even and flat, avoiding any dramatic shadows, consistent with a clean, modern UI aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6vLWTBGUWfKCgJm5tZeR6dI3MtQEmkPwVWxNdsnCAQ0kS99mz0l35jga-e8LS-_E5qNs-YgbG1Gi7dTrvMM85gS0LHZObRUpMr_sUcDQZrf6MmlJMM-rXGKsZeDY2yLBuBWQR9Xp6q8TK4IuP06eTBd4Jz9mlbyB36ufkQUZnawxd1XwMAEI_pVoK1IcOrA-Ii61SVQKWsmOAmxQuwR364-WlMmB12WDBMb48YOsy1w2VD4VJfY2a"/>
+</div>
+</div>
+<!-- Current Question -->
+<div class="bg-surface rounded-card p-md shadow-soft border border-line mt-sm">
+<h2 class="font-label-sm text-label-sm text-ink-soft uppercase tracking-wider mb-2">Current Question</h2>
+<p class="font-headline-md text-headline-md text-primary">"Why did you choose this specific university over others in the UK?"</p>
+</div>
+<!-- Action Area -->
+<div class="flex items-center justify-between mt-md">
+<button class="bg-surface border border-line text-ink-soft hover:bg-surface-container-low px-6 py-3 rounded-lg font-label-md text-label-md transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">help</span>
+                    Request Clarification
+                </button>
+<button class="bg-go text-on-primary hover:bg-go/90 px-8 py-3 rounded-lg font-label-md text-label-md transition-colors flex items-center gap-2 shadow-soft">
+                    Complete Response
+                    <span class="material-symbols-outlined text-sm">check_circle</span>
+</button>
+</div>
+</div>
+<!-- Right Column: Transcription & Metrics (4 cols on desktop) -->
+<div class="md:col-span-4 flex flex-col gap-md">
+<!-- Real-time Transcription -->
+<div class="bg-surface rounded-card p-md shadow-soft border border-line h-[400px] flex flex-col">
+<div class="flex justify-between items-center mb-md pb-2 border-b border-line">
+<h3 class="font-headline-sm text-headline-sm text-primary">Live Transcript</h3>
+<span class="material-symbols-outlined text-ink-soft">closed_caption</span>
+</div>
+<div class="flex-grow overflow-y-auto pr-2 space-y-4">
+<!-- Interviewer Text -->
+<div class="flex gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm text-ink-soft">school</span>
+</div>
+<div class="pt-1">
+<p class="font-label-sm text-label-sm text-ink-soft mb-1">Interviewer</p>
+<p class="font-body-md text-body-md text-on-surface">Thank you for that background. Moving on to your specific academic interests...</p>
+</div>
+</div>
+<!-- Question Marker -->
+<div class="flex gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm text-ink-soft">school</span>
+</div>
+<div class="pt-1">
+<p class="font-label-sm text-label-sm text-ink-soft mb-1">Interviewer</p>
+<p class="font-body-md text-body-md text-on-surface font-semibold">Why did you choose this specific university over others in the UK?</p>
+</div>
+</div>
+<!-- Applicant Text (Active) -->
+<div class="flex gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">person</span>
+</div>
+<div class="pt-1 w-full">
+<p class="font-label-sm text-label-sm text-ink-soft mb-1">You</p>
+<p class="font-body-md text-body-md text-on-surface">I was particularly drawn to the strong emphasis on practical research modules in the second year, which aligns perfectly with my goal of... <span class="inline-block w-1.5 h-4 bg-primary animate-pulse ml-1 align-middle"></span></p>
+</div>
+</div>
+</div>
+</div>
+<!-- Session Info -->
+<div class="bg-surface-container-lowest rounded-card p-md border border-line">
+<h3 class="font-label-sm text-label-sm text-ink-soft uppercase tracking-wider mb-sm">Session Details</h3>
+<ul class="space-y-3">
+<li class="flex justify-between items-center border-b border-line pb-2">
+<span class="font-body-sm text-body-sm text-ink-soft">Module</span>
+<span class="font-label-sm text-label-sm text-primary">Academic Fit</span>
+</li>
+<li class="flex justify-between items-center border-b border-line pb-2">
+<span class="font-body-sm text-body-sm text-ink-soft">Question</span>
+<span class="font-label-sm text-label-sm text-primary">4 of 12</span>
+</li>
+<li class="flex justify-between items-center">
+<span class="font-body-sm text-body-sm text-ink-soft">Elapsed Time</span>
+<span class="font-label-sm text-label-sm text-primary">14:22</span>
+</li>
+</ul>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) - Suppressed on this task-focused screen per instructions, but requested in JSON. 
+         Instruction: "Automatic Suppression: You MUST exclude the navigation shell if the page intent is: ... Task-Focused". 
+         Since this is an "Active Practice Interface" (task-focused), we suppress the BottomNavBar on mobile to prioritize the canvas. -->
+</body></html>

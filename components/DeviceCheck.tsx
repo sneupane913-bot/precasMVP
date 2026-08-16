@@ -324,16 +324,16 @@ export function DeviceCheck({ onReady }: { onReady: () => void }) {
     return (
       <div className="mx-auto max-w-md p-6 text-center">
         <h1 className="mb-3 text-xl font-bold text-ink">We need your camera and microphone</h1>
-        <p className="mb-6 leading-relaxed text-slate-600">{hardFail}</p>
+        <p className="mb-6 leading-relaxed text-ink-soft">{hardFail}</p>
         <button
           onClick={() => window.location.reload()}
-          className="w-full rounded-xl bg-ink px-6 py-3.5 text-base font-semibold text-white"
+          className="w-full rounded-control bg-ink px-6 py-3.5 text-base font-semibold text-white"
         >
           Reload this page
         </button>
         <button
           onClick={onReady}
-          className="mt-3 w-full rounded-xl border-2 border-slate-300 px-6 py-3.5 text-base font-semibold text-slate-600"
+          className="mt-3 w-full rounded-control border-2 border-line-strong px-6 py-3.5 text-base font-semibold text-ink-soft"
         >
           Continue anyway
         </button>
@@ -344,11 +344,11 @@ export function DeviceCheck({ onReady }: { onReady: () => void }) {
   return (
     <div className="mx-auto max-w-2xl p-4 sm:p-6">
       <h1 className="mb-1 text-2xl font-bold text-ink">Let us check your setup</h1>
-      <p className="mb-5 text-slate-600">
+      <p className="mb-5 text-ink-soft">
         The real interview is recorded with your camera on. Let us make sure everything works first.
       </p>
 
-      <div className="mb-4 overflow-hidden rounded-2xl bg-ink">
+      <div className="mb-4 overflow-hidden rounded-card bg-ink">
         <video
           ref={videoRef}
           autoPlay
@@ -362,14 +362,14 @@ export function DeviceCheck({ onReady }: { onReady: () => void }) {
         {checks.map((c) => (
           <li
             key={c.key}
-            className={`flex items-start gap-3 rounded-xl border px-4 py-3 ${
+            className={`flex items-start gap-3 rounded-control border px-4 py-3 ${
               c.state === 'pass'
-                ? 'border-emerald-200 bg-emerald-50'
+                ? 'border-go/30 bg-go-tint'
                 : c.state === 'warn'
-                  ? 'border-amber-200 bg-amber-50'
+                  ? 'border-warn/40 bg-warn-tint'
                   : c.state === 'fail'
-                    ? 'border-red-200 bg-red-50'
-                    : 'border-slate-200 bg-white'
+                    ? 'border-stop/30 bg-stop-tint'
+                    : 'border-line bg-surface'
             }`}
           >
             <span className="mt-0.5 w-4 text-center text-lg leading-none">
@@ -377,19 +377,19 @@ export function DeviceCheck({ onReady }: { onReady: () => void }) {
             </span>
             <div className="min-w-0">
               <p className="text-sm font-semibold text-ink">{c.label}</p>
-              <p className="text-sm leading-snug text-slate-600">{c.detail}</p>
+              <p className="text-sm leading-snug text-ink-soft">{c.detail}</p>
             </div>
           </li>
         ))}
       </ul>
 
       {/* ---------------- Sound check ---------------- */}
-      <div className="mb-5 rounded-2xl border border-slate-200 bg-white p-5">
+      <div className="mb-5 rounded-card border border-line bg-surface p-5">
         <h2 className="mb-1 font-bold text-ink">Sound check</h2>
-        <p className="mb-1 text-sm leading-relaxed text-slate-600">
+        <p className="mb-1 text-sm leading-relaxed text-ink-soft">
           Press the button and say your name out loud for three seconds.
         </p>
-        <p className="mb-4 text-sm leading-relaxed text-slate-500">
+        <p className="mb-4 text-sm leading-relaxed text-ink-quiet">
           We will then play your voice back to you. Hearing yourself a few seconds later is normal
           and is meant to happen: it is the only way to know what the interviewer will hear.
         </p>
@@ -401,7 +401,7 @@ export function DeviceCheck({ onReady }: { onReady: () => void }) {
           Two truths on one screen is worse than either being wrong. Once a
           verdict exists, the verdict is the only voice.
         */}
-        <div className="mb-1 flex items-center justify-between text-xs font-medium text-slate-500">
+        <div className="mb-1 flex items-center justify-between text-micro font-medium text-ink-quiet">
           <span>{echoState === 'recording' ? 'Speak now' : 'Microphone level'}</span>
           <span>
             {echoVerdict
@@ -417,10 +417,10 @@ export function DeviceCheck({ onReady }: { onReady: () => void }) {
                   : 'Very quiet'}
           </span>
         </div>
-        <div className="mb-4 h-3 w-full overflow-hidden rounded-full bg-slate-100">
+        <div className="mb-4 h-3 w-full overflow-hidden rounded-full bg-surface-sunk">
           <div
             className={`h-full transition-all duration-75 ${
-              level > 0.012 ? 'bg-emerald-500' : 'bg-slate-300'
+              level > 0.012 ? 'bg-go' : 'bg-line-strong'
             }`}
             style={{ width: `${Math.min(100, level * 300)}%` }}
           />
@@ -429,7 +429,7 @@ export function DeviceCheck({ onReady }: { onReady: () => void }) {
         {echoState === 'playing' ? (
           <button
             onClick={stopPlayback}
-            className="w-full rounded-xl border-2 border-slate-300 px-5 py-3.5 text-base font-semibold text-slate-700"
+            className="w-full rounded-control border-2 border-line-strong px-5 py-3.5 text-base font-semibold text-ink-soft"
           >
             Playing your voice back... tap to stop
           </button>
@@ -437,7 +437,7 @@ export function DeviceCheck({ onReady }: { onReady: () => void }) {
           <button
             onClick={runEchoTest}
             disabled={echoState === 'recording' || echoState === 'analysing' || !cameraOk}
-            className="w-full rounded-xl bg-ink px-5 py-3.5 text-base font-semibold text-white disabled:opacity-50"
+            className="w-full rounded-control bg-ink px-5 py-3.5 text-base font-semibold text-white disabled:opacity-50"
           >
             {echoState === 'idle' && 'Start sound check'}
             {echoState === 'recording' && `Recording... ${countdown}`}
@@ -448,12 +448,12 @@ export function DeviceCheck({ onReady }: { onReady: () => void }) {
 
         {echoVerdict && (
           <p
-            className={`mt-3 rounded-lg px-4 py-3 text-sm leading-relaxed ${
+            className={`mt-3 rounded-control px-4 py-3 text-sm leading-relaxed ${
               echoVerdict.tone === 'pass'
-                ? 'bg-emerald-50 text-emerald-900'
+                ? 'bg-go-tint text-go-dark'
                 : echoVerdict.tone === 'warn'
-                  ? 'bg-amber-50 text-amber-900'
-                  : 'bg-red-50 text-red-900'
+                  ? 'bg-warn-tint text-warn'
+                  : 'bg-stop-tint text-stop'
             }`}
           >
             {echoVerdict.text}
@@ -464,7 +464,7 @@ export function DeviceCheck({ onReady }: { onReady: () => void }) {
         {echoVerdict?.tone === 'fail' && !overrideMic && (
           <button
             onClick={() => setOverrideMic(true)}
-            className="mt-2 w-full rounded-xl border-2 border-slate-300 px-5 py-3 text-sm font-semibold text-slate-600"
+            className="mt-2 w-full rounded-control border-2 border-line-strong px-5 py-3 text-sm font-semibold text-ink-soft"
           >
             I can hear the playback, continue anyway
           </button>
@@ -474,12 +474,12 @@ export function DeviceCheck({ onReady }: { onReady: () => void }) {
       <button
         onClick={onReady}
         disabled={!canStart}
-        className="w-full rounded-xl bg-emerald-600 px-6 py-4 text-lg font-bold text-white shadow-sm disabled:bg-slate-300"
+        className="w-full rounded-control bg-go px-6 py-4 text-lg font-bold text-white shadow-sm disabled:bg-line-strong"
       >
         Start my interview
       </button>
       {!canStart && (
-        <p className="mt-2 text-center text-sm font-semibold text-red-600">
+        <p className="mt-2 text-center text-sm font-semibold text-stop">
           {!cameraOk
             ? 'Your camera is not ready yet.'
             : !soundCheckRun

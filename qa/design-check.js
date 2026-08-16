@@ -97,6 +97,37 @@ t('D-1b', 'no arbitrary duration or easing in any component',
   arbitrary.length === 0,
   arbitrary.length ? arbitrary.join('\n          ') : 'durations and easings come from the config only');
 
+/**
+ * D-1c. NO MALFORMED TOKEN CLASSES.
+ *
+ * Written after I broke eighteen of them myself, in one command.
+ *
+ * Converting the old palette I replaced the PREFIX `bg-slate-` with
+ * `bg-surface-sunk`, which silently turned `bg-slate-300` into
+ * `bg-surface-sunk300` — a class Tailwind does not generate, so it emits
+ * nothing and the element loses its background with no error anywhere. `tsc`
+ * was green, every suite was green, and a disabled button had simply become
+ * invisible. `bg-red-500` became `bg-stop-tint0`, so the recording indicator
+ * stopped being red.
+ *
+ * That is F-2 committed by the very sweep that was supposed to eliminate F-2,
+ * and nothing in the pipeline could see it: a class that does not exist looks
+ * exactly like a class you did not write.
+ */
+const malformed = [];
+for (const f of FILES) {
+  for (const m of code(f).matchAll(
+    /\b(?:bg|text|border|ring|divide)-(?:surface|surface-sunk|ink|ink-soft|ink-quiet|line|line-strong|go|go-dark|go-tint|warn|warn-tint|stop|stop-tint|paper|brand)[a-z-]*\d+/g
+  )) {
+    malformed.push(`${rel(f)}  ${m[0]}`);
+  }
+}
+t('D-1c', 'no malformed token class (a digit glued to a token name)',
+  malformed.length === 0,
+  malformed.length
+    ? malformed.join('\n          ') + '\n          Tailwind emits nothing for these, so the style silently vanishes'
+    : 'no token name has a shade number stuck to it');
+
 // ------------------------------------------------------------------ D-2
 
 const durations = [...CSS.matchAll(/--t-([a-z]+):\s*(\d+)ms/g)].map((m) => ({ name: m[1], ms: Number(m[2]) }));

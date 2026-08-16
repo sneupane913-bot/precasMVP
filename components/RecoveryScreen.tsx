@@ -40,11 +40,11 @@ export function RecoveryScreen({
         </Link>
 
         <h1 className="mb-3 text-center font-serif text-3xl font-bold text-ink">{title}</h1>
-        <p className="mb-6 text-center leading-relaxed text-slate-600">{lead}</p>
+        <p className="mb-6 text-center leading-relaxed text-ink-soft">{lead}</p>
 
-        <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-5">
+        <div className="mb-8 rounded-card border border-line bg-surface p-5">
           <p className="mb-3 font-semibold text-ink">The usual reasons</p>
-          <ul className="space-y-2.5 text-sm leading-relaxed text-slate-600">
+          <ul className="space-y-2.5 text-sm leading-relaxed text-ink-soft">
             {reasons.map(([head, body]) => (
               <li key={head}>
                 <strong className="text-ink">{head}</strong> {body}
@@ -56,20 +56,20 @@ export function RecoveryScreen({
         <div className="flex flex-col gap-3">
           <Link
             href={primary.href}
-            className="inline-flex w-full items-center justify-center rounded-xl bg-ink px-6 py-4 font-bold text-white"
+            className="inline-flex w-full items-center justify-center rounded-control bg-ink px-6 py-4 font-bold text-white"
           >
             {primary.label}
           </Link>
           <Link
             href="/"
-            className="inline-flex w-full items-center justify-center rounded-xl border-2 border-slate-300 px-6 py-4 font-semibold text-slate-700"
+            className="inline-flex w-full items-center justify-center rounded-control border-2 border-line-strong px-6 py-4 font-semibold text-ink-soft"
           >
             Go to the home page
           </Link>
         </div>
 
         {footnote && (
-          <p className="mt-6 text-center text-sm leading-relaxed text-slate-500">{footnote}</p>
+          <p className="mt-6 text-center text-sm leading-relaxed text-ink-quiet">{footnote}</p>
         )}
       </div>
     </main>

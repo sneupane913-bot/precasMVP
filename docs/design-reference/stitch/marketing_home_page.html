@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PreCAS Practice - UK Interview Prep for Nepali Students</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Noto+Serif:wght@600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Noto+Serif:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#bac8dc",
+                        "surface-tint": "#525f71",
+                        "secondary": "#006d42",
+                        "tertiary": "#000000",
+                        "tertiary-fixed-dim": "#e0c1a0",
+                        "primary-fixed": "#d6e4f9",
+                        "surface": "#f8f9fc",
+                        "on-primary-fixed-variant": "#3a4859",
+                        "on-secondary-fixed": "#002111",
+                        "surface-container": "#edeef1",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#0f1c2c",
+                        "surface-variant": "#e1e2e5",
+                        "outline": "#74777d",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#005231",
+                        "on-secondary-container": "#007347",
+                        "on-surface": "#191c1e",
+                        "on-tertiary-fixed-variant": "#584329",
+                        "secondary-container": "#82fab7",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#281804",
+                        "surface-container-high": "#e7e8eb",
+                        "primary-fixed-dim": "#bac8dc",
+                        "primary": "#000000",
+                        "surface-container-highest": "#e1e2e5",
+                        "on-tertiary-container": "#9a7f61",
+                        "secondary-fixed": "#82fab7",
+                        "on-surface-variant": "#44474c",
+                        "secondary-fixed-dim": "#65dd9c",
+                        "surface-dim": "#d9dadd",
+                        "surface-container-low": "#f2f3f6",
+                        "outline-variant": "#c4c6cc",
+                        "on-primary-container": "#778598",
+                        "error": "#ba1a1a",
+                        "inverse-on-surface": "#f0f1f4",
+                        "background": "#f8f9fc",
+                        "surface-bright": "#f8f9fc",
+                        "on-background": "#191c1e",
+                        "tertiary-container": "#281804",
+                        "inverse-surface": "#2e3133",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#feddba",
+                        "primary-container": "#0f1c2c",
+                        "on-secondary": "#ffffff",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1120px",
+                        "base": "4px",
+                        "xl": "64px",
+                        "lg": "40px",
+                        "sm": "16px",
+                        "xs": "8px",
+                        "md": "24px",
+                        "gutter": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Noto Serif"],
+                        "label-md": ["Hanken Grotesk"],
+                        "headline-md": ["Noto Serif"],
+                        "display-mobile": ["Noto Serif"],
+                        "body-sm": ["Hanken Grotesk"],
+                        "display": ["Noto Serif"],
+                        "headline-sm": ["Noto Serif"],
+                        "label-sm": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "display-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "display": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Subtle scrolling animation for the proof strip */
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-250px * 6)); } /* Adjust based on image width and count */
+        }
+        .animate-scroll {
+            animation: scroll 30s linear infinite;
+        }
+        .animate-scroll:hover {
+            animation-play-state: paused;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- Top Navigation Bar -->
+<nav class="sticky top-0 w-full z-50 bg-surface/90 dark:bg-surface-container/90 backdrop-blur-md border-b border-outline-variant dark:border-outline">
+<div class="max-w-container-max mx-auto px-gutter py-xs flex justify-between items-center">
+<!-- Brand -->
+<a class="flex items-center gap-sm group" href="#">
+<div class="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+<span class="font-headline-sm text-on-secondary font-bold">P</span>
+</div>
+<span class="font-headline-sm text-headline-sm font-semibold text-secondary dark:text-secondary-fixed">PreCAS Practice</span>
+</a>
+<!-- Desktop Navigation Links -->
+<div class="hidden md:flex items-center gap-lg">
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 px-3 py-2 rounded-md" href="#universities">Universities</a>
+<a class="font-label-md text-label-md text-secondary dark:text-secondary-fixed font-semibold border-b-2 border-secondary px-3 py-2" href="#practice">Practice</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 px-3 py-2 rounded-md" href="#pricing">Pricing</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 px-3 py-2 rounded-md" href="#faq">FAQ</a>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-md">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hidden sm:block" href="#">Sign In</a>
+<a class="bg-primary text-on-primary font-label-md text-label-md px-4 py-2 rounded-full hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-2" href="#">
+                    Start Free
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</nav>
+<main>
+<!-- Hero Section -->
+<section class="relative w-full min-h-[90vh] flex items-center overflow-hidden bg-primary-container">
+<!-- Background Image with Gradient Overlay -->
+<div class="absolute inset-0 z-0">
+<img alt="" class="w-full h-full object-cover object-right md:object-center opacity-80" src="https://lh3.googleusercontent.com/aida/AP1WRLuQCOcvnBRGiZwE9m87mWYb3v9O6ISlVvo4wTB4Dwbujk0j6otuZ_6OwOFgpxXd-sFCwFzsPJ0qlQT8oT4cFu1-LPdmDppFXWGiwhJBJ-a1Z19xZr9fuCGnj2JksrmhRQ_7j01zpWy6pLRlqEmAoJQy7vABUzbwRfpNBpD5H98pdsDgsDAlmjM9G-9GGso78ZThzSet9qhndDBEaJYyqVXfU62ePTmUcmAYhdC4sd0MKYOtlVRBdj1v_9g"/>
+<div class="absolute inset-0 bg-gradient-to-r from-primary-container via-primary-container/80 to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-container-max mx-auto px-gutter w-full">
+<div class="max-w-2xl text-on-primary">
+<div class="inline-block px-3 py-1 mb-6 rounded-full bg-surface/10 border border-surface/20 backdrop-blur-sm">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary-fixed-dim">For Nepali students applying to the UK</span>
+</div>
+<h1 class="font-display-mobile md:font-display text-display-mobile md:text-display mb-6 text-surface">
+                        Practise your UK interview before it counts
+                    </h1>
+<p class="font-body-lg text-body-lg text-inverse-primary mb-10 max-w-xl">
+                        Sit a real mock Pre-CAS interview for your own university. We listen to your answers and tell you exactly what to fix.
+                    </p>
+<div class="flex flex-col sm:flex-row items-start sm:items-center gap-md">
+<a class="bg-secondary text-on-secondary px-8 py-4 rounded-full font-label-md text-label-md hover:bg-on-secondary-container transition-colors shadow-md flex items-center gap-2" href="#">
+                            Start free practice
+                            <span class="material-symbols-outlined">mic</span>
+</a>
+<a class="flex items-center gap-2 font-label-md text-label-md text-surface hover:text-primary-fixed transition-colors group" href="#how-it-works">
+<div class="w-10 h-10 rounded-full bg-surface/10 flex items-center justify-center border border-surface/30 group-hover:bg-surface/20 transition-colors">
+<span class="material-symbols-outlined" data-weight="fill">play_arrow</span>
+</div>
+                            See how it works
+                        </a>
+</div>
+<p class="font-label-sm text-label-sm text-inverse-primary/70 mt-4">
+                        No card, no payment. 10 real questions free.
+                    </p>
+</div>
+</div>
+</section>
+<!-- Proof Strip Section -->
+<section class="py-lg border-b border-surface-variant bg-surface overflow-hidden">
+<div class="max-w-container-max mx-auto px-gutter mb-6 text-center">
+<h2 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Students practise for these universities</h2>
+</div>
+<div class="relative w-full overflow-hidden flex">
+<!-- Double the content for smooth infinite scroll -->
+<div class="flex gap-lg items-center animate-scroll whitespace-nowrap shrink-0 px-lg">
+<img alt="" class="h-16 w-auto object-contain opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all" src="https://lh3.googleusercontent.com/aida/AP1WRLtL_-dIE94dNNiJBvmnxZxbCg6xViUQagW6_QLvUeYY1736zAIzf7-w0OCBMs2cfUGDuF7L8IUVrqoBXGcxtbHdzHk8Mt8fCZPNbFkv2YpWfYFkQQheogcomRlVfj5dJLsSqaQMJ8ZTPIIlVUDiIHyn0kNeQnEILZW2seOqReGmu2G5-iI5GcgSXCjy_sveReodSpHQRI8HhYOMrg4k1z0zl1-wvD2v7MfOKLQQMXHx9_9W8s_3Sct_MAk"/>
+<img alt="" class="h-16 w-auto object-contain opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all" src="https://lh3.googleusercontent.com/aida/AP1WRLvum5ROOzYA5ME5IFsIjzNry4kyWmjdB5l1Bu-K0-IDmeMhKq70Xk8sw5ZfAtpcRW2j0we3pLrfq4NQWZJngd_Y_5uVsEEnBVUHgkSqCY-8ZVoqhpnTzzqdreoXOzVkjokFlbdy1SVzOG0OPX09zFHIFmV8VKlEhUMy20-QuryPo37V7ia5RxDU1d9lEfjjwI7uMR58BWSWfJl8fSK6BevILzEUwMrwZHv1A1D4iReUMJ8KedJthXOcSZ0"/>
+<img alt="" class="h-16 w-auto object-contain opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all" src="https://lh3.googleusercontent.com/aida/AP1WRLtECk4A6Lxcr3soyKmVzoMJqs0hPRs76GNTEcuA4erPsW6iJ96xIrYHZ3ZaPI7dLy439hsLAK9jcMJX9JlFk-LhI3kIZXLgHMnzJF_Wnb5TzxAiymtGzCWuZNfT0deg_2kADZJLpjmCh1FJ-OIbj9GgsZZFYFnZkrkaI36cdesXUHwFjDHGZ93k6QxiSyfIcbDm_Xg27HQOpuEldLJamAoYYe_3WewsvayzOr6-2v2p8x37bf9gkI-Opw"/>
+<img alt="" class="h-16 w-auto object-contain opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all" src="https://lh3.googleusercontent.com/aida/AP1WRLs3CSQxjRRDBJ1MlOSIUH-QEkfQbdIrFQU74Vr0wzbNfAbJWve_ZwRq87uC01vuE-punUPa4f50LrXAVDzB77edPUswH0cR6pHlVD7vetQqAjP3P2-zIQyKkTJRXvT7uy-UUUfl69GKk9VN7Gxj_tuVNKl8qDShbPQd9PVkZ2s0Ab4VgRnEaTeg93G5Hli_yr1DenXiqMi28wnBXfH4WRlxwSTTMicwa0AJwZDKPbyUJZo4IBKrqrkO6Rg"/>
+<img alt="" class="h-16 w-auto object-contain opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all" src="https://lh3.googleusercontent.com/aida/AP1WRLt4QHYXVQkaePtDMqjCG7kBwwpaggg1MlY70Ov0EuNgJT9nFCoiyOSfR0hRVGK6p2X-_EJfJzlbpQAMm0-ZIVvtmuqqi4645QBQ2EEhLF7GJOjfw1hmekhrH3yovkt1f3kyNAHN_Dh4mvyRCdajJdMWM423jsbPZHqamJ84Gv_WvwWM0v44939XXzO60fZg-SvLjAhOM7cSKnohVDLbFFEb9voLNq1td3St2Gv6-NVpUq9AQZfv2Hf4UXA"/>
+<img alt="" class="h-16 w-auto object-contain opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all" src="https://lh3.googleusercontent.com/aida/AP1WRLv1ld4gSXd4Dnvty7FzcCnggMTl3JEEayd_H0yy1sJlHLsid8FFW3kLLxhCD4goWZAmaKyktJ_vKcYkW9SB69gS73Cj7OiBG8W5LGEl66-jMHXyspyZTp7O6wQexdewewRM-w2V2Dj9w0gTOAL_8aRKyacuCWeyFsMaU8G_uv3hPHtXvDMKEFIiO21oOWZV-ez4eWtWUqCkF6Vljj7aeT2YgUBIwcfOUevkFtz2XLGaQBRPuJ7Ang2NnFs"/>
+</div>
+<div class="flex gap-lg items-center animate-scroll whitespace-nowrap shrink-0 px-lg">
+<img alt="" class="h-16 w-auto object-contain opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all" src="https://lh3.googleusercontent.com/aida/AP1WRLtL_-dIE94dNNiJBvmnxZxbCg6xViUQagW6_QLvUeYY1736zAIzf7-w0OCBMs2cfUGDuF7L8IUVrqoBXGcxtbHdzHk8Mt8fCZPNbFkv2YpWfYFkQQheogcomRlVfj5dJLsSqaQMJ8ZTPIIlVUDiIHyn0kNeQnEILZW2seOqReGmu2G5-iI5GcgSXCjy_sveReodSpHQRI8HhYOMrg4k1z0zl1-wvD2v7MfOKLQQMXHx9_9W8s_3Sct_MAk"/>
+<img alt="" class="h-16 w-auto object-contain opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all" src="https://lh3.googleusercontent.com/aida/AP1WRLvum5ROOzYA5ME5IFsIjzNry4kyWmjdB5l1Bu-K0-IDmeMhKq70Xk8sw5ZfAtpcRW2j0we3pLrfq4NQWZJngd_Y_5uVsEEnBVUHgkSqCY-8ZVoqhpnTzzqdreoXOzVkjokFlbdy1SVzOG0OPX09zFHIFmV8VKlEhUMy20-QuryPo37V7ia5RxDU1d9lEfjjwI7uMR58BWSWfJl8fSK6BevILzEUwMrwZHv1A1D4iReUMJ8KedJthXOcSZ0"/>
+<img alt="" class="h-16 w-auto object-contain opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all" src="https://lh3.googleusercontent.com/aida/AP1WRLtECk4A6Lxcr3soyKmVzoMJqs0hPRs76GNTEcuA4erPsW6iJ96xIrYHZ3ZaPI7dLy439hsLAK9jcMJX9JlFk-LhI3kIZXLgHMnzJF_Wnb5TzxAiymtGzCWuZNfT0deg_2kADZJLpjmCh1FJ-OIbj9GgsZZFYFnZkrkaI36cdesXUHwFjDHGZ93k6QxiSyfIcbDm_Xg27HQOpuEldLJamAoYYe_3WewsvayzOr6-2v2p8x37bf9gkI-Opw"/>
+<img alt="" class="h-16 w-auto object-contain opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all" src="https://lh3.googleusercontent.com/aida/AP1WRLs3CSQxjRRDBJ1MlOSIUH-QEkfQbdIrFQU74Vr0wzbNfAbJWve_ZwRq87uC01vuE-punUPa4f50LrXAVDzB77edPUswH0cR6pHlVD7vetQqAjP3P2-zIQyKkTJRXvT7uy-UUUfl69GKk9VN7Gxj_tuVNKl8qDShbPQd9PVkZ2s0Ab4VgRnEaTeg93G5Hli_yr1DenXiqMi28wnBXfH4WRlxwSTTMicwa0AJwZDKPbyUJZo4IBKrqrkO6Rg"/>
+<img alt="" class="h-16 w-auto object-contain opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all" src="https://lh3.googleusercontent.com/aida/AP1WRLt4QHYXVQkaePtDMqjCG7kBwwpaggg1MlY70Ov0EuNgJT9nFCoiyOSfR0hRVGK6p2X-_EJfJzlbpQAMm0-ZIVvtmuqqi4645QBQ2EEhLF7GJOjfw1hmekhrH3yovkt1f3kyNAHN_Dh4mvyRCdajJdMWM423jsbPZHqamJ84Gv_WvwWM0v44939XXzO60fZg-SvLjAhOM7cSKnohVDLbFFEb9voLNq1td3St2Gv6-NVpUq9AQZfv2Hf4UXA"/>
+<img alt="" class="h-16 w-auto object-contain opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all" src="https://lh3.googleusercontent.com/aida/AP1WRLv1ld4gSXd4Dnvty7FzcCnggMTl3JEEayd_H0yy1sJlHLsid8FFW3kLLxhCD4goWZAmaKyktJ_vKcYkW9SB69gS73Cj7OiBG8W5LGEl66-jMHXyspyZTp7O6wQexdewewRM-w2V2Dj9w0gTOAL_8aRKyacuCWeyFsMaU8G_uv3hPHtXvDMKEFIiO21oOWZV-ez4eWtWUqCkF6Vljj7aeT2YgUBIwcfOUevkFtz2XLGaQBRPuJ7Ang2NnFs"/>
+</div>
+</div>
+</section>
+<!-- Three Steps Section -->
+<section class="py-xl bg-background" id="how-it-works">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="text-center max-w-2xl mx-auto mb-xl">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-4">Three steps to interview readiness</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Built to calm your nerves and build real speaking habits.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<!-- Step 1 -->
+<div class="flex flex-col">
+<div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-6 shadow-sm border border-surface-variant">
+<img alt="" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLsNBJBqEaK0KwJ4lMvAWyWDmG3XOHKMSxzxf8ea7MwjTuDDCoN-RoQgPLOZqo0UDP-z2wSj1M2QvL238GyoYLla4pS6q_PYk6A1k432BU3uXyQfCnmDiadXu-jGOExwUrfIbXO-SRhILx0_IjrbIyP2WBx2KqR1YjDH7I7WnGUSAQnkEwtoyUtI_RtkcfoW7tg0AMseuUF9GWppJgAlKzGI0dtsnmDN1ICCktkeSU8YGjPNyMCkIzJPsuc"/>
+<div class="absolute top-4 left-4 w-8 h-8 bg-surface rounded-full flex items-center justify-center font-label-md text-label-md text-primary shadow-sm border border-surface-variant">1</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Pick your university</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Questions come from the credibility themes universities publish.</p>
+</div>
+<!-- Step 2 -->
+<div class="flex flex-col">
+<div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-6 shadow-sm border border-surface-variant">
+<img alt="" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLuQA3tbh_8upni44YjIDTiA8Z1NPe7RHMkEpoVxsLepm1pOkUxY9juRopvHg5-EeIChiyhhVEsHAa7FRgZQT3kpaNEhJvWgBTG-me0mk46sEfibg8V6ben1APBcHWUPFDxJuCrbYeqJw14LIrb55JRP0tUSFgnxO-jJewFAJOsB2hs_j-CJNyd_6S5w7FfcfE8VLgdgZl6gmur1AxmT-NkyprZusFaplR13x7FDPsN77Gfh0Yc5Ql2H-gk"/>
+<div class="absolute top-4 left-4 w-8 h-8 bg-surface rounded-full flex items-center justify-center font-label-md text-label-md text-primary shadow-sm border border-surface-variant">2</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Answer out loud</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Camera on and timer running, exactly like the real interview.</p>
+</div>
+<!-- Step 3 -->
+<div class="flex flex-col">
+<div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-6 shadow-sm border border-surface-variant">
+<img alt="" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLuxde3JUD8MaHFrKgftVDzB_vXOg5drh60HpLIM_wgDnCWFxrcM5rBBMRbZMuQA9RaE_htzHvqLF9WNHbCDhyoe61OP6WeLdmoUx2D5ENXaZdnD5d5l3kmtBI2Xo5b8CrKlzaTVH3v7GzlnKvMQ3mKGmzMSqW4Ttk5X9YY1ksTx9eFRVFGH28eMqyJuJt8Z6xAnvxfWizyBXn-K_a2kuNdehS0N2IlvBxbyZOyrICNqFKVblJTadUpG7_g"/>
+<div class="absolute top-4 left-4 w-8 h-8 bg-surface rounded-full flex items-center justify-center font-label-md text-label-md text-primary shadow-sm border border-surface-variant">3</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Get real feedback</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">We tell you what you actually said and how to say it better.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full pt-xl pb-md bg-on-primary-fixed dark:bg-tertiary-container text-surface dark:text-on-tertiary-fixed font-body-sm text-body-sm">
+<div class="max-w-container-max mx-auto px-gutter grid grid-cols-1 md:grid-cols-4 gap-lg">
+<!-- Brand Column -->
+<div class="col-span-1 md:col-span-1">
+<a class="inline-block font-headline-sm text-headline-sm text-secondary-fixed mb-4" href="#">PreCAS Practice</a>
+<p class="text-surface-variant/80 mb-6">Empowering Nepali students to achieve their UK academic dreams with confidence.</p>
+<p class="text-surface-variant/60 text-xs">© 2024 PreCAS Practice. All rights reserved.</p>
+</div>
+<!-- Links Column 1 -->
+<div class="col-span-1">
+<h4 class="font-label-md text-label-md text-surface mb-4 uppercase tracking-wider">Product</h4>
+<ul class="space-y-3">
+<li><a class="text-surface-variant/80 hover:text-secondary-fixed transition-colors" href="#">University Lists</a></li>
+<li><a class="text-surface-variant/80 hover:text-secondary-fixed transition-colors" href="#">Practice Links</a></li>
+<li><a class="text-surface-variant/80 hover:text-secondary-fixed transition-colors" href="#">Pricing</a></li>
+</ul>
+</div>
+<!-- Links Column 2 -->
+<div class="col-span-1">
+<h4 class="font-label-md text-label-md text-surface mb-4 uppercase tracking-wider">Legal</h4>
+<ul class="space-y-3">
+<li><a class="text-surface-variant/80 hover:text-secondary-fixed transition-colors" href="#">Privacy Policy</a></li>
+<li><a class="text-surface-variant/80 hover:text-secondary-fixed transition-colors" href="#">Terms of Service</a></li>
+</ul>
+</div>
+<!-- Contact Column -->
+<div class="col-span-1">
+<h4 class="font-label-md text-label-md text-surface mb-4 uppercase tracking-wider">Support</h4>
+<p class="text-surface-variant/80 mb-4">Need help? Get in touch with our support team.</p>
+<a class="inline-flex items-center gap-2 bg-secondary-fixed text-on-secondary-fixed px-4 py-2 rounded-md font-label-md hover:bg-secondary-fixed-dim transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+                    WhatsApp Support
+                </a>
+</div>
+</div>
+</footer>
+</body></html>

@@ -67,21 +67,21 @@ export function InstallPrompt({ show }: { show: boolean }) {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-x-3 bottom-3 z-50 rounded-2xl border-2 border-ink bg-white p-4 shadow-xl sm:left-auto sm:right-4 sm:w-96">
+    <div className="fixed inset-x-3 bottom-3 z-50 rounded-card border-2 border-ink bg-surface p-4 shadow-xl sm:left-auto sm:right-4 sm:w-96">
       <div className="mb-3 flex items-start gap-3">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-ink text-lg font-black text-white">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-control bg-ink text-lg font-black text-white">
           P
         </span>
         <div className="min-w-0">
           <p className="font-bold leading-tight text-ink">Keep this on your phone</p>
-          <p className="text-sm leading-snug text-slate-600">
+          <p className="text-sm leading-snug text-ink-soft">
             Add it to your home screen so you can practise in one tap.
           </p>
         </div>
       </div>
 
       {isIos ? (
-        <ol className="mb-3 space-y-1 rounded-xl bg-slate-50 p-3 text-sm text-slate-700">
+        <ol className="mb-3 space-y-1 rounded-control bg-surface-sunk p-3 text-sm text-ink-soft">
           <li>
             1. Tap the <strong>Share</strong> button at the bottom of Safari
           </li>
@@ -95,7 +95,7 @@ export function InstallPrompt({ show }: { show: boolean }) {
       ) : (
         <button
           onClick={install}
-          className="mb-2 w-full rounded-xl bg-ink px-5 py-3 font-bold text-white"
+          className="mb-2 w-full rounded-control bg-ink px-5 py-3 font-bold text-white"
         >
           Add to home screen
         </button>
@@ -103,7 +103,7 @@ export function InstallPrompt({ show }: { show: boolean }) {
 
       <button
         onClick={dismiss}
-        className="w-full rounded-xl border-2 border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600"
+        className="w-full rounded-control border-2 border-line px-5 py-2.5 text-sm font-semibold text-ink-soft"
       >
         Not now
       </button>

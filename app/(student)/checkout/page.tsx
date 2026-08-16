@@ -42,7 +42,7 @@ interface CreatedOrder {
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={<main className="p-8 text-center text-slate-500">Loading...</main>}>
+    <Suspense fallback={<main className="p-8 text-center text-ink-quiet">Loading...</main>}>
       <Checkout />
     </Suspense>
   );
@@ -259,13 +259,13 @@ function Checkout() {
       <main className="mx-auto max-w-md px-5 py-12 text-center">
         <div className="mb-4 text-5xl">✓</div>
         <h1 className="mb-2 font-serif text-2xl text-ink">Payment approved</h1>
-        <p className="mb-6 leading-relaxed text-slate-600">
+        <p className="mb-6 leading-relaxed text-ink-soft">
           Your credits have been added. You can finish the questions you started and take your full
           mock interviews.
         </p>
         <a
           href="/universities"
-          className="inline-flex w-full items-center justify-center rounded-xl bg-emerald-600 px-6 py-4 text-lg font-bold text-white"
+          className="inline-flex w-full items-center justify-center rounded-control bg-go px-6 py-4 text-lg font-bold text-white"
         >
           Continue practising
         </a>
@@ -280,19 +280,19 @@ function Checkout() {
           cash. Deliberately minimal so nothing competes with paying. */}
       <div className="mb-8 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-500 font-black text-white">
+          <span className="grid h-8 w-8 place-items-center rounded-control bg-go font-black text-white">
             P
           </span>
           <span className="font-serif text-base text-ink">PreCAS Practice</span>
         </Link>
-        <Link href="/pricing" className="text-sm font-semibold text-slate-500 hover:text-ink">
+        <Link href="/pricing" className="text-sm font-semibold text-ink-quiet hover:text-ink">
           Back to packs
         </Link>
       </div>
 
       <h1 className="mb-1 font-serif text-2xl text-ink">Pay to continue</h1>
       {order && (
-        <p className="mb-4 text-slate-600">
+        <p className="mb-4 text-ink-soft">
           {order.packName}: {order.mocks} mock interviews and {order.practice} practice sessions.
         </p>
       )}
@@ -309,7 +309,7 @@ function Checkout() {
           come from plans.ts so they cannot drift from the ledger.
           ------------------------------------------------------------------ */}
       {state === 'choosing' && (
-        <fieldset className="mb-6 rounded-2xl border border-slate-200 bg-white p-4">
+        <fieldset className="mb-6 rounded-card border border-line bg-surface p-4">
           <legend className="px-1 text-sm font-semibold text-ink">Which pack?</legend>
           <div className="grid gap-2 sm:grid-cols-2">
             {PACK_CHOICES.map((p) => {
@@ -317,8 +317,8 @@ function Checkout() {
               return (
                 <label
                   key={p.code}
-                  className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 p-3 transition ${
-                    on ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'
+                  className={`flex cursor-pointer items-start gap-3 rounded-control border-2 p-3 transition ${
+                    on ? 'border-go bg-go-tint' : 'border-line hover:border-line-strong'
                   }`}
                 >
                   <input
@@ -330,7 +330,7 @@ function Checkout() {
                   />
                   <span>
                     <span className="block font-bold text-ink">NPR {p.priceNpr}</span>
-                    <span className="block text-sm text-slate-600">
+                    <span className="block text-sm text-ink-soft">
                       {p.mockInterviews} mock interviews, {p.practiceSessions} practice
                     </span>
                   </span>
@@ -343,7 +343,7 @@ function Checkout() {
 
       {error && (
         <div className="mb-4">
-          <p className="rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3 font-medium text-red-800">
+          <p className="rounded-control border-2 border-stop/30 bg-stop-tint px-4 py-3 font-medium text-stop">
             {error}
           </p>
           {/* D-17. When `create` failed the page collapsed to a pack picker and
@@ -364,9 +364,9 @@ function Checkout() {
       )}
 
       {state === 'submitted' && (
-        <div className="rounded-2xl border-2 border-sky-300 bg-sky-50 p-5">
-          <p className="mb-1 font-bold text-sky-900">We have your payment details</p>
-          <p className="mb-3 text-sm leading-relaxed text-sky-900/90">
+        <div className="rounded-card border-2 border-line-strong bg-surface-sunk p-5">
+          <p className="mb-1 font-bold text-brand-light">We have your payment details</p>
+          <p className="mb-3 text-sm leading-relaxed text-brand-light/90">
             A person checks this against our bank record, so please allow up to{' '}
             <strong>{order?.waitHours ?? 4} hours</strong>. You do not need to pay again, and you do
             not need to stay on this page. Your credits switch on by themselves the moment it is
@@ -375,7 +375,7 @@ function Checkout() {
           {/* The client's point: a student who has sent real money and heard
               nothing has exactly one question — "who do I call" — and this
               screen did not answer it. */}
-          <ol className="mb-4 space-y-1 text-sm text-sky-900/90">
+          <ol className="mb-4 space-y-1 text-sm text-brand-light/90">
             <li>✓ Payment details received</li>
             <li>• Checking our bank record</li>
             <li>• Credits added</li>
@@ -385,22 +385,22 @@ function Checkout() {
               quote a reference back to us is a student who does not feel
               cheated while they wait. */}
           {order && (
-            <dl className="mb-4 rounded-xl bg-white/70 p-4 text-sm">
+            <dl className="mb-4 rounded-control bg-surface/70 p-4 text-sm">
               <div className="flex justify-between gap-3 py-0.5">
-                <dt className="text-sky-900/70">Amount</dt>
-                <dd className="font-bold text-sky-900">NPR {order.amountNpr.toLocaleString()}</dd>
+                <dt className="text-brand-light/70">Amount</dt>
+                <dd className="font-bold text-brand-light">NPR {order.amountNpr.toLocaleString()}</dd>
               </div>
               <div className="flex justify-between gap-3 py-0.5">
-                <dt className="text-sky-900/70">Transaction number</dt>
-                <dd className="font-mono font-bold text-sky-900">{txn.trim()}</dd>
+                <dt className="text-brand-light/70">Transaction number</dt>
+                <dd className="font-mono font-bold text-brand-light">{txn.trim()}</dd>
               </div>
               <div className="flex justify-between gap-3 py-0.5">
-                <dt className="text-sky-900/70">Reference</dt>
-                <dd className="font-mono text-sky-900">{order.orderId.slice(0, 8)}</dd>
+                <dt className="text-brand-light/70">Reference</dt>
+                <dd className="font-mono text-brand-light">{order.orderId.slice(0, 8)}</dd>
               </div>
             </dl>
           )}
-          <p className="mb-4 text-xs leading-relaxed text-sky-900/70">
+          <p className="mb-4 text-micro leading-relaxed text-brand-light/70">
             Keep this reference. If anything goes wrong, quoting it lets us find your payment
             straight away.
           </p>
@@ -417,18 +417,18 @@ function Checkout() {
       )}
 
       {state === 'rejected' && (
-        <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-5">
-          <p className="mb-1 font-bold text-amber-900">We could not match that payment yet</p>
+        <div className="rounded-card border-2 border-warn/40 bg-warn-tint p-5">
+          <p className="mb-1 font-bold text-warn">We could not match that payment yet</p>
 
           {/* The approver's own words. "The number is one digit short" is
               something a student can act on; "we could not match it" is not. */}
           {rejectedReason && (
-            <p className="mb-3 rounded-xl bg-white/70 px-4 py-3 text-sm font-medium text-amber-900">
+            <p className="mb-3 rounded-control bg-surface/70 px-4 py-3 text-sm font-medium text-warn">
               What we found: {rejectedReason}
             </p>
           )}
 
-          <p className="mb-4 text-sm leading-relaxed text-amber-900/90">
+          <p className="mb-4 text-sm leading-relaxed text-warn/90">
             This is almost always the transaction number typed slightly wrong. Nothing has been
             taken from you by us, and nothing is closed off. Check the number in your wallet app and
             send it again. If you are sure it is right, message or call us and we will look properly
@@ -441,7 +441,7 @@ function Checkout() {
               setRejectedReason(null);
               void createOrder();
             }}
-            className="mb-3 w-full rounded-xl bg-ink px-5 py-3 font-bold text-white"
+            className="mb-3 w-full rounded-control bg-ink px-5 py-3 font-bold text-white"
           >
             Check the number and try again
           </button>
@@ -460,8 +460,8 @@ function Checkout() {
 
       {state === 'paying' && order && (
         <>
-          <div className="mb-5 rounded-2xl border-2 border-ink bg-white p-5 text-center">
-            <p className="text-sm text-slate-500">Amount to pay</p>
+          <div className="mb-5 rounded-card border-2 border-ink bg-surface p-5 text-center">
+            <p className="text-sm text-ink-quiet">Amount to pay</p>
             <p className="mb-4 text-4xl font-black text-ink">NPR {order.amountNpr.toLocaleString()}</p>
             {order.payTo.walletNumber ? (
               <>
@@ -475,20 +475,20 @@ function Checkout() {
                     <img
                       src={order.payTo.qrImageUrl}
                       alt={`${order.payTo.walletName} payment QR code for ${order.payTo.accountName}`}
-                      className="mx-auto h-56 w-56 rounded-xl border-2 border-slate-200 bg-white object-contain p-2"
+                      className="mx-auto h-56 w-56 rounded-control border-2 border-line bg-surface object-contain p-2"
                     />
-                    <p className="mt-2 text-xs text-slate-500">
+                    <p className="mt-2 text-micro text-ink-quiet">
                       Scan with your wallet app, then type the amount yourself.
                     </p>
                   </div>
                 )}
-                <div className="rounded-xl bg-slate-50 p-4 text-left text-sm">
-                  <p className="text-slate-500">
+                <div className="rounded-control bg-surface-sunk p-4 text-left text-sm">
+                  <p className="text-ink-quiet">
                     {order.payTo.qrImageUrl ? 'Or send to' : 'Send to'}
                   </p>
                   <p className="font-bold text-ink">{order.payTo.walletName}</p>
                   <p className="font-mono text-lg font-bold text-ink">{order.payTo.walletNumber}</p>
-                  <p className="mb-3 text-slate-600">{order.payTo.accountName}</p>
+                  <p className="mb-3 text-ink-soft">{order.payTo.accountName}</p>
                   <button
                     type="button"
                     onClick={() => {
@@ -496,22 +496,22 @@ function Checkout() {
                       setCopied(true);
                       setTimeout(() => setCopied(false), 2000);
                     }}
-                    className="w-full rounded-lg border-2 border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700"
+                    className="w-full rounded-control border-2 border-line-strong px-4 py-2 text-sm font-semibold text-ink-soft"
                   >
                     {copied ? 'Copied' : 'Copy the number'}
                   </button>
                 </div>
               </>
             ) : (
-              <p className="rounded-xl bg-amber-50 p-4 text-sm text-amber-900">
+              <p className="rounded-control bg-warn-tint p-4 text-sm text-warn">
                 Payment details are not set up yet. Please contact us on WhatsApp to pay.
               </p>
             )}
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-card border border-line bg-surface p-5">
             <h2 className="mb-1 font-bold text-ink">After you have paid</h2>
-            <p className="mb-4 text-sm leading-relaxed text-slate-600">
+            <p className="mb-4 text-sm leading-relaxed text-ink-soft">
               Open your wallet app and copy the transaction number from the receipt. That number is
               how we find your payment.
             </p>
@@ -531,7 +531,7 @@ function Checkout() {
                 Naming all three names is what makes this findable, and real
                 examples are what stop somebody typing the amount instead.
                 -------------------------------------------------------------- */}
-            <p className="mb-2 text-xs leading-relaxed text-slate-500">
+            <p className="mb-2 text-micro leading-relaxed text-ink-quiet">
               On your receipt this may be called <strong>Transaction Code</strong>,{' '}
               <strong>Transaction ID</strong> or <strong>Reference Code</strong>. They are all the
               same thing. Examples: <span className="font-mono">1NOH8C2</span> from eSewa, or{' '}
@@ -541,14 +541,14 @@ function Checkout() {
               value={txn}
               onChange={(e) => setTxn(e.target.value)}
               placeholder="1NOH8C2  or  697873804"
-              className="mb-3 w-full rounded-xl border-2 border-slate-200 px-4 py-3 font-mono outline-none focus:border-ink"
+              className="mb-3 w-full rounded-control border-2 border-line px-4 py-3 font-mono outline-none focus:border-ink"
             />
 
             <label className="mb-1 block text-sm font-semibold text-ink">Name you paid with</label>
             <input
               value={payerName}
               onChange={(e) => setPayerName(e.target.value)}
-              className="mb-3 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+              className="mb-3 w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
             />
 
             {/*
@@ -577,7 +577,7 @@ function Checkout() {
             <label className="mb-1 block text-sm font-semibold text-ink">
               Your WhatsApp number
             </label>
-            <p className="mb-2 text-xs leading-relaxed text-slate-500">
+            <p className="mb-2 text-micro leading-relaxed text-ink-quiet">
               The number your wallet is registered to. We use it only to confirm this payment, and to
               reach you if we cannot find it. Ten digits, for example{' '}
               <span className="font-mono">9843205222</span>.
@@ -594,9 +594,9 @@ function Checkout() {
               inputMode="numeric"
               placeholder="9843205222"
               aria-label="Your WhatsApp number"
-              className="mb-1 w-full rounded-xl border-2 border-slate-200 px-4 py-3 font-mono outline-none focus:border-ink"
+              className="mb-1 w-full rounded-control border-2 border-line px-4 py-3 font-mono outline-none focus:border-ink"
             />
-            <p className="mb-4 text-xs leading-relaxed text-slate-500">
+            <p className="mb-4 text-micro leading-relaxed text-ink-quiet">
               {whatsappLooksRight
                 ? 'We will send your confirmation to this number.'
                 : 'Please type the full number, including the 98 or 97 at the start.'}
@@ -606,7 +606,7 @@ function Checkout() {
                 requirement would strand every student whose phone storage is
                 full or whose connection drops on a 2 MB upload. */}
             <label className="mb-1 block text-sm font-semibold text-ink">
-              Picture of the receipt <span className="font-normal text-slate-500">(optional)</span>
+              Picture of the receipt <span className="font-normal text-ink-quiet">(optional)</span>
             </label>
             <input
               type="file"
@@ -615,9 +615,9 @@ function Checkout() {
                 const f = e.target.files?.[0];
                 if (f) void uploadShot(f);
               }}
-              className="mb-1 w-full rounded-xl border-2 border-dashed border-slate-200 px-4 py-3 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-ink"
+              className="mb-1 w-full rounded-control border-2 border-dashed border-line px-4 py-3 text-sm file:mr-3 file:rounded-control file:border-0 file:bg-surface-sunk file:px-3 file:py-2 file:text-sm file:font-semibold file:text-ink"
             />
-            <p className="mb-4 text-xs leading-relaxed text-slate-500">
+            <p className="mb-4 text-micro leading-relaxed text-ink-quiet">
               {shotNote
                 ? `${shotName ? shotName + ' — ' : ''}${shotNote}`
                 : 'It helps us find your payment faster, but the transaction number above is what we actually check. You can skip this.'}
@@ -626,7 +626,7 @@ function Checkout() {
             <button
               onClick={submit}
               disabled={busy || txn.trim().length < 4 || !payerName.trim() || !whatsappLooksRight}
-              className="w-full rounded-xl bg-emerald-600 px-5 py-4 text-lg font-bold text-white disabled:bg-slate-300"
+              className="w-full rounded-control bg-go px-5 py-4 text-lg font-bold text-white disabled:bg-line-strong"
             >
               {busy ? 'Sending...' : 'I have paid'}
             </button>
@@ -643,7 +643,7 @@ function Checkout() {
             />
 
             {(txn.trim().length < 4 || !payerName.trim() || !whatsappLooksRight) && (
-              <p className="mt-2 text-sm font-semibold text-red-600">
+              <p className="mt-2 text-sm font-semibold text-stop">
                 Fill in the transaction number, the name you paid with, and your WhatsApp number.
               </p>
             )}

@@ -126,10 +126,10 @@ export default function AccountPage() {
       <main className="mx-auto min-h-screen max-w-3xl px-5 py-10">
         <h1 className="mb-8 font-serif text-3xl font-bold text-ink">Your practice</h1>
 
-        {loading && <p className="text-slate-500">Loading...</p>}
+        {loading && <p className="text-ink-quiet">Loading...</p>}
 
         {error && (
-          <p className="mb-4 rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3 font-medium text-red-800">
+          <p className="mb-4 rounded-control border-2 border-stop/30 bg-stop-tint px-4 py-3 font-medium text-stop">
             {error}
           </p>
         )}
@@ -147,9 +147,9 @@ export default function AccountPage() {
             {/* N-4. A seat-backed student is told where their mocks came from
                 and what to do when they run out, instead of being sold to. */}
             {data.seatBacked && (
-              <section className="mb-8 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-5">
+              <section className="mb-8 rounded-card border-2 border-go/30 bg-go-tint p-5">
                 <p className="mb-1 font-bold text-ink">Your consultancy is covering this</p>
-                <p className="text-sm leading-relaxed text-emerald-900">
+                <p className="text-sm leading-relaxed text-go-dark">
                   You do not pay us anything. When your interviews run out, ask your consultancy to
                   add more — they can do it in a moment.
                 </p>
@@ -165,14 +165,14 @@ export default function AccountPage() {
 
             {/* What they have left */}
             <section className="mb-8 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-2xl border border-slate-200 bg-white p-5">
-                <p className="text-sm text-slate-600">Mock interviews left</p>
+              <div className="rounded-card border border-line bg-surface p-5">
+                <p className="text-sm text-ink-soft">Mock interviews left</p>
                 <p className="font-serif text-3xl font-black text-ink">
                   {data.entitlement.mocksLeft}
                 </p>
               </div>
-              <div className="rounded-2xl border border-slate-200 bg-white p-5">
-                <p className="text-sm text-slate-600">Practice questions left</p>
+              <div className="rounded-card border border-line bg-surface p-5">
+                <p className="text-sm text-ink-soft">Practice questions left</p>
                 <p className="font-serif text-3xl font-black text-ink">
                   {data.entitlement.practiceLeft}
                 </p>
@@ -184,15 +184,15 @@ export default function AccountPage() {
                 the whole block is hidden until there is something real to say. */}
             {data.progress && data.progress.sittings > 0 && (
               <section className="mb-8 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-2xl border border-slate-200 bg-white p-5">
-                  <p className="mb-1 text-sm text-slate-600">Your progress</p>
+                <div className="rounded-card border border-line bg-surface p-5">
+                  <p className="mb-1 text-sm text-ink-soft">Your progress</p>
                   {data.progress.trend === null ? (
                     <>
                       <p className="font-serif text-2xl font-bold text-ink">
                         {data.progress.sittings === 1 ? 'One interview done' : `${data.progress.sittings} done`}
                       </p>
                       {/* Honest: we will not draw a trend from a single point. */}
-                      <p className="mt-1 text-sm leading-relaxed text-slate-500">
+                      <p className="mt-1 text-sm leading-relaxed text-ink-quiet">
                         Do one more and we will show you whether you are improving.
                       </p>
                     </>
@@ -201,16 +201,16 @@ export default function AccountPage() {
                       <p
                         className={`font-serif text-3xl font-black ${
                           data.progress.trend > 0
-                            ? 'text-emerald-600'
+                            ? 'text-go-dark'
                             : data.progress.trend < 0
-                              ? 'text-amber-600'
+                              ? 'text-warn'
                               : 'text-ink'
                         }`}
                       >
                         {data.progress.trend > 0 ? '+' : ''}
                         {data.progress.trend}%
                       </p>
-                      <p className="mt-1 text-sm leading-relaxed text-slate-500">
+                      <p className="mt-1 text-sm leading-relaxed text-ink-quiet">
                         {data.progress.trend > 0
                           ? `Better than your first interview. You are at ${data.progress.latest}% now.`
                           : data.progress.trend < 0
@@ -222,17 +222,17 @@ export default function AccountPage() {
                 </div>
 
                 {data.progress.weakest && (
-                  <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-5">
-                    <p className="mb-1 text-sm text-emerald-800">Work on this next</p>
+                  <div className="rounded-card border-2 border-go/30 bg-go-tint p-5">
+                    <p className="mb-1 text-sm text-go-dark">Work on this next</p>
                     <p className="font-serif text-xl font-bold text-ink">
                       {data.progress.weakest.label}
                     </p>
-                    <p className="mb-3 mt-1 text-sm leading-relaxed text-emerald-900">
+                    <p className="mb-3 mt-1 text-sm leading-relaxed text-go-dark">
                       {data.progress.weakest.advice}
                     </p>
                     <Link
                       href="/practice"
-                      className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white"
+                      className="inline-flex items-center justify-center rounded-control bg-go px-4 py-2 text-sm font-bold text-white"
                     >
                       Practise one question
                     </Link>
@@ -246,8 +246,8 @@ export default function AccountPage() {
                 nearly-empty student ends up comparing packs while their
                 interview is next week. */}
             {data.offerRenew && (
-              <section className="mb-8 rounded-2xl border-2 border-ink bg-white p-6">
-                <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-emerald-700">
+              <section className="mb-8 rounded-card border-2 border-ink bg-surface p-6">
+                <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-go-dark">
                   {data.entitlement.mocksLeft === 0 ? 'You have none left' : 'Nearly out'}
                 </p>
                 <h2 className="mb-2 font-serif text-xl font-bold text-ink">
@@ -255,14 +255,14 @@ export default function AccountPage() {
                     ? 'Top up to keep practising'
                     : `Only ${data.entitlement.mocksLeft} mock interview${data.entitlement.mocksLeft === 1 ? '' : 's'} left`}
                 </h2>
-                <p className="mb-5 leading-relaxed text-slate-600">
+                <p className="mb-5 leading-relaxed text-ink-soft">
                   {data.lastPayer?.name
                     ? 'Your details are already filled in, so this takes a moment.'
                     : 'It takes a moment, and your interviews never expire.'}
                 </p>
                 <Link
                   href="/checkout?pack=prep&renew=1"
-                  className="inline-flex items-center justify-center rounded-xl bg-ink px-6 py-3.5 font-bold text-white"
+                  className="inline-flex items-center justify-center rounded-control bg-ink px-6 py-3.5 font-bold text-white"
                 >
                   Top up
                 </Link>
@@ -270,7 +270,7 @@ export default function AccountPage() {
             )}
 
             {data.offerUpgrade && !data.offerRenew && (
-              <p className="mb-8 text-center text-sm text-slate-500">
+              <p className="mb-8 text-center text-sm text-ink-quiet">
                 Want more interviews?{' '}
                 <Link href="/pricing" className="font-semibold text-ink underline underline-offset-4">
                   See the bigger pack
@@ -279,10 +279,10 @@ export default function AccountPage() {
             )}
 
             {/* History */}
-            <section className="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-              <div className="border-b border-slate-200 p-5">
+            <section className="mb-8 overflow-hidden rounded-card border border-line bg-surface">
+              <div className="border-b border-line p-5">
                 <h2 className="font-serif text-lg font-bold text-ink">Everything you have done</h2>
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-ink-soft">
                   Only you can see these. We never show your answers to a consultancy.
                 </p>
               </div>
@@ -290,23 +290,23 @@ export default function AccountPage() {
               {data.sessions.length === 0 ? (
                 <div className="p-10 text-center">
                   <p className="mb-2 font-semibold text-ink">You have not practised yet</p>
-                  <p className="mb-5 text-sm text-slate-500">
+                  <p className="mb-5 text-sm text-ink-quiet">
                     Your first ten questions are free.
                   </p>
                   <Link
                     href="/universities"
-                    className="inline-flex items-center justify-center rounded-xl bg-ink px-6 py-3 font-bold text-white"
+                    className="inline-flex items-center justify-center rounded-control bg-ink px-6 py-3 font-bold text-white"
                   >
                     Start practising
                   </Link>
                 </div>
               ) : (
-                <ul className="divide-y divide-slate-100">
+                <ul className="divide-y divide-line">
                   {data.sessions.map((s) => (
                     <li key={s.id} className="flex flex-wrap items-center justify-between gap-3 p-5">
                       <div>
                         <p className="font-semibold text-ink">{s.university}</p>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-ink-quiet">
                           {new Date(s.createdAt).toLocaleDateString()} ·{' '}
                           {s.answered} of {s.total} answered
                           {s.band ? ` · ${BAND_LABEL[s.band] ?? s.band}` : ''}
@@ -315,14 +315,14 @@ export default function AccountPage() {
                       {s.status === 'completed' ? (
                         <Link
                           href={`/results/${s.id}`}
-                          className="rounded-xl border-2 border-ink px-4 py-2.5 text-sm font-bold text-ink"
+                          className="rounded-control border-2 border-ink px-4 py-2.5 text-sm font-bold text-ink"
                         >
                           See report
                         </Link>
                       ) : (
                         <Link
                           href={`/interview/${s.id}`}
-                          className="rounded-xl bg-ink px-4 py-2.5 text-sm font-bold text-white"
+                          className="rounded-control bg-ink px-4 py-2.5 text-sm font-bold text-white"
                         >
                           Carry on
                         </Link>
@@ -334,13 +334,13 @@ export default function AccountPage() {
             </section>
 
             {/* Referral */}
-            <section className="mb-8 rounded-2xl border border-slate-200 bg-white p-5">
+            <section className="mb-8 rounded-card border border-line bg-surface p-5">
               <h2 className="mb-1 font-serif text-lg font-bold text-ink">Invite a friend</h2>
-              <p className="mb-4 text-sm text-slate-600">
+              <p className="mb-4 text-sm text-ink-soft">
                 When a friend buys a pack using your link, you get one extra mock interview.
               </p>
               <div className="flex flex-wrap gap-2">
-                <code className="flex-1 truncate rounded-xl bg-surface-sunk px-4 py-3 text-sm text-ink">
+                <code className="flex-1 truncate rounded-control bg-surface-sunk px-4 py-3 text-sm text-ink">
                   {referralLink}
                 </code>
                 <button
@@ -349,7 +349,7 @@ export default function AccountPage() {
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                   }}
-                  className="rounded-xl bg-ink px-5 py-3 text-sm font-bold text-white"
+                  className="rounded-control bg-ink px-5 py-3 text-sm font-bold text-white"
                 >
                   {copied ? 'Copied' : 'Copy link'}
                 </button>
@@ -357,9 +357,9 @@ export default function AccountPage() {
             </section>
 
             {/* Delete, J3 */}
-            <section className="rounded-2xl border-2 border-red-200 bg-red-50 p-5">
-              <h2 className="mb-1 font-bold text-red-900">Delete everything</h2>
-              <p className="mb-4 text-sm leading-relaxed text-red-900/90">
+            <section className="rounded-card border-2 border-stop/30 bg-stop-tint p-5">
+              <h2 className="mb-1 font-bold text-stop">Delete everything</h2>
+              <p className="mb-4 text-sm leading-relaxed text-stop/90">
                 This removes every interview and every answer you have given us, for good. We cannot
                 get them back afterwards. Your payment records stay, because we are required to keep
                 a record of money, but your name and email are removed from them.
@@ -368,7 +368,7 @@ export default function AccountPage() {
               {!confirming ? (
                 <button
                   onClick={() => setConfirming(true)}
-                  className="rounded-xl border-2 border-red-400 bg-white px-5 py-3 font-bold text-red-700"
+                  className="rounded-control border-2 border-stop/40 bg-surface px-5 py-3 font-bold text-stop"
                 >
                   Delete my data
                 </button>
@@ -377,13 +377,13 @@ export default function AccountPage() {
                   <button
                     onClick={deleteEverything}
                     disabled={deleting}
-                    className="flex-1 rounded-xl bg-red-600 px-5 py-3 font-bold text-white disabled:opacity-60"
+                    className="flex-1 rounded-control bg-stop px-5 py-3 font-bold text-white disabled:opacity-60"
                   >
                     {deleting ? 'Deleting...' : 'Yes, delete everything'}
                   </button>
                   <button
                     onClick={() => setConfirming(false)}
-                    className="flex-1 rounded-xl border-2 border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700"
+                    className="flex-1 rounded-control border-2 border-line-strong bg-surface px-5 py-3 font-semibold text-ink-soft"
                   >
                     Keep my data
                   </button>

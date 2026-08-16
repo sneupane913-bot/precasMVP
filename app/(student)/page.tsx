@@ -25,7 +25,7 @@ export default async function HomePage() {
       {/* ---------------- Above the fold: one action ---------------- */}
       <section className="bg-ink px-5 pb-14 pt-12 text-white sm:pt-20">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="mb-4 inline-block rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium">
+          <p className="mb-4 inline-block rounded-full bg-surface/10 px-4 py-1.5 text-sm font-medium">
             For Nepali students applying to the UK
           </p>
           <h1 className="mb-4 font-serif text-3xl leading-tight sm:text-5xl">
@@ -41,13 +41,13 @@ export default async function HomePage() {
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               href="/start?next=/universities"
-              className="inline-flex w-full items-center justify-center rounded-xl bg-emerald-500 px-8 py-4 text-lg font-bold text-white shadow-lg transition hover:bg-emerald-400 active:scale-[0.98] sm:w-auto sm:px-10"
+              className="inline-flex w-full items-center justify-center rounded-control bg-go px-8 py-4 text-lg font-bold text-white shadow-lg transition hover:bg-go active:scale-[0.98] sm:w-auto sm:px-10"
             >
               Start free practice
             </Link>
             <Link
               href="#how-it-works"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-lg font-semibold text-white/90 transition hover:text-white sm:w-auto"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-control px-6 py-4 text-lg font-semibold text-white/90 transition hover:text-white sm:w-auto"
             >
               <span aria-hidden>▸</span> See how it works
             </Link>
@@ -63,12 +63,12 @@ export default async function HomePage() {
       <TrustedBy />
 
       {/* ---------------- Three steps (design-reference/landing_page) ---------------- */}
-      <section id="how-it-works" className="bg-white px-5 py-16">
+      <section id="how-it-works" className="bg-surface px-5 py-16">
         <div className="mx-auto max-w-5xl">
           <h2 className="mb-2 text-center font-serif text-3xl font-bold text-ink">
             Three steps to interview readiness
           </h2>
-          <p className="mb-10 text-center text-slate-600">
+          <p className="mb-10 text-center text-ink-soft">
             Built to calm your nerves and build real speaking habits.
           </p>
           <div className="grid gap-5 sm:grid-cols-3">
@@ -89,12 +89,12 @@ export default async function HomePage() {
                 d: 'We tell you what you actually said and how to say it better.',
               },
             ].map((s) => (
-              <div key={s.n} className="rounded-2xl border border-slate-200 bg-white p-6">
-                <div className="mb-4 grid h-10 w-10 place-items-center rounded-xl bg-surface-sunk font-bold text-ink">
+              <div key={s.n} className="rounded-card border border-line bg-surface p-6">
+                <div className="mb-4 grid h-10 w-10 place-items-center rounded-control bg-surface-sunk font-bold text-ink">
                   {s.n}
                 </div>
                 <h3 className="mb-2 font-serif text-lg font-bold text-ink">{s.t}</h3>
-                <p className="text-sm leading-relaxed text-slate-600">{s.d}</p>
+                <p className="text-sm leading-relaxed text-ink-soft">{s.d}</p>
               </div>
             ))}
           </div>
@@ -110,7 +110,7 @@ export default async function HomePage() {
             <h2 className="mb-4 font-serif text-3xl font-bold leading-tight text-ink">
               Feedback in simple English, on what you actually said
             </h2>
-            <p className="mb-6 leading-relaxed text-slate-700">
+            <p className="mb-6 leading-relaxed text-ink-soft">
               We do not just hand you a score. We show you your own words, tell you what to fix,
               and give you a better way to say it that you can actually use.
             </p>
@@ -122,38 +122,38 @@ export default async function HomePage() {
                 'The one most important fix, explained in Nepali.',
               ].map((line) => (
                 <li key={line} className="flex gap-3">
-                  <span className="mt-0.5 shrink-0 font-bold text-emerald-600" aria-hidden>
+                  <span className="mt-0.5 shrink-0 font-bold text-go-dark" aria-hidden>
                     ✓
                   </span>
-                  <span className="leading-relaxed text-slate-700">{line}</span>
+                  <span className="leading-relaxed text-ink-soft">{line}</span>
                 </li>
               ))}
             </ul>
           </div>
 
           {/* Illustrative example of the report, clearly labelled as a sample. */}
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <div className="rounded-card bg-surface p-6 shadow-sm">
+            <div className="mb-4 flex items-center justify-between border-b border-line pb-3">
+              <p className="text-micro font-semibold uppercase tracking-wider text-ink-quiet">
                 Question analysis
               </p>
-              <span className="rounded-md bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-800">
+              <span className="rounded-md bg-go-tint px-2 py-1 text-micro font-bold text-go-dark">
                 Sample
               </span>
             </div>
             <p className="mb-4 font-serif text-lg font-bold text-ink">
               Why did you choose to study in the UK?
             </p>
-            <div className="mb-4 rounded-xl bg-slate-50 p-4">
-              <p className="mb-1 text-xs font-semibold text-slate-500">What we heard you say</p>
-              <p className="text-sm italic leading-relaxed text-slate-700">
+            <div className="mb-4 rounded-control bg-surface-sunk p-4">
+              <p className="mb-1 text-micro font-semibold text-ink-quiet">What we heard you say</p>
+              <p className="text-sm italic leading-relaxed text-ink-soft">
                 I choose UK because it have very good education and the degree is recognize
                 everywhere.
               </p>
             </div>
-            <div className="rounded-xl border-l-4 border-emerald-500 bg-emerald-50/50 p-4">
-              <p className="mb-1 text-xs font-semibold text-emerald-800">A better way to say it</p>
-              <p className="text-sm leading-relaxed text-slate-700">
+            <div className="rounded-control border-l-4 border-go bg-go-tint/50 p-4">
+              <p className="mb-1 text-micro font-semibold text-go-dark">A better way to say it</p>
+              <p className="text-sm leading-relaxed text-ink-soft">
                 I chose the UK because it offers a world class education and the degree is
                 recognised everywhere.
               </p>
@@ -167,12 +167,12 @@ export default async function HomePage() {
           block as /pricing, which he approved. It is one shared component now
           (components/PricingPacks.tsx), so the two pages cannot drift apart.
           They did once: home advertised a monthly plan we never sold (QA-205). */}
-      <section className="bg-white px-5 py-14">
+      <section className="bg-surface px-5 py-14">
         <div className="mx-auto max-w-4xl">
           <h2 className="mb-2 text-center font-serif text-3xl text-ink">
             Pay once, not monthly
           </h2>
-          <p className="mx-auto mb-8 max-w-lg text-center leading-relaxed text-slate-600">
+          <p className="mx-auto mb-8 max-w-lg text-center leading-relaxed text-ink-soft">
             Start with ten free questions. If it helps, buy a pack. Your credits do not expire and
             there is nothing to cancel.
           </p>
@@ -184,7 +184,7 @@ export default async function HomePage() {
       {/* ---------------- FAQ (B18) ----------------
           The four questions a nervous student actually asks before starting.
           Native details/summary so it works with no JavaScript. */}
-      <section className="bg-white px-5 py-16">
+      <section className="bg-surface px-5 py-16">
         <div className="mx-auto max-w-2xl">
           <h2 className="mb-8 text-center font-serif text-3xl font-bold text-ink">
             Questions students ask
@@ -210,20 +210,20 @@ export default async function HomePage() {
             ].map((f) => (
               <details
                 key={f.q}
-                className="group rounded-2xl border border-slate-200 bg-white p-5 open:bg-surface-sunk"
+                className="group rounded-card border border-line bg-surface p-5 open:bg-surface-sunk"
               >
                 <summary className="cursor-pointer list-none font-semibold text-ink marker:hidden">
                   <span className="flex items-center justify-between gap-4">
                     {f.q}
                     <span
-                      className="shrink-0 text-slate-400 transition group-open:rotate-45"
+                      className="shrink-0 text-ink-quiet transition group-open:rotate-45"
                       aria-hidden
                     >
                       +
                     </span>
                   </span>
                 </summary>
-                <p className="mt-3 leading-relaxed text-slate-700">{f.a}</p>
+                <p className="mt-3 leading-relaxed text-ink-soft">{f.a}</p>
               </details>
             ))}
           </div>

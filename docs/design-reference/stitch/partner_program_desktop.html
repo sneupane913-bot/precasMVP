@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduPartner - Partner Program</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&amp;family=Noto+Serif:wght@600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#bac8dc",
+                    "outline-variant": "#c4c6cc",
+                    "tertiary-container": "#281804",
+                    "on-secondary-container": "#007347",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed": "#002111",
+                    "on-secondary-fixed-variant": "#005231",
+                    "outline": "#74777d",
+                    "on-secondary": "#ffffff",
+                    "primary-container": "#0f1c2c",
+                    "on-error": "#ffffff",
+                    "on-surface-variant": "#44474c",
+                    "surface-variant": "#e1e2e5",
+                    "background": "#f8f9fc",
+                    "on-tertiary-fixed": "#281804",
+                    "surface-dim": "#d9dadd",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed-variant": "#3a4859",
+                    "surface-tint": "#525f71",
+                    "on-error-container": "#93000a",
+                    "inverse-on-surface": "#f0f1f4",
+                    "on-tertiary-fixed-variant": "#584329",
+                    "secondary-container": "#82fab7",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f2f3f6",
+                    "surface": "#f8f9fc",
+                    "on-background": "#191c1e",
+                    "primary": "#000000",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed": "#feddba",
+                    "error-container": "#ffdad6",
+                    "surface-bright": "#f8f9fc",
+                    "on-primary-container": "#778598",
+                    "tertiary": "#000000",
+                    "inverse-primary": "#bac8dc",
+                    "secondary-fixed-dim": "#65dd9c",
+                    "surface-container-highest": "#e1e2e5",
+                    "inverse-surface": "#2e3133",
+                    "on-primary-fixed": "#0f1c2c",
+                    "secondary-fixed": "#82fab7",
+                    "on-tertiary-container": "#9a7f61",
+                    "surface-container": "#edeef1",
+                    "tertiary-fixed-dim": "#e0c1a0",
+                    "on-surface": "#191c1e",
+                    "secondary": "#006d42",
+                    "primary-fixed": "#d6e4f9",
+                    "surface-container-high": "#e7e8eb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "lg": "40px",
+                    "sm": "16px",
+                    "base": "4px",
+                    "xl": "64px",
+                    "gutter": "20px",
+                    "xs": "8px",
+                    "container-max": "1120px",
+                    "md": "24px"
+            },
+            "fontFamily": {
+                    "label-md": [
+                            "Hanken Grotesk"
+                    ],
+                    "headline-md": [
+                            "Noto Serif"
+                    ],
+                    "headline-lg": [
+                            "Noto Serif"
+                    ],
+                    "body-lg": [
+                            "Hanken Grotesk"
+                    ],
+                    "label-sm": [
+                            "Hanken Grotesk"
+                    ],
+                    "display": [
+                            "Noto Serif"
+                    ],
+                    "body-sm": [
+                            "Hanken Grotesk"
+                    ],
+                    "body-md": [
+                            "Hanken Grotesk"
+                    ],
+                    "headline-sm": [
+                            "Noto Serif"
+                    ],
+                    "display-mobile": [
+                            "Noto Serif"
+                    ]
+            },
+            "fontSize": {
+                    "label-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "1",
+                                    "letterSpacing": "0.02em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.4",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.3",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "1",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "display": [
+                            "40px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-sm": [
+                            "14px",
+                            {
+                                    "lineHeight": "1.5",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.5",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-sm": [
+                            "20px",
+                            {
+                                    "lineHeight": "1.4",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "display-mobile": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "fontWeight": "700"
+                            }
+                    ]
+            }
+        },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased flex flex-col min-h-screen">
+<!-- TopNavBar Component -->
+<nav class="bg-surface dark:bg-surface-container-lowest text-primary dark:text-primary-fixed font-label-md text-label-md w-full h-16 border-b border-outline-variant dark:border-outline flat no shadows transition-all duration-200 ease-in-out">
+<div class="flex justify-between items-center px-gutter max-w-container-max mx-auto h-full">
+<div class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed">EduPartner</div>
+<div class="flex items-center gap-md">
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Partner sign in</a>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow flex flex-col items-center w-full px-gutter max-w-container-max mx-auto py-xl gap-xl">
+<!-- Header Section -->
+<section class="w-full text-center max-w-3xl flex flex-col gap-sm">
+<h1 class="font-display text-display text-on-surface md:font-display md:text-display font-display-mobile text-display-mobile">Give your students the practice</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Buy seats in bulk, put your own logo on it, and give your students their own link. You keep the difference between what you pay and what you charge them.</p>
+</section>
+<!-- Pricing Cards -->
+<section class="w-full grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Card 1 -->
+<div class="bg-surface rounded-xl p-md flex flex-col gap-sm border border-line" style="box-shadow: 0 1px 2px rgba(13,27,42,.04);">
+<div class="font-headline-md text-headline-md text-on-surface">20 seats</div>
+<div class="font-headline-sm text-headline-sm text-on-surface-variant">NPR 6,000</div>
+<div class="font-body-sm text-body-sm text-outline">about NPR 300 per student</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface rounded-xl p-md flex flex-col gap-sm border border-line" style="box-shadow: 0 1px 2px rgba(13,27,42,.04);">
+<div class="font-headline-md text-headline-md text-on-surface">30 seats</div>
+<div class="font-headline-sm text-headline-sm text-on-surface-variant">NPR 9,000</div>
+<div class="font-body-sm text-body-sm text-outline">about NPR 300 per student</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface rounded-xl p-md flex flex-col gap-sm border border-line" style="box-shadow: 0 1px 2px rgba(13,27,42,.04);">
+<div class="font-headline-md text-headline-md text-on-surface">50 seats</div>
+<div class="font-headline-sm text-headline-sm text-on-surface-variant">NPR 15,000</div>
+<div class="font-body-sm text-body-sm text-outline">about NPR 300 per student</div>
+</div>
+</section>
+<!-- Two Column Layout: Features & Privacy -->
+<section class="w-full grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Features List -->
+<div class="flex flex-col gap-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">What each seat gives a student</h2>
+<ul class="flex flex-col gap-sm">
+<li class="flex items-start gap-sm border-b border-surface-variant pb-sm">
+<span class="material-symbols-outlined text-primary" data-icon="check_circle">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">10 full mock interviews of 17 questions each</span>
+</li>
+<li class="flex items-start gap-sm border-b border-surface-variant pb-sm">
+<span class="material-symbols-outlined text-primary" data-icon="check_circle">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">20 practice sessions</span>
+</li>
+<li class="flex items-start gap-sm border-b border-surface-variant pb-sm">
+<span class="material-symbols-outlined text-primary" data-icon="check_circle">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Feedback in English with a Nepali summary</span>
+</li>
+<li class="flex items-start gap-sm pb-sm">
+<span class="material-symbols-outlined text-primary" data-icon="check_circle">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Your logo and colours</span>
+</li>
+</ul>
+</div>
+<!-- Privacy Panel -->
+<div class="bg-primary-fixed rounded-xl p-lg flex flex-col gap-md">
+<h3 class="font-headline-sm text-headline-sm text-on-primary-fixed">What you can and cannot see</h3>
+<p class="font-body-md text-body-md text-on-primary-fixed-variant">You see which of your students are practising, how much of their pack is left, and how they are progressing overall. You do NOT see what they actually said. Their answers cover family income, visa history and personal circumstances, and those belong to the student. We think that is the right line, and we would rather tell you plainly than let you find out later.</p>
+</div>
+</section>
+<!-- Actions -->
+<section class="w-full flex flex-col sm:flex-row justify-center gap-md pt-lg">
+<button class="bg-secondary text-on-secondary font-label-md text-label-md py-sm px-lg rounded-full hover:bg-on-secondary-container transition-colors flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+                Talk to us on WhatsApp
+            </button>
+<button class="bg-surface border border-outline text-on-surface-variant font-label-md text-label-md py-sm px-lg rounded-full hover:bg-surface-sunk transition-colors flex items-center justify-center">
+                I already have an account
+            </button>
+</section>
+</main>
+<!-- Footer Component -->
+<footer class="bg-surface-container-low dark:bg-surface-container-highest text-on-surface dark:text-on-surface-variant font-body-sm text-body-sm w-full py-xl border-t border-outline-variant dark:border-outline flat no shadows opacity-80 hover:opacity-100 transition-opacity">
+<div class="flex flex-col md:flex-row justify-between items-center px-gutter max-w-container-max mx-auto gap-md">
+<div class="font-headline-sm text-headline-sm text-primary">EduPartner</div>
+<div class="flex flex-wrap justify-center gap-md">
+<a class="text-on-surface-variant hover:text-primary underline" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary underline" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary underline" href="#">Data Security</a>
+<a class="text-on-surface-variant hover:text-primary underline" href="#">Support</a>
+</div>
+<div>© 2024 EduPartner Global. All rights reserved.</div>
+</div>
+</footer>
+</body></html>

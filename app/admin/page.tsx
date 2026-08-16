@@ -368,9 +368,9 @@ export default function AdminPage() {
       <main className="grid min-h-screen place-items-center bg-paper px-5 py-10">
         <div className="w-full max-w-md">
           <p className="mb-1 font-serif text-xl font-bold text-ink">{data.consultancy.name}</p>
-          <p className="mb-6 text-sm text-slate-500">One thing before you start</p>
+          <p className="mb-6 text-sm text-ink-quiet">One thing before you start</p>
           {error && (
-            <p className="mb-4 rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3 font-medium text-red-800">
+            <p className="mb-4 rounded-control border-2 border-stop/30 bg-stop-tint px-4 py-3 font-medium text-stop">
               {error}
             </p>
           )}
@@ -392,14 +392,14 @@ export default function AdminPage() {
       <main className="grid min-h-screen place-items-center bg-paper px-5">
         <div className="w-full max-w-sm">
           <h1 className="mb-1 font-serif text-2xl font-bold text-ink">Consultancy portal</h1>
-          <p className="mb-6 text-slate-600">Sign in to see your own students.</p>
+          <p className="mb-6 text-ink-soft">Sign in to see your own students.</p>
 
           <label className="mb-1 block text-sm font-semibold text-ink">Your short name</label>
           <input
             value={slug}
             onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
             placeholder="for example kathmandu-hub"
-            className="mb-4 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+            className="mb-4 w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
           />
 
           <label className="mb-1 block text-sm font-semibold text-ink">Passcode</label>
@@ -412,17 +412,17 @@ export default function AdminPage() {
                       name="consultancy-passcode"
           />
 
-          {error && <p className="mb-3 font-medium text-red-600">{error}</p>}
+          {error && <p className="mb-3 font-medium text-stop">{error}</p>}
 
           <button
             onClick={login}
             disabled={!slug || !passcode || busy}
-            className="w-full rounded-xl bg-ink px-6 py-3.5 font-bold text-white disabled:bg-slate-300"
+            className="w-full rounded-control bg-ink px-6 py-3.5 font-bold text-white disabled:bg-line-strong"
           >
             {busy ? 'Checking...' : 'Sign in'}
           </button>
           {(!slug || !passcode) && (
-            <p className="mt-2 text-sm font-semibold text-red-600">
+            <p className="mt-2 text-sm font-semibold text-stop">
               Enter both your short name and your passcode.
             </p>
           )}
@@ -442,16 +442,16 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-paper">
       {/* ------------------------------------------------------- top bar --- */}
-      <header className="border-b border-slate-200 bg-white">
+      <header className="border-b border-line bg-surface">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-4">
           <div>
             <p className="font-serif text-xl font-bold text-ink">{data.consultancy.name}</p>
-            <p className="text-sm text-slate-500">Consultancy portal</p>
+            <p className="text-sm text-ink-quiet">Consultancy portal</p>
           </div>
           <button
             onClick={login}
             disabled={busy}
-            className="rounded-xl border-2 border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 disabled:opacity-50"
+            className="rounded-control border-2 border-line-strong px-4 py-2.5 text-sm font-semibold text-ink-soft disabled:opacity-50"
           >
             {busy ? 'Loading...' : 'Refresh'}
           </button>
@@ -461,25 +461,25 @@ export default function AdminPage() {
       <main className="mx-auto max-w-6xl px-5 py-8">
         {/* Never both at once. `call()` clears each before it sets the other. */}
         {error && (
-          <p className="mb-4 rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3 font-medium text-red-800">
+          <p className="mb-4 rounded-control border-2 border-stop/30 bg-stop-tint px-4 py-3 font-medium text-stop">
             {error}
           </p>
         )}
         {notice && !error && (
-          <p className="mb-4 rounded-xl border-2 border-emerald-200 bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
+          <p className="mb-4 rounded-control border-2 border-go/30 bg-go-tint px-4 py-3 font-medium text-go-dark">
             {notice}
           </p>
         )}
 
         {/* Notifications, including "super admin approved this for you". */}
         {data.notifications.length > 0 && (
-          <section className="mb-6 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-5">
-            <h2 className="mb-2 font-bold text-emerald-900">Messages for you</h2>
+          <section className="mb-6 rounded-card border-2 border-go/30 bg-go-tint p-5">
+            <h2 className="mb-2 font-bold text-go-dark">Messages for you</h2>
             <ul className="space-y-1.5">
               {data.notifications.slice(0, 5).map((n) => (
-                <li key={n.id} className="text-sm text-emerald-900">
+                <li key={n.id} className="text-sm text-go-dark">
                   {n.message}
-                  <span className="ml-2 text-emerald-700/70">
+                  <span className="ml-2 text-go-dark/70">
                     {new Date(n.createdAt).toLocaleDateString()}
                   </span>
                 </li>
@@ -495,21 +495,21 @@ export default function AdminPage() {
             and the screen had no button. Put first, above everything else,
             because a student is sitting waiting on it. */}
         {waiting.length > 0 && (
-          <section className="mb-6 overflow-hidden rounded-2xl border-2 border-amber-300 bg-amber-50">
-            <div className="border-b border-amber-200 p-5">
-              <h2 className="font-serif text-lg font-bold text-amber-900">
+          <section className="mb-6 overflow-hidden rounded-card border-2 border-warn/40 bg-warn-tint">
+            <div className="border-b border-warn/40 p-5">
+              <h2 className="font-serif text-lg font-bold text-warn">
                 {waiting.length === 1
                   ? '1 student is waiting for you'
                   : `${waiting.length} students are waiting for you`}
               </h2>
-              <p className="text-sm text-amber-900/80">
+              <p className="text-sm text-warn/80">
                 They have paid and sent us the transaction number. Approve it only if you have seen
                 the money yourself. Their credits switch on the moment you do.
               </p>
             </div>
-            <ul className="divide-y divide-amber-200">
+            <ul className="divide-y divide-warn/30">
               {waiting.map((o) => (
-                <li key={o.id} className="flex flex-wrap items-center gap-4 bg-white/60 p-5">
+                <li key={o.id} className="flex flex-wrap items-center gap-4 bg-surface/60 p-5">
                   <div className="min-w-0 flex-1">
                     <p className="font-bold text-ink">
                       {o.studentName || o.payerName || 'Unnamed student'}
@@ -517,14 +517,14 @@ export default function AdminPage() {
                         NPR {o.amountNpr.toLocaleString()}
                       </span>
                     </p>
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-ink-soft">
                       {o.studentEmail || 'no email'} · paid as {o.payerName || 'unknown'} · number
                       ending {o.payerPhoneSuffix || '----'}
                     </p>
                     <p className="mt-1 font-mono text-sm text-ink">
                       Transaction {o.walletTxnId}
                     </p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-micro text-ink-quiet">
                       Sent {new Date(o.createdAt).toLocaleString()}
                     </p>
                     {o.screenshotUrl && (
@@ -542,14 +542,14 @@ export default function AdminPage() {
                     <button
                       onClick={() => decide(o, true)}
                       disabled={deciding === o.id}
-                      className="rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white disabled:opacity-50"
+                      className="rounded-control bg-go px-5 py-3 font-bold text-white disabled:opacity-50"
                     >
                       {deciding === o.id ? 'Working...' : 'Approve'}
                     </button>
                     <button
                       onClick={() => decide(o, false)}
                       disabled={deciding === o.id}
-                      className="rounded-xl border-2 border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700 disabled:opacity-50"
+                      className="rounded-control border-2 border-line-strong bg-surface px-5 py-3 font-semibold text-ink-soft disabled:opacity-50"
                     >
                       Cannot confirm
                     </button>
@@ -588,25 +588,25 @@ export default function AdminPage() {
             transaction id, super admin approval. One approval queue and one set
             of money guarantees, rather than a special B2B path where a
             different mistake could happen. */}
-        <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5">
+        <section className="mb-6 rounded-card border border-line bg-surface p-5">
           <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="font-serif text-lg font-bold text-ink">Buy more seats</h2>
-            <span className={`text-sm font-semibold ${s.seatsLeft === 0 ? 'text-amber-700' : 'text-slate-500'}`}>
+            <span className={`text-sm font-semibold ${s.seatsLeft === 0 ? 'text-warn' : 'text-ink-quiet'}`}>
               {s.seatsLeft} of {s.seatsTotal} left
             </span>
           </div>
 
           {s.seatPaymentPending ? (
-            <div className="rounded-xl border-2 border-sky-200 bg-sky-50 p-4">
-              <p className="font-bold text-sky-900">We are checking your seat payment</p>
-              <p className="mt-1 text-sm leading-relaxed text-sky-900/90">
+            <div className="rounded-control border-2 border-line-strong bg-surface-sunk p-4">
+              <p className="font-bold text-brand-light">We are checking your seat payment</p>
+              <p className="mt-1 text-sm leading-relaxed text-brand-light/90">
                 A person checks this against our bank record, so it can take a little while. Your
                 seats appear here the moment it is approved. There is no need to send it again.
               </p>
             </div>
           ) : seatOrder ? (
-            <div className="rounded-xl border-2 border-ink p-4">
-              <p className="mb-1 text-sm text-slate-500">
+            <div className="rounded-control border-2 border-ink p-4">
+              <p className="mb-1 text-sm text-ink-quiet">
                 {seatOrder.bundleName}, {seatOrder.seats} seats
               </p>
               <p className="mb-4 text-3xl font-black text-ink">
@@ -618,11 +618,11 @@ export default function AdminPage() {
                 <img
                   src={seatOrder.payTo.qrImageUrl}
                   alt={`${seatOrder.payTo.walletName} payment QR code`}
-                  className="mx-auto mb-3 h-48 w-48 rounded-xl border-2 border-slate-200 bg-white object-contain p-2"
+                  className="mx-auto mb-3 h-48 w-48 rounded-control border-2 border-line bg-surface object-contain p-2"
                 />
               )}
-              <div className="mb-4 rounded-xl bg-slate-50 p-4 text-sm">
-                <p className="text-slate-500">
+              <div className="mb-4 rounded-control bg-surface-sunk p-4 text-sm">
+                <p className="text-ink-quiet">
                   {seatOrder.payTo.qrImageUrl ? 'Or send to' : 'Send to'}
                 </p>
                 <p className="font-bold text-ink">{seatOrder.payTo.walletName}</p>
@@ -631,7 +631,7 @@ export default function AdminPage() {
                 </p>
               </div>
 
-              <p className="mb-3 text-sm leading-relaxed text-slate-600">
+              <p className="mb-3 text-sm leading-relaxed text-ink-soft">
                 After you have sent it, copy the transaction number from your receipt. eSewa calls it
                 a Transaction Code, a bank calls it a Transaction ID or Reference Code. Any of those
                 is the right one.
@@ -640,44 +640,44 @@ export default function AdminPage() {
                 value={seatTxn}
                 onChange={(e) => setSeatTxn(e.target.value)}
                 placeholder="Transaction number, e.g. 1NOH8C2"
-                className="mb-2 w-full rounded-xl border-2 border-slate-200 px-4 py-3 font-mono outline-none focus:border-ink"
+                className="mb-2 w-full rounded-control border-2 border-line px-4 py-3 font-mono outline-none focus:border-ink"
               />
               <input
                 value={seatPayer}
                 onChange={(e) => setSeatPayer(e.target.value)}
                 placeholder="Name you paid with"
-                className="mb-2 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+                className="mb-2 w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
               />
               <input
                 value={seatSuffix}
                 onChange={(e) => setSeatSuffix(e.target.value.replace(/\D/g, '').slice(0, 4))}
                 placeholder="Last 4 digits of your phone number"
-                className="mb-3 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+                className="mb-3 w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
               />
               <div className="flex flex-col gap-2 sm:flex-row">
                 <button
                   onClick={submitSeatPayment}
                   disabled={busy || seatTxn.trim().length < 4 || !seatPayer.trim() || seatSuffix.length < 2}
-                  className="flex-1 rounded-xl bg-emerald-600 px-5 py-3.5 font-bold text-white disabled:bg-slate-300"
+                  className="flex-1 rounded-control bg-go px-5 py-3.5 font-bold text-white disabled:bg-line-strong"
                 >
                   {busy ? 'Sending...' : 'I have paid'}
                 </button>
                 <button
                   onClick={() => setSeatOrder(null)}
-                  className="rounded-xl border-2 border-slate-300 px-5 py-3.5 font-semibold text-slate-700"
+                  className="rounded-control border-2 border-line-strong px-5 py-3.5 font-semibold text-ink-soft"
                 >
                   Not now
                 </button>
               </div>
               {(seatTxn.trim().length < 4 || !seatPayer.trim() || seatSuffix.length < 2) && (
-                <p className="mt-2 text-sm font-semibold text-red-600">
+                <p className="mt-2 text-sm font-semibold text-stop">
                   Fill in the transaction number, the name you paid with, and the last 4 digits.
                 </p>
               )}
             </div>
           ) : (
             <>
-              <p className="mb-4 text-sm leading-relaxed text-slate-600">
+              <p className="mb-4 text-sm leading-relaxed text-ink-soft">
                 A seat gives one student the full pack: {SEAT_GRANT.mocks} mock interviews and{' '}
                 {SEAT_GRANT.practice} practice questions, exactly what a student gets for NPR{' '}
                 {(getPlan('serious')?.priceNpr ?? 0).toLocaleString()} on their own.
@@ -688,13 +688,13 @@ export default function AdminPage() {
                     key={b.code}
                     onClick={() => startSeatPurchase(b.code)}
                     disabled={busy}
-                    className="rounded-xl border-2 border-slate-200 p-4 text-left transition hover:border-ink disabled:opacity-50"
+                    className="rounded-control border-2 border-line p-4 text-left transition hover:border-ink disabled:opacity-50"
                   >
                     <p className="font-bold text-ink">{b.name}</p>
                     <p className="font-serif text-2xl font-black text-ink">
                       NPR {b.priceNpr.toLocaleString()}
                     </p>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-ink-quiet">
                       NPR {Math.round(b.priceNpr / b.seats)} a seat
                     </p>
                   </button>
@@ -704,7 +704,7 @@ export default function AdminPage() {
           )}
 
           {(data.seatOrders ?? []).filter((o) => o.state === 'verified').length > 0 && (
-            <p className="mt-4 text-xs text-slate-500">
+            <p className="mt-4 text-micro text-ink-quiet">
               {(data.seatOrders ?? []).filter((o) => o.state === 'verified').length} seat purchase(s)
               approved so far.
             </p>
@@ -712,14 +712,14 @@ export default function AdminPage() {
         </section>
 
         {/* Share link */}
-        <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5">
+        <section className="mb-6 rounded-card border border-line bg-surface p-5">
           <h2 className="mb-1 font-serif text-lg font-bold text-ink">Your student link</h2>
-          <p className="mb-4 text-sm text-slate-600">
+          <p className="mb-4 text-sm text-ink-soft">
             Give this to your students. Anyone who signs up through it belongs to you and appears
             below.
           </p>
           <div className="flex flex-wrap gap-2">
-            <code className="flex-1 truncate rounded-xl bg-surface-sunk px-4 py-3 text-sm text-ink">
+            <code className="flex-1 truncate rounded-control bg-surface-sunk px-4 py-3 text-sm text-ink">
               {link}
             </code>
             <button
@@ -728,7 +728,7 @@ export default function AdminPage() {
                 setCopied(true);
                 setTimeout(() => setCopied(false), 2000);
               }}
-              className="rounded-xl bg-ink px-5 py-3 text-sm font-bold text-white"
+              className="rounded-control bg-ink px-5 py-3 text-sm font-bold text-white"
             >
               {copied ? 'Copied' : 'Copy link'}
             </button>
@@ -738,7 +738,7 @@ export default function AdminPage() {
               written and no screen ever called it, so every consultancy's own
               landing page carried our default navy and no logo. It is their
               link, given to their students, with their name on it. */}
-          <div className="mt-5 border-t border-slate-100 pt-4">
+          <div className="mt-5 border-t border-line pt-4">
             {!brandOpen ? (
               <div className="flex flex-wrap gap-4">
                 <button
@@ -756,18 +756,18 @@ export default function AdminPage() {
               </div>
             ) : (
               <>
-                <p className="mb-3 text-sm text-slate-600">
+                <p className="mb-3 text-sm text-ink-soft">
                   This is what your students see on your own link. Leave the logo blank and we show
                   your name instead.
                 </p>
                 <label className="mb-1 block text-sm font-semibold text-ink">
-                  Logo web address <span className="font-normal text-slate-500">(optional)</span>
+                  Logo web address <span className="font-normal text-ink-quiet">(optional)</span>
                 </label>
                 <input
                   value={logoUrl}
                   onChange={(e) => setLogoUrl(e.target.value)}
                   placeholder="https://your-site.com/logo.png"
-                  className="mb-3 w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm outline-none focus:border-ink"
+                  className="mb-3 w-full rounded-control border-2 border-line px-4 py-3 text-sm outline-none focus:border-ink"
                 />
                 <label className="mb-1 block text-sm font-semibold text-ink">Your colour</label>
                 <div className="mb-4 flex items-center gap-3">
@@ -775,16 +775,16 @@ export default function AdminPage() {
                     type="color"
                     value={colour}
                     onChange={(e) => setColour(e.target.value)}
-                    className="h-11 w-16 cursor-pointer rounded-lg border-2 border-slate-200"
+                    className="h-11 w-16 cursor-pointer rounded-control border-2 border-line"
                     aria-label="Your brand colour"
                   />
-                  <code className="rounded-lg bg-slate-50 px-3 py-2 text-sm text-ink">{colour}</code>
+                  <code className="rounded-control bg-surface-sunk px-3 py-2 text-sm text-ink">{colour}</code>
                 </div>
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <button
                     onClick={saveBranding}
                     disabled={busy}
-                    className="rounded-xl bg-ink px-5 py-3 font-bold text-white disabled:opacity-50"
+                    className="rounded-control bg-ink px-5 py-3 font-bold text-white disabled:opacity-50"
                   >
                     {busy ? 'Saving...' : 'Save'}
                   </button>
@@ -794,7 +794,7 @@ export default function AdminPage() {
                       setLogoUrl(data.consultancy.logoUrl ?? '');
                       setColour(data.consultancy.primaryColor || DEFAULT_BRAND_HEX);
                     }}
-                    className="rounded-xl border-2 border-slate-300 px-5 py-3 font-semibold text-slate-700"
+                    className="rounded-control border-2 border-line-strong px-5 py-3 font-semibold text-ink-soft"
                   >
                     Cancel
                   </button>
@@ -817,10 +817,10 @@ export default function AdminPage() {
         </section>
 
         {/* Students */}
-        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <div className="border-b border-slate-200 p-5">
+        <section className="overflow-hidden rounded-card border border-line bg-surface">
+          <div className="border-b border-line p-5">
             <h2 className="font-serif text-lg font-bold text-ink">Your students</h2>
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-ink-soft">
               How much they are practising and what they have left. We never show you what a student
               said in an interview.
             </p>
@@ -829,14 +829,14 @@ export default function AdminPage() {
           {data.students.length === 0 ? (
             <div className="p-10 text-center">
               <p className="mb-2 font-semibold text-ink">No students yet</p>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-ink-quiet">
                 Share your link above. Students appear here the moment they sign up through it.
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                <thead className="bg-surface-sunk text-micro uppercase tracking-wide text-ink-quiet">
                   <tr>
                     <th className="px-5 py-3 font-semibold">Student</th>
                     <th className="px-3 py-3 font-semibold">Mocks left</th>
@@ -846,24 +846,24 @@ export default function AdminPage() {
                     <th className="px-5 py-3 font-semibold">Top up</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-line">
                   {data.students.map((st) => (
                     <tr key={st.id}>
                       <td className="px-5 py-3">
                         <p className="font-semibold text-ink">{st.name || 'Unnamed'}</p>
-                        <p className="text-xs text-slate-500">{st.email || 'no email'}</p>
+                        <p className="text-micro text-ink-quiet">{st.email || 'no email'}</p>
                       </td>
-                      <td className="px-3 py-3 tabular-nums text-slate-700">{st.mocksLeft}</td>
-                      <td className="px-3 py-3 tabular-nums text-slate-700">{st.practiceLeft}</td>
-                      <td className="px-3 py-3 text-slate-600">
+                      <td className="px-3 py-3 tabular-nums text-ink-soft">{st.mocksLeft}</td>
+                      <td className="px-3 py-3 tabular-nums text-ink-soft">{st.practiceLeft}</td>
+                      <td className="px-3 py-3 text-ink-soft">
                         {new Date(st.lastSeenAt).toLocaleDateString()}
                       </td>
                       <td className="px-3 py-3">
                         <span
-                          className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                          className={`rounded-full px-2.5 py-1 text-micro font-bold ${
                             st.status === 'active'
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : 'bg-red-100 text-red-800'
+                              ? 'bg-go-tint text-go-dark'
+                              : 'bg-stop-tint text-stop'
                           }`}
                         >
                           {st.status}
@@ -877,17 +877,17 @@ export default function AdminPage() {
                           are no seats, never a bare grey button. */}
                       <td className="px-5 py-3">
                         {st.mocksLeft > 0 ? (
-                          <span className="text-xs text-slate-400">not needed yet</span>
+                          <span className="text-micro text-ink-quiet">not needed yet</span>
                         ) : s.seatsLeft > 0 ? (
                           <button
                             onClick={() => renew(st)}
                             disabled={renewing === st.id || busy}
-                            className="rounded-lg bg-ink px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
+                            className="rounded-control bg-ink px-3 py-1.5 text-micro font-bold text-white disabled:opacity-50"
                           >
                             {renewing === st.id ? 'Working...' : 'Use a seat'}
                           </button>
                         ) : (
-                          <span className="text-xs font-semibold text-amber-700">
+                          <span className="text-micro font-semibold text-warn">
                             no seats left
                           </span>
                         )}
@@ -897,7 +897,7 @@ export default function AdminPage() {
                           <button
                             onClick={() => revokeSeat(st)}
                             disabled={busy}
-                            className="ml-2 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 disabled:opacity-50"
+                            className="ml-2 rounded-control border border-line-strong px-3 py-1.5 text-micro font-semibold text-ink-soft disabled:opacity-50"
                           >
                             Take seat back
                           </button>
@@ -915,14 +915,14 @@ export default function AdminPage() {
             without messaging us. Deliberately below the students table: it is
             a record, not a task. */}
         {settled.length > 0 && (
-          <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-            <div className="border-b border-slate-200 p-5">
+          <section className="mt-6 overflow-hidden rounded-card border border-line bg-surface">
+            <div className="border-b border-line p-5">
               <h2 className="font-serif text-lg font-bold text-ink">Payments already decided</h2>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-ink-soft">
                 Approved by you or by us. Nothing here needs doing.
               </p>
             </div>
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-line">
               {settled.slice(0, 25).map((o) => (
                 <li key={o.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
                   <div className="min-w-0">
@@ -930,16 +930,16 @@ export default function AdminPage() {
                       {o.studentName || o.payerName || 'Unnamed'} · NPR{' '}
                       {o.amountNpr.toLocaleString()}
                     </p>
-                    <p className="font-mono text-xs text-slate-500">{o.walletTxnId}</p>
+                    <p className="font-mono text-micro text-ink-quiet">{o.walletTxnId}</p>
                     {o.rejectedReason && (
-                      <p className="text-xs text-amber-800">Not confirmed: {o.rejectedReason}</p>
+                      <p className="text-micro text-warn">Not confirmed: {o.rejectedReason}</p>
                     )}
                   </div>
                   <span
-                    className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                    className={`rounded-full px-2.5 py-1 text-micro font-bold ${
                       o.state === 'verified'
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : 'bg-slate-100 text-slate-700'
+                        ? 'bg-go-tint text-go-dark'
+                        : 'bg-surface-sunk text-ink-soft'
                     }`}
                   >
                     {o.state === 'verified' ? 'approved' : o.state}
@@ -967,13 +967,13 @@ function Stat({
 }) {
   return (
     <div
-      className={`rounded-2xl border p-5 ${
-        accent ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-white'
+      className={`rounded-card border p-5 ${
+        accent ? 'border-warn/40 bg-warn-tint' : 'border-line bg-surface'
       }`}
     >
-      <p className="mb-2 text-sm text-slate-600">{label}</p>
+      <p className="mb-2 text-sm text-ink-soft">{label}</p>
       <p className="font-serif text-3xl font-black text-ink">{value}</p>
-      <p className="mt-1 text-xs text-slate-500">{hint}</p>
+      <p className="mt-1 text-micro text-ink-quiet">{hint}</p>
     </div>
   );
 }

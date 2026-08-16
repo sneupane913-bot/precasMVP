@@ -59,14 +59,14 @@ export function PasscodeChangeForm({
 
   return (
     <section
-      className={`rounded-2xl border-2 p-5 ${
-        forced ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-white'
+      className={`rounded-card border-2 p-5 ${
+        forced ? 'border-warn/40 bg-warn-tint' : 'border-line bg-surface'
       }`}
     >
-      <h2 className={`mb-1 font-serif text-lg font-bold ${forced ? 'text-amber-900' : 'text-ink'}`}>
+      <h2 className={`mb-1 font-serif text-lg font-bold ${forced ? 'text-warn' : 'text-ink'}`}>
         {title}
       </h2>
-      <p className={`mb-4 text-sm leading-relaxed ${forced ? 'text-amber-900/90' : 'text-slate-600'}`}>
+      <p className={`mb-4 text-sm leading-relaxed ${forced ? 'text-warn/90' : 'text-ink-soft'}`}>
         {explanation}
       </p>
 
@@ -79,9 +79,9 @@ export function PasscodeChangeForm({
         value={next}
         onChange={(e) => setNext(e.target.value)}
         autoComplete="new-password"
-        className="mb-1 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+        className="mb-1 w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
       />
-      <p className="mb-3 text-xs text-slate-500">
+      <p className="mb-3 text-micro text-ink-quiet">
         At least {minLength} characters, with letters as well as numbers.
       </p>
 
@@ -95,12 +95,12 @@ export function PasscodeChangeForm({
         onChange={(e) => setAgain(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && ready && submit()}
         autoComplete="new-password"
-        className="mb-2 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+        className="mb-2 w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
       />
 
       {/* Being able to see what you typed prevents the commonest lockout of
           all: a typo, entered identically twice, on a phone keyboard. */}
-      <label className="mb-4 flex items-center gap-2 text-sm text-slate-600">
+      <label className="mb-4 flex items-center gap-2 text-sm text-ink-soft">
         <input
           type="checkbox"
           checked={show}
@@ -112,31 +112,31 @@ export function PasscodeChangeForm({
 
       {/* One message at a time, naming the actual problem. */}
       {tooShort && (
-        <p className="mb-3 text-sm font-semibold text-red-600">
+        <p className="mb-3 text-sm font-semibold text-stop">
           Too short. Use at least {minLength} characters.
         </p>
       )}
       {!tooShort && digitsOnly && (
-        <p className="mb-3 text-sm font-semibold text-red-600">
+        <p className="mb-3 text-sm font-semibold text-stop">
           Numbers alone are guessed quickly. Add some letters.
         </p>
       )}
       {!tooShort && !digitsOnly && mismatch && (
-        <p className="mb-3 text-sm font-semibold text-red-600">
+        <p className="mb-3 text-sm font-semibold text-stop">
           The two do not match yet.
         </p>
       )}
-      {localError && <p className="mb-3 text-sm font-semibold text-red-600">{localError}</p>}
+      {localError && <p className="mb-3 text-sm font-semibold text-stop">{localError}</p>}
 
       <button
         onClick={submit}
         disabled={!ready || busy}
-        className="w-full rounded-xl bg-ink px-6 py-3.5 font-bold text-white disabled:bg-slate-300"
+        className="w-full rounded-control bg-ink px-6 py-3.5 font-bold text-white disabled:bg-line-strong"
       >
         {busy ? 'Saving...' : 'Save my passcode'}
       </button>
 
-      <p className="mt-3 text-xs leading-relaxed text-slate-500">
+      <p className="mt-3 text-micro leading-relaxed text-ink-quiet">
         Write it down somewhere safe. We cannot read it back to you, and nobody
         here can see it once it is saved.
       </p>

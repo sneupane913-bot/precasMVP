@@ -73,7 +73,7 @@ export function SiteFooterView({ whatsappDigits = '' }: { whatsappDigits?: strin
           {/* Brand block */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2.5">
-              <span className="grid h-9 w-9 place-items-center rounded-lg bg-emerald-500 font-black text-white">
+              <span className="grid h-9 w-9 place-items-center rounded-control bg-go font-black text-white">
                 P
               </span>
               <span className="font-serif text-lg">PreCAS Practice</span>
@@ -114,7 +114,7 @@ export function SiteFooterView({ whatsappDigits = '' }: { whatsappDigits?: strin
         </div>
 
         {/* Honesty disclaimer, kept from the original home page */}
-        <div className="mt-10 rounded-2xl bg-white/5 p-5 text-sm leading-relaxed text-white/60">
+        <div className="mt-10 rounded-card bg-surface/5 p-5 text-sm leading-relaxed text-white/60">
           <p className="mb-2">
             This is practice only. We help you explain your own true situation clearly. We do not
             write answers for you and we never suggest saying anything untrue.

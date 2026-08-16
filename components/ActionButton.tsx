@@ -77,7 +77,7 @@ export function ActionButton({
         onClick={run}
         disabled={disabled || state === 'busy'}
         aria-busy={state === 'busy'}
-        className={className || 'w-full rounded-xl bg-ink px-6 py-4 font-bold text-white disabled:opacity-60'}
+        className={className || 'w-full rounded-control bg-ink px-6 py-4 font-bold text-white disabled:opacity-60'}
       >
         {state === 'busy' ? busyLabel : state === 'done' && doneLabel ? doneLabel : children}
       </button>
@@ -85,12 +85,12 @@ export function ActionButton({
       {/* Attached to the button that caused it, never floating at the top of
           the page where a student on a phone will not see it. */}
       {error && (
-        <p role="alert" className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+        <p role="alert" className="mt-2 rounded-control bg-stop-tint px-3 py-2 text-sm font-medium text-stop">
           {error}
         </p>
       )}
       {message && !error && (
-        <p className="mt-2 text-sm font-medium text-emerald-700">{message}</p>
+        <p className="mt-2 text-sm font-medium text-go-dark">{message}</p>
       )}
     </div>
   );

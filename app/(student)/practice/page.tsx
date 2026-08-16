@@ -81,16 +81,16 @@ export default function PracticePage() {
         <h1 className="mb-2 text-center font-serif text-3xl font-bold text-ink sm:text-4xl">
           Practise one question
         </h1>
-        <p className="mx-auto mb-10 max-w-lg text-center leading-relaxed text-slate-600">
+        <p className="mx-auto mb-10 max-w-lg text-center leading-relaxed text-ink-soft">
           One question, answered out loud, with feedback on what you actually said. It takes about
           two minutes, so you can do it while you wait for a bus.
         </p>
 
-        <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-6">
+        <section className="mb-6 rounded-card border border-line bg-surface p-6">
           <h2 className="mb-1 font-serif text-lg font-bold text-ink">
             What do you want to practise?
           </h2>
-          <p className="mb-5 text-sm text-slate-600">
+          <p className="mb-5 text-sm text-ink-soft">
             Pick the one that worries you most, or let us choose.
           </p>
 
@@ -99,8 +99,8 @@ export default function PracticePage() {
               onClick={() => setCategory('any')}
               className={`rounded-full px-4 py-2.5 text-sm font-semibold transition ${
                 category === 'any'
-                  ? 'bg-emerald-400 text-ink'
-                  : 'border border-slate-200 text-slate-600 hover:border-slate-400'
+                  ? 'bg-go text-ink'
+                  : 'border border-line text-ink-soft hover:border-line-strong'
               }`}
             >
               Anything
@@ -111,8 +111,8 @@ export default function PracticePage() {
                 onClick={() => setCategory(c)}
                 className={`rounded-full px-4 py-2.5 text-sm font-semibold transition ${
                   category === c
-                    ? 'bg-emerald-400 text-ink'
-                    : 'border border-slate-200 text-slate-600 hover:border-slate-400'
+                    ? 'bg-go text-ink'
+                    : 'border border-line text-ink-soft hover:border-line-strong'
                 }`}
               >
                 {CATEGORY_LABEL[c]}
@@ -122,7 +122,7 @@ export default function PracticePage() {
         </section>
 
         {error && (
-          <p className="mb-4 rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3 font-medium text-red-800">
+          <p className="mb-4 rounded-control border-2 border-stop/30 bg-stop-tint px-4 py-3 font-medium text-stop">
             {error}
           </p>
         )}
@@ -130,12 +130,12 @@ export default function PracticePage() {
         <button
           onClick={start}
           disabled={starting}
-          className="w-full rounded-xl bg-ink px-6 py-4 text-lg font-bold text-white transition active:scale-[0.99] disabled:opacity-60"
+          className="w-full rounded-control bg-ink px-6 py-4 text-lg font-bold text-white transition active:scale-[0.99] disabled:opacity-60"
         >
           {starting ? 'Starting...' : 'Start practising'}
         </button>
 
-        <p className="mt-4 text-center text-sm text-slate-500">
+        <p className="mt-4 text-center text-sm text-ink-quiet">
           This uses one practice question from your pack, not a full mock interview.
         </p>
       </main>

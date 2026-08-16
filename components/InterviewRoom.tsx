@@ -663,10 +663,10 @@ export function InterviewRoom({
     return (
       <div className="mx-auto max-w-md p-6 text-center">
         <h1 className="mb-3 text-xl font-bold text-ink">We cannot start your interview</h1>
-        <p className="mb-6 text-slate-600">{error}</p>
+        <p className="mb-6 text-ink-soft">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="w-full rounded-xl bg-ink px-6 py-3.5 text-base font-semibold text-white"
+          className="w-full rounded-control bg-ink px-6 py-3.5 text-base font-semibold text-white"
         >
           Reload and try again
         </button>
@@ -680,7 +680,7 @@ export function InterviewRoom({
       <header className="sticky top-0 z-30 bg-ink text-white shadow-lg">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3">
           <div
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-lg text-sm font-black"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-control text-sm font-black"
             style={{ backgroundColor: institution.accent }}
           >
             {institution.monogram}
@@ -708,10 +708,10 @@ export function InterviewRoom({
               aria-label={`Question ${i + 1}`}
               className={`h-2 shrink-0 rounded-full transition-all ${
                 i === index
-                  ? 'w-6 bg-white'
+                  ? 'w-6 bg-surface'
                   : answeredIds.has(q.id)
-                    ? 'w-2 bg-emerald-400'
-                    : 'w-2 bg-white/25'
+                    ? 'w-2 bg-go'
+                    : 'w-2 bg-surface/25'
               }`}
             />
           ))}
@@ -720,14 +720,14 @@ export function InterviewRoom({
 
       <main className="mx-auto grid max-w-7xl gap-4 p-4 lg:grid-cols-[1fr_320px]">
         {/* ================= Question and answer ================= */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+        <div className="rounded-card border border-line bg-surface p-5 shadow-sm sm:p-7">
           <div className="mb-1 flex items-center gap-2">
-            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-micro font-bold uppercase tracking-wide text-slate-600">
+            <span className="rounded-full bg-surface-sunk px-2.5 py-1 text-micro font-bold uppercase tracking-wide text-ink-soft">
               Question {index + 1}
             </span>
             <button
               onClick={() => speak(question.text)}
-              className="rounded-full border border-slate-200 px-2.5 py-1 text-micro font-semibold text-slate-600 hover:bg-slate-100"
+              className="rounded-full border border-line px-2.5 py-1 text-micro font-semibold text-ink-soft hover:bg-surface-sunk"
             >
               ▶ Read this to me
             </button>
@@ -738,7 +738,7 @@ export function InterviewRoom({
                 if (!on) window.speechSynthesis?.cancel();
               }}
               className={`rounded-full px-2.5 py-1 text-micro font-semibold ${
-                voiceOn ? 'bg-slate-200 text-slate-700' : 'text-slate-400 hover:bg-slate-100'
+                voiceOn ? 'bg-line text-ink-soft' : 'text-ink-quiet hover:bg-surface-sunk'
               }`}
             >
               {voiceOn ? 'Auto voice: on' : 'Auto voice: off'}
@@ -746,7 +746,7 @@ export function InterviewRoom({
           </div>
 
           {demo.stt && (
-            <div className="mb-4 rounded-xl border-2 border-purple-300 bg-purple-50 px-4 py-3">
+            <div className="mb-4 rounded-control border-2 border-purple-300 bg-purple-50 px-4 py-3">
               <p className="font-bold text-purple-900">Demo mode: we are not really listening yet</p>
               {/* D-26. This used to name DEEPGRAM_API_KEY while /super named
                   GROQ_API_KEY for the same feature. Groq is the primary in
@@ -768,10 +768,10 @@ export function InterviewRoom({
           {/* ---- Live flag, placed where the eye already is ---- */}
           {latestFlag && phase === 'recording' && (
             <div
-              className={`mb-3 animate-slideUp rounded-xl border-l-4 px-4 py-2.5 text-sm font-medium ${
+              className={`mb-3 animate-slideUp rounded-control border-l-4 px-4 py-2.5 text-sm font-medium ${
                 FLAG_META[latestFlag.type].severity === 'critical'
-                  ? 'border-red-500 bg-red-50 text-red-900'
-                  : 'border-amber-500 bg-amber-50 text-amber-900'
+                  ? 'border-stop/40 bg-stop-tint text-stop'
+                  : 'border-warn/40 bg-warn-tint text-warn'
               }`}
               role="status"
             >
@@ -780,22 +780,22 @@ export function InterviewRoom({
           )}
 
           {/* ---- Answer space ---- */}
-          <div className="rounded-2xl bg-gradient-to-b from-sky-50 to-emerald-50/60 p-5">
+          <div className="rounded-card bg-gradient-to-b from-sky-50 to-emerald-50/60 p-5">
             {/* Unmistakable state banner. The previous version only changed the
                 button label, and it was not obvious that recording had begun. */}
             {phase === 'recording' && (
               <div
-                className={`mb-4 flex items-center gap-3 rounded-xl px-4 py-3 text-white transition-colors ${
+                className={`mb-4 flex items-center gap-3 rounded-control px-4 py-3 text-white transition-colors ${
                   secondsLeft <= 10
-                    ? 'bg-red-600'
+                    ? 'bg-stop'
                     : secondsLeft <= 20
-                      ? 'bg-amber-600'
-                      : 'bg-emerald-600'
+                      ? 'bg-warn-tint'
+                      : 'bg-go'
                 }`}
               >
                 <span className="relative flex h-3 w-3 shrink-0">
-                  <span className="absolute inline-flex h-full w-full animate-pulseRing rounded-full bg-white" />
-                  <span className="relative inline-flex h-3 w-3 rounded-full bg-white" />
+                  <span className="absolute inline-flex h-full w-full animate-pulseRing rounded-full bg-surface" />
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-surface" />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-base font-bold leading-tight">
@@ -814,9 +814,9 @@ export function InterviewRoom({
               </div>
             )}
             {phase === 'ready' && (
-              <div className="mb-4 rounded-xl bg-white/70 px-4 py-3">
+              <div className="mb-4 rounded-control bg-surface/70 px-4 py-3">
                 <p className="text-base font-bold text-ink">Read the question, then press start</p>
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-ink-soft">
                   You have {question.timeLimitSeconds} seconds. Nothing is recorded until you press
                   the button.
                 </p>
@@ -824,10 +824,10 @@ export function InterviewRoom({
             )}
 
             <div className="mb-4 flex items-center justify-between">
-              <span className="text-sm font-semibold text-slate-700">Your answer</span>
+              <span className="text-sm font-semibold text-ink-soft">Your answer</span>
               <span
                 className={`flex items-center gap-1.5 text-sm font-bold tabular-nums ${
-                  secondsLeft <= 15 && phase === 'recording' ? 'text-amber-600' : 'text-slate-600'
+                  secondsLeft <= 15 && phase === 'recording' ? 'text-warn' : 'text-ink-soft'
                 }`}
               >
                 <ClockIcon />
@@ -853,26 +853,26 @@ export function InterviewRoom({
                 said "Listening", which reads as working when it is not. So the
                 signal now drives ONE thing: telling them to speak up.
                 ---------------------------------------------------------------- */}
-            <div className="mb-5 min-h-[104px] rounded-xl bg-white/70 p-4 text-sm leading-relaxed text-slate-800">
+            <div className="mb-5 min-h-[104px] rounded-control bg-surface/70 p-4 text-sm leading-relaxed text-ink">
               {phase === 'reviewed' && finalTranscript ? (
                 <p>{finalTranscript}</p>
               ) : phase === 'recording' ? (
                 notHearingYou ? (
                   <div>
-                    <p className="mb-1 font-bold text-amber-700">We cannot hear you yet</p>
-                    <p className="text-sm leading-relaxed text-amber-800">
+                    <p className="mb-1 font-bold text-warn">We cannot hear you yet</p>
+                    <p className="text-sm leading-relaxed text-warn">
                       Speak louder, and a little closer to the microphone. Nothing is being picked
                       up, so this answer would come back empty. The officer will need to hear you
                       clearly too.
                     </p>
                   </div>
                 ) : (
-                  <p className="text-slate-500">
+                  <p className="text-ink-quiet">
                     Recording. Keep going — you will see what we heard when you stop.
                   </p>
                 )
               ) : (
-                <p className="text-slate-400">
+                <p className="text-ink-quiet">
                   Your answer will be shown back to you once you stop recording.
                 </p>
               )}
@@ -886,11 +886,11 @@ export function InterviewRoom({
                   className="group flex flex-col items-center gap-2"
                   aria-label="Start recording your answer"
                 >
-                  <span className="relative grid h-20 w-20 place-items-center rounded-full bg-white shadow-lg ring-2 ring-emerald-500/40 transition group-active:scale-95">
-                    <MicIcon className="h-8 w-8 text-emerald-600" />
+                  <span className="relative grid h-20 w-20 place-items-center rounded-full bg-surface shadow-lg ring-2 ring-go/30/40 transition group-active:scale-95">
+                    <MicIcon className="h-8 w-8 text-go-dark" />
                   </span>
-                  <span className="text-lg font-bold text-emerald-700">Start answering</span>
-                  <span className="text-sm text-slate-500">Tap the microphone to begin</span>
+                  <span className="text-lg font-bold text-go-dark">Start answering</span>
+                  <span className="text-sm text-ink-quiet">Tap the microphone to begin</span>
                 </button>
               )}
 
@@ -900,15 +900,15 @@ export function InterviewRoom({
                   className="flex flex-col items-center gap-2"
                   aria-label="Stop recording"
                 >
-                  <span className="relative grid h-20 w-20 place-items-center rounded-full bg-red-600 shadow-lg">
+                  <span className="relative grid h-20 w-20 place-items-center rounded-full bg-stop shadow-lg">
                     <span
-                      className="absolute inset-0 rounded-full bg-red-500/40"
+                      className="absolute inset-0 rounded-full bg-stop/40"
                       style={{ transform: `scale(${1 + noiseLevel * 2.2})`, transition: 'transform 90ms' }}
                     />
-                    <span className="relative h-6 w-6 rounded bg-white" />
+                    <span className="relative h-6 w-6 rounded bg-surface" />
                   </span>
-                  <span className="text-lg font-bold text-red-700">I have finished answering</span>
-                  <span className="text-sm text-slate-500">
+                  <span className="text-lg font-bold text-stop">I have finished answering</span>
+                  <span className="text-sm text-ink-quiet">
                     Or wait for the timer to run out
                   </span>
                 </button>
@@ -917,16 +917,16 @@ export function InterviewRoom({
               {phase === 'uploading' && (
                 <div className="flex flex-col items-center gap-2 py-4">
                   <Spinner />
-                  <span className="text-base font-semibold text-slate-700">
+                  <span className="text-base font-semibold text-ink-soft">
                     Listening to your answer...
                   </span>
-                  <span className="text-sm text-slate-500">This takes a few seconds.</span>
+                  <span className="text-sm text-ink-quiet">This takes a few seconds.</span>
                 </div>
               )}
 
               {/* ---- Failure. Never auto-advance. The student chooses. ---- */}
               {phase === 'retry' && (
-                <div className="w-full animate-slideUp rounded-xl border-2 border-amber-300 bg-amber-50 p-4">
+                <div className="w-full animate-slideUp rounded-control border-2 border-warn/40 bg-warn-tint p-4">
                   {/* E-4: no error blames the student for OUR failure.
                       In demo mode there is no speech-to-text key at all, so
                       the answer was never listened to — saying "we could not
@@ -934,10 +934,10 @@ export function InterviewRoom({
                       problem when the problem is a missing key of ours. The
                       client hit this three times in a row and reasonably
                       thought the product was broken. */}
-                  <p className="mb-1 font-bold text-amber-900">
+                  <p className="mb-1 font-bold text-warn">
                     {demo?.stt ? 'Demo mode: we are not listening yet' : 'We could not use that answer'}
                   </p>
-                  <p className="mb-4 text-sm leading-relaxed text-amber-900/90">{message}</p>
+                  <p className="mb-4 text-sm leading-relaxed text-warn/90">{message}</p>
 
                   {/* S-28. When the recording survived, sending it again is the
                       first and best option. Re-recording an answer you already
@@ -945,7 +945,7 @@ export function InterviewRoom({
                   {canResend && (
                     <button
                       onClick={resend}
-                      className="mb-2 w-full rounded-xl bg-emerald-600 px-5 py-3 text-base font-bold text-white"
+                      className="mb-2 w-full rounded-control bg-go px-5 py-3 text-base font-bold text-white"
                     >
                       Send the same recording again
                     </button>
@@ -960,20 +960,20 @@ export function InterviewRoom({
                         setPhase('ready');
                       }}
                       disabled={attemptsLeft <= 0}
-                      className="flex-1 rounded-xl bg-ink px-5 py-3 text-base font-semibold text-white disabled:opacity-40"
+                      className="flex-1 rounded-control bg-ink px-5 py-3 text-base font-semibold text-white disabled:opacity-40"
                     >
                       Record again
                       {attemptsLeft > 0 && attemptsLeft < 3 ? ` (${attemptsLeft} left)` : ''}
                     </button>
                     <button
                       onClick={skip}
-                      className="flex-1 rounded-xl border-2 border-slate-300 px-5 py-3 text-base font-semibold text-slate-700"
+                      className="flex-1 rounded-control border-2 border-line-strong px-5 py-3 text-base font-semibold text-ink-soft"
                     >
                       Skip this question
                     </button>
                   </div>
                   {attemptsLeft <= 0 && (
-                    <p className="mt-2 text-sm font-medium text-red-700">
+                    <p className="mt-2 text-sm font-medium text-stop">
                       You have used all your tries for this question. Skip it for now and practise it
                       afterwards.
                     </p>
@@ -984,14 +984,14 @@ export function InterviewRoom({
               {phase === 'reviewed' && (
                 <div className="w-full animate-slideUp">
                   {message && (
-                    <p className="mb-3 rounded-lg bg-slate-100 px-4 py-2.5 text-sm text-slate-700">
+                    <p className="mb-3 rounded-control bg-surface-sunk px-4 py-2.5 text-sm text-ink-soft">
                       {message}
                     </p>
                   )}
                   <div className="flex flex-col gap-2 sm:flex-row">
                     <button
                       onClick={next}
-                      className="flex-1 rounded-xl bg-emerald-600 px-5 py-3.5 text-base font-bold text-white shadow-sm"
+                      className="flex-1 rounded-control bg-go px-5 py-3.5 text-base font-bold text-white shadow-sm"
                     >
                       {isLast ? 'Finish and see my results' : 'Saved. Next question'}
                     </button>
@@ -1003,7 +1003,7 @@ export function InterviewRoom({
                           setLiveText('');
                           setPhase('ready');
                         }}
-                        className="rounded-xl border-2 border-slate-300 px-5 py-3.5 text-base font-semibold text-slate-700"
+                        className="rounded-control border-2 border-line-strong px-5 py-3.5 text-base font-semibold text-ink-soft"
                       >
                         Answer again
                       </button>
@@ -1015,23 +1015,23 @@ export function InterviewRoom({
               {phase === 'finishing' && (
                 <div className="flex flex-col items-center gap-2 py-4">
                   <Spinner />
-                  <span className="font-semibold text-slate-700">Preparing your results...</span>
+                  <span className="font-semibold text-ink-soft">Preparing your results...</span>
                 </div>
               )}
             </div>
           </div>
 
           {/* ---- PEE + Wrap-up: the house answer method ---- */}
-          <div className="mt-5 rounded-xl border border-slate-200 bg-white p-4">
-            <p className="mb-3 text-xs font-bold uppercase tracking-wide text-slate-500">
+          <div className="mt-5 rounded-control border border-line bg-surface p-4">
+            <p className="mb-3 text-micro font-bold uppercase tracking-wide text-ink-quiet">
               Build every answer this way
             </p>
             <div className="grid gap-2 sm:grid-cols-2">
               {STRUCTURE.map((s, i) => (
                 <div
                   key={s.label}
-                  className={`flex gap-3 rounded-lg p-3 ${
-                    phase === 'recording' ? 'bg-emerald-50/70' : 'bg-slate-50'
+                  className={`flex gap-3 rounded-control p-3 ${
+                    phase === 'recording' ? 'bg-go-tint/70' : 'bg-surface-sunk'
                   }`}
                 >
                   <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-ink text-sm font-black text-white">
@@ -1041,7 +1041,7 @@ export function InterviewRoom({
                     <p className="text-sm font-bold leading-tight text-ink">
                       {i + 1}. {s.label}
                     </p>
-                    <p className="text-micro leading-snug text-slate-600">{s.hint}</p>
+                    <p className="text-micro leading-snug text-ink-soft">{s.hint}</p>
                   </div>
                 </div>
               ))}
@@ -1050,20 +1050,20 @@ export function InterviewRoom({
 
           {/* ---- Tips ---- */}
           {question.tips.length > 0 && (
-            <div className="mt-4 flex items-start gap-3 rounded-xl bg-slate-50 p-4">
-              <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink text-xs font-bold text-white">
+            <div className="mt-4 flex items-start gap-3 rounded-control bg-surface-sunk p-4">
+              <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink text-micro font-bold text-white">
                 i
               </span>
               <div className="min-w-0 flex-1">
-                <p className="mb-0.5 text-micro font-bold uppercase tracking-wide text-slate-500">
+                <p className="mb-0.5 text-micro font-bold uppercase tracking-wide text-ink-quiet">
                   Tip {tipIndex + 1} of {question.tips.length}
                 </p>
-                <p className="text-sm leading-relaxed text-slate-700">{question.tips[tipIndex]}</p>
+                <p className="text-sm leading-relaxed text-ink-soft">{question.tips[tipIndex]}</p>
               </div>
               {question.tips.length > 1 && (
                 <button
                   onClick={() => setTipIndex((i) => (i + 1) % question.tips.length)}
-                  className="shrink-0 rounded-lg px-2 py-1 text-sm font-semibold text-slate-500 hover:bg-slate-200"
+                  className="shrink-0 rounded-control px-2 py-1 text-sm font-semibold text-ink-quiet hover:bg-line"
                   aria-label="Next tip"
                 >
                   Next
@@ -1075,7 +1075,7 @@ export function InterviewRoom({
 
         {/* ================= Camera and monitor ================= */}
         <aside className="space-y-4">
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-ink shadow-sm">
+          <div className="overflow-hidden rounded-card border border-line bg-ink shadow-sm">
             <div className="relative aspect-[4/3]">
               <video
                 ref={videoRef}
@@ -1090,20 +1090,20 @@ export function InterviewRoom({
                 </div>
               )}
               {phase === 'recording' && (
-                <span className="absolute bottom-2 right-2 rounded-md bg-black/70 px-2 py-1 text-xs font-bold tabular-nums text-white">
+                <span className="absolute bottom-2 right-2 rounded-md bg-black/70 px-2 py-1 text-micro font-bold tabular-nums text-white">
                   {String(Math.floor(secondsLeft / 60))}:{String(secondsLeft % 60).padStart(2, '0')}
                 </span>
               )}
               {phase === 'recording' && (
-                <span className="absolute left-2 top-2 flex items-center gap-1.5 rounded-md bg-red-600 px-2 py-1 text-micro font-bold text-white">
-                  <span className="h-1.5 w-1.5 rounded-full bg-white" /> REC
+                <span className="absolute left-2 top-2 flex items-center gap-1.5 rounded-md bg-stop px-2 py-1 text-micro font-bold text-white">
+                  <span className="h-1.5 w-1.5 rounded-full bg-surface" /> REC
                 </span>
               )}
               {/* countdown bar */}
               <div className="absolute inset-x-0 bottom-0 h-1 bg-black/30">
                 <div
                   className={`h-full transition-all duration-1000 ${
-                    secondsLeft <= 15 ? 'bg-amber-400' : 'bg-emerald-400'
+                    secondsLeft <= 15 ? 'bg-warn-tint' : 'bg-go'
                   }`}
                   style={{ width: `${Math.min(100, pct * 100)}%` }}
                 />
@@ -1115,7 +1115,7 @@ export function InterviewRoom({
                 setCameraOn(on);
                 streamRef.current?.getVideoTracks().forEach((t) => (t.enabled = on));
               }}
-              className="w-full py-2.5 text-xs font-medium text-white/70 hover:bg-white/5"
+              className="w-full py-2.5 text-micro font-medium text-white/70 hover:bg-surface/5"
             >
               {cameraOn ? 'Turn camera off' : 'Turn camera on'}
             </button>
@@ -1139,7 +1139,7 @@ export function InterviewRoom({
               if (answeredCount >= questions.length) finish();
               else setEndConfirm(true);
             }}
-            className="w-full rounded-xl border-2 border-slate-300 bg-white py-3 text-sm font-semibold text-slate-600"
+            className="w-full rounded-control border-2 border-line-strong bg-surface py-3 text-sm font-semibold text-ink-soft"
           >
             End interview and see results
           </button>
@@ -1152,22 +1152,22 @@ export function InterviewRoom({
           role="dialog"
           aria-modal="true"
           aria-labelledby="end-early-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-ink/70 p-4"
         >
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <h2 id="end-early-title" className="text-xl font-bold text-slate-900">
+          <div className="w-full max-w-md rounded-card bg-surface p-6 shadow-2xl">
+            <h2 id="end-early-title" className="text-xl font-bold text-ink">
               You still have {questions.length - answeredCount} question
               {questions.length - answeredCount === 1 ? '' : 's'} left
             </h2>
 
-            <p className="mt-3 text-sm leading-relaxed text-slate-600">
+            <p className="mt-3 text-sm leading-relaxed text-ink-soft">
               A report is made once, when the interview ends. If you stop now, this mock is used up
               and the {questions.length - answeredCount} question
               {questions.length - answeredCount === 1 ? '' : 's'} you have not answered cannot be
               added to it later.
             </p>
 
-            <div className="mt-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
+            <div className="mt-4 rounded-control bg-warn-tint p-3 text-sm text-warn">
               You have answered <strong>{answeredCount}</strong> of{' '}
               <strong>{questions.length}</strong>. A score from part of an interview cannot tell you
               whether you are ready.
@@ -1176,13 +1176,13 @@ export function InterviewRoom({
             <div className="mt-5 flex flex-col gap-2">
               <button
                 onClick={() => setEndConfirm(false)}
-                className="w-full rounded-xl bg-slate-900 py-3 text-sm font-semibold text-white"
+                className="w-full rounded-control bg-ink py-3 text-sm font-semibold text-white"
               >
                 Go back and finish the interview
               </button>
               <button
                 onClick={finish}
-                className="w-full rounded-xl border border-slate-300 bg-white py-3 text-sm font-medium text-slate-600"
+                className="w-full rounded-control border border-line-strong bg-surface py-3 text-sm font-medium text-ink-soft"
               >
                 Stop anyway and use up this mock
               </button>
@@ -1216,7 +1216,7 @@ function ClockIcon() {
 
 function Spinner() {
   return (
-    <svg className="h-8 w-8 animate-spin text-slate-400" viewBox="0 0 24 24" fill="none">
+    <svg className="h-8 w-8 animate-spin text-ink-quiet" viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25" />
       <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
     </svg>

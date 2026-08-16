@@ -74,7 +74,7 @@ export function PasscodeInput({
         spellCheck={false}
         // pr-24 leaves room for the button so a long passcode cannot run
         // underneath it and become unreadable at the very moment you need it.
-        className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 pr-24 outline-none focus:border-ink"
+        className="w-full rounded-control border-2 border-line px-4 py-3 pr-24 outline-none focus:border-ink"
       />
       <button
         type="button"
@@ -82,7 +82,7 @@ export function PasscodeInput({
         // Deliberately says what pressing it will DO, not what the state is.
         // "Hide"/"Show" as a bare label is ambiguous about which it means.
         aria-pressed={shown}
-        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-3 py-1.5 text-sm font-bold text-slate-600 transition hover:bg-slate-100 hover:text-ink"
+        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-control px-3 py-1.5 text-sm font-bold text-ink-soft transition hover:bg-surface-sunk hover:text-ink"
       >
         {shown ? 'Hide' : 'Show'}
       </button>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Student Dashboard - PreCAS Practice</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&amp;family=Noto+Serif:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#c4c6cc",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#007347",
+                        "outline": "#74777d",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#e7e8eb",
+                        "tertiary-fixed": "#feddba",
+                        "secondary-fixed": "#82fab7",
+                        "surface-container-highest": "#e1e2e5",
+                        "on-tertiary-fixed-variant": "#584329",
+                        "surface-container": "#edeef1",
+                        "inverse-primary": "#bac8dc",
+                        "primary-container": "#0f1c2c",
+                        "tertiary": "#000000",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#005231",
+                        "on-surface": "#191c1e",
+                        "on-surface-variant": "#44474c",
+                        "inverse-surface": "#2e3133",
+                        "surface-tint": "#525f71",
+                        "surface": "#f8f9fc",
+                        "secondary-fixed-dim": "#65dd9c",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#bac8dc",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed": "#0f1c2c",
+                        "surface-dim": "#d9dadd",
+                        "on-secondary-fixed": "#002111",
+                        "on-tertiary-container": "#9a7f61",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#82fab7",
+                        "on-secondary": "#ffffff",
+                        "primary": "#000000",
+                        "on-primary-container": "#778598",
+                        "tertiary-fixed-dim": "#e0c1a0",
+                        "primary-fixed": "#d6e4f9",
+                        "surface-container-low": "#f2f3f6",
+                        "surface-bright": "#f8f9fc",
+                        "surface-variant": "#e1e2e5",
+                        "on-primary-fixed-variant": "#3a4859",
+                        "on-tertiary-fixed": "#281804",
+                        "secondary": "#006d42",
+                        "background": "#f8f9fc",
+                        "tertiary-container": "#281804",
+                        "on-background": "#191c1e",
+                        "inverse-on-surface": "#f0f1f4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "64px",
+                        "base": "4px",
+                        "sm": "16px",
+                        "container-max": "1120px",
+                        "md": "24px",
+                        "xs": "8px",
+                        "gutter": "20px",
+                        "lg": "40px"
+                    },
+                    "fontFamily": {
+                        "display-mobile": ["Noto Serif"],
+                        "body-sm": ["Hanken Grotesk"],
+                        "label-sm": ["Hanken Grotesk"],
+                        "display": ["Noto Serif"],
+                        "headline-lg": ["Noto Serif"],
+                        "body-md": ["Hanken Grotesk"],
+                        "label-md": ["Hanken Grotesk"],
+                        "headline-sm": ["Noto Serif"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "headline-md": ["Noto Serif"]
+                    },
+                    "fontSize": {
+                        "display-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "display": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #f7f8fb; /* Paper background */
+        }
+        .soft-shadow {
+            box-shadow: 0 1px 2px rgba(13,27,42,.04);
+        }
+        .deep-shadow {
+            box-shadow: 0 8px 24px rgba(13,27,42,.06);
+        }
+    </style>
+</head>
+<body class="text-on-background font-body-md antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface border-b border-outline-variant w-full sticky top-0 z-50">
+<div class="flex justify-between items-center w-full px-sm md:px-lg max-w-container-max mx-auto h-16">
+<!-- Brand -->
+<div class="font-display text-display-mobile font-bold text-primary">
+                PreCAS Practice
+            </div>
+<!-- Desktop Navigation -->
+<nav class="hidden md:flex gap-md h-full items-center">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md h-full flex items-center pt-[2px]" href="#">Dashboard</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-body-md text-body-md h-full flex items-center" href="#">Interviews</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-body-md text-body-md h-full flex items-center" href="#">Schedule</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-body-md text-body-md h-full flex items-center" href="#">Progress</a>
+</nav>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-sm">
+<button class="text-on-surface-variant hover:text-primary transition-colors duration-200 p-2">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors duration-200 p-2">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-grow w-full px-sm md:px-lg max-w-container-max mx-auto py-xl">
+<!-- Page Header -->
+<header class="mb-lg">
+<h1 class="font-display text-display text-primary">Your Progress toward UKVI Readiness</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-sm max-w-2xl">
+                Review your upcoming schedule and track your interview performance metrics.
+            </p>
+</header>
+<!-- Top Row: Next Mock & Overall Stats -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-xl">
+<!-- Next Scheduled Mock (Bento Main Card) -->
+<section class="md:col-span-8 bg-surface rounded-xl soft-shadow p-lg flex flex-col md:flex-row gap-lg border border-surface-variant relative overflow-hidden">
+<!-- Subtle background accent to indicate importance -->
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary-fixed rounded-full blur-3xl opacity-20 -mr-32 -mt-32 pointer-events-none"></div>
+<div class="flex-grow flex flex-col justify-between relative z-10">
+<div>
+<div class="inline-flex items-center gap-2 bg-surface-container-low px-3 py-1 rounded-full border border-line mb-md">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Next Interview</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-primary mb-xs">Comprehensive UKVI Mock</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                            Tomorrow, 14:00 GMT
+                        </p>
+</div>
+<div class="mt-auto pt-md">
+<button class="bg-[#0f9d63] hover:bg-opacity-90 text-on-primary font-label-md text-label-md py-3 px-6 rounded-lg transition-colors flex items-center gap-2 shadow-sm">
+                            Enter Interview Room
+                            <span class="material-symbols-outlined text-[18px]">video_camera_front</span>
+</button>
+</div>
+</div>
+<div class="w-full md:w-1/3 flex flex-col items-center justify-center text-center p-md bg-surface-container-lowest rounded-lg border border-surface-variant relative z-10">
+<div class="w-24 h-24 rounded-full overflow-hidden mb-sm border-2 border-surface shadow-sm">
+<img alt="Interviewer" class="w-full h-full object-cover" data-alt="A professional headshot of a middle-aged academic interviewer wearing glasses and a formal navy blazer, looking approachable yet authoritative, against a neutral light grey background. High-quality corporate portrait photography style, well-lit, sharp focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPNLQWF4Ymfe12h30mlWQVphyCIRwUWDw1n4Y5RkdQ1d7rLomrAvhCpCKgFnoG7pMtWsag9zHbV0UjUbscUMX7sQ6uzl8AYYw3nDrxEgVxpuYCBjTRCARef88IWPrkewrjiPuX9MbjrfdhKaCQIVdFsEYtwikJaTDyupu-uXOlsf9DA5xNlHoTX9M8kuKC52EEHoZPeFMjqvTp9l7XKXBtnWAUIdo1-m3M7NX_pbDlCZ-y4TnR4Oul"/>
+</div>
+<h3 class="font-label-md text-label-md text-primary">Dr. Eleanor Vance</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Senior Assessor</p>
+</div>
+</section>
+<!-- Quick Stats Column -->
+<section class="md:col-span-4 flex flex-col gap-gutter">
+<div class="bg-surface rounded-xl soft-shadow p-md border border-surface-variant flex items-start gap-md">
+<div class="p-3 bg-tertiary-fixed rounded-lg text-on-tertiary-fixed">
+<span class="material-symbols-outlined">trending_up</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Overall Readiness</p>
+<p class="font-headline-lg text-headline-lg text-primary">78%</p>
+</div>
+</div>
+<div class="bg-surface rounded-xl soft-shadow p-md border border-surface-variant flex items-start gap-md flex-grow">
+<div class="p-3 bg-secondary-fixed rounded-lg text-on-secondary-fixed">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Completed Mocks</p>
+<p class="font-headline-lg text-headline-lg text-primary">3</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-2 border-t border-surface-variant pt-2">Target: 5 before final assessment.</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Progress Markers Section -->
+<section class="mb-xl">
+<h2 class="font-headline-md text-headline-md text-primary mb-md">Competency Tracking</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Financial Knowledge -->
+<div class="bg-surface rounded-xl soft-shadow p-md border border-surface-variant">
+<div class="flex justify-between items-center mb-sm">
+<h3 class="font-label-md text-label-md text-primary">Financial Knowledge</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container-low px-2 py-1 rounded">Needs Review</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-2 mb-2 overflow-hidden">
+<div class="bg-primary h-2 rounded-full" style="width: 45%"></div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-sm">Focus on explaining your funding sources clearly.</p>
+</div>
+<!-- Course Choice -->
+<div class="bg-surface rounded-xl soft-shadow p-md border border-surface-variant">
+<div class="flex justify-between items-center mb-sm">
+<h3 class="font-label-md text-label-md text-primary">Course Choice</h3>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary-fixed px-2 py-1 rounded">Strong</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-2 mb-2 overflow-hidden">
+<div class="bg-secondary h-2 rounded-full" style="width: 85%"></div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-sm">Excellent articulation of career alignment.</p>
+</div>
+<!-- Credibility -->
+<div class="bg-surface rounded-xl soft-shadow p-md border border-surface-variant">
+<div class="flex justify-between items-center mb-sm">
+<h3 class="font-label-md text-label-md text-primary">Credibility</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container-low px-2 py-1 rounded">On Track</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-2 mb-2 overflow-hidden">
+<div class="bg-primary h-2 rounded-full" style="width: 60%"></div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-sm">Maintain eye contact and natural pacing.</p>
+</div>
+</div>
+</section>
+<!-- Past Mock Sessions -->
+<section>
+<h2 class="font-headline-md text-headline-md text-primary mb-md">Past Mock Sessions</h2>
+<div class="bg-surface rounded-xl soft-shadow border border-surface-variant overflow-hidden">
+<!-- List Item 1 -->
+<div class="p-md border-b border-surface-variant flex flex-col md:flex-row justify-between items-start md:items-center gap-md hover:bg-surface-container-lowest transition-colors">
+<div class="flex items-start gap-md">
+<div class="p-2 bg-surface-container rounded border border-surface-variant text-on-surface-variant hidden md:block">
+<span class="material-symbols-outlined">assignment</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-primary mb-1">Initial Assessment</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Oct 12, 2023 • 45 minutes</p>
+</div>
+</div>
+<div class="flex items-center gap-md w-full md:w-auto justify-between md:justify-end">
+<span class="font-label-sm text-label-sm px-3 py-1 bg-surface-container-low text-on-surface-variant rounded-full">Score: 62%</span>
+<button class="font-label-md text-label-md text-primary border border-outline-variant px-4 py-2 rounded hover:bg-surface-container-low transition-colors">Review Feedback</button>
+</div>
+</div>
+<!-- List Item 2 -->
+<div class="p-md border-b border-surface-variant flex flex-col md:flex-row justify-between items-start md:items-center gap-md hover:bg-surface-container-lowest transition-colors">
+<div class="flex items-start gap-md">
+<div class="p-2 bg-surface-container rounded border border-surface-variant text-on-surface-variant hidden md:block">
+<span class="material-symbols-outlined">assignment</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-primary mb-1">Financial Focus Mock</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Oct 19, 2023 • 30 minutes</p>
+</div>
+</div>
+<div class="flex items-center gap-md w-full md:w-auto justify-between md:justify-end">
+<span class="font-label-sm text-label-sm px-3 py-1 bg-surface-container-low text-on-surface-variant rounded-full">Score: 71%</span>
+<button class="font-label-md text-label-md text-primary border border-outline-variant px-4 py-2 rounded hover:bg-surface-container-low transition-colors">Review Feedback</button>
+</div>
+</div>
+<!-- View All -->
+<div class="p-sm text-center bg-surface-container-lowest">
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">View All History</button>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden bg-surface border-t border-outline-variant fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-xs pb-safe shadow-sm">
+<a class="flex flex-col items-center justify-center text-secondary font-bold w-1/4 h-full active:scale-95 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-sm text-label-sm">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors w-1/4 h-full" href="#">
+<span class="material-symbols-outlined mb-1">video_chat</span>
+<span class="font-label-sm text-label-sm">Interviews</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors w-1/4 h-full" href="#">
+<span class="material-symbols-outlined mb-1">calendar_today</span>
+<span class="font-label-sm text-label-sm">Schedule</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors w-1/4 h-full" href="#">
+<span class="material-symbols-outlined mb-1">analytics</span>
+<span class="font-label-sm text-label-sm">Progress</span>
+</a>
+</nav>
+</body></html>

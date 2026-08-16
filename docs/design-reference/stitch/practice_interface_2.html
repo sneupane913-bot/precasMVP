@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PreCAS Practice - Live Interview</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&amp;family=Noto+Serif:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "error-container": "#ffdad6",
+                "background": "#f8f9fc",
+                "inverse-surface": "#2e3133",
+                "primary-container": "#0f1c2c",
+                "surface-bright": "#f8f9fc",
+                "secondary-container": "#82fab7",
+                "surface-tint": "#525f71",
+                "on-secondary-fixed-variant": "#005231",
+                "primary-fixed": "#d6e4f9",
+                "tertiary-container": "#281804",
+                "secondary-fixed": "#82fab7",
+                "on-secondary-container": "#007347",
+                "inverse-on-surface": "#f0f1f4",
+                "primary": "#000000",
+                "primary-fixed-dim": "#bac8dc",
+                "surface-container-highest": "#e1e2e5",
+                "on-surface-variant": "#44474c",
+                "outline-variant": "#c4c6cc",
+                "on-tertiary": "#ffffff",
+                "on-error": "#ffffff",
+                "error": "#ba1a1a",
+                "tertiary-fixed": "#feddba",
+                "tertiary": "#000000",
+                "surface-container-high": "#e7e8eb",
+                "on-tertiary-fixed-variant": "#584329",
+                "on-primary-fixed": "#0f1c2c",
+                "on-tertiary-fixed": "#281804",
+                "on-primary-container": "#778598",
+                "on-primary-fixed-variant": "#3a4859",
+                "surface-dim": "#d9dadd",
+                "surface-container-lowest": "#ffffff",
+                "on-error-container": "#93000a",
+                "surface-container": "#edeef1",
+                "secondary": "#006d42",
+                "on-tertiary-container": "#9a7f61",
+                "inverse-primary": "#bac8dc",
+                "on-primary": "#ffffff",
+                "on-secondary-fixed": "#002111",
+                "outline": "#74777d",
+                "surface-container-low": "#f2f3f6",
+                "tertiary-fixed-dim": "#e0c1a0",
+                "on-secondary": "#ffffff",
+                "on-surface": "#191c1e",
+                "secondary-fixed-dim": "#65dd9c",
+                "surface": "#f8f9fc",
+                "surface-variant": "#e1e2e5",
+                "on-background": "#191c1e"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "container-max": "1120px",
+                "sm": "16px",
+                "base": "4px",
+                "gutter": "20px",
+                "xs": "8px",
+                "md": "24px",
+                "lg": "40px",
+                "xl": "64px"
+        },
+        "fontFamily": {
+                "display": [
+                        "Noto Serif"
+                ],
+                "headline-sm": [
+                        "Noto Serif"
+                ],
+                "display-mobile": [
+                        "Noto Serif"
+                ],
+                "label-sm": [
+                        "Hanken Grotesk"
+                ],
+                "body-lg": [
+                        "Hanken Grotesk"
+                ],
+                "body-md": [
+                        "Hanken Grotesk"
+                ],
+                "label-md": [
+                        "Hanken Grotesk"
+                ],
+                "headline-md": [
+                        "Noto Serif"
+                ],
+                "body-sm": [
+                        "Hanken Grotesk"
+                ],
+                "headline-lg": [
+                        "Noto Serif"
+                ]
+        },
+        "fontSize": {
+                "display": [
+                        "40px",
+                        {
+                                "lineHeight": "1.2",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-sm": [
+                        "20px",
+                        {
+                                "lineHeight": "1.4",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-mobile": [
+                        "32px",
+                        {
+                                "lineHeight": "1.2",
+                                "fontWeight": "700"
+                        }
+                ],
+                "label-sm": [
+                        "12px",
+                        {
+                                "lineHeight": "1",
+                                "fontWeight": "500"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "1.6",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "1.5",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-md": [
+                        "14px",
+                        {
+                                "lineHeight": "1",
+                                "letterSpacing": "0.02em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "1.4",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-sm": [
+                        "14px",
+                        {
+                                "lineHeight": "1.5",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "1.3",
+                                "fontWeight": "600"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+  body {
+    background-color: theme('colors.background');
+    color: theme('colors.on-surface');
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid theme('colors.surface-variant');
+  }
+  @keyframes pulse-ring {
+    0% { transform: scale(0.8); opacity: 0.5; }
+    100% { transform: scale(1.3); opacity: 0; }
+  }
+  .animate-pulse-ring {
+    animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  }
+</style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+<!-- Focus Mode Header: Navigation shell suppressed for transactional state -->
+<header class="bg-primary-container text-on-primary w-full sticky top-0 z-50">
+<div class="max-w-[1120px] mx-auto px-gutter h-[72px] flex items-center justify-between">
+<div class="flex items-center gap-md">
+<div class="w-14 h-14 rounded-xl overflow-hidden bg-surface-container-lowest border border-outline-variant flex items-center justify-center shadow-sm">
+<img alt="BPP University Monogram" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLtL_-dIE94dNNiJBvmnxZxbCg6xViUQagW6_QLvUeYY1736zAIzf7-w0OCBMs2cfUGDuF7L8IUVrqoBXGcxtbHdzHk8Mt8fCZPNbFkv2YpWfYFkQQheogcomRlVfj5dJLsSqaQMJ8ZTPIIlVUDiIHyn0kNeQnEILZW2seOqReGmu2G5-iI5GcgSXCjy_sveReodSpHQRI8HhYOMrg4k1z0zl1-wvD2v7MfOKLQQMXHx9_9W8s_3Sct_MAk"/>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary-fixed-dim">BPP University</span>
+<span class="font-headline-sm text-headline-sm text-on-primary">Pre-CAS mock interview</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-headline-sm text-headline-sm text-on-primary">Q 8 of 17</span>
+<span class="font-label-sm text-label-sm text-primary-fixed-dim">3 answered</span>
+</div>
+</div>
+</header>
+<!-- Progress Rail -->
+<div class="w-full bg-surface-container border-b border-outline-variant">
+<div class="max-w-[1120px] mx-auto px-gutter py-sm flex items-center gap-[2px]">
+<!-- 3 Filled Segments -->
+<div class="h-2 flex-1 rounded-full bg-secondary"></div>
+<div class="h-2 flex-1 rounded-full bg-secondary"></div>
+<div class="h-2 flex-1 rounded-full bg-secondary"></div>
+<!-- 4 Hollow Segments -->
+<div class="h-2 flex-1 rounded-full bg-surface-variant"></div>
+<div class="h-2 flex-1 rounded-full bg-surface-variant"></div>
+<div class="h-2 flex-1 rounded-full bg-surface-variant"></div>
+<div class="h-2 flex-1 rounded-full bg-surface-variant"></div>
+<!-- Segment 8: Outlined/Active -->
+<div class="h-2 flex-1 rounded-full border-2 border-secondary bg-surface-container-lowest"></div>
+<!-- Remaining Hollow Segments (9 to 17) -->
+<div class="h-2 flex-1 rounded-full bg-surface-variant"></div>
+<div class="h-2 flex-1 rounded-full bg-surface-variant"></div>
+<div class="h-2 flex-1 rounded-full bg-surface-variant"></div>
+<div class="h-2 flex-1 rounded-full bg-surface-variant"></div>
+<div class="h-2 flex-1 rounded-full bg-surface-variant"></div>
+<div class="h-2 flex-1 rounded-full bg-surface-variant"></div>
+<div class="h-2 flex-1 rounded-full bg-surface-variant"></div>
+<div class="h-2 flex-1 rounded-full bg-surface-variant"></div>
+<div class="h-2 flex-1 rounded-full bg-surface-variant"></div>
+</div>
+</div>
+<main class="flex-1 max-w-[1120px] w-full mx-auto px-gutter py-lg grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Main Column -->
+<div class="md:col-span-8 flex flex-col gap-lg">
+<!-- Question Area -->
+<section class="flex flex-col gap-sm">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Current Question</span>
+<h1 class="font-headline-md text-headline-md text-primary">Why do you want to study at BPP University?</h1>
+</section>
+<!-- Answer Panel (Recording State) -->
+<section class="glass-card rounded-xl p-md shadow-[0_1px_2px_rgba(13,27,42,.04)] flex flex-col gap-lg border-t-4 border-t-error">
+<header class="flex justify-between items-center pb-sm border-b border-surface-variant">
+<h2 class="font-headline-sm text-headline-sm text-primary flex items-center gap-xs">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">fiber_manual_record</span>
+          Your answer
+        </h2>
+<div class="font-body-lg text-body-lg text-error font-medium flex items-center gap-xs">
+<span class="material-symbols-outlined">schedule</span>
+          02:45
+        </div>
+</header>
+<div class="flex flex-col items-center justify-center py-xl gap-md text-center">
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">
+          Recording. Keep going — you will see what we heard when you stop.
+        </p>
+<!-- Record Control -->
+<div class="relative flex items-center justify-center mt-md mb-sm">
+<div class="absolute w-[72px] h-[72px] rounded-full border-4 border-secondary animate-pulse-ring"></div>
+<button aria-label="Stop recording" class="w-[72px] h-[72px] rounded-full bg-secondary text-on-secondary shadow-md hover:bg-on-secondary-container transition-colors flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-display" style="font-variation-settings: 'FILL' 1;">mic</span>
+</button>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant">
+          Tap to start. Tap again when you have finished.
+        </p>
+</div>
+</section>
+</div>
+<!-- Right Rail (Monitor) -->
+<aside class="md:col-span-4 flex flex-col gap-md">
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0_1px_2px_rgba(13,27,42,.04)] border border-surface-variant flex flex-col gap-sm">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Monitor</h3>
+<!-- Camera Thumbnail -->
+<div class="relative w-full aspect-video rounded-lg overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover" data-alt="A focused, professional young adult sitting at a well-lit desk looking directly at a laptop webcam. The setting is a quiet, neutral home office with soft, even lighting typical of a high-quality video call. The mood is serious and prepared, fitting a formal academic interview context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOyjskdmteNaEpLPLXrdazWRM5aw9P-PGt5Y-sqlHA8Hiprq-B7EieyLq28jndNThu5YH9Gd8pFkTxRYYqVw2VPpc7QtoVMLVfotT9XCrCBNRakAA807sfx1aiJIDFJxn-XQIpQ-vk0SUOCjkMm7_OvMSNE_k_xWXiAf89uzAj--YnAWEndd2GoHvwfUVVTDUEP91Qba8MoPIn8LO8ayNRR7ED-iFnDe_8WEtcMGqmSvgonP7RaICY"/>
+<div class="absolute top-xs right-xs bg-error text-on-error rounded-full px-2 py-1 flex items-center gap-1 shadow-sm">
+<span class="w-2 h-2 rounded-full bg-on-error animate-pulse"></span>
+<span class="font-label-sm text-label-sm">REC</span>
+</div>
+</div>
+<!-- Status Chips -->
+<div class="flex flex-wrap gap-xs mt-xs">
+<div class="bg-surface-container-high text-on-surface px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">videocam</span> Camera On
+        </div>
+<div class="bg-surface-container-high text-on-surface px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">mic</span> Mic On
+        </div>
+<div class="bg-error-container text-on-error-container px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">flag</span> Flags 2
+        </div>
+</div>
+<!-- Sound Bar -->
+<div class="mt-sm">
+<div class="flex justify-between items-center mb-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Input Level</span>
+<span class="material-symbols-outlined text-[16px] text-secondary">volume_up</span>
+</div>
+<div class="w-full h-2 bg-surface-variant rounded-full overflow-hidden flex">
+<div class="w-2/3 bg-secondary h-full transition-all duration-300"></div>
+</div>
+</div>
+<!-- Notice -->
+<div class="mt-sm bg-tertiary-fixed text-on-tertiary-fixed p-sm rounded-lg flex items-start gap-sm border border-tertiary-fixed-dim">
+<span class="material-symbols-outlined text-on-tertiary-fixed mt-[2px]">lightbulb</span>
+<p class="font-body-sm text-body-sm">
+<strong>Room is too dark.</strong> Please ensure your face is clearly visible for the AI assessment to function optimally.
+        </p>
+</div>
+</div>
+<!-- End Button -->
+<button class="w-full py-sm px-md rounded-lg border border-outline text-primary font-label-md text-label-md hover:bg-surface-container-low transition-colors flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined">exit_to_app</span>
+      End interview and see results
+    </button>
+</aside>
+<!-- Below Fold Card -->
+<section class="md:col-span-12 mt-lg">
+<div class="bg-surface-container-low rounded-xl p-lg border border-surface-variant shadow-sm flex flex-col md:flex-row gap-xl items-start">
+<div class="md:w-1/3">
+<h3 class="font-headline-sm text-headline-sm text-primary mb-sm">BUILD EVERY ANSWER THIS WAY</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+          Structuring your thoughts under pressure is key to demonstrating institutional readiness. Utilize the P-E-E-Wrap framework.
+        </p>
+</div>
+<div class="md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="flex gap-sm items-start">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary font-label-md flex items-center justify-center shrink-0">P</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-1">Point</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">State your main argument or answer clearly upfront.</p>
+</div>
+</div>
+<div class="flex gap-sm items-start">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary font-label-md flex items-center justify-center shrink-0">E</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-1">Evidence</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Provide a specific example or data point to back it up.</p>
+</div>
+</div>
+<div class="flex gap-sm items-start">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary font-label-md flex items-center justify-center shrink-0">E</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-1">Explanation</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Connect the evidence back to your initial point and the question.</p>
+</div>
+</div>
+<div class="flex gap-sm items-start">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container font-label-md flex items-center justify-center shrink-0">W</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-1">Wrap</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Conclude with a brief, confident summary sentence.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</body></html>

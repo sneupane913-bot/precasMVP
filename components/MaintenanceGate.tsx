@@ -12,7 +12,7 @@ export async function MaintenanceGate({ children }: { children: React.ReactNode 
   return (
     <main className="grid min-h-screen place-items-center bg-ink px-6 py-16 text-white">
       <div className="max-w-lg text-center">
-        <div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-2xl bg-white/10 text-3xl">
+        <div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-card bg-surface/10 text-3xl">
           !
         </div>
 
@@ -21,13 +21,13 @@ export async function MaintenanceGate({ children }: { children: React.ReactNode 
         <p className="mb-8 leading-relaxed text-white/75">{s.maintenanceMessage}</p>
 
         {(s.contactName || s.contactPhone) && (
-          <div className="rounded-2xl bg-white/10 p-6">
+          <div className="rounded-card bg-surface/10 p-6">
             <p className="mb-2 text-sm uppercase tracking-wide text-white/50">Please contact</p>
             {s.contactName && <p className="text-lg font-bold">{s.contactName}</p>}
             {s.contactPhone && (
               <a
                 href={`tel:${s.contactPhone.replace(/\s/g, '')}`}
-                className="mt-1 inline-block text-2xl font-black tracking-wide text-emerald-400"
+                className="mt-1 inline-block text-2xl font-black tracking-wide text-go"
               >
                 {s.contactPhone}
               </a>

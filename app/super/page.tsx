@@ -504,7 +504,7 @@ export default function SuperAdminPage() {
       <main className="grid min-h-screen place-items-center bg-paper px-5">
         <div className="w-full max-w-sm">
           <h1 className="mb-1 font-serif text-2xl font-bold text-ink">Super admin</h1>
-          <p className="mb-6 text-slate-600">Everything across the platform.</p>
+          <p className="mb-6 text-ink-soft">Everything across the platform.</p>
           {/* Readable on request. The client was locked out of his own back
               office by a masked field he could not check. See PasscodeInput. */}
           <PasscodeInput
@@ -515,16 +515,16 @@ export default function SuperAdminPage() {
             autoFocus
                       name="super-passcode"
           />
-          {error && <p className="mb-3 font-medium text-red-600">{error}</p>}
+          {error && <p className="mb-3 font-medium text-stop">{error}</p>}
           <button
             onClick={loadAll}
             disabled={!key || busy}
-            className="w-full rounded-xl bg-ink px-6 py-3.5 font-bold text-white disabled:bg-slate-300"
+            className="w-full rounded-control bg-ink px-6 py-3.5 font-bold text-white disabled:bg-line-strong"
           >
             {busy ? 'Checking...' : 'Open'}
           </button>
           {!key && (
-            <p className="mt-2 text-sm font-semibold text-red-600">Enter the passcode to continue.</p>
+            <p className="mt-2 text-sm font-semibold text-stop">Enter the passcode to continue.</p>
           )}
         </div>
       </main>
@@ -560,18 +560,18 @@ export default function SuperAdminPage() {
   return (
     <div className="min-h-screen bg-paper lg:flex">
       {/* ---------------------------------------------------- side nav --- */}
-      <aside className="border-b border-slate-200 bg-surface-sunk px-5 py-5 lg:min-h-screen lg:w-64 lg:shrink-0 lg:border-b-0 lg:border-r lg:px-6 lg:py-8">
+      <aside className="border-b border-line bg-surface-sunk px-5 py-5 lg:min-h-screen lg:w-64 lg:shrink-0 lg:border-b-0 lg:border-r lg:px-6 lg:py-8">
         <div className="mb-6">
           <p className="font-serif text-xl font-bold text-ink">Admin portal</p>
-          <p className="text-sm text-slate-500">PreCAS Practice</p>
+          <p className="text-sm text-ink-quiet">PreCAS Practice</p>
         </div>
         <nav className="flex gap-2 overflow-x-auto lg:flex-col lg:gap-1">
           {nav.map((n) => (
             <button
               key={n.id}
               onClick={() => setTab(n.id)}
-              className={`whitespace-nowrap rounded-xl px-4 py-2.5 text-left text-sm font-semibold transition ${
-                tab === n.id ? 'bg-emerald-400 text-ink' : 'text-slate-600 hover:bg-white'
+              className={`whitespace-nowrap rounded-control px-4 py-2.5 text-left text-sm font-semibold transition ${
+                tab === n.id ? 'bg-go text-ink' : 'text-ink-soft hover:bg-surface'
               }`}
             >
               {n.label}
@@ -585,19 +585,19 @@ export default function SuperAdminPage() {
         <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="font-serif text-3xl font-bold text-ink">System overview</h1>
-            <p className="text-slate-600">Analytics and approvals</p>
+            <p className="text-ink-soft">Analytics and approvals</p>
           </div>
           <div className="flex gap-2">
             <button
               onClick={loadAll}
               disabled={busy}
-              className="rounded-xl border-2 border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 disabled:opacity-50"
+              className="rounded-control border-2 border-line-strong px-4 py-2.5 text-sm font-semibold text-ink-soft disabled:opacity-50"
             >
               {busy ? 'Loading...' : 'Refresh'}
             </button>
             <button
               onClick={exportCsv}
-              className="rounded-xl bg-ink px-4 py-2.5 text-sm font-bold text-white"
+              className="rounded-control bg-ink px-4 py-2.5 text-sm font-bold text-white"
             >
               Export to CSV
             </button>
@@ -605,12 +605,12 @@ export default function SuperAdminPage() {
         </div>
 
         {error && (
-          <p className="mb-4 rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3 font-medium text-red-800">
+          <p className="mb-4 rounded-control border-2 border-stop/30 bg-stop-tint px-4 py-3 font-medium text-stop">
             {error}
           </p>
         )}
         {notice && (
-          <p className="mb-4 rounded-xl border-2 border-emerald-200 bg-emerald-50 px-4 py-3 font-medium text-emerald-800">
+          <p className="mb-4 rounded-control border-2 border-go/30 bg-go-tint px-4 py-3 font-medium text-go-dark">
             {notice}
           </p>
         )}
@@ -621,15 +621,15 @@ export default function SuperAdminPage() {
              when it does not. A student in demo mode is shown sample text and
              told plainly it is not their voice, but the OWNER should never
              find that out from a student. */
-          <section className="mb-6 rounded-2xl border-2 border-amber-300 bg-amber-50 p-5">
-            <h2 className="mb-1 font-bold text-amber-900">
+          <section className="mb-6 rounded-card border-2 border-warn/40 bg-warn-tint p-5">
+            <h2 className="mb-1 font-bold text-warn">
               The AI is not switched on yet
             </h2>
-            <p className="text-sm leading-relaxed text-amber-900/90">
+            <p className="text-sm leading-relaxed text-warn/90">
               Nobody is being listened to. Students see clearly marked sample text instead of their
               own words, and no score is ever invented from it. To switch it on, set{' '}
-              <code className="rounded bg-white/70 px-1 font-mono">GROQ_API_KEY</code> for speech and{' '}
-              <code className="rounded bg-white/70 px-1 font-mono">GEMINI_API_KEY</code> for the
+              <code className="rounded bg-surface/70 px-1 font-mono">GROQ_API_KEY</code> for speech and{' '}
+              <code className="rounded bg-surface/70 px-1 font-mono">GEMINI_API_KEY</code> for the
               feedback, then redeploy. Keys live in the host, never in this screen, so nobody who
               gets into this dashboard can read or steal them.
             </p>
@@ -693,26 +693,26 @@ export default function SuperAdminPage() {
             )}
 
             <div className="grid gap-6 lg:grid-cols-3">
-              <section className="rounded-2xl border border-slate-200 bg-white lg:col-span-2">
-                <div className="border-b border-slate-200 p-5">
+              <section className="rounded-card border border-line bg-surface lg:col-span-2">
+                <div className="border-b border-line p-5">
                   <h2 className="font-serif text-lg font-bold text-ink">Where students come from</h2>
                 </div>
                 <div className="grid gap-4 p-5 sm:grid-cols-2">
-                  <div className="rounded-xl bg-surface-sunk p-4">
-                    <p className="text-sm text-slate-600">Direct students</p>
+                  <div className="rounded-control bg-surface-sunk p-4">
+                    <p className="text-sm text-ink-soft">Direct students</p>
                     <p className="text-2xl font-black text-ink">{direct}</p>
                   </div>
-                  <div className="rounded-xl bg-surface-sunk p-4">
-                    <p className="text-sm text-slate-600">Through a consultancy</p>
+                  <div className="rounded-control bg-surface-sunk p-4">
+                    <p className="text-sm text-ink-soft">Through a consultancy</p>
                     <p className="text-2xl font-black text-ink">{viaConsultancy}</p>
                   </div>
                 </div>
-                <div className="border-t border-slate-100 p-5">
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <div className="border-t border-line p-5">
+                  <p className="mb-3 text-micro font-semibold uppercase tracking-wide text-ink-quiet">
                     Consultancies our direct students named
                   </p>
                   {data.attribution.length === 0 ? (
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-ink-quiet">
                       Nothing yet. This fills up as students tell us who they are applying through,
                       and it is the list of consultancies worth approaching.
                     </p>
@@ -720,8 +720,8 @@ export default function SuperAdminPage() {
                     <ul className="space-y-2">
                       {data.attribution.slice(0, 8).map((a) => (
                         <li key={a.name} className="flex justify-between text-sm">
-                          <span className="capitalize text-slate-700">{a.name}</span>
-                          <span className="font-bold text-emerald-700">{a.count} students</span>
+                          <span className="capitalize text-ink-soft">{a.name}</span>
+                          <span className="font-bold text-go-dark">{a.count} students</span>
                         </li>
                       ))}
                     </ul>
@@ -729,26 +729,26 @@ export default function SuperAdminPage() {
                 </div>
               </section>
 
-              <section className="rounded-2xl border border-slate-200 bg-white">
-                <div className="border-b border-slate-200 p-5">
+              <section className="rounded-card border border-line bg-surface">
+                <div className="border-b border-line p-5">
                   <h2 className="font-serif text-lg font-bold text-ink">Referral leaders</h2>
-                  <p className="text-sm text-slate-600">Counted only when the friend paid.</p>
+                  <p className="text-sm text-ink-soft">Counted only when the friend paid.</p>
                 </div>
                 <div className="p-5">
                   {data.referralLeaderboard.length === 0 ? (
-                    <p className="text-sm text-slate-500">No paid referrals yet.</p>
+                    <p className="text-sm text-ink-quiet">No paid referrals yet.</p>
                   ) : (
                     <ol className="space-y-2">
                       {data.referralLeaderboard.slice(0, 10).map((l, i) => (
                         <li
                           key={l.code}
-                          className="flex items-center justify-between rounded-lg bg-surface-sunk px-3 py-2 text-sm"
+                          className="flex items-center justify-between rounded-control bg-surface-sunk px-3 py-2 text-sm"
                         >
-                          <span className="text-slate-700">
-                            <span className="mr-2 font-bold text-slate-400">#{i + 1}</span>
+                          <span className="text-ink-soft">
+                            <span className="mr-2 font-bold text-ink-quiet">#{i + 1}</span>
                             {l.name || l.code}
                           </span>
-                          <span className="font-bold text-emerald-700">{l.paid}</span>
+                          <span className="font-bold text-go-dark">{l.paid}</span>
                         </li>
                       ))}
                     </ol>
@@ -761,21 +761,21 @@ export default function SuperAdminPage() {
 
         {/* -------------------------------------------------- students --- */}
         {tab === 'students' && (
-          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-            <div className="border-b border-slate-200 p-5">
+          <section className="overflow-hidden rounded-card border border-line bg-surface">
+            <div className="border-b border-line p-5">
               <h2 className="font-serif text-lg font-bold text-ink">Students</h2>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-ink-soft">
                 Engagement and entitlement only. Answers are never shown here.
               </p>
             </div>
             {data.students.length === 0 ? (
-              <p className="p-10 text-center text-slate-500">
+              <p className="p-10 text-center text-ink-quiet">
                 No students yet. They appear the moment somebody signs in.
               </p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                  <thead className="bg-surface-sunk text-micro uppercase tracking-wide text-ink-quiet">
                     <tr>
                       <th className="px-5 py-3 font-semibold">Student</th>
                       <th className="px-3 py-3 font-semibold">Phone</th>
@@ -786,48 +786,48 @@ export default function SuperAdminPage() {
                       <th className="px-5 py-3 font-semibold">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-line">
                     {data.students.map((s) => (
                       <tr key={s.id}>
                         <td className="px-5 py-3">
                           <p className="font-semibold text-ink">{s.name || 'Unnamed'}</p>
-                          <p className="text-xs text-slate-500">{s.email || 'no email'}</p>
+                          <p className="text-micro text-ink-quiet">{s.email || 'no email'}</p>
                         </td>
                         {/* Tappable. If the only way to act on a row is to
                             copy a number out by hand, the row is a list entry
                             and not a tool. */}
-                        <td className="px-3 py-3 text-slate-600">
+                        <td className="px-3 py-3 text-ink-soft">
                           {s.phone ? (
                             <a href={`tel:${s.phone}`} className="font-medium text-ink underline underline-offset-2">
                               {s.phone}
                             </a>
                           ) : (
-                            <span className="text-slate-400">not given</span>
+                            <span className="text-ink-quiet">not given</span>
                           )}
                           {s.phone && s.whatsappConfirmed === false && (
-                            <span className="ml-1 block text-micro font-semibold text-amber-700">
+                            <span className="ml-1 block text-micro font-semibold text-warn">
                               not on WhatsApp
                             </span>
                           )}
                         </td>
-                        <td className="px-3 py-3 text-slate-600">
+                        <td className="px-3 py-3 text-ink-soft">
                           {s.consultancyId ? 'Consultancy' : 'Direct'}
                         </td>
-                        <td className="px-3 py-3 capitalize text-slate-600">
+                        <td className="px-3 py-3 capitalize text-ink-soft">
                           {s.attributionConsultancy || 'not said'}
                         </td>
                         {/* Giving credit without seeing what they already
                             have is guessing. This comes from the directory,
                             which is now loaded alongside the overview. */}
-                        <td className="px-3 py-3 tabular-nums text-slate-700">
+                        <td className="px-3 py-3 tabular-nums text-ink-soft">
                           {directory?.students.find((d) => d.id === s.id)?.mocksLeft ?? '-'}
                         </td>
                         <td className="px-3 py-3">
                           <span
-                            className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                            className={`rounded-full px-2.5 py-1 text-micro font-bold ${
                               s.status === 'active'
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : 'bg-red-100 text-red-800'
+                                ? 'bg-go-tint text-go-dark'
+                                : 'bg-stop-tint text-stop'
                             }`}
                           >
                             {s.status}
@@ -842,7 +842,7 @@ export default function SuperAdminPage() {
                             <button
                               onClick={() => grantCredit(s.id, s.name || s.email || 'this student')}
                               disabled={busy}
-                              className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
+                              className="rounded-control bg-go px-3 py-1.5 text-micro font-bold text-white disabled:opacity-50"
                             >
                               Give credit
                             </button>
@@ -850,7 +850,7 @@ export default function SuperAdminPage() {
                               onClick={() =>
                                 setStudentStatus(s.id, s.status === 'active' ? 'disabled' : 'active')
                               }
-                              className="rounded-lg border-2 border-slate-300 px-3 py-1.5 text-xs font-bold text-slate-700"
+                              className="rounded-control border-2 border-line-strong px-3 py-1.5 text-micro font-bold text-ink-soft"
                             >
                               {s.status === 'active' ? 'Disable' : 'Enable'}
                             </button>
@@ -867,31 +867,31 @@ export default function SuperAdminPage() {
 
         {/* -------------------------------------------------- payments --- */}
         {tab === 'payments' && (
-          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-            <div className="border-b border-slate-200 p-5">
+          <section className="overflow-hidden rounded-card border border-line bg-surface">
+            <div className="border-b border-line p-5">
               <h2 className="font-serif text-lg font-bold text-ink">Payments</h2>
-              <p className="mb-3 text-sm text-slate-600">
+              <p className="mb-3 text-sm text-ink-soft">
                 Check the transaction id in the receiver&apos;s own wallet ledger before approving. A
                 screenshot is evidence, never proof.
               </p>
-              <div className="flex flex-wrap gap-2 text-xs font-bold">
-                <span className="rounded-full bg-amber-100 px-3 py-1 text-amber-800">
+              <div className="flex flex-wrap gap-2 text-micro font-bold">
+                <span className="rounded-full bg-warn-tint px-3 py-1 text-warn">
                   {awaiting.length} waiting
                 </span>
-                <span className="rounded-full bg-emerald-100 px-3 py-1 text-emerald-800">
+                <span className="rounded-full bg-go-tint px-3 py-1 text-go-dark">
                   {approvedCount} approved
                 </span>
-                <span className="rounded-full bg-red-100 px-3 py-1 text-red-800">
+                <span className="rounded-full bg-stop-tint px-3 py-1 text-stop">
                   {rejectedCount} rejected
                 </span>
               </div>
             </div>
             {orders.length === 0 ? (
-              <p className="p-10 text-center text-slate-500">No payments yet.</p>
+              <p className="p-10 text-center text-ink-quiet">No payments yet.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                  <thead className="bg-surface-sunk text-micro uppercase tracking-wide text-ink-quiet">
                     <tr>
                       <th className="px-5 py-3 font-semibold">Student</th>
                       <th className="px-3 py-3 font-semibold">Pack</th>
@@ -902,16 +902,16 @@ export default function SuperAdminPage() {
                       <th className="px-5 py-3 font-semibold">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-line">
                     {orders.map((o) => (
                       <tr key={o.id}>
                         <td className="px-5 py-3">
                           <p className="font-semibold text-ink">{o.studentName || 'Unnamed'}</p>
-                          <p className="text-xs text-slate-500">{o.payerName || o.studentEmail || ''}</p>
+                          <p className="text-micro text-ink-quiet">{o.payerName || o.studentEmail || ''}</p>
                         </td>
-                        <td className="px-3 py-3 uppercase text-slate-600">{o.packCode}</td>
+                        <td className="px-3 py-3 uppercase text-ink-soft">{o.packCode}</td>
                         <td className="px-3 py-3 tabular-nums">NPR {o.amountNpr.toLocaleString()}</td>
-                        <td className="px-3 py-3 font-mono text-xs text-slate-600">
+                        <td className="px-3 py-3 font-mono text-micro text-ink-soft">
                           {o.walletTxnId || '—'}
                         </td>
                         {/* N-13. When money has not landed, the only useful next
@@ -920,7 +920,7 @@ export default function SuperAdminPage() {
                             while a student assumes they were robbed. The last 4
                             they typed sits underneath, because that is what you
                             check against the wallet ledger. */}
-                        <td className="px-3 py-3 text-xs">
+                        <td className="px-3 py-3 text-micro">
                           {o.payerPhone ? (
                             <>
                               <a href={`tel:${o.payerPhone}`} className="font-semibold text-ink underline underline-offset-2">
@@ -940,16 +940,16 @@ export default function SuperAdminPage() {
                                 )}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="ml-2 rounded-md bg-emerald-100 px-2 py-0.5 font-semibold text-emerald-800"
+                                className="ml-2 rounded-md bg-go-tint px-2 py-0.5 font-semibold text-go-dark"
                               >
                                 WhatsApp
                               </a>
                             </>
                           ) : (
-                            <span className="text-slate-400">not given</span>
+                            <span className="text-ink-quiet">not given</span>
                           )}
                           {o.payerPhoneSuffix && (
-                            <span className="block text-micro text-slate-500">
+                            <span className="block text-micro text-ink-quiet">
                               paid from ...{o.payerPhoneSuffix}
                             </span>
                           )}
@@ -958,19 +958,19 @@ export default function SuperAdminPage() {
                               WhatsApp, a message will vanish and the payment
                               sits unapproved while they wait. Ring it. */}
                           {o.payerPhone && o.payerPhoneWhatsappConfirmed === false && (
-                            <span className="block text-micro font-semibold text-amber-700">
+                            <span className="block text-micro font-semibold text-warn">
                               not on WhatsApp, call instead
                             </span>
                           )}
                         </td>
                         <td className="px-3 py-3">
                           <span
-                            className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                            className={`rounded-full px-2.5 py-1 text-micro font-bold ${
                               o.state === 'verified'
-                                ? 'bg-emerald-100 text-emerald-800'
+                                ? 'bg-go-tint text-go-dark'
                                 : o.state === 'rejected'
-                                  ? 'bg-red-100 text-red-800'
-                                  : 'bg-amber-100 text-amber-800'
+                                  ? 'bg-stop-tint text-stop'
+                                  : 'bg-warn-tint text-warn'
                             }`}
                           >
                             {o.state}
@@ -982,20 +982,20 @@ export default function SuperAdminPage() {
                               <button
                                 onClick={() => verify(o.id, o)}
                                 disabled={busy}
-                                className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
+                                className="rounded-control bg-go px-3 py-1.5 text-micro font-bold text-white disabled:opacity-50"
                               >
                                 Approve
                               </button>
                               <button
                                 onClick={() => reject(o.id)}
                                 disabled={busy}
-                                className="rounded-lg border-2 border-red-300 px-3 py-1.5 text-xs font-bold text-red-700 disabled:opacity-50"
+                                className="rounded-control border-2 border-stop/40 px-3 py-1.5 text-micro font-bold text-stop disabled:opacity-50"
                               >
                                 Reject
                               </button>
                             </div>
                           ) : (
-                            <span className="text-xs text-slate-400">done</span>
+                            <span className="text-micro text-ink-quiet">done</span>
                           )}
                         </td>
                       </tr>
@@ -1014,9 +1014,9 @@ export default function SuperAdminPage() {
             growth plan is consultancies, that is not a missing nicety. */}
         {tab === 'consultancies' && (
           <section>
-            <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-5">
+            <div className="mb-6 rounded-card border border-line bg-surface p-5">
               <h2 className="mb-1 font-serif text-lg font-bold text-ink">Add a consultancy</h2>
-              <p className="mb-4 text-sm leading-relaxed text-slate-600">
+              <p className="mb-4 text-sm leading-relaxed text-ink-soft">
                 They get their own link and their own portal. Nothing works until you approve them
                 below, so it is safe to set one up before the money arrives.
               </p>
@@ -1065,7 +1065,7 @@ export default function SuperAdminPage() {
                   <button
                     type="submit"
                     disabled={busy}
-                    className="w-full rounded-xl bg-ink px-5 py-3 font-bold text-white disabled:opacity-50"
+                    className="w-full rounded-control bg-ink px-5 py-3 font-bold text-white disabled:opacity-50"
                   >
                     {busy ? 'Working...' : 'Create'}
                   </button>
@@ -1073,19 +1073,19 @@ export default function SuperAdminPage() {
               </form>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-              <div className="border-b border-slate-200 p-5">
+            <div className="overflow-hidden rounded-card border border-line bg-surface">
+              <div className="border-b border-line p-5">
                 <h2 className="font-serif text-lg font-bold text-ink">Consultancies</h2>
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-ink-soft">
                   Seats given out, seats left, and how many students came through their link.
                 </p>
               </div>
               {(directory?.consultancies ?? []).length === 0 ? (
-                <p className="p-10 text-center text-slate-500">None yet.</p>
+                <p className="p-10 text-center text-ink-quiet">None yet.</p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm">
-                    <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                    <thead className="bg-surface-sunk text-micro uppercase tracking-wide text-ink-quiet">
                       <tr>
                         <th className="px-5 py-3 font-semibold">Consultancy</th>
                         <th className="px-3 py-3 font-semibold">Seats</th>
@@ -1095,34 +1095,34 @@ export default function SuperAdminPage() {
                         <th className="px-5 py-3 font-semibold">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-line">
                       {(directory?.consultancies ?? []).map((c) => (
                         <tr key={c.id}>
                           <td className="px-5 py-3">
                             <p className="font-semibold text-ink">{c.name}</p>
-                            <p className="font-mono text-xs text-slate-500">/c/{c.slug}</p>
+                            <p className="font-mono text-micro text-ink-quiet">/c/{c.slug}</p>
                           </td>
-                          <td className="px-3 py-3 tabular-nums text-slate-700">
+                          <td className="px-3 py-3 tabular-nums text-ink-soft">
                             {c.seatsGivenOut} of {c.seatsTotal}
-                            <span className="block text-xs text-slate-500">
+                            <span className="block text-micro text-ink-quiet">
                               {c.seatsLeft} left
                               {c.renewals > 0 ? `, ${c.renewals} top ups` : ''}
                             </span>
                           </td>
-                          <td className="px-3 py-3 tabular-nums text-slate-700">
+                          <td className="px-3 py-3 tabular-nums text-ink-soft">
                             {c.studentsFromLink}
                           </td>
-                          <td className="px-3 py-3 tabular-nums text-slate-700">
+                          <td className="px-3 py-3 tabular-nums text-ink-soft">
                             NPR {c.paidNpr.toLocaleString()}
                           </td>
                           <td className="px-3 py-3">
                             <span
-                              className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                              className={`rounded-full px-2.5 py-1 text-micro font-bold ${
                                 c.status === 'approved'
-                                  ? 'bg-emerald-100 text-emerald-800'
+                                  ? 'bg-go-tint text-go-dark'
                                   : c.status === 'pending'
-                                    ? 'bg-amber-100 text-amber-800'
-                                    : 'bg-red-100 text-red-800'
+                                    ? 'bg-warn-tint text-warn'
+                                    : 'bg-stop-tint text-stop'
                               }`}
                             >
                               {c.status}
@@ -1134,7 +1134,7 @@ export default function SuperAdminPage() {
                                 <button
                                   onClick={() => setConsultancyStatus(c, 'approved')}
                                   disabled={busy}
-                                  className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
+                                  className="rounded-control bg-go px-3 py-1.5 text-micro font-bold text-white disabled:opacity-50"
                                 >
                                   Approve
                                 </button>
@@ -1143,7 +1143,7 @@ export default function SuperAdminPage() {
                                 <button
                                   onClick={() => setConsultancyStatus(c, 'suspended')}
                                   disabled={busy}
-                                  className="rounded-lg border-2 border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 disabled:opacity-50"
+                                  className="rounded-control border-2 border-line-strong px-3 py-1.5 text-micro font-semibold text-ink-soft disabled:opacity-50"
                                 >
                                   Suspend
                                 </button>
@@ -1153,7 +1153,7 @@ export default function SuperAdminPage() {
                                 <button
                                   onClick={() => setLabNetworks(c)}
                                   disabled={busy}
-                                  className="rounded-lg border-2 border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 disabled:opacity-50"
+                                  className="rounded-control border-2 border-line-strong px-3 py-1.5 text-micro font-semibold text-ink-soft disabled:opacity-50"
                                 >
                                   Lab networks
                                 </button>
@@ -1174,9 +1174,9 @@ export default function SuperAdminPage() {
             N-25. Add a question to the live bank with no deploy. The action
             worked from the day it was written; nothing ever called it. */}
         {tab === 'questions' && (
-          <section className="rounded-2xl border border-slate-200 bg-white p-5">
+          <section className="rounded-card border border-line bg-surface p-5">
             <h2 className="mb-1 font-serif text-lg font-bold text-ink">Add a question</h2>
-            <p className="mb-4 text-sm leading-relaxed text-slate-600">
+            <p className="mb-4 text-sm leading-relaxed text-ink-soft">
               It goes into the live bank straight away, with no deploy. Write what a real
               interviewer would ask, and say what a good answer has to show, because that is what
               the marking uses.
@@ -1211,7 +1211,7 @@ export default function SuperAdminPage() {
                 maxLength={400}
                 rows={2}
                 placeholder="Who is paying for your studies, and how do you know they can?"
-                className="mb-3 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+                className="mb-3 w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
               />
               <label className="mb-1 block text-sm font-semibold text-ink">
                 What a good answer must show
@@ -1223,12 +1223,12 @@ export default function SuperAdminPage() {
                 maxLength={300}
                 rows={2}
                 placeholder="A named person, their real occupation, and awareness of the actual amount."
-                className="mb-4 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+                className="mb-4 w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
               />
               <button
                 type="submit"
                 disabled={busy}
-                className="rounded-xl bg-ink px-5 py-3 font-bold text-white disabled:opacity-50"
+                className="rounded-control bg-ink px-5 py-3 font-bold text-white disabled:opacity-50"
               >
                 {busy ? 'Adding...' : 'Add to the bank'}
               </button>
@@ -1242,20 +1242,20 @@ export default function SuperAdminPage() {
             that justifies letting consultancies approve payments was invisible
             to the one person it protects. */}
         {tab === 'audit' && (
-          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-            <div className="border-b border-slate-200 p-5">
+          <section className="overflow-hidden rounded-card border border-line bg-surface">
+            <div className="border-b border-line p-5">
               <h2 className="font-serif text-lg font-bold text-ink">Who did what</h2>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-ink-soft">
                 Newest first. This is the record that makes letting a consultancy approve their own
                 students safe to allow.
               </p>
             </div>
             {auditRows.length === 0 ? (
-              <p className="p-10 text-center text-slate-500">Nothing recorded yet.</p>
+              <p className="p-10 text-center text-ink-quiet">Nothing recorded yet.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                  <thead className="bg-surface-sunk text-micro uppercase tracking-wide text-ink-quiet">
                     <tr>
                       <th className="px-5 py-3 font-semibold">When</th>
                       <th className="px-3 py-3 font-semibold">Who</th>
@@ -1263,18 +1263,18 @@ export default function SuperAdminPage() {
                       <th className="px-5 py-3 font-semibold">Details</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-line">
                     {auditRows.map((a) => (
                       <tr key={a.id}>
-                        <td className="whitespace-nowrap px-5 py-3 text-xs text-slate-500">
+                        <td className="whitespace-nowrap px-5 py-3 text-micro text-ink-quiet">
                           {new Date(a.createdAt).toLocaleString()}
                         </td>
                         <td className="px-3 py-3">
                           <span
-                            className={`rounded-full px-2 py-0.5 text-xs font-bold ${
+                            className={`rounded-full px-2 py-0.5 text-micro font-bold ${
                               a.actorRole === 'admin'
-                                ? 'bg-amber-100 text-amber-800'
-                                : 'bg-slate-100 text-slate-700'
+                                ? 'bg-warn-tint text-warn'
+                                : 'bg-surface-sunk text-ink-soft'
                             }`}
                           >
                             {a.actorRole === 'admin' ? 'consultancy' : a.actorRole}
@@ -1283,12 +1283,12 @@ export default function SuperAdminPage() {
                         <td className="px-3 py-3 font-medium text-ink">
                           {a.action.replace(/_/g, ' ')}
                           {a.before !== null && a.after !== null && (
-                            <span className="block text-xs text-slate-500">
+                            <span className="block text-micro text-ink-quiet">
                               {a.before} to {a.after}
                             </span>
                           )}
                         </td>
-                        <td className="px-5 py-3 text-xs text-slate-600">{a.note}</td>
+                        <td className="px-5 py-3 text-micro text-ink-soft">{a.note}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1328,11 +1328,11 @@ export default function SuperAdminPage() {
                 countdown feature: the deadline a student sees is a real server
                 timestamp tied to a named reason. A lever that could turn it
                 into a fake urgency banner would be worse than no lever. */}
-            <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
+            <section className="mt-6 rounded-card border border-line bg-surface p-5">
               <h2 className="mb-1 font-serif text-lg font-bold text-ink">
                 The offer after the free questions
               </h2>
-              <p className="mb-4 text-sm leading-relaxed text-slate-600">
+              <p className="mb-4 text-sm leading-relaxed text-ink-soft">
                 When a student finishes their free ten, they get one real deadline and extra mocks if
                 they buy inside it. The deadline is theirs, it is set once, and it is never reissued
                 or restarted.
@@ -1377,9 +1377,9 @@ export default function SuperAdminPage() {
                       min={15}
                       max={1440}
                       defaultValue={data.rewardRule.windowMinutes}
-                      className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm outline-none focus:border-ink"
+                      className="w-full rounded-control border-2 border-line px-4 py-3 text-sm outline-none focus:border-ink"
                     />
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 text-micro text-ink-quiet">
                       15 minutes to 24 hours. Shorter is pressure, longer is not a real deadline.
                     </p>
                   </div>
@@ -1394,7 +1394,7 @@ export default function SuperAdminPage() {
                       min={0}
                       max={10}
                       defaultValue={data.rewardRule.bonusPrep}
-                      className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm outline-none focus:border-ink"
+                      className="w-full rounded-control border-2 border-line px-4 py-3 text-sm outline-none focus:border-ink"
                     />
                   </div>
                   <div>
@@ -1408,7 +1408,7 @@ export default function SuperAdminPage() {
                       min={0}
                       max={10}
                       defaultValue={data.rewardRule.bonusSerious}
-                      className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm outline-none focus:border-ink"
+                      className="w-full rounded-control border-2 border-line px-4 py-3 text-sm outline-none focus:border-ink"
                     />
                   </div>
                 </div>
@@ -1423,9 +1423,9 @@ export default function SuperAdminPage() {
                   minLength={10}
                   maxLength={300}
                   defaultValue={data.rewardRule.publicReason}
-                  className="mb-1 w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm outline-none focus:border-ink"
+                  className="mb-1 w-full rounded-control border-2 border-line px-4 py-3 text-sm outline-none focus:border-ink"
                 />
-                <p className="mb-4 text-xs leading-relaxed text-slate-500">
+                <p className="mb-4 text-micro leading-relaxed text-ink-quiet">
                   This sits next to a real countdown, so it has to name a real reason. Never invent
                   scarcity, and never say a price is going up when it is not. We add value, we do
                   not discount, so a student who paid yesterday was not overcharged.
@@ -1434,7 +1434,7 @@ export default function SuperAdminPage() {
                 <button
                   type="submit"
                   disabled={busy}
-                  className="rounded-xl bg-ink px-5 py-3 font-bold text-white disabled:opacity-50"
+                  className="rounded-control bg-ink px-5 py-3 font-bold text-white disabled:opacity-50"
                 >
                   {busy ? 'Saving...' : 'Save the offer'}
                 </button>
@@ -1445,28 +1445,28 @@ export default function SuperAdminPage() {
 
         {/* --------------------------------------------------- flagged --- */}
         {tab === 'flagged' && (
-          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-            <div className="border-b border-slate-200 p-5">
+          <section className="overflow-hidden rounded-card border border-line bg-surface">
+            <div className="border-b border-line p-5">
               <h2 className="font-serif text-lg font-bold text-ink">Flagged free trials</h2>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-ink-soft">
                 These students were held back automatically. They can still browse and buy. If they
                 look genuine, switch their free questions on.
               </p>
             </div>
             {flagged.length === 0 ? (
-              <p className="p-10 text-center text-slate-500">Nothing flagged. </p>
+              <p className="p-10 text-center text-ink-quiet">Nothing flagged. </p>
             ) : (
-              <ul className="divide-y divide-slate-100">
+              <ul className="divide-y divide-line">
                 {flagged.map((f) => (
                   <li key={f.id} className="flex flex-wrap items-center justify-between gap-3 p-5">
                     <div>
                       <p className="font-semibold text-ink">{f.studentName || 'Unnamed student'}</p>
-                      <p className="text-xs text-slate-500">{f.studentEmail || ''}</p>
-                      <p className="mt-1 text-sm text-red-700">
+                      <p className="text-micro text-ink-quiet">{f.studentEmail || ''}</p>
+                      <p className="mt-1 text-sm text-stop">
                         {f.reason || (f.riskReasons ?? []).join('; ') || 'Flagged automatically'}
                       </p>
                       {f.fingerprintHash && (
-                        <p className="mt-0.5 font-mono text-micro text-slate-400">
+                        <p className="mt-0.5 font-mono text-micro text-ink-quiet">
                           device {f.fingerprintHash.slice(0, 18)}
                         </p>
                       )}
@@ -1475,14 +1475,14 @@ export default function SuperAdminPage() {
                       <button
                         onClick={() => resolveFlag(f.id, true)}
                         disabled={busy}
-                        className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
+                        className="rounded-control bg-go px-3 py-2 text-micro font-bold text-white disabled:opacity-50"
                       >
                         Switch free questions on
                       </button>
                       <button
                         onClick={() => resolveFlag(f.id, false)}
                         disabled={busy}
-                        className="rounded-lg border-2 border-slate-300 px-3 py-2 text-xs font-bold text-slate-700 disabled:opacity-50"
+                        className="rounded-control border-2 border-line-strong px-3 py-2 text-micro font-bold text-ink-soft disabled:opacity-50"
                       >
                         Keep held
                       </button>
@@ -1498,7 +1498,7 @@ export default function SuperAdminPage() {
                         <button
                           onClick={() => blockDevice(f.fingerprintHash as string, f.studentName)}
                           disabled={busy}
-                          className="rounded-lg border-2 border-amber-300 px-3 py-2 text-xs font-bold text-amber-800 disabled:opacity-50"
+                          className="rounded-control border-2 border-warn/40 px-3 py-2 text-micro font-bold text-warn disabled:opacity-50"
                         >
                           Stop free trials from this device
                         </button>
@@ -1514,7 +1514,7 @@ export default function SuperAdminPage() {
         {/* A12 / LIVE-004: prove which revision is live, so an audit is never
             run against a stale deploy again. */}
         {data.build && (
-          <p className="mt-10 text-center text-xs text-slate-400">
+          <p className="mt-10 text-center text-micro text-ink-quiet">
             Build {data.build.shortSha} · {data.build.context} · {data.build.branch} · built{' '}
             {new Date(data.build.builtAt).toLocaleString()}
           </p>
@@ -1552,19 +1552,19 @@ function Stat({
   const good = tone === 'good';
   return (
     <div
-      className={`rounded-2xl border p-5 ${
+      className={`rounded-card border p-5 ${
         accent
           ? good
-            ? 'border-emerald-300 bg-emerald-100'
-            : 'border-amber-300 bg-amber-50'
-          : 'border-slate-200 bg-white'
+            ? 'border-go/40 bg-go-tint'
+            : 'border-warn/40 bg-warn-tint'
+          : 'border-line bg-surface'
       }`}
     >
-      <p className="mb-2 text-sm text-slate-600">{label}</p>
+      <p className="mb-2 text-sm text-ink-soft">{label}</p>
       <p className="font-serif text-3xl font-black text-ink">{value}</p>
       <p
-        className={`mt-1 text-xs ${
-          accent ? (good ? 'font-semibold text-emerald-800' : 'font-semibold text-amber-800') : 'text-slate-500'
+        className={`mt-1 text-micro ${
+          accent ? (good ? 'font-semibold text-go-dark' : 'font-semibold text-warn') : 'text-ink-quiet'
         }`}
       >
         {hint}
@@ -1597,7 +1597,7 @@ function Field({
     <div>
       <label htmlFor={name} className="mb-1 block text-sm font-semibold text-ink">
         {label}
-        {!required && <span className="font-normal text-slate-500"> (optional)</span>}
+        {!required && <span className="font-normal text-ink-quiet"> (optional)</span>}
       </label>
       <input
         id={name}
@@ -1605,9 +1605,9 @@ function Field({
         type={type}
         required={required}
         placeholder={placeholder}
-        className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm outline-none focus:border-ink"
+        className="w-full rounded-control border-2 border-line px-4 py-3 text-sm outline-none focus:border-ink"
       />
-      {hint && <p className="mt-1 text-xs text-slate-500">{hint}</p>}
+      {hint && <p className="mt-1 text-micro text-ink-quiet">{hint}</p>}
     </div>
   );
 }

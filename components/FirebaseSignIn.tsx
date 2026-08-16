@@ -253,7 +253,7 @@ export function FirebaseSignIn({
     return (
       <button
         disabled
-        className="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-slate-200 bg-white px-6 py-4 text-lg font-bold text-slate-400"
+        className="flex w-full items-center justify-center gap-3 rounded-control border-2 border-line bg-surface px-6 py-4 text-lg font-bold text-ink-quiet"
       >
         Getting ready...
       </button>
@@ -263,9 +263,9 @@ export function FirebaseSignIn({
   // ---- Development: no Firebase project configured yet -------------------
   if (!config) {
     return (
-      <div className="rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50 p-5">
-        <p className="mb-1 font-bold text-amber-900">Google sign-in is not switched on yet</p>
-        <p className="mb-4 text-sm leading-relaxed text-amber-900/90">
+      <div className="rounded-card border-2 border-dashed border-warn/40 bg-warn-tint p-5">
+        <p className="mb-1 font-bold text-warn">Google sign-in is not switched on yet</p>
+        <p className="mb-4 text-sm leading-relaxed text-warn/90">
           Add the Firebase keys to switch on the real button. Until then you can sign in with a test
           name so the rest of the flow works. This test route is refused in production.
         </p>
@@ -274,17 +274,17 @@ export function FirebaseSignIn({
             value={devHandle}
             onChange={(e) => setDevHandle(e.target.value.replace(/[^a-z0-9]/gi, ''))}
             placeholder="test name, e.g. sujan"
-            className="flex-1 rounded-xl border-2 border-amber-200 px-3 py-2.5"
+            className="flex-1 rounded-control border-2 border-warn/40 px-3 py-2.5"
           />
           <button
             onClick={() => devHandle && exchange(`dev:${devHandle}`)}
             disabled={!devHandle || busy}
-            className="rounded-xl bg-ink px-5 py-2.5 font-bold text-white disabled:bg-slate-300"
+            className="rounded-control bg-ink px-5 py-2.5 font-bold text-white disabled:bg-line-strong"
           >
             {busy ? '...' : 'Continue'}
           </button>
         </div>
-        {error && <p className="mt-3 font-medium text-red-700">{error}</p>}
+        {error && <p className="mt-3 font-medium text-stop">{error}</p>}
       </div>
     );
   }
@@ -294,7 +294,7 @@ export function FirebaseSignIn({
       <button
         onClick={signIn}
         disabled={busy}
-        className="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-slate-300 bg-white px-6 py-4 text-lg font-bold text-slate-700 transition active:scale-[0.99] disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-3 rounded-control border-2 border-line-strong bg-surface px-6 py-4 text-lg font-bold text-ink-soft transition active:scale-[0.99] disabled:opacity-60"
       >
         <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden>
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -306,9 +306,9 @@ export function FirebaseSignIn({
       </button>
 
       {error && (
-        <div className="mt-3 rounded-xl bg-red-50 px-4 py-3 text-center">
-          <p className="font-medium text-red-700">{error}</p>
-          <p className="mt-1 text-xs text-red-500">
+        <div className="mt-3 rounded-control bg-stop-tint px-4 py-3 text-center">
+          <p className="font-medium text-stop">{error}</p>
+          <p className="mt-1 text-micro text-stop">
             If this keeps happening, send us this: <span className="font-mono">{detail}</span>
           </p>
         </div>

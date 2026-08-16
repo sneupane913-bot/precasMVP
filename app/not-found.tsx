@@ -14,7 +14,7 @@ export default function NotFound() {
         </Link>
 
         <h1 className="mb-3 font-serif text-3xl font-bold text-ink">We could not find that page</h1>
-        <p className="mb-8 leading-relaxed text-slate-600">
+        <p className="mb-8 leading-relaxed text-ink-soft">
           The link may be old, or the practice you are looking for may have finished. Nothing you
           have paid for is lost.
         </p>
@@ -22,13 +22,13 @@ export default function NotFound() {
         <div className="flex flex-col gap-3">
           <Link
             href="/universities"
-            className="inline-flex w-full items-center justify-center rounded-xl bg-ink px-6 py-4 font-bold text-white"
+            className="inline-flex w-full items-center justify-center rounded-control bg-ink px-6 py-4 font-bold text-white"
           >
             Choose a university and practise
           </Link>
           <Link
             href="/"
-            className="inline-flex w-full items-center justify-center rounded-xl border-2 border-slate-300 px-6 py-4 font-semibold text-slate-700"
+            className="inline-flex w-full items-center justify-center rounded-control border-2 border-line-strong px-6 py-4 font-semibold text-ink-soft"
           >
             Go to the home page
           </Link>

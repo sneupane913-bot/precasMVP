@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Check your setup - PreCAS Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Noto+Serif:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "background": "#f8f9fc",
+                        "inverse-surface": "#2e3133",
+                        "primary-container": "#0f1c2c",
+                        "surface-bright": "#f8f9fc",
+                        "secondary-container": "#82fab7",
+                        "surface-tint": "#525f71",
+                        "on-secondary-fixed-variant": "#005231",
+                        "primary-fixed": "#d6e4f9",
+                        "tertiary-container": "#281804",
+                        "secondary-fixed": "#82fab7",
+                        "on-secondary-container": "#007347",
+                        "inverse-on-surface": "#f0f1f4",
+                        "primary": "#000000",
+                        "primary-fixed-dim": "#bac8dc",
+                        "surface-container-highest": "#e1e2e5",
+                        "on-surface-variant": "#44474c",
+                        "outline-variant": "#c4c6cc",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#feddba",
+                        "tertiary": "#000000",
+                        "surface-container-high": "#e7e8eb",
+                        "on-tertiary-fixed-variant": "#584329",
+                        "on-primary-fixed": "#0f1c2c",
+                        "on-tertiary-fixed": "#281804",
+                        "on-primary-container": "#778598",
+                        "on-primary-fixed-variant": "#3a4859",
+                        "surface-dim": "#d9dadd",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#edeef1",
+                        "secondary": "#006d42",
+                        "on-tertiary-container": "#9a7f61",
+                        "inverse-primary": "#bac8dc",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed": "#002111",
+                        "outline": "#74777d",
+                        "surface-container-low": "#f2f3f6",
+                        "tertiary-fixed-dim": "#e0c1a0",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#191c1e",
+                        "secondary-fixed-dim": "#65dd9c",
+                        "surface": "#f8f9fc",
+                        "surface-variant": "#e1e2e5",
+                        "on-background": "#191c1e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1120px",
+                        "sm": "16px",
+                        "base": "4px",
+                        "gutter": "20px",
+                        "xs": "8px",
+                        "md": "24px",
+                        "lg": "40px",
+                        "xl": "64px"
+                    },
+                    "fontFamily": {
+                        "display": ["Noto Serif"],
+                        "headline-sm": ["Noto Serif"],
+                        "display-mobile": ["Noto Serif"],
+                        "label-sm": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"],
+                        "label-md": ["Hanken Grotesk"],
+                        "headline-md": ["Noto Serif"],
+                        "body-sm": ["Hanken Grotesk"],
+                        "headline-lg": ["Noto Serif"]
+                    },
+                    "fontSize": {
+                        "display": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "display-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased">
+<!-- Top Navigation suppressed as requested (Setup/Transactional flow) -->
+<main class="flex-grow flex flex-col items-center justify-start py-xl px-gutter w-full max-w-[800px] mx-auto">
+<!-- Header -->
+<header class="w-full text-center mb-lg">
+<h1 class="font-headline-lg text-headline-lg text-primary mb-sm">Check your setup</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+                This interview is recorded with your camera on. Let us make sure everything works.
+            </p>
+</header>
+<!-- Main Content Area -->
+<div class="w-full flex flex-col gap-lg">
+<!-- Camera Preview -->
+<div class="w-full aspect-video bg-surface-variant rounded-xl overflow-hidden relative shadow-sm border border-outline-variant flex items-center justify-center">
+<!-- Simulated Camera Feed -->
+<div class="absolute inset-0 bg-surface-container-high flex flex-col items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-display mb-xs opacity-50" data-icon="videocam">videocam</span>
+<span class="font-label-md text-label-md">Camera Active</span>
+</div>
+<!-- Image representation of a person setting up, matching "Academic Distinction" -->
+<img alt="Camera preview feed" class="absolute inset-0 w-full h-full object-cover opacity-80" data-alt="A high-quality, realistic photograph showing a professional environment from a webcam perspective. The scene depicts a well-lit, quiet study room or home office with neutral, sophisticated decor in soft white and gray tones. A subtle blur suggests depth of field, focusing on a clean, orderly desk setup. The aesthetic is institutional, serious, and academic, devoid of distracting elements or bright, trendy colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCo9CT73hbhBs_V9JD2jI_TU0oaU_4zLkAtx2uLMijJDHpGiZQri0yuvtg3EA1jPp66SDnEhPNhn3pdrdbcBd4wFyUn848el9HqMA6RpiMxNW5CNq3g00YF_yXLzQWkLUdu0n45M_UcRuFoH3Vr1vtlfeoA1svZ85OwxQSDf8tqt4IlCNLquCXzqMWFrY3frGFRmx1G5vA1paN28nhVJ-Qo-Bz5oRj634si_NRpX10C_aaR8c3HykUC"/>
+</div>
+<!-- Status List -->
+<div class="w-full bg-surface rounded-xl shadow-[0_1px_2px_rgba(13,27,42,.04)] border border-surface-container-high p-md flex flex-col gap-sm">
+<!-- Status Item 1: Camera -->
+<div class="flex items-center gap-sm pb-sm border-b border-surface-variant last:border-0 last:pb-0">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container shrink-0">
+<span class="material-symbols-outlined" data-icon="check_circle" data-weight="fill">check_circle</span>
+</div>
+<div class="flex-grow">
+<h3 class="font-label-md text-label-md text-on-surface">Camera</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Ready</p>
+</div>
+</div>
+<!-- Status Item 2: Microphone -->
+<div class="flex items-center gap-sm pb-sm border-b border-surface-variant last:border-0 last:pb-0">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container shrink-0">
+<span class="material-symbols-outlined" data-icon="check_circle" data-weight="fill">check_circle</span>
+</div>
+<div class="flex-grow">
+<h3 class="font-label-md text-label-md text-on-surface">Microphone</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Ready</p>
+</div>
+</div>
+<!-- Status Item 3: Internet -->
+<div class="flex items-center gap-sm pb-sm border-b border-surface-variant last:border-0 last:pb-0">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container shrink-0">
+<span class="material-symbols-outlined" data-icon="check_circle" data-weight="fill">check_circle</span>
+</div>
+<div class="flex-grow">
+<h3 class="font-label-md text-label-md text-on-surface">Internet</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Your connection is good</p>
+</div>
+</div>
+<!-- Status Item 4: Sound Check -->
+<div class="flex flex-col gap-xs pt-xs">
+<div class="flex items-start gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant shrink-0 mt-1">
+<span class="material-symbols-outlined" data-icon="mic">mic</span>
+</div>
+<div class="flex-grow">
+<h3 class="font-label-md text-label-md text-on-surface">Sound check</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-sm">Press the button and say your name out loud for three seconds.</p>
+<!-- Level Meter UI -->
+<div class="flex items-center gap-sm w-full">
+<button class="h-10 px-md bg-surface-container border border-outline-variant text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container-high transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]" data-icon="play_arrow">play_arrow</span>
+                                    Test
+                                </button>
+<div class="flex-grow h-2 bg-surface-variant rounded-full overflow-hidden relative">
+<!-- Dynamic Meter Bar -->
+<div class="absolute left-0 top-0 bottom-0 bg-secondary w-1/3 rounded-full transition-all duration-100 ease-in-out" id="audio-level-bar"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant w-20 text-right" id="audio-feedback">Too quiet</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Action -->
+<div class="w-full mt-xl pt-lg border-t border-surface-variant flex justify-center pb-xl">
+<!-- Disabled State -->
+<button class="w-full max-w-md h-12 rounded-lg bg-surface-container-highest text-on-surface-variant font-label-md text-label-md flex items-center justify-center opacity-60 cursor-not-allowed transition-colors" disabled="">
+                I am ready — start the interview
+            </button>
+</div>
+</main>
+<script>
+        // Simple script to simulate the audio meter interaction for demonstration
+        document.addEventListener('DOMContentLoaded', () => {
+            const meter = document.getElementById('audio-level-bar');
+            const feedback = document.getElementById('audio-feedback');
+            const testBtn = document.querySelector('button:not([disabled])');
+            
+            let isTesting = false;
+            let intervalId;
+
+            testBtn.addEventListener('click', () => {
+                if (isTesting) {
+                    clearInterval(intervalId);
+                    meter.style.width = '0%';
+                    feedback.textContent = 'Too quiet';
+                    feedback.classList.remove('text-secondary');
+                    testBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">play_arrow</span> Test';
+                    isTesting = false;
+                } else {
+                    isTesting = true;
+                    testBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">stop</span> Stop';
+                    
+                    intervalId = setInterval(() => {
+                        // Simulate audio levels
+                        const level = Math.random() * 100;
+                        meter.style.width = `${level}%`;
+                        
+                        if (level > 60) {
+                            meter.style.backgroundColor = '#006d42'; // secondary
+                            feedback.textContent = 'Good level';
+                            feedback.classList.add('text-secondary');
+                        } else {
+                            meter.style.backgroundColor = '#9a7f61'; // on-tertiary-container (fallback for warning)
+                            feedback.textContent = 'Too quiet';
+                            feedback.classList.remove('text-secondary');
+                        }
+                    }, 150);
+                }
+            });
+        });
+    </script>
+</body></html>

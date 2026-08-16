@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PreCAS Practice Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&amp;family=Noto+Serif:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#feddba",
+                        "secondary": "#006d42",
+                        "tertiary": "#000000",
+                        "on-tertiary-fixed-variant": "#584329",
+                        "secondary-fixed-dim": "#65dd9c",
+                        "surface-container": "#edeef1",
+                        "on-primary-fixed": "#0f1c2c",
+                        "surface-container-highest": "#e1e2e5",
+                        "primary-container": "#0f1c2c",
+                        "on-surface-variant": "#44474c",
+                        "on-background": "#191c1e",
+                        "primary": "#000000",
+                        "inverse-on-surface": "#f0f1f4",
+                        "secondary-container": "#82fab7",
+                        "on-primary-container": "#778598",
+                        "on-secondary": "#ffffff",
+                        "background": "#f8f9fc",
+                        "on-primary-fixed-variant": "#3a4859",
+                        "on-error-container": "#93000a",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#e7e8eb",
+                        "on-secondary-container": "#007347",
+                        "on-tertiary-fixed": "#281804",
+                        "outline-variant": "#c4c6cc",
+                        "primary-fixed": "#d6e4f9",
+                        "tertiary-fixed-dim": "#e0c1a0",
+                        "secondary-fixed": "#82fab7",
+                        "surface-container-low": "#f2f3f6",
+                        "on-secondary-fixed": "#002111",
+                        "on-secondary-fixed-variant": "#005231",
+                        "tertiary-container": "#281804",
+                        "surface-bright": "#f8f9fc",
+                        "surface": "#f8f9fc",
+                        "outline": "#74777d",
+                        "surface-tint": "#525f71",
+                        "on-tertiary-container": "#9a7f61",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#bac8dc",
+                        "surface-variant": "#e1e2e5",
+                        "on-surface": "#191c1e",
+                        "error": "#ba1a1a",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#d9dadd",
+                        "primary-fixed-dim": "#bac8dc",
+                        "inverse-surface": "#2e3133"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "container-max": "1120px",
+                        "xs": "8px",
+                        "gutter": "20px",
+                        "sm": "16px",
+                        "xl": "64px",
+                        "lg": "40px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "display-mobile": ["Noto Serif"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-lg": ["Noto Serif"],
+                        "display": ["Noto Serif"],
+                        "label-sm": ["Hanken Grotesk"],
+                        "headline-sm": ["Noto Serif"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "label-md": ["Hanken Grotesk"],
+                        "body-sm": ["Hanken Grotesk"],
+                        "headline-md": ["Noto Serif"]
+                    },
+                    "fontSize": {
+                        "display-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased pb-[80px]">
+<!-- TopNavBar (Web & Mobile, but styled for mobile here as requested by layout, though JSON says docked top-0) -->
+<header class="bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline flex justify-between items-center w-full px-sm md:px-lg max-w-container-max mx-auto h-16 sticky top-0 z-40 shadow-sm">
+<div class="font-display text-display-mobile font-bold text-primary dark:text-primary-fixed-dim">
+            PreCAS Practice
+        </div>
+<div class="flex items-center gap-sm">
+<button class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200">
+<span class="material-symbols-outlined text-[24px]">notifications</span>
+</button>
+<button class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200">
+<span class="material-symbols-outlined text-[24px]">account_circle</span>
+</button>
+</div>
+</header>
+<main class="px-sm py-md md:max-w-[400px] md:mx-auto">
+<!-- Greeting -->
+<section class="mb-md">
+<h1 class="font-headline-lg text-headline-lg-mobile text-primary mb-xs">Good evening, Sita</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Tuesday, 24 October</p>
+</section>
+<!-- Balance Cards -->
+<section class="flex gap-sm mb-lg">
+<!-- Card A -->
+<div class="flex-1 bg-surface rounded-xl shadow-sm border border-outline-variant p-sm flex flex-col items-center text-center">
+<div class="w-16 h-16 rounded-full border-4 border-secondary flex items-center justify-center mb-xs">
+<span class="font-headline-md text-headline-md font-bold text-primary">7</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-base uppercase tracking-wide">mock interviews left</p>
+<p class="font-label-sm text-label-sm text-outline">of 10</p>
+</div>
+<!-- Card B -->
+<div class="flex-1 bg-surface rounded-xl shadow-sm border border-outline-variant p-sm flex flex-col items-center text-center">
+<div class="w-16 h-16 rounded-full border-4 border-primary flex items-center justify-center mb-xs">
+<span class="font-headline-md text-headline-md font-bold text-primary">14</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-base uppercase tracking-wide">practice questions left</p>
+<p class="font-label-sm text-label-sm text-outline">of 20</p>
+</div>
+</section>
+<!-- Continue Card -->
+<section class="bg-[#eaf7f0] rounded-xl border-2 border-secondary p-sm mb-lg relative overflow-hidden">
+<div class="flex items-start gap-sm mb-sm relative z-10">
+<img alt="BPP" class="w-[48px] h-[48px] rounded-lg border border-outline-variant bg-surface object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLtL_-dIE94dNNiJBvmnxZxbCg6xViUQagW6_QLvUeYY1736zAIzf7-w0OCBMs2cfUGDuF7L8IUVrqoBXGcxtbHdzHk8Mt8fCZPNbFkv2YpWfYFkQQheogcomRlVfj5dJLsSqaQMJ8ZTPIIlVUDiIHyn0kNeQnEILZW2seOqReGmu2G5-iI5GcgSXCjy_sveReodSpHQRI8HhYOMrg4k1z0zl1-wvD2v7MfOKLQQMXHx9_9W8s_3Sct_MAk"/>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-primary">BPP University</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">PreCAS Interview Practice</p>
+</div>
+</div>
+<div class="mb-sm relative z-10">
+<div class="flex justify-between font-label-sm text-label-sm text-secondary mb-base">
+<span>Progress</span>
+<span>3 / 17</span>
+</div>
+<div class="w-full bg-surface-container-high rounded-full h-2">
+<div class="bg-secondary h-2 rounded-full" style="width: 17%"></div>
+</div>
+</div>
+<button class="w-full bg-secondary text-on-secondary font-label-md text-label-md py-3 rounded-lg shadow-sm flex items-center justify-center gap-xs hover:opacity-90 transition-opacity">
+<span>Continue where you left off</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</section>
+<!-- Your Reports -->
+<section class="mb-lg">
+<h2 class="font-headline-md text-headline-md text-primary mb-sm">Your Reports</h2>
+<div class="bg-surface rounded-xl shadow-sm border border-outline-variant overflow-hidden">
+<a class="flex items-center p-sm border-b border-outline-variant hover:bg-surface-sunk transition-colors" href="#">
+<img alt="BPP" class="w-[40px] h-[40px] rounded-md border border-outline-variant bg-surface object-cover mr-sm" src="https://lh3.googleusercontent.com/aida/AP1WRLtL_-dIE94dNNiJBvmnxZxbCg6xViUQagW6_QLvUeYY1736zAIzf7-w0OCBMs2cfUGDuF7L8IUVrqoBXGcxtbHdzHk8Mt8fCZPNbFkv2YpWfYFkQQheogcomRlVfj5dJLsSqaQMJ8ZTPIIlVUDiIHyn0kNeQnEILZW2seOqReGmu2G5-iI5GcgSXCjy_sveReodSpHQRI8HhYOMrg4k1z0zl1-wvD2v7MfOKLQQMXHx9_9W8s_3Sct_MAk"/>
+<div class="flex-1">
+<h4 class="font-label-md text-label-md text-primary">BPP University</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Completed 12 Oct</p>
+</div>
+<div class="bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm px-2 py-1 rounded-md mr-sm">Band 6</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</a>
+<a class="flex items-center p-sm hover:bg-surface-sunk transition-colors" href="#">
+<div class="w-[40px] h-[40px] rounded-md border border-outline-variant bg-surface-container flex items-center justify-center mr-sm">
+<span class="font-display text-[16px] font-bold text-on-surface-variant">UCL</span>
+</div>
+<div class="flex-1">
+<h4 class="font-label-md text-label-md text-primary">University College London</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Completed 05 Oct</p>
+</div>
+<div class="bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm px-2 py-1 rounded-md mr-sm">Band 7</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</a>
+</div>
+</section>
+<!-- Buy Again -->
+<section class="bg-surface rounded-xl border border-outline-variant p-sm text-center shadow-sm">
+<h3 class="font-headline-sm text-headline-sm text-primary mb-xs">Need more practice?</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-sm">Top up your balance with additional mock interviews or questions.</p>
+<button class="bg-surface text-primary font-label-md text-label-md py-2 px-md rounded-lg border border-outline hover:bg-surface-container-low transition-colors inline-block">
+                See the packs
+            </button>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden bg-surface dark:bg-inverse-surface border-t border-outline-variant dark:border-outline shadow-sm dark:shadow-none fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-xs pb-safe">
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed font-bold hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors rounded-lg w-[64px] py-1">
+<span class="material-symbols-outlined text-[24px] mb-1" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-sm text-label-sm">Dashboard</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors rounded-lg w-[64px] py-1">
+<span class="material-symbols-outlined text-[24px] mb-1">video_chat</span>
+<span class="font-label-sm text-label-sm">Interviews</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors rounded-lg w-[64px] py-1">
+<span class="material-symbols-outlined text-[24px] mb-1">calendar_today</span>
+<span class="font-label-sm text-label-sm">Schedule</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors rounded-lg w-[64px] py-1">
+<span class="material-symbols-outlined text-[24px] mb-1">analytics</span>
+<span class="font-label-sm text-label-sm">Progress</span>
+</button>
+</nav>
+</body></html>

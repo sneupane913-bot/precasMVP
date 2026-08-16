@@ -7,7 +7,7 @@ import { FirebaseSignIn, type FirebaseWebConfig } from '@/components/FirebaseSig
 
 export default function StartPage() {
   return (
-    <Suspense fallback={<main className="p-8 text-center text-slate-500">Loading...</main>}>
+    <Suspense fallback={<main className="p-8 text-center text-ink-quiet">Loading...</main>}>
       <StartInner />
     </Suspense>
   );
@@ -124,17 +124,17 @@ function StartInner() {
               'See exactly what to fix, in simple English.',
             ].map((line) => (
               <li key={line} className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-emerald-600" aria-hidden>
+                <span className="mt-0.5 shrink-0 text-go-dark" aria-hidden>
                   ✓
                 </span>
-                <span className="leading-relaxed text-slate-700">{line}</span>
+                <span className="leading-relaxed text-ink-soft">{line}</span>
               </li>
             ))}
           </ul>
         </div>
 
         <div>
-          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-slate-400">
+          <p className="mb-4 text-micro font-semibold uppercase tracking-[0.15em] text-ink-quiet">
             Trusted by students applying to
           </p>
           <div className="flex items-center gap-6">
@@ -166,12 +166,12 @@ function StartInner() {
           <h1 className="mb-2 text-center font-serif text-3xl font-bold text-ink">
             Sign in to start
           </h1>
-          <p className="mb-10 text-center leading-relaxed text-slate-600">
+          <p className="mb-10 text-center leading-relaxed text-ink-soft">
             One tap with Google. No password, no form, no payment.
           </p>
 
           {loading ? (
-            <div className="h-14 animate-pulse rounded-xl bg-slate-100" />
+            <div className="h-14 animate-pulse rounded-control bg-surface-sunk" />
           ) : (
             <FirebaseSignIn
               config={config}
@@ -190,19 +190,19 @@ function StartInner() {
           )}
 
       {softDenied && (
-        <div className="mt-6 rounded-2xl border-2 border-amber-300 bg-amber-50 p-5">
-          <p className="mb-1 font-bold text-amber-900">We need to check one thing</p>
-          <p className="mb-4 text-sm leading-relaxed text-amber-900/90">{softDenied}</p>
+        <div className="mt-6 rounded-card border-2 border-warn/40 bg-warn-tint p-5">
+          <p className="mb-1 font-bold text-warn">We need to check one thing</p>
+          <p className="mb-4 text-sm leading-relaxed text-warn/90">{softDenied}</p>
           <div className="flex flex-col gap-2">
             <a
               href={`https://wa.me/${(process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? '').replace(/\D/g, '')}`}
-              className="rounded-xl bg-emerald-600 px-5 py-3 text-center font-bold text-white"
+              className="rounded-control bg-go px-5 py-3 text-center font-bold text-white"
             >
               Message us on WhatsApp
             </a>
             <button
               onClick={() => router.push('/pricing')}
-              className="rounded-xl border-2 border-slate-300 px-5 py-3 font-semibold text-slate-700"
+              className="rounded-control border-2 border-line-strong px-5 py-3 font-semibold text-ink-soft"
             >
               Look at the packs instead
             </button>
@@ -211,17 +211,17 @@ function StartInner() {
       )}
 
       {ref && (
-        <p className="mt-6 rounded-xl bg-emerald-50 px-4 py-3 text-center text-sm text-emerald-900">
+        <p className="mt-6 rounded-control bg-go-tint px-4 py-3 text-center text-sm text-go-dark">
           A friend invited you. When you buy a pack, they get a free mock too.
         </p>
       )}
 
-          <p className="mt-6 text-center text-xs leading-relaxed text-slate-400">
+          <p className="mt-6 text-center text-micro leading-relaxed text-ink-quiet">
             We use your Google account only to know it is you and to keep your practice history. We
             never post anything, and we never see your password.
           </p>
 
-          <div className="mt-10 flex justify-center gap-6 text-xs text-slate-400">
+          <div className="mt-10 flex justify-center gap-6 text-micro text-ink-quiet">
             <Link href="/privacy" className="hover:text-ink">
               Privacy policy
             </Link>

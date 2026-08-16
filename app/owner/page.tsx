@@ -145,16 +145,16 @@ export default function OwnerPage() {
   return (
     <main className="mx-auto max-w-xl p-5 sm:p-8">
       <h1 className="mb-1 text-2xl font-bold text-ink">Owner control</h1>
-      <p className="mb-6 text-slate-600">
+      <p className="mb-6 text-ink-soft">
         This page is not linked from anywhere. Only your owner key opens it.
       </p>
 
       <label className="mb-1 block text-sm font-semibold text-ink">Owner key</label>
       <PasscodeInput value={key} onChange={setKey} placeholder="Your owner key" name="owner-key" />
 
-      <div className="mb-6 rounded-2xl border-2 border-slate-200 bg-white p-5">
+      <div className="mb-6 rounded-card border-2 border-line bg-surface p-5">
         <h2 className="mb-1 font-bold text-ink">Message students will see</h2>
-        <p className="mb-4 text-sm text-slate-600">
+        <p className="mb-4 text-sm text-ink-soft">
           Shown on every page while the platform is off.
         </p>
 
@@ -162,7 +162,7 @@ export default function OwnerPage() {
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="mb-4 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+          className="mb-4 w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
         />
 
         <label className="mb-1 block text-sm font-semibold text-ink">Message</label>
@@ -170,7 +170,7 @@ export default function OwnerPage() {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           rows={4}
-          className="mb-4 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+          className="mb-4 w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
         />
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -180,7 +180,7 @@ export default function OwnerPage() {
               value={contactName}
               onChange={(e) => setContactName(e.target.value)}
               placeholder="Your name"
-              className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+              className="w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
             />
           </div>
           <div>
@@ -189,19 +189,19 @@ export default function OwnerPage() {
               value={contactPhone}
               onChange={(e) => setContactPhone(e.target.value)}
               placeholder="98XXXXXXXX"
-              className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
+              className="w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
             />
           </div>
         </div>
       </div>
 
       {error && (
-        <p className="mb-4 rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3 font-medium text-red-800">
+        <p className="mb-4 rounded-control border-2 border-stop/30 bg-stop-tint px-4 py-3 font-medium text-stop">
           {error}
         </p>
       )}
       {result && (
-        <p className="mb-4 rounded-xl border-2 border-emerald-200 bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
+        <p className="mb-4 rounded-control border-2 border-go/30 bg-go-tint px-4 py-3 font-medium text-go-dark">
           {result}
         </p>
       )}
@@ -211,22 +211,22 @@ export default function OwnerPage() {
           <button
             onClick={() => setConfirming(true)}
             disabled={!key || busy}
-            className="w-full rounded-xl bg-red-600 px-6 py-4 text-lg font-bold text-white disabled:bg-slate-300"
+            className="w-full rounded-control bg-stop px-6 py-4 text-lg font-bold text-white disabled:bg-line-strong"
           >
             Turn the platform OFF
           </button>
           <button
             onClick={() => apply(false)}
             disabled={!key || busy}
-            className="w-full rounded-xl border-2 border-slate-300 px-6 py-3.5 text-base font-semibold text-slate-700 disabled:opacity-40"
+            className="w-full rounded-control border-2 border-line-strong px-6 py-3.5 text-base font-semibold text-ink-soft disabled:opacity-40"
           >
             Turn the platform back ON
           </button>
         </div>
       ) : (
-        <div className="rounded-2xl border-2 border-red-300 bg-red-50 p-5">
-          <p className="mb-1 font-bold text-red-900">Turn the whole platform off?</p>
-          <p className="mb-4 text-sm leading-relaxed text-red-900/90">
+        <div className="rounded-card border-2 border-stop/40 bg-stop-tint p-5">
+          <p className="mb-1 font-bold text-stop">Turn the whole platform off?</p>
+          <p className="mb-4 text-sm leading-relaxed text-stop/90">
             Every student, every consultancy, everyone. They will see your message and your phone
             number. You can turn it back on from this page at any time. Nothing is deleted.
           </p>
@@ -234,13 +234,13 @@ export default function OwnerPage() {
             <button
               onClick={() => apply(true)}
               disabled={busy}
-              className="flex-1 rounded-xl bg-red-600 px-5 py-3.5 font-bold text-white"
+              className="flex-1 rounded-control bg-stop px-5 py-3.5 font-bold text-white"
             >
               {busy ? 'Working...' : 'Yes, turn it off now'}
             </button>
             <button
               onClick={() => setConfirming(false)}
-              className="flex-1 rounded-xl border-2 border-slate-300 bg-white px-5 py-3.5 font-semibold text-slate-700"
+              className="flex-1 rounded-control border-2 border-line-strong bg-surface px-5 py-3.5 font-semibold text-ink-soft"
             >
               Cancel
             </button>
@@ -251,22 +251,22 @@ export default function OwnerPage() {
       {/* QA H3: a switch whose stated purpose is a commercial dispute needs a
           record, because later somebody will ask who paused it and when. */}
       {audit.length > 0 && (
-        <section className="mt-8 overflow-hidden rounded-2xl border-2 border-slate-200 bg-white">
-          <div className="border-b border-slate-200 p-5">
+        <section className="mt-8 overflow-hidden rounded-card border-2 border-line bg-surface">
+          <div className="border-b border-line p-5">
             <h2 className="font-bold text-ink">History of this switch</h2>
-            <p className="text-sm text-slate-600">Newest first. Kept as a record.</p>
+            <p className="text-sm text-ink-soft">Newest first. Kept as a record.</p>
           </div>
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-line">
             {audit.map((a, i) => (
               <li key={`${a.at}-${i}`} className="flex flex-wrap justify-between gap-2 px-5 py-3">
                 <span
                   className={`font-semibold ${
-                    a.action === 'paused' ? 'text-red-700' : 'text-emerald-700'
+                    a.action === 'paused' ? 'text-stop' : 'text-go-dark'
                   }`}
                 >
                   {a.action === 'paused' ? 'Platform paused' : 'Platform resumed'}
                 </span>
-                <span className="text-sm text-slate-500">
+                <span className="text-sm text-ink-quiet">
                   {new Date(a.at).toLocaleString()} · {a.ip || 'unknown source'}
                 </span>
               </li>
@@ -275,7 +275,7 @@ export default function OwnerPage() {
         </section>
       )}
 
-      <p className="mt-6 text-xs leading-relaxed text-slate-400">
+      <p className="mt-6 text-micro leading-relaxed text-ink-quiet">
         Platform right now: <strong>{enabled ? 'OFF' : 'ON'}</strong>. Read from the server, not from
         this browser.
       </p>

@@ -86,13 +86,13 @@ export function PaySettingsForm({
     reader.readAsDataURL(file);
   }
 
-  const field = 'w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink';
+  const field = 'w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink';
   const label = 'mb-1 block text-sm font-semibold text-ink';
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6">
+    <div className="rounded-card border border-line bg-surface p-6">
       <h2 className="mb-1 font-serif text-xl font-bold text-ink">Payment and support details</h2>
-      <p className="mb-6 text-sm leading-relaxed text-slate-600">
+      <p className="mb-6 text-sm leading-relaxed text-ink-soft">
         These appear on the checkout page. Changing them here takes effect immediately, with no
         deploy. A wallet number that needs a code release is a number that will be wrong on the day
         it matters most.
@@ -100,7 +100,7 @@ export function PaySettingsForm({
 
       <div className="mb-6">
         <label className={label}>Payment QR</label>
-        <p className="mb-3 text-sm text-slate-500">
+        <p className="mb-3 text-sm text-ink-quiet">
           Upload the QR from your wallet app, or paste a link to it. Students see this first, before
           any of the fields asking what they paid.
         </p>
@@ -111,12 +111,12 @@ export function PaySettingsForm({
             <img
               src={v.payQrImageUrl}
               alt="Payment QR as students will see it"
-              className="h-40 w-40 rounded-xl border-2 border-slate-200 bg-white object-contain p-2"
+              className="h-40 w-40 rounded-control border-2 border-line bg-surface object-contain p-2"
             />
             <div>
               {/* Shown, not hidden behind a save. An admin must be able to see
                   the QR is the RIGHT one before students are pointed at it. */}
-              <p className="mb-2 text-sm font-semibold text-emerald-700">
+              <p className="mb-2 text-sm font-semibold text-go-dark">
                 This is exactly what a student will see.
               </p>
               <button
@@ -125,14 +125,14 @@ export function PaySettingsForm({
                   setSaved(false);
                   setV((p) => ({ ...p, payQrImageUrl: '' }));
                 }}
-                className="rounded-lg border-2 border-slate-300 px-3 py-1.5 text-sm font-bold text-slate-700"
+                className="rounded-control border-2 border-line-strong px-3 py-1.5 text-sm font-bold text-ink-soft"
               >
                 Remove it
               </button>
             </div>
           </div>
         ) : (
-          <p className="mb-3 rounded-xl bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
+          <p className="mb-3 rounded-control bg-warn-tint px-4 py-3 text-sm font-medium text-warn">
             No QR is set, so checkout currently tells students to contact you on WhatsApp to pay.
             That works, but it costs you every sale where nobody replies quickly.
           </p>
@@ -142,9 +142,9 @@ export function PaySettingsForm({
           type="file"
           accept="image/*"
           onChange={(e) => void pickFile(e.target.files?.[0] ?? null)}
-          className="mb-2 block w-full text-sm text-slate-600"
+          className="mb-2 block w-full text-sm text-ink-soft"
         />
-        {fileError && <p className="mb-2 text-sm font-medium text-red-600">{fileError}</p>}
+        {fileError && <p className="mb-2 text-sm font-medium text-stop">{fileError}</p>}
         <input
           value={v.payQrImageUrl.startsWith('data:') ? '' : v.payQrImageUrl}
           onChange={set('payQrImageUrl')}
@@ -171,7 +171,7 @@ export function PaySettingsForm({
           <input value={v.supportWhatsapp} onChange={set('supportWhatsapp')} placeholder="9779843805222" className={field} />
           {/* The client will move this to a sales number. Say so, so nobody
               assumes it is hard-wired to one person. */}
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-micro text-ink-quiet">
             Every WhatsApp link and every &ldquo;call us&rdquo; number in the product uses this.
             Change it here when the sales number takes over.
           </p>
@@ -194,7 +194,7 @@ export function PaySettingsForm({
               tell ten minutes from tomorrow, so they message us, or worse, they
               pay a second time. A number they can plan around is kinder and
               cheaper. Raise it during Dashain rather than quietly missing it. */}
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-micro text-ink-quiet">
             Shown to anyone waiting on a payment. Be honest: a promise you miss costs more than a
             longer one you keep.
           </p>
@@ -209,11 +209,11 @@ export function PaySettingsForm({
             const ok = await onSave(v);
             setSaved(ok);
           }}
-          className="rounded-xl bg-ink px-6 py-3 font-bold text-white disabled:opacity-50"
+          className="rounded-control bg-ink px-6 py-3 font-bold text-white disabled:opacity-50"
         >
           {busy ? 'Saving...' : 'Save these details'}
         </button>
-        {saved && <span className="font-semibold text-emerald-700">Saved. Students see this now.</span>}
+        {saved && <span className="font-semibold text-go-dark">Saved. Students see this now.</span>}
       </div>
     </div>
   );
