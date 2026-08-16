@@ -106,6 +106,18 @@ for (const f of FILES) {
   for (const m of src.matchAll(/router\.(?:push|replace)\(\s*(?:`([^`]+)`|'([^']+)')/g)) {
     links.push({ file: rel, href: m[1] ?? m[2], tpl: Boolean(m[1]) });
   }
+  /**
+   * Links declared as DATA, not as JSX.
+   *
+   * SiteFooter builds its nav from an array of `{ label, href: '/refund' }`
+   * objects and maps over it. The first version of R-6 could not see that and
+   * reported /refund as an orphan when it is linked from every page in the
+   * product. A check that cries wolf gets ignored, which is worse than not
+   * having it — so the extractor was fixed rather than the rule relaxed.
+   */
+  for (const m of src.matchAll(/\bhref:\s*(?:'([^']+)'|`([^`]+)`|"([^"]+)")/g)) {
+    links.push({ file: rel, href: m[1] ?? m[2] ?? m[3], tpl: Boolean(m[2]) });
+  }
 }
 
 const internal = links.filter((l) => l.href.startsWith('/'));
@@ -172,6 +184,39 @@ const packless = internal.filter((l) => l.href === '/checkout' || l.href === '/c
 t('R-5', '/checkout is never linked without a pack',
   packless.length === 0,
   packless.length ? packless.map((d) => d.file).join(', ') : 'every /checkout link names a pack');
+
+/**
+ * R-6. EVERY PAGE HAS A DOOR.
+ *
+ * Written 16 Aug after I built /dashboard — the single most changed screen of
+ * the redesign — and linked it from nowhere. No nav item, no post-sign-in
+ * route. The client opened the site, saw the pages he already knew, and
+ * reported, correctly, that nothing had changed.
+ *
+ * `reachable-check.js` guards the same shape for API ACTIONS. It could not see
+ * this, because a page is not an action. So the shape shipped again, in the
+ * one file that was supposed to be the proof the redesign happened.
+ *
+ * A route with no inbound link is a route only its author knows about.
+ */
+const PARAMETERISED = /\[/;                       // /interview/[id] is reached dynamically
+const DIRECT_ENTRY = new Set([
+  '/',            // typed, and the OG target
+  '/start',       // typed, and every 401 pushes here
+  '/admin', '/super', '/owner', '/consultancy', '/signout',
+]);
+
+const targets = new Set(
+  internal.map((l) => l.href.split('?')[0].replace(/\/$/, '') || '/')
+);
+const orphans = [...ROUTES].filter(
+  (r) => !DIRECT_ENTRY.has(r) && !PARAMETERISED.test(r) && !targets.has(r)
+);
+t('R-6', 'every page is linked from somewhere',
+  orphans.length === 0,
+  orphans.length
+    ? orphans.join(', ') + '\n           a route nothing links to is one only its author can find'
+    : `${ROUTES.size} routes, every non-entry one has an inbound link`);
 
 // ---------------------------------------------------------------- the map
 

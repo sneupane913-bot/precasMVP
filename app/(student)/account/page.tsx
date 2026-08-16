@@ -62,9 +62,29 @@ const BAND_LABEL: Record<string, string> = {
 };
 
 export default function AccountPage() {
+
   // D-1/D-2/D-4. The footer is sync now; the number comes from here.
   const supportNumber = useSupportNumber();
   const router = useRouter();
+  /**
+   * DB-1, enforced on EVERY path, not just sign-in.
+   *
+   * The client paid and still landed on the old page, because the only
+   * redirect lived in /start. Anyone already signed in — arriving from
+   * checkout, from a bookmark, from the header — never passed through it. So
+   * the dashboard existed and he could not get to it, which made it useless.
+   *
+   * A paying student's home is the dashboard, from wherever they arrive.
+   */
+  useEffect(() => {
+    fetch('/api/me')
+      .then((r) => r.json())
+      .then((j) => {
+        if (j?.data?.entitlement?.hasPaid) router.replace('/dashboard');
+      })
+      .catch(() => {});
+  }, [router]);
+
   const [data, setData] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

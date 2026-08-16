@@ -186,8 +186,12 @@ export function HeaderSession({ initial }: { initial?: SessionSnapshot }) {
             : `${session.mocksLeft} mock${session.mocksLeft === 1 ? '' : 's'} · ${session.practiceLeft ?? 0} practice`}
         </Link>
       )}
+      {/* F-4 caught in my own work: /dashboard was built and NOTHING linked to
+          it, so the most-changed screen in the redesign was unreachable and the
+          client reasonably reported that nothing had changed. A feature with no
+          door does not exist. */}
       <Link
-        href="/account"
+        href="/dashboard"
         className="hidden text-sm font-semibold text-ink-soft transition-colors duration-tap ease-move hover:text-ink sm:inline"
       >
         My practice

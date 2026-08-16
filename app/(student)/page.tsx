@@ -22,40 +22,63 @@ export default async function HomePage() {
     <>
       <SiteHeader session={session} />
       <main>
-      {/* ---------------- Above the fold: one action ---------------- */}
-      <section className="bg-ink px-5 pb-14 pt-12 text-white sm:pt-20">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="mb-4 inline-block rounded-full bg-surface/10 px-4 py-1.5 text-sm font-medium">
+      {/* ------------------------------------------------------------------
+          THE HERO. Full-bleed photograph with an ink gradient, per the Stitch
+          system and REDESIGN.md Block 1.
+
+          The image is positioned so the LEFT half stays calm on desktop and the
+          TOP half on mobile, because that is where this text sits. The gradient
+          is not decoration: it is what keeps the headline above 4.5:1 against a
+          photograph whose brightness we do not control.
+
+          If the file is not there yet the section is simply ink, exactly as it
+          was before — a missing photograph must never cost a student the
+          headline.
+          ------------------------------------------------------------------ */}
+      <section className="relative isolate overflow-hidden bg-ink text-white">
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-20 bg-cover bg-center opacity-70"
+          style={{ backgroundImage: "image-set(url('/img/hero-desktop.png') 1x)" }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-gradient-to-b from-ink/95 via-ink/80 to-ink/95 md:bg-gradient-to-r md:from-ink md:via-ink/85 md:to-ink/40"
+        />
+        <div className="mx-auto max-w-[1120px] px-4 pb-16 pt-14 md:px-10 md:pb-24 md:pt-24">
+        <div className="max-w-2xl md:text-left text-center mx-auto md:mx-0">
+          <p className="mb-5 inline-block rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium backdrop-blur">
             For Nepali students applying to the UK
           </p>
-          <h1 className="mb-4 font-serif text-3xl leading-tight sm:text-5xl">
+          <h1 className="mb-5 font-serif text-[2.25rem] font-bold leading-[1.08] tracking-tight sm:text-[3.25rem]">
             Practise your UK interview before it counts
           </h1>
-          <p className="mx-auto mb-8 max-w-lg text-lg leading-relaxed text-white/75">
+          <p className="mb-9 max-w-lg text-lg leading-relaxed text-white/80">
             Sit a real mock Pre-CAS interview for your own university. We listen to your answers and
             tell you exactly what to fix.
           </p>
 
           {/* QA B1: this pointed straight at /universities, which skipped the
               sign-in gate entirely. Sign-in comes first, then the catalogue. */}
-          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <div className="flex flex-col items-stretch gap-3 sm:flex-row md:items-center">
             <Link
               href="/start?next=/universities"
-              className="inline-flex w-full items-center justify-center rounded-control bg-go px-8 py-4 text-lg font-bold text-white shadow-lg transition hover:bg-go active:scale-[0.98] sm:w-auto sm:px-10"
+              className="inline-flex min-h-tap items-center justify-center rounded-control bg-go px-9 py-4 text-lg font-bold text-white transition-colors duration-tap ease-move hover:bg-go-dark active:scale-[0.99]"
             >
               Start free practice
             </Link>
             <Link
               href="#how-it-works"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-control px-6 py-4 text-lg font-semibold text-white/90 transition hover:text-white sm:w-auto"
+              className="inline-flex min-h-tap items-center justify-center gap-2 rounded-control border border-white/25 px-7 py-4 text-lg font-semibold text-white/90 transition-colors duration-tap ease-move hover:bg-white/10 hover:text-white"
             >
-              <span aria-hidden>▸</span> See how it works
+              See how it works
             </Link>
           </div>
 
-          <p className="mt-4 text-sm text-white/60">
+          <p className="mt-5 text-sm text-white/60">
             No card, no payment. {TRIAL_QUESTION_COUNT} real questions free.
           </p>
+        </div>
         </div>
       </section>
 
@@ -63,12 +86,12 @@ export default async function HomePage() {
       <TrustedBy />
 
       {/* ---------------- Three steps (design-reference/landing_page) ---------------- */}
-      <section id="how-it-works" className="bg-surface px-5 py-16">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="mb-2 text-center font-serif text-3xl font-bold text-ink">
+      <section id="how-it-works" className="bg-surface px-4 py-16 md:px-10 md:py-24">
+        <div className="mx-auto max-w-[1120px]">
+          <h2 className="text-center font-serif text-[2rem] font-bold tracking-tight text-ink md:text-display">
             Three steps to interview readiness
           </h2>
-          <p className="mb-10 text-center text-ink-soft">
+          <p className="mb-12 mt-3 text-center text-lg text-ink-soft">
             Built to calm your nerves and build real speaking habits.
           </p>
           <div className="grid gap-5 sm:grid-cols-3">
@@ -77,24 +100,47 @@ export default async function HomePage() {
                 n: '1',
                 t: 'Pick your university',
                 d: 'Questions come from the credibility themes universities publish.',
+                img: '/img/step-1-choose.png',
               },
               {
                 n: '2',
                 t: 'Answer out loud',
                 d: 'Camera on and timer running, exactly like the real interview.',
+                img: '/img/step-2-speak.png',
               },
               {
                 n: '3',
                 t: 'Get real feedback',
                 d: 'We tell you what you actually said and how to say it better.',
+                img: '/img/dashboard-welcome.png',
               },
             ].map((s) => (
-              <div key={s.n} className="rounded-card border border-line bg-surface p-6">
-                <div className="mb-4 grid h-10 w-10 place-items-center rounded-control bg-surface-sunk font-bold text-ink">
-                  {s.n}
+              /* One person's journey across three photographs, so the section
+                 reads as a sequence rather than three unrelated stock shots.
+                 The tinted panel behind each image means a missing file leaves
+                 a considered block of colour, not a broken frame. */
+              <div
+                key={s.n}
+                className="overflow-hidden rounded-card border border-line bg-surface shadow-card"
+              >
+                <div className="aspect-[4/3] w-full bg-surface-sunk">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={s.img}
+                    alt=""
+                    width={1200}
+                    height={900}
+                    loading="lazy"
+                    className="h-full w-full object-cover"
+                  />
                 </div>
-                <h3 className="mb-2 font-serif text-lg font-bold text-ink">{s.t}</h3>
-                <p className="text-sm leading-relaxed text-ink-soft">{s.d}</p>
+                <div className="p-6">
+                  <div className="mb-4 grid h-9 w-9 place-items-center rounded-full bg-ink text-micro font-bold text-white">
+                    {s.n}
+                  </div>
+                  <h3 className="mb-2 font-serif text-lg font-bold text-ink">{s.t}</h3>
+                  <p className="leading-relaxed text-ink-soft">{s.d}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -104,10 +150,10 @@ export default async function HomePage() {
       {/* ---------------- The wedge, with the sample report card ----------------
           design-reference/landing_page pairs the claim with a visible example,
           because "feedback on what you said" means nothing until it is shown. */}
-      <section className="bg-surface-sunk px-5 py-16">
-        <div className="mx-auto grid max-w-5xl items-center gap-10 lg:grid-cols-2">
+      <section className="bg-surface-sunk px-4 py-16 md:px-10 md:py-24">
+        <div className="mx-auto grid max-w-[1120px] items-center gap-12 lg:grid-cols-2">
           <div>
-            <h2 className="mb-4 font-serif text-3xl font-bold leading-tight text-ink">
+            <h2 className="mb-5 font-serif text-[2rem] font-bold leading-tight tracking-tight text-ink md:text-display">
               Feedback in simple English, on what you actually said
             </h2>
             <p className="mb-6 leading-relaxed text-ink-soft">

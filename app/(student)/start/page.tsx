@@ -32,7 +32,19 @@ function StartInner() {
   const via = params.get('via') ?? undefined;
   /** N-1. The seat size the consultancy's link hands out. */
   const seat = params.get('seat') ?? undefined;
-  const next = params.get('next') ?? '/universities';
+  /**
+   * DB-1. Where sign-in sends them.
+   *
+   * An explicit ?next= always wins — that is what carries a pack choice through
+   * the sign-in detour. Otherwise the server decides from whether they have
+   * ever paid: a paying student goes to their dashboard, everyone else to the
+   * catalogue. Dropping a paying student on the marketing page tells somebody
+   * who has already given us money to consider giving us money.
+   *
+   * Resolved after /api/me answers, so it is never a guess.
+   */
+  const explicitNext = params.get('next');
+  const next = explicitNext ?? '/universities';
 
   /**
    * PILOT-02. This page never used to ask whether you were ALREADY signed in.
@@ -80,7 +92,11 @@ function StartInner() {
       try {
         const me = await withTimeout('/api/me');
         if (!cancelled && me?.data?.signedIn) {
-          router.replace(next);
+          // DB-1. Decide from the ledger, not from a default. An explicit
+          // ?next= still wins, because that is what carries a chosen pack
+          // through the sign-in detour.
+          const paid = Boolean(me?.data?.entitlement?.hasPaid);
+          router.replace(explicitNext ?? (paid ? '/dashboard' : '/universities'));
           return;
         }
       } catch {
@@ -184,7 +200,22 @@ function StartInner() {
                   setSoftDenied(r.trial.message);
                   return;
                 }
-                router.push(next);
+                /**
+                 * DB-1, on the FIRST sign-in too. A returning payer who signs
+                 * in fresh must land on their dashboard, not the catalogue.
+                 * Asked here rather than assumed, because the trial grant may
+                 * have just changed what they are entitled to.
+                 */
+                if (explicitNext) {
+                  router.push(explicitNext);
+                  return;
+                }
+                fetch('/api/me')
+                  .then((x) => x.json())
+                  .then((j) =>
+                    router.push(j?.data?.entitlement?.hasPaid ? '/dashboard' : '/universities')
+                  )
+                  .catch(() => router.push('/universities'));
               }}
             />
           )}

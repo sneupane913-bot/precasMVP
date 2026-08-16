@@ -117,6 +117,28 @@ function UniversityBrowser() {
   const featured = useMemo(() => results.filter((i) => i.featured), [results]);
   const others = useMemo(() => results.filter((i) => !i.featured), [results]);
 
+  /**
+   * "See all", the way Netflix does it — the client's own comparison.
+   *
+   * The full UK list on one page reads as a wall, and a wall is the fastest
+   * way to make somebody give up on finding their own university. So we show a
+   * handful and let them open the rest deliberately.
+   *
+   * TWO THINGS THIS MUST NOT DO, both of which are the same defect shape as
+   * "you have used your free questions" — a screen implying something untrue:
+   *
+   *   1. It must NEVER hide a search result. If a student types "Wolverhampton"
+   *      and the match is on the collapsed side, hiding it says "we do not have
+   *      your university" when we do. So the moment there is a query or a
+   *      filter, everything is shown and the control disappears.
+   *   2. The number is real, not decorative. "See all 34" comes from the list.
+   */
+  const SHOW_FIRST = 6;
+  const [showAllOthers, setShowAllOthers] = useState(false);
+  const isSearching = q.trim().length > 0 || type !== 'all';
+  const visibleOthers = isSearching || showAllOthers ? others : others.slice(0, SHOW_FIRST);
+  const hiddenCount = others.length - visibleOthers.length;
+
   async function start(slug: string) {
     // Not signed in: send them to sign in and come straight back here.
     if (signedIn === false) {
@@ -308,17 +330,45 @@ function UniversityBrowser() {
 
           {others.length > 0 && (
             <>
-              <h2 className="mb-4 mt-10 font-serif text-xl font-bold text-ink">
-                All UK universities
-                <span className="ml-2 text-sm font-normal text-ink-quiet">
-                  {others.length} more
-                </span>
-              </h2>
+              <div className="mb-4 mt-12 flex items-end justify-between gap-4 border-b border-line pb-3">
+                <h2 className="font-serif text-title font-bold text-ink">
+                  All UK universities
+                  <span className="ml-2 text-sm font-normal text-ink-quiet">
+                    {others.length}
+                  </span>
+                </h2>
+                {/* Only offered when there is genuinely something folded away,
+                    and never while a search is running. */}
+                {!isSearching && hiddenCount > 0 && (
+                  <button
+                    onClick={() => setShowAllOthers(true)}
+                    className="shrink-0 text-sm font-bold text-go-dark underline underline-offset-4 transition-opacity duration-tap ease-move hover:opacity-70"
+                  >
+                    See all {others.length}
+                  </button>
+                )}
+                {!isSearching && showAllOthers && (
+                  <button
+                    onClick={() => setShowAllOthers(false)}
+                    className="shrink-0 text-sm font-bold text-ink-soft underline underline-offset-4 transition-opacity duration-tap ease-move hover:opacity-70"
+                  >
+                    Show fewer
+                  </button>
+                )}
+              </div>
               <ul className="grid gap-4 sm:grid-cols-2">
-                {others.map((i) => (
+                {visibleOthers.map((i) => (
                   <UniCard key={i.id} i={i} starting={starting} signedIn={signedIn} hasCredit={hasCredit} resuming={Boolean(inProgress)} onStart={start} />
                 ))}
               </ul>
+              {!isSearching && hiddenCount > 0 && (
+                <button
+                  onClick={() => setShowAllOthers(true)}
+                  className="mx-auto mt-6 flex min-h-tap items-center justify-center rounded-control border border-line bg-surface px-6 py-3 font-bold text-ink transition-colors duration-tap ease-move hover:bg-surface-sunk"
+                >
+                  See all {others.length} universities
+                </button>
+              )}
             </>
           )}
           </>
