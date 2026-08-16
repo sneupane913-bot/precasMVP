@@ -242,7 +242,7 @@ export function FirebaseSignIn({
       setError(describe(code));
       // NEVER swallow the code again. Without it, neither the student nor we
       // can tell a blocked popup from a misconfigured project.
-      setDetail(`${code}${message ? ` — ${message.slice(0, 120)}` : ''}`);
+      setDetail(`${code}${message ? `: ${message.slice(0, 120)}` : ''}`);
       setBusy(false);
     }
   }

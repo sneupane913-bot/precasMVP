@@ -44,6 +44,13 @@ HOW TO WRITE THE MODEL ANSWER
 - Four to six short sentences. No more.
 - Follow PEE plus wrap-up exactly, in order.
 
+WHEN THE STUDENT RAN OUT OF TIME
+You will sometimes be told the answer was CUT OFF by the timer. When that happens:
+- The last sentence may be incomplete, and the transcription may have guessed at how it ended. Do not judge the student on those final words and never quote them back.
+- Do not mark Wrap-up as present. They did not get to it. That is the honest reading.
+- Make your FIRST fix about time, in plain words: start speaking as soon as the timer begins, and say the important thing first, because the interviewer will cut them off too.
+- Do not tell them their answer was incomplete as if it were carelessness. Running out of time usually means they thought too long before starting or gave too much background. Say which one you can see.
+
 DETECTING MEMORISATION
 If the answer is unusually fluent, uses vocabulary far above conversational level, has no hesitation markers at all, or reads like written prose rather than speech, set soundsMemorised true and tell the student plainly that a real interviewer will notice and will reword the question to test them.
 
@@ -73,6 +80,25 @@ export async function evaluateAnswer(args: {
   transcript: string;
   durationSeconds: number;
   previousTranscripts: string[];
+  /**
+   * D-39. True when the timer, not the student, ended the answer.
+   *
+   * Found by the client on his first complete sitting. He said "One of the
+   * things I researched carefully is" and the timer stopped him there. Whisper
+   * returned "...is from the data that I found." It COMPLETED HIS SENTENCE
+   * with words he never spoke.
+   *
+   * That is the same failure as the prompt leak, and worse in one way: it hides
+   * the very thing the student needs to be told. Running out of time is a real
+   * and common mistake, and a tidy invented ending makes it invisible. His
+   * words: "if the AI starts filling in the gaps itself, then this mistake will
+   * never be caught."
+   *
+   * We cannot stop Whisper guessing. We CAN know when it had the opportunity,
+   * because we know how long they spoke and how long they were given. So the
+   * evaluator is told, and stops trusting the final words.
+   */
+  ranOutOfTime?: boolean;
 }): Promise<Evaluation | null> {
   const clean = redact(args.transcript).split(/\s+/).slice(0, MAX_TRANSCRIPT_WORDS).join(' ');
 
@@ -90,6 +116,9 @@ export async function evaluateAnswer(args: {
     `QUESTION (category: ${args.question.category}): ${args.question.text}`,
     `PRIVATE MARKING NOTES (never repeat these to the student): ${args.question.rubricNotes}`,
     `ANSWER LENGTH: ${Math.round(args.durationSeconds)} seconds`,
+    args.ranOutOfTime
+      ? `THE TIMER CUT THIS ANSWER OFF. The student did not choose to stop. Treat the final sentence as unfinished, and do not trust or quote its last words: the transcription may have guessed at them.`
+      : '',
     args.previousTranscripts.length
       ? `EARLIER ANSWERS IN THIS SESSION, for consistency and fluency comparison:\n${args.previousTranscripts
           .slice(-3)

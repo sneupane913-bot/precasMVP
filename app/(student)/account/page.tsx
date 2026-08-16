@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { InstallPrompt } from '@/components/InstallPrompt';
 import { useRouter } from 'next/navigation';
 import { SiteHeader } from '@/components/SiteHeader';
-import { SiteFooter } from '@/components/SiteFooter';
+import { SiteFooterView } from '@/components/SiteFooter';
+import { useSupportNumber } from '@/lib/useSupportNumber';
 import { OfferCountdown, type Offer } from '@/components/OfferCountdown';
 
 /**
@@ -61,6 +62,8 @@ const BAND_LABEL: Record<string, string> = {
 };
 
 export default function AccountPage() {
+  // D-1/D-2/D-4. The footer is sync now; the number comes from here.
+  const supportNumber = useSupportNumber();
   const router = useRouter();
   const [data, setData] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);
@@ -211,7 +214,7 @@ export default function AccountPage() {
                         {data.progress.trend > 0
                           ? `Better than your first interview. You are at ${data.progress.latest}% now.`
                           : data.progress.trend < 0
-                            ? `Down from your first interview. That happens \u2014 the questions get harder as you go further in.`
+                            ? `Down from your first interview. That happens. The questions get harder as you go further in.`
                             : `The same as your first interview. You are at ${data.progress.latest}%.`}
                       </p>
                     </>
@@ -390,7 +393,7 @@ export default function AccountPage() {
           </>
         )}
       </main>
-      <SiteFooter />
+      <SiteFooterView whatsappDigits={supportNumber} />
     </>
   );
 }

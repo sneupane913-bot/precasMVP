@@ -1,4 +1,5 @@
 import { currentStudent } from '@/lib/auth/session';
+import { entitlementFor } from '@/lib/entitlement';
 import type { SessionSnapshot } from '@/components/HeaderSession';
 
 /**
@@ -20,7 +21,16 @@ import type { SessionSnapshot } from '@/components/HeaderSession';
 export async function headerSession(): Promise<SessionSnapshot | undefined> {
   try {
     const s = await currentStudent();
-    return { signedIn: Boolean(s), name: s?.name ?? null };
+    if (!s) return { signedIn: false, name: null };
+    // The balance travels with the header so every page can show it, not just
+    // /account. Cheap: this already reads the student.
+    const ent = await entitlementFor(s);
+    return {
+      signedIn: true,
+      name: s.name ?? null,
+      mocksLeft: ent.mocksLeft,
+      practiceLeft: ent.practiceLeft,
+    };
   } catch {
     return undefined; // unknown, not "signed out"
   }

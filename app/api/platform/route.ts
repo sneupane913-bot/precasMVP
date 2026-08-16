@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
+import { z, type ZodError } from 'zod';
+import { zodMessage } from '@/lib/zod-message';
+import { supportWhatsapp } from '@/lib/support';
 import {
   platform,
   isOwner,
@@ -16,6 +18,8 @@ import {
   LIMITS as RL,
 } from '@/lib/rate-limit';
 import { apiError } from '@/lib/types';
+import { repo } from '@/lib/db';
+import type { ApprovalAudit } from '@/lib/db/types';
 
 export const runtime = 'nodejs';
 
@@ -25,11 +29,78 @@ export const runtime = 'nodejs';
  * at a maintenance screen needs, and only while maintenance is actually on.
  * When the platform is up it says so and nothing else.
  */
+/**
+ * D-16. Strip the passcode from anything leaving this route.
+ *
+ * Three handlers returned the whole Consultancy row: `overview`,
+ * `setConsultancyStatus` and `createConsultancy`. `/api/admin` had always
+ * stripped it, which is exactly why rule A-18 was recorded as PROVEN, the
+ * automated assertion checked that route and nobody checked this one.
+ *
+ * A single choke point rather than three call sites, so a fourth handler added
+ * later cannot quietly reintroduce it.
+ */
+/**
+ * D-18. Consultancy lifecycle events were the only back-office actions with no
+ * record at all.
+ *
+ * Creating a consultancy hands out seats and records money received. Approving
+ * one switches on their link so those seats can be taken. Suspending one cuts a
+ * partner off. None of the three wrote an audit row, while a consultancy
+ * changing its OWN passcode was audited carefully with before and after values.
+ * The discipline was applied to the smaller thing and not the larger one.
+ *
+ * If a consultancy ever disputes when they were approved, or how many seats
+ * they were given, there has to be something to point at.
+ */
+async function auditPlatform(
+  action: ApprovalAudit['action'],
+  subjectId: string,
+  before: string | null,
+  after: string | null,
+  note: string
+): Promise<void> {
+  try {
+    await repo().appendAudit({
+      id: crypto.randomUUID(),
+      actorRole: 'super_admin',
+      actorId: 'super_admin',
+      action,
+      subjectId,
+      before,
+      after,
+      note,
+      createdAt: new Date().toISOString(),
+    });
+  } catch {
+    // An audit failure must never block the money action it describes.
+  }
+}
+
+function withoutPasscode(c: Consultancy): Omit<Consultancy, 'passcode'> {
+  const { passcode: _secret, ...safe } = c;
+  return safe;
+}
+
 export async function GET() {
   const s = await platform.getSettings();
 
+  /**
+   * D-17. The support number is returned even when nothing is wrong.
+   *
+   * The checkout used to get the number ONLY on a successful `create`, so any
+   * failure on that call removed the "Talk to a person" card from the one
+   * screen where money is in flight. The number is already sent to every
+   * student on every successful checkout, so publishing it here leaks nothing
+   * and means no screen can ever lose its way to a human.
+   */
   if (!s.maintenanceMode) {
-    return NextResponse.json({ ok: true, data: { maintenanceMode: false } });
+    return NextResponse.json({
+      ok: true,
+      // Through the helper, so it picks up the env fallback exactly like every
+      // other screen rather than being the one place that reads settings raw.
+      data: { maintenanceMode: false, supportWhatsapp: await supportWhatsapp() },
+    });
   }
 
   return NextResponse.json({
@@ -58,11 +129,38 @@ const Body = z.discriminatedUnion('action', [
     action: z.literal('overview'),
     superKey: z.string().min(1),
   }),
+  /**
+   * D-13. Read back the saved maintenance message, for the owner only.
+   *
+   * The public GET deliberately withholds the contact name and number while the
+   * platform is UP, because that is the owner's personal number and there is no
+   * reason to publish it. But the owner's own screen still has to load what is
+   * saved, or the fields come back blank on every visit and a second pause
+   * ships an emergency screen with no phone number on it.
+   */
+  z.object({
+    action: z.literal('getMaintenance'),
+    ownerKey: z.string().min(1),
+  }),
   z.object({
     action: z.literal('setConsultancyStatus'),
     superKey: z.string().min(1),
     consultancyId: z.string().min(1),
     status: z.enum(['pending', 'approved', 'suspended']),
+  }),
+  /**
+   * D-31. Mark a consultancy's network as a lab.
+   *
+   * Raises the per-device account threshold from 4 to 40 for that IP, which is
+   * the whole reason `DEVICE_ALLOWLISTED_THRESHOLD` exists. Without a way to
+   * set this the fifth student to sit at a shared lab machine was soft-denied
+   * their free trial, at the client's most important kind of customer.
+   */
+  z.object({
+    action: z.literal('setAllowlistedIps'),
+    superKey: z.string().min(1),
+    consultancyId: z.string().min(1),
+    ips: z.array(z.string().min(3).max(45)).max(20),
   }),
   z.object({
     action: z.literal('createConsultancy'),
@@ -96,14 +194,33 @@ export async function POST(req: Request) {
   let body: z.infer<typeof Body>;
   try {
     body = Body.parse(await req.json());
-  } catch {
+  } catch (e) {
+    // D-22. Name the field and the limit instead of six generic words.
     return NextResponse.json(
-      apiError('BAD_REQUEST', 'invalid body', 'Something went wrong.'),
+      apiError('BAD_REQUEST', 'invalid body', zodMessage(e as ZodError)),
       { status: 400 }
     );
   }
 
   // ---- Owner only. A super admin cannot reach this branch. ----
+  if (body.action === 'getMaintenance') {
+    if (!isOwner(body.ownerKey)) {
+      rateLimitPenalise(`platform-auth:${clientIp(req)}`, RL.auth);
+      return NextResponse.json(apiError('FORBIDDEN', 'bad owner key', 'Not allowed.'), { status: 403 });
+    }
+    const cur = await platform.getSettings();
+    return NextResponse.json({
+      ok: true,
+      data: {
+        maintenanceMode: cur.maintenanceMode,
+        maintenanceTitle: cur.maintenanceTitle,
+        maintenanceMessage: cur.maintenanceMessage,
+        contactName: cur.contactName,
+        contactPhone: cur.contactPhone,
+      },
+    });
+  }
+
   if (body.action === 'setMaintenance') {
     if (!isOwner(body.ownerKey)) {
       rateLimitPenalise(`platform-auth:${clientIp(req)}`, RL.auth);
@@ -153,7 +270,13 @@ export async function POST(req: Request) {
     return NextResponse.json({
       ok: true,
       data: {
-        consultancies,
+        // D-16. This used to return the whole Consultancy row, PASSCODE AND
+        // ALL, in plain text. Not the handover code we chose either: the
+        // private one the consultancy picked precisely so we would not know it,
+        // on the very screen that told them "your student list should be yours
+        // alone". `/api/admin` had always stripped it, which is why the rule
+        // was recorded as proven; nobody checked this route.
+        consultancies: consultancies.map(withoutPasscode),
         students,
         revenue: revenueSummary(consultancies, students),
       },
@@ -173,7 +296,40 @@ export async function POST(req: Request) {
       approvedAt: body.status === 'approved' ? new Date().toISOString() : c.approvedAt,
     };
     await platform.saveConsultancy(updated);
-    return NextResponse.json({ ok: true, data: updated });
+    await auditPlatform(
+      body.status === 'approved' ? 'approve_consultancy' : 'suspend_consultancy',
+      c.id,
+      c.status,
+      body.status,
+      `${c.name} (${c.slug}) set to ${body.status}. ${c.seatsTotal} seats, NPR ${c.paidNpr} recorded as paid.`
+    );
+    return NextResponse.json({ ok: true, data: withoutPasscode(updated) });
+  }
+
+  if (body.action === 'setAllowlistedIps') {
+    const c = await platform.getConsultancy(body.consultancyId);
+    if (!c) {
+      return NextResponse.json(apiError('NOT_FOUND', 'no consultancy', 'Not found.'), { status: 404 });
+    }
+    const updated: Consultancy = { ...c, allowlistedIps: body.ips };
+    await platform.saveConsultancy(updated);
+    await auditPlatform(
+      'set_allowlisted_ips',
+      c.id,
+      String((c.allowlistedIps ?? []).length),
+      String(body.ips.length),
+      `${c.name} (${c.slug}) lab networks set to ${body.ips.length} address(es).`
+    );
+    return NextResponse.json({
+      ok: true,
+      data: {
+        allowlistedIps: body.ips,
+        message:
+          body.ips.length > 0
+            ? 'Saved. Students on those networks can share a machine without losing their free questions.'
+            : 'Saved. That consultancy is back to the normal shared-device limit.',
+      },
+    });
   }
 
   // createConsultancy
@@ -209,5 +365,12 @@ export async function POST(req: Request) {
     passcodeChangedAt: null,
   };
   await platform.saveConsultancy(created);
-  return NextResponse.json({ ok: true, data: created });
+  await auditPlatform(
+    'create_consultancy',
+    created.id,
+    null,
+    `${created.seatsTotal} seats`,
+    `${created.name} (${created.slug}) created with ${created.seatsTotal} seats, NPR ${created.paidNpr} recorded as paid.`
+  );
+  return NextResponse.json({ ok: true, data: withoutPasscode(created) });
 }

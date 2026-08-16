@@ -317,6 +317,18 @@ export class BlobRepo implements Repo {
     return this.getMany<SeatAllocation>(`seatalloc/${consultancyId}/`);
   }
 
+  /** D-29. Stamp revokedAt so the seat counts as free again. */
+  async revokeSeat(consultancyId: string, studentId: string): Promise<boolean> {
+    const seats = await this.listSeats(consultancyId);
+    const live = seats.find((s) => s.studentId === studentId && !s.revokedAt);
+    if (!live) return false;
+    await this.put(`seatalloc/${consultancyId}/${live.id}`, {
+      ...live,
+      revokedAt: new Date().toISOString(),
+    });
+    return true;
+  }
+
   // ------------------------------------------------------- audit and notices
 
   async appendAudit(a: ApprovalAudit): Promise<void> {

@@ -85,6 +85,16 @@ export interface Repo {
    */
   allocateSeat(a: SeatAllocation, seatsTotal: number, opts?: { renewal?: boolean }): Promise<{ ok: boolean; seatsUsed: number }>;
   listSeats(consultancyId: string): Promise<SeatAllocation[]>;
+  /**
+   * D-29. Give a seat back.
+   *
+   * `SeatAllocation.revokedAt` was READ in six places to work out how many
+   * seats were still live, and WRITTEN nowhere but `null`. So a seat taken by
+   * somebody who should not have had it, a stranger who found the consultancy's
+   * public link, was gone permanently and the consultancy had no way to reclaim
+   * what they had paid for.
+   */
+  revokeSeat(consultancyId: string, studentId: string): Promise<boolean>;
 
   // audit and notifications
   appendAudit(a: ApprovalAudit): Promise<void>;

@@ -402,8 +402,54 @@ export function resolvedQuestion(q: Question, inst: Institution): Question {
   };
 }
 
+/**
+ * D-24. Questions the super admin adds, and questions a student asks for.
+ *
+ * `POST /api/super addQuestion` answered `{"id":"x-...","total":1}` and the
+ * question was NEVER ASKED. `extraQuestions` in platform settings had two
+ * writers, the admin screen and a student's own drill list, and **no reader
+ * anywhere in the interview path** -- `eligiblePool()` and `buildQuestionPlan()`
+ * returned only the hardcoded array below. So two separate promises were
+ * silently broken, one of them to a student who had paid.
+ *
+ * Read through a primed cache rather than by making every call site async.
+ * `getQuestion` is called from six places including a page render, and turning
+ * all of them async to reach one setting would be a far larger change than the
+ * bug deserves. Server routes call `primeExtraQuestions()` once at the top; the
+ * sync functions then see the merged pool.
+ */
+let EXTRA: Question[] = [];
+
+export async function primeExtraQuestions(): Promise<void> {
+  try {
+    const { platform } = await import('@/lib/platform');
+    const s = await platform.getSettings();
+    EXTRA = (s.extraQuestions ?? []).map((q) => ({
+      id: q.id,
+      vertical: 'uk-precas' as const,
+      institutionId: null,
+      category: (q.category as Question['category']) ?? 'conversational',
+      text: q.text,
+      timeLimitSeconds: 60,
+      tips: [],
+      modelAnswer: '',
+      // The admin writes the intent; it is the private note the evaluator uses
+      // and is never sent to the browser.
+      rubricNotes: q.intent ?? '',
+    }));
+  } catch {
+    // A settings read failure must never take the question bank down with it.
+    EXTRA = [];
+  }
+}
+
+/** The vetted bank plus anything added since, without a deploy. */
+function pool(): Question[] {
+  return EXTRA.length ? [...QUESTIONS, ...EXTRA] : QUESTIONS;
+}
+
 export function getQuestion(id: string): Question | undefined {
-  return QUESTIONS.find((q) => q.id === id);
+  return pool().find((q) => q.id === id);
 }
 
 /**
@@ -460,10 +506,11 @@ function shuffled<T>(arr: T[]): T[] {
  * is not a defence.
  */
 export function eligiblePool(): Question[] {
-  return QUESTIONS;
+  return pool();
 }
 
 export function buildQuestionPlan(limit: number): string[] {
+  const QUESTIONS = pool();
   if (limit >= QUESTIONS.length) return QUESTIONS.map((q) => q.id);
 
   // Openers first. A real interview starts by asking who you are, so the
@@ -507,13 +554,16 @@ export function buildQuestionPlan(limit: number): string[] {
  * useful loop in the product.
  */
 export function buildPracticePlan(category?: string): string[] {
-  const pool = category ? QUESTIONS.filter((q) => q.category === category) : QUESTIONS;
-  const from = pool.length > 0 ? pool : QUESTIONS;
+  // D-24. Practice draws from the merged pool too, or a question the admin
+  // added is asked in a mock and never in a drill.
+  const all = pool();
+  const bucket = category ? all.filter((q) => q.category === category) : all;
+  const from = bucket.length > 0 ? bucket : all;
   const pick = from[Math.floor(Math.random() * from.length)]!;
   return [pick.id];
 }
 
 /** Categories that actually have questions, for the practice picker. */
 export function practiceCategories(): string[] {
-  return [...new Set(QUESTIONS.map((q) => q.category))];
+  return [...new Set(pool().map((q) => q.category))];
 }

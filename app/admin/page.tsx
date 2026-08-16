@@ -169,9 +169,66 @@ export default function AdminPage() {
       // The passcode in state is now wrong; every later call would 403.
       setPasscode(newPasscode);
       setMustChange(false);
+
+      /**
+       * Re-read everything with the NEW passcode before showing the portal.
+       *
+       * While the handover code is in force the server deliberately sends a
+       * hollow payload: no students, no orders, and zero seats, because the
+       * secret is still shared and none of that is theirs alone yet. Without
+       * this refetch the portal renders that hollow payload as though it were
+       * real, and the first thing a new consultancy sees is "Seats left 0" when
+       * they have just paid for four.
+       *
+       * The new passcode is passed explicitly rather than read from state,
+       * because `setPasscode` above has not been applied yet on this pass.
+       */
+      const res = await fetch('/api/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, passcode: newPasscode, action: 'login' }),
+      });
+      const json = await res.json();
+      if (json.ok) {
+        setData(json.data as AdminData);
+        setLogoUrl(json.data.consultancy.logoUrl ?? '');
+        setColour(json.data.consultancy.primaryColor || '#0d1b2a');
+      }
+
       setNotice(ok.message ?? 'Saved. Use your new passcode from now on.');
       return true;
     },
+    [call, slug]
+  );
+
+  /**
+   * D-29. Take a seat back from a student who should not have had one.
+   *
+   * The student link is a public URL and a seat is granted automatically to
+   * anyone who signs up through it, so a link forwarded into a Facebook group
+   * spends seats the consultancy paid for on strangers. `revokedAt` existed on
+   * the allocation and was read in six places to count live seats, and nothing
+   * anywhere could set it.
+   */
+  const revokeSeat = useCallback(
+    async (student: Student) => {
+      if (
+        !window.confirm(
+          `Take your seat back from ${student.name || student.email || 'this student'}?\n\n` +
+            'The seat becomes available again. Anything they have already used stays with them, ' +
+            'and they keep their reports.'
+        )
+      )
+        return;
+      const ok = (await call({ action: 'revokeSeat', studentId: student.id })) as
+        | { message?: string }
+        | null;
+      if (ok) {
+        setNotice(ok.message ?? 'Seat taken back.');
+        await login();
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [call]
   );
 
@@ -263,7 +320,7 @@ export default function AdminPage() {
         setSeatSuffix('');
       }
     },
-    [call]
+    [call, slug]
   );
 
   /** N-6, second half: tell us the transaction number. */
@@ -351,6 +408,7 @@ export default function AdminPage() {
             onEnter={() => slug && passcode && login()}
             placeholder="Passcode"
             label="Consultancy passcode"
+                      name="consultancy-passcode"
           />
 
           {error && <p className="mb-3 font-medium text-red-600">{error}</p>}
@@ -831,6 +889,17 @@ export default function AdminPage() {
                           <span className="text-xs font-semibold text-amber-700">
                             no seats left
                           </span>
+                        )}
+                        {/* D-29. The way back. Only shown for a student who is
+                            actually holding one of their seats. */}
+                        {st.mocksLeft > 0 && (
+                          <button
+                            onClick={() => revokeSeat(st)}
+                            disabled={busy}
+                            className="ml-2 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 disabled:opacity-50"
+                          >
+                            Take seat back
+                          </button>
                         )}
                       </td>
                     </tr>

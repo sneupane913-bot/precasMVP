@@ -88,7 +88,13 @@ line
 
 for suite in "${SERVER[@]}"; do
   PORT=$((PORT + 1))
-  npx next dev -p "$PORT" >"/tmp/qa-$suite.log" 2>&1 &
+  # QA_ALLOW_DEV_TOKENS: the harness signs in with `dev:` tokens rather than
+  # real Google ones. That used to work only while Firebase was UNCONFIGURED,
+  # so the day real keys were added to .env.local every server suite went red at
+  # once and looked like thirty broken features instead of one broken sign-in.
+  # Asking for the hatch by name means configuring the product properly can
+  # never silently disarm the tests again. It is still refused in production.
+  QA_ALLOW_DEV_TOKENS=1 npx next dev -p "$PORT" >"/tmp/qa-$suite.log" 2>&1 &
   SRV=$!
 
   # Wait for it to answer rather than sleeping a fixed guess.

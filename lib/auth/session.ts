@@ -70,6 +70,26 @@ export async function currentStudent(): Promise<Student | null> {
   return s;
 }
 
+/**
+ * D-30. The signed-in student, disabled or not.
+ *
+ * `currentStudent()` returns null for a disabled account, which is right for
+ * every action but wrong for every MESSAGE. Because the session looked empty,
+ * a disabled student was told "Please sign in first so we can save your
+ * practice." They ARE signed in; they have been disabled. So they sign in
+ * again, succeed at Google, land in the same place and read the same sentence,
+ * for ever, with no explanation and nobody to contact.
+ *
+ * Everywhere else in this product a refusal carries a reason and a way out.
+ * This was the one place it did not, and it is the path a wrongly flagged
+ * student lands on.
+ */
+export async function currentStudentEvenIfDisabled(): Promise<Student | null> {
+  const id = await currentStudentId();
+  if (!id) return null;
+  return (await repo().getStudent(id)) ?? null;
+}
+
 /** Short, unambiguous, and safe to read out over the phone. */
 export function newReferralCode(): string {
   const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no O/0, no I/1

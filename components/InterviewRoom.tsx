@@ -51,6 +51,7 @@ export function InterviewRoom({
   institution,
   questions,
   startIndex,
+  alreadyAnswered = [],
   demo,
   isTrial,
   fullMockLength,
@@ -59,6 +60,15 @@ export function InterviewRoom({
   institution: Institution;
   questions: PublicQuestion[];
   startIndex: number;
+  /**
+   * Question ids already answered in an EARLIER visit to this sitting.
+   *
+   * D-25. Without this the counter starts at zero on every entry, so a student
+   * coming back to a half-finished interview is told their work is gone. The
+   * data was always safe; the label was the thing that lied, and the label is
+   * all the student can see.
+   */
+  alreadyAnswered?: string[];
   demo: { stt: boolean; evaluator: boolean; storage: boolean };
   /** True when this sitting is the free 10 of a 17 question paper. */
   isTrial: boolean;
@@ -79,11 +89,27 @@ export function InterviewRoom({
   /** S-28. True when the upload failed for network reasons and the audio survives. */
   const [canResend, setCanResend] = useState(false);
   const pendingRef = useRef<{ blob: Blob; questionId: string; durationSeconds: number } | null>(null);
+
+  /**
+   * D-37. Always points at the CURRENT upload closure. See the long note on
+   * `rec.onstop` below for why a plain reference silently destroyed answers.
+   */
+  const uploadRef = useRef<() => Promise<void>>(async () => {});
+
+  /**
+   * D-40. The upload that is currently in flight, if any.
+   *
+   * The client suspected that stopping early loses the recording. It does not:
+   * the timer and the stop button both go through `stopRecording`, so the audio
+   * is uploaded either way. But looking for it found a real defect beside it,
+   * described on `closeSession`.
+   */
+  const inFlightRef = useRef<Promise<void> | null>(null);
   const [tipIndex, setTipIndex] = useState(0);
   const [cameraOn, setCameraOn] = useState(true);
   /** Question read-aloud. Off by default: the browser voice is poor. */
   const [voiceOn, setVoiceOn] = useState(false);
-  const [answeredIds, setAnsweredIds] = useState<Set<string>>(new Set());
+  const [answeredIds, setAnsweredIds] = useState<Set<string>>(() => new Set(alreadyAnswered));
   const [error, setError] = useState<string | null>(null);
   // Held in STATE, not only a ref. useMonitor needs this as a dependency, and a
   // ref assignment does not re-render, so the noise monitor would only ever
@@ -260,7 +286,37 @@ export function InterviewRoom({
     rec.ondataavailable = (e) => {
       if (e.data.size > 0) chunksRef.current.push(e.data);
     };
-    rec.onstop = () => void upload();
+    /**
+     * D-37. THE WORST DEFECT IN THE HISTORY OF THIS PRODUCT. IT DESTROYED DATA.
+     *
+     * This line used to read `rec.onstop = () => void upload()`.
+     *
+     * `startRecording` is memoised on [startLiveTranscript], which never
+     * changes, so it is created ONCE, on question one. The `upload` it captured
+     * was therefore question one's `upload`, with `question.id` frozen at
+     * "q-01" for the whole interview. Every subsequent answer was uploaded
+     * under question one's id.
+     *
+     * The server behaved perfectly and made it worse: it replaces any existing
+     * answer for a question id, so answer two overwrote answer one, answer
+     * three overwrote answer two. At the end there was exactly ONE answer.
+     *
+     * Every symptom the client reported was this one line:
+     *   - "1 done, 9 left" never moved, because answeredIds only ever gained q-01
+     *   - the end-interview dialog always said 9 left, which looked hardcoded
+     *   - the report showed ONE question
+     *   - and it showed question one's TEXT above question three's TRANSCRIPT
+     *
+     * Nothing was hardcoded. The student was being charged for ten answers and
+     * shown one, and the one shown was attributed to the wrong question.
+     *
+     * A ref always holds the CURRENT upload, so the recorder can be created
+     * once and still call the right closure every time.
+     */
+    rec.onstop = () => {
+      // D-40. Publish the in-flight upload so `closeSession` can wait for it.
+      inFlightRef.current = uploadRef.current();
+    };
     rec.start(250);
     recorderRef.current = rec;
     startedAtRef.current = Date.now();
@@ -363,11 +419,17 @@ export function InterviewRoom({
       // Our failure, not theirs, and the recording is safe.
       setCanResend(true);
       setMessage(
-        'Your answer was recorded but could not reach us. Your connection dropped. Nothing is lost \u2014 send the same recording again.'
+        'Your answer was recorded but could not reach us. Your connection dropped. Nothing is lost. Send the same recording again.'
       );
       setPhase('retry');
     }
   }, [question.id, sessionId, raise]);
+
+  // D-37. Keep the ref pointing at this render's upload, so the recorder's
+  // onstop handler can never call a closure from an earlier question.
+  useEffect(() => {
+    uploadRef.current = upload;
+  }, [upload]);
 
   /** S-28. Send the recording we already have, without making them speak again. */
   const resend = useCallback(async () => {
@@ -435,9 +497,31 @@ export function InterviewRoom({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, question?.id, next]);
 
-  /** Close the session and release the camera. Shared by both endings. */
+  /**
+   * Close the session and release the camera. Shared by both endings.
+   *
+   * D-40. THE ANSWER THEY WERE STILL SPEAKING USED TO BE THROWN AWAY.
+   *
+   * `stopRecording()` does not upload synchronously. It stops the recorder,
+   * the recorder fires `onstop`, and `onstop` STARTS an upload. This function
+   * used to carry straight on to `/complete` and then navigate to the results
+   * page, so a student who was mid-answer when they pressed "End interview"
+   * raced their own recording: the summary was built, and often the page
+   * changed, before their last answer had been saved.
+   *
+   * It is the quiet version of D-37. Nothing looked broken. An answer simply
+   * was not there, and only the student would know it should have been.
+   *
+   * So we now wait for the recording in flight. `.catch` because a failed
+   * upload must not trap them on the interview screen: their answers are on
+   * the server and the results page rebuilds the summary from those.
+   */
   const closeSession = useCallback(async () => {
     stopRecording();
+    if (inFlightRef.current) {
+      await inFlightRef.current.catch(() => {});
+      inFlightRef.current = null;
+    }
     streamRef.current?.getTracks().forEach((t) => t.stop());
     window.speechSynthesis?.cancel();
     try {
@@ -448,7 +532,22 @@ export function InterviewRoom({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
 
+  /**
+   * D-33. "End interview and see results" was a single unguarded click, and it
+   * spent the whole mock. A student answered ONE of ten questions, pressed it
+   * out of curiosity, and the credit was gone: the universities page then said
+   * "Buy a pack to start". Nothing had warned them, and nothing could give it
+   * back.
+   *
+   * This is the most expensive button on the site, so it now says what it
+   * costs before it charges. Deliberately NOT window.confirm: that renders as a
+   * frozen browser, cannot say how many questions are left, and cannot be
+   * styled to look like a decision rather than an error.
+   */
+  const [endConfirm, setEndConfirm] = useState(false);
+
   const finish = useCallback(async () => {
+    setEndConfirm(false);
     setPhase('finishing');
     await closeSession();
 
@@ -548,7 +647,11 @@ export function InterviewRoom({
   if (phase === 'trial_gate') {
     return (
       <TrialGate
-        answered={questions.length}
+        // D-28. This was `questions.length`, the size of the sitting, so the
+        // screen that asks for NPR 449 told a student who had answered 2 that
+        // they had "answered all 10 free questions".
+        answered={answeredCount}
+        askedCount={questions.length}
         total={fullMockLength}
         remaining={Math.max(0, fullMockLength - questions.length)}
         onSeeReport={() => router.push(`/results/${sessionId}`)}
@@ -645,11 +748,15 @@ export function InterviewRoom({
           {demo.stt && (
             <div className="mb-4 rounded-xl border-2 border-purple-300 bg-purple-50 px-4 py-3">
               <p className="font-bold text-purple-900">Demo mode: we are not really listening yet</p>
+              {/* D-26. This used to name DEEPGRAM_API_KEY while /super named
+                  GROQ_API_KEY for the same feature. Groq is the primary in
+                  lib/ai/stt.ts and costs $0.111 an hour against Deepgram's
+                  $0.258, so following this screen meant buying the fallback at
+                  more than double the price. One name, in both places. */}
               <p className="mt-1 text-sm leading-relaxed text-purple-900/90">
                 No speech-to-text key is set, so the transcript below is sample text, not your
-                voice. Everything else on this screen is real. Add a Deepgram key to
-                <span className="font-mono"> .env.local </span>
-                to hear your actual answers.
+                voice. Nothing here is scored and nothing is a judgement of your English. Everything
+                else on this screen is real.
               </p>
             </div>
           )}
@@ -1026,13 +1133,63 @@ export function InterviewRoom({
           />
 
           <button
-            onClick={finish}
+            onClick={() => {
+              // Finishing the last question is not "ending early". Only ask
+              // when there is genuinely something left to lose.
+              if (answeredCount >= questions.length) finish();
+              else setEndConfirm(true);
+            }}
             className="w-full rounded-xl border-2 border-slate-300 bg-white py-3 text-sm font-semibold text-slate-600"
           >
             End interview and see results
           </button>
         </aside>
       </main>
+
+      {/* D-33. Names the exact cost, in the student's own numbers. */}
+      {endConfirm && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="end-early-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 p-4"
+        >
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <h2 id="end-early-title" className="text-xl font-bold text-slate-900">
+              You still have {questions.length - answeredCount} question
+              {questions.length - answeredCount === 1 ? '' : 's'} left
+            </h2>
+
+            <p className="mt-3 text-sm leading-relaxed text-slate-600">
+              A report is made once, when the interview ends. If you stop now, this mock is used up
+              and the {questions.length - answeredCount} question
+              {questions.length - answeredCount === 1 ? '' : 's'} you have not answered cannot be
+              added to it later.
+            </p>
+
+            <div className="mt-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
+              You have answered <strong>{answeredCount}</strong> of{' '}
+              <strong>{questions.length}</strong>. A score from part of an interview cannot tell you
+              whether you are ready.
+            </div>
+
+            <div className="mt-5 flex flex-col gap-2">
+              <button
+                onClick={() => setEndConfirm(false)}
+                className="w-full rounded-xl bg-slate-900 py-3 text-sm font-semibold text-white"
+              >
+                Go back and finish the interview
+              </button>
+              <button
+                onClick={finish}
+                className="w-full rounded-xl border border-slate-300 bg-white py-3 text-sm font-medium text-slate-600"
+              >
+                Stop anyway and use up this mock
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

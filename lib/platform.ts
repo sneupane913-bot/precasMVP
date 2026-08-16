@@ -43,6 +43,19 @@ export interface Consultancy {
    */
   passcodeIsTemporary?: boolean;
   passcodeChangedAt?: string | null;
+  /**
+   * D-31. Networks that are a known consultancy lab.
+   *
+   * `lib/trial-gate.ts` allows 4 distinct accounts per device normally and 40
+   * on an allowlisted consultancy network, and that 40 exists for exactly one
+   * purpose: a lab with a few shared machines must not have its students
+   * refused their free trial. The gate read this field through an `as` cast
+   * because it did not exist on the type, and nothing anywhere ever wrote it,
+   * so the branch was dead code and the fifth student at a shared machine was
+   * always soft-denied. The client's most important customer is a consultancy
+   * with a lab.
+   */
+  allowlistedIps?: string[];
 }
 
 export interface StudentRecord {

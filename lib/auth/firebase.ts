@@ -71,11 +71,35 @@ interface LookupUser {
 export async function verifyFirebaseIdToken(idToken: string): Promise<FirebaseIdentity | null> {
   const cfg = firebaseWebConfig();
 
-  // Development escape hatch. Refused in production, verified by test:
-  // `next start` runs as production and rejects these, which is how it should be.
-  if (!cfg) {
-    if (process.env.NODE_ENV === 'production') return null;
-    if (!idToken.startsWith('dev:')) return null;
+  /**
+   * Development escape hatch, and the reason it is shaped like this.
+   *
+   * It used to be reachable ONLY when `!cfg`, that is, only while Firebase was
+   * not configured. That worked for exactly as long as nobody configured
+   * Firebase. The moment real Google keys were added to `.env.local` so that
+   * sign-in would work in a browser, every `dev:` token started being posted to
+   * Google, who quite correctly rejected it, and **nine test suites went red at
+   * once**: pilot, rules, journey, lifecycle, adversarial, fraud, tenant,
+   * backoffice and backoffice-ui. Every one of them failed with 401, 404 or
+   * `undefined` because none of them could sign in any more.
+   *
+   * That is a nasty class of bug. The harness's ability to sign in depended on
+   * the product being MISCONFIGURED, so the suites were quietly guaranteed to
+   * stop working the moment the product was set up properly, and the failures
+   * looked like thirty broken features rather than one broken key.
+   *
+   * So the hatch is now explicit and independent of the Firebase config:
+   *   - never in production, which `next start` still proves;
+   *   - otherwise only when the harness asks for it by name.
+   *
+   * `qa/run-all.sh` sets `QA_ALLOW_DEV_TOKENS=1`. Nothing else does, so an
+   * ordinary `next dev` on a laptop behaves exactly like production here.
+   */
+  const devTokensAllowed =
+    process.env.NODE_ENV !== 'production' &&
+    (!cfg || process.env.QA_ALLOW_DEV_TOKENS === '1');
+
+  if (idToken.startsWith('dev:') && devTokensAllowed) {
     const handle = idToken.slice(4).trim().toLowerCase().replace(/[^a-z0-9]/g, '');
     if (!handle) return null;
     return {
@@ -88,6 +112,9 @@ export async function verifyFirebaseIdToken(idToken: string): Promise<FirebaseId
       provider: 'dev',
     };
   }
+
+  // No Firebase configured and not an allowed dev token: nothing can verify it.
+  if (!cfg) return null;
 
   try {
     const res = await fetch(

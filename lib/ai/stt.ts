@@ -65,7 +65,30 @@ export async function transcribe(
   const groqKey = process.env.GROQ_API_KEY;
   const deepgramKey = process.env.DEEPGRAM_API_KEY;
 
-  if (groqKey) return transcribeGroq(audio, mimeType, groqKey, durationSeconds);
+  /**
+   * Two providers, and a REAL fallback between them.
+   *
+   * This used to be "use Groq if the key exists, otherwise Deepgram", with no
+   * path from one to the other. So a Groq outage, or simply hitting the free
+   * tier's 7,200 audio-seconds-per-hour ceiling during a busy evening, meant
+   * the student got nothing at all even when a perfectly good Deepgram key was
+   * sitting in the environment unused.
+   *
+   * That is the single-supplier risk the client named: Groq's paid Developer
+   * tier is currently closed to new upgrades, so the cheap provider is one he
+   * cannot pay and therefore cannot lean on alone.
+   *
+   * Now: try Groq, and if it comes back failed for any reason, try Deepgram
+   * before giving up. Set both keys and neither provider can take the product
+   * down on its own. Silence and too-short answers are NOT failures and are
+   * returned as they are, because retrying a quiet recording on a second paid
+   * provider would just spend money to reach the same honest answer.
+   */
+  if (groqKey) {
+    const first = await transcribeGroq(audio, mimeType, groqKey, durationSeconds);
+    if (first.status !== 'failed' || !deepgramKey) return first;
+    return transcribeDeepgram(audio, mimeType, deepgramKey, durationSeconds);
+  }
   if (deepgramKey) return transcribeDeepgram(audio, mimeType, deepgramKey, durationSeconds);
 
   if (process.env.NODE_ENV === 'production') {
@@ -123,7 +146,7 @@ async function transcribeGroq(
     }
 
     const json = (await res.json()) as GroqResponse;
-    const transcript = (json.text ?? '').trim();
+    const transcript = stripHallucinatedTail((json.text ?? '').trim());
     const wordCount = transcript ? transcript.split(/\s+/).length : 0;
 
     // Whisper hallucinates stock phrases on silence. Catch the common ones.
@@ -135,6 +158,82 @@ async function transcribeGroq(
   } catch {
     return { status: 'failed', transcript: '', confidence: 0, wordCount: 0, provider: 'groq', partial: false, wordsPerSecond: 0 };
   }
+}
+
+/**
+ * D-36. FOUND IN THE FIRST REAL INTERVIEW EVER SAT ON THIS PRODUCT.
+ *
+ * The client spoke a clean 45-second introduction. Whisper transcribed all of
+ * it correctly, then appended "NEPALI STUDENT ASKING A QUESTION", which he
+ * never said. It then appeared on the results page under the heading
+ * "WHAT YOU SAID".
+ *
+ * That is not a random hallucination. It is OUR OWN `prompt` parameter, the
+ * vocabulary hint sent on line 133, bleeding back into the output. Whisper is
+ * documented to do this when the audio ends in silence: with nothing left to
+ * transcribe it falls back on the conditioning text.
+ *
+ * Putting words in a student's mouth is the one thing this product must never
+ * do, and it is exactly what we criticise the competitor for. So the tail is
+ * removed whenever it looks like our prompt rather than like speech.
+ *
+ * Detection is deliberately conservative, because deleting something a student
+ * ACTUALLY said is a worse failure than leaving an artefact in. A trailing
+ * fragment is only dropped when it is both short and shouted in capitals, or
+ * when it repeats the distinctive words of our own hint.
+ */
+const PROMPT_WORDS = new Set(
+  'nepali student answering uk university precas cas credibility interview about their course tuition fees sponsor accommodation career plans'.split(
+    ' '
+  )
+);
+
+export function stripHallucinatedTail(text: string): string {
+  if (!text) return text;
+
+  // Split on sentence ends but keep the punctuation with each piece.
+  const parts = text.match(/[^.!?]+[.!?]*/g);
+  if (!parts || parts.length < 2) return text;
+
+  let out = [...parts];
+
+  // Only ever consider the LAST fragment. Bleed happens at the end, where the
+  // silence is. Mid-answer text is real speech and is never touched.
+  for (let guard = 0; guard < 2 && out.length > 1; guard++) {
+    const tail = out[out.length - 1].trim();
+    const words = tail.replace(/[^A-Za-z\s]/g, '').trim().split(/\s+/).filter(Boolean);
+    if (words.length === 0) break;
+
+    /**
+     * Two different limits, and the first version got this wrong.
+     *
+     * The first attempt capped BOTH checks at 10 words, so it caught the short
+     * shouted form but sailed straight past the full sentence: "NEPALI student
+     * answering a UK university pre-CAS credibility interview about their
+     * course, university, tuition fees, sponsor, accommodation and career
+     * plans." That is 24 words, it is our prompt almost verbatim, and it
+     * reached the student's report under the heading "WHAT YOU SAID".
+     *
+     * A shouted fragment is only suspicious when it is SHORT, because a long
+     * capitalised passage is more likely something odd the student really said.
+     * A prompt echo is recognised by its words, not its length, so it gets the
+     * longer allowance.
+     */
+    const lettersOnly = tail.replace(/[^A-Za-z]/g, '');
+    const shouted =
+      words.length <= 10 && lettersOnly.length > 3 && lettersOnly === lettersOnly.toUpperCase();
+    const fromOurPrompt =
+      words.length <= 40 &&
+      words.filter((w) => PROMPT_WORDS.has(w.toLowerCase())).length / words.length >= 0.6;
+
+    if (shouted || fromOurPrompt) {
+      out = out.slice(0, -1);
+      continue;
+    }
+    break;
+  }
+
+  return out.join('').trim();
 }
 
 /**
@@ -230,7 +329,8 @@ function mockTranscribe(audio: ArrayBuffer, durationSeconds = 0): TranscriptionR
     };
   }
   const transcript =
-    '[DEMO TEXT, NOT YOUR VOICE] Um, my name is Sujan Neupane and I am from Butwal in ' +
+    DEMO_TRANSCRIPT_MARKER +
+    ' Um, my name is Sujan Neupane and I am from Butwal in ' +
     'Nepal. I completed my bachelor degree in business administration in 2023 from ' +
     'Tribhuvan University. After that I worked for about two years in a trading company ' +
     'as a sales officer. I have applied for the MSc Management course because I want to ' +
@@ -271,6 +371,26 @@ interface DeepgramResponse {
  */
 export function sttIsMocked(): boolean {
   return !process.env.GROQ_API_KEY && !process.env.DEEPGRAM_API_KEY;
+}
+
+/**
+ * The marker every mock transcript carries.
+ *
+ * Exported because the SUMMARY has to be able to recognise it. Without that,
+ * demo text walks straight past the "no transcript, no score" guard in the
+ * answer route: that guard only fires when `stt.status !== 'ok'`, and the mock
+ * provider returns `ok`. The result was a report telling a student their
+ * English clarity was 75% based on a paragraph they never said.
+ *
+ * Deliberately matched on the STORED TRANSCRIPT rather than on
+ * `sttIsMocked()`, so a session sat in demo mode still reports honestly after
+ * a real key is added later. What was demo stays demo.
+ */
+export const DEMO_TRANSCRIPT_MARKER = '[DEMO TEXT, NOT YOUR VOICE]';
+
+/** True when this answer's words came from the mock provider, not the student. */
+export function isDemoTranscript(text: string | null | undefined): boolean {
+  return typeof text === 'string' && text.startsWith(DEMO_TRANSCRIPT_MARKER);
 }
 
 export function redact(text: string): string {

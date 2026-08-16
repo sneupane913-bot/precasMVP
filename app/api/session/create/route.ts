@@ -6,13 +6,15 @@ import {
   buildPracticePlan,
   publicQuestion,
   getQuestion,
+  primeExtraQuestions,
 } from '@/lib/data/questions';
 import { store } from '@/lib/store';
 import { weakestCategoryFor } from '@/lib/advice';
 import { platformDown } from '@/lib/platform';
+import { supportWhatsapp } from '@/lib/support';
 import { rateLimit, clientIp, LIMITS as RL, maxMocksPerDay } from '@/lib/rate-limit';
 import { ensureOwnerId } from '@/lib/owner-session';
-import { currentStudent } from '@/lib/auth/session';
+import { currentStudent, currentStudentEvenIfDisabled } from '@/lib/auth/session';
 import { entitlementFor } from '@/lib/entitlement';
 import { repo } from '@/lib/db';
 import { apiError, type ApiResult, type InterviewSession } from '@/lib/types';
@@ -36,6 +38,9 @@ const Body = z.object({
 });
 
 export async function POST(req: Request) {
+  // D-24. Questions added with no deploy join the pool before it is used.
+  await primeExtraQuestions();
+
   const down = await platformDown();
   if (down) {
     return NextResponse.json(apiError(down.code, down.message, down.userMessage), { status: 503 });
@@ -63,6 +68,29 @@ export async function POST(req: Request) {
   // a trial. Sign-in is now required before any session exists.
   const student = await currentStudent();
   if (!student) {
+    /**
+     * D-30. Say which of the two things has actually happened.
+     *
+     * A disabled account also makes `currentStudent()` null, so a disabled
+     * student used to be told to sign in, sign in successfully, and be told to
+     * sign in again. Never a loop with no explanation: if they are signed in
+     * and disabled, say so, and give them somebody to talk to.
+     */
+    const disabled = await currentStudentEvenIfDisabled();
+    if (disabled) {
+      const num = await supportWhatsapp();
+      return NextResponse.json(
+        apiError(
+          'ACCOUNT_DISABLED',
+          'account disabled',
+          `Your account is paused, so you cannot start a new interview. Nothing you have done has been lost and any credits you paid for are safe.${
+            num ? ` Please message or call ${num} and we will sort it out.` : ' Please get in touch and we will sort it out.'
+          }`,
+          num ? { label: 'Message us', href: `https://wa.me/${num.replace(/\D/g, '')}` } : undefined
+        ),
+        { status: 403 }
+      );
+    }
     return NextResponse.json(
       apiError(
         'NOT_SIGNED_IN',

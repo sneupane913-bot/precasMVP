@@ -6,7 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { publicInstitutions } from '@/lib/data/institutions';
 import type { Institution } from '@/lib/types';
 import { SiteHeader } from '@/components/SiteHeader';
-import { SiteFooter } from '@/components/SiteFooter';
+import { SiteFooterView } from '@/components/SiteFooter';
+import { useSupportNumber } from '@/lib/useSupportNumber';
 
 /**
  * University-first browsing. The competitor's single best idea: a student who
@@ -22,6 +23,8 @@ export default function UniversitiesPage() {
 }
 
 function UniversityBrowser() {
+  // D-1/D-2/D-4. The footer is sync now; the number comes from here.
+  const supportNumber = useSupportNumber();
   const router = useRouter();
   // QA finding LIVE-006: the home page links here with ?q=BPP but the field
   // came up blank and every card was shown, so the link promised a filter it
@@ -236,8 +239,8 @@ function UniversityBrowser() {
             <p className="mb-1 font-bold text-ink">You have an interview in progress</p>
             <p className="mb-4 leading-relaxed text-emerald-900">
               {inProgress.answered > 0
-                ? `You answered ${inProgress.answered} of ${inProgress.total} questions. Nothing is lost — pick up exactly where you stopped.`
-                : `You started this interview and have not answered anything yet. Nothing is lost — go straight back in.`}
+                ? `You answered ${inProgress.answered} of ${inProgress.total} questions. Nothing is lost. Pick up exactly where you stopped.`
+                : `You started this interview and have not answered anything yet. Nothing is lost. Go straight back in.`}
             </p>
             <Link
               href={`/interview/${inProgress.sessionId}`}
@@ -277,7 +280,7 @@ function UniversityBrowser() {
               {starting ? 'Starting...' : 'Practise the general UK interview'}
             </button>
             <p className="mt-3 text-sm text-slate-500">
-              Or try a shorter search — "Coventry" rather than "Coventry University London".
+              Or try a shorter search, "Coventry" rather than "Coventry University London".
             </p>
           </div>
         ) : (
@@ -318,7 +321,7 @@ function UniversityBrowser() {
         )}
       </div>
       </main>
-      <SiteFooter />
+      <SiteFooterView whatsappDigits={supportNumber} />
     </>
   );
 }

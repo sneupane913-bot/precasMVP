@@ -30,6 +30,7 @@ export function PasscodeInput({
   placeholder,
   label,
   autoFocus,
+  name,
 }: {
   value: string;
   onChange: (v: string) => void;
@@ -38,6 +39,16 @@ export function PasscodeInput({
   /** Screen-reader name. Defaults to the placeholder. */
   label?: string;
   autoFocus?: boolean;
+  /**
+   * D-14. A distinct field name per portal.
+   *
+   * All three login boxes looked like the same credential to Chrome, so it
+   * autofilled the SUPER ADMIN passcode into the CONSULTANCY box, which then
+   * failed as "That name or passcode is not correct." On the client's own
+   * machine that means his super passcode is being offered on screens he hands
+   * to consultancies.
+   */
+  name?: string;
 }) {
   const [shown, setShown] = useState(false);
 
@@ -55,7 +66,11 @@ export function PasscodeInput({
         autoFocus={autoFocus}
         // Never offer to save or autofill a shared back-office passcode into a
         // browser profile that may not belong to the person holding it.
-        autoComplete="off"
+        name={name ?? 'passcode'}
+        // `off` is ignored by Chrome on password inputs; `new-password` is the
+        // value it actually respects, and the distinct name stops one portal's
+        // saved credential being offered on another's form.
+        autoComplete="new-password"
         spellCheck={false}
         // pr-24 leaves room for the button so a long passcode cannot run
         // underneath it and become unreadable at the very moment you need it.

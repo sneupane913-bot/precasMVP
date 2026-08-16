@@ -6,6 +6,7 @@ import type {
 } from '@/lib/types';
 import { FLAG_META } from '@/lib/types';
 import { getQuestion } from '@/lib/data/questions';
+import { isDemoTranscript } from '@/lib/ai/stt';
 
 function bandFor(score: number): Band {
   if (score >= 80) return 'ready';
@@ -87,10 +88,34 @@ export function buildSummary(session: InterviewSession): SessionSummary {
   // Rule: coaching may only be derived from successfully transcribed answers,
   // or from events we genuinely observed (flags, completion). Everything else
   // is reported as not assessed.
-  const heardNothing = scored.length === 0;
+  /**
+   * D-27. Demo answers count as NOT HEARD.
+   *
+   * The answer route carries the real guard, "no transcript, no score, ever",
+   * but it only fires when `stt.status !== 'ok'` and the mock provider returns
+   * `ok`. So with no AI key set, the report showed a student "Almost ready",
+   * "75%", and "English clarity 75%" derived from a paragraph they never
+   * spoke, with nothing on the page saying the AI was off.
+   *
+   * `lib/ai/stt.ts` already states the rule this broke: presenting invented
+   * text as a student's own answer is the exact failure we criticise the
+   * competitor for, and it is not excused by being a development convenience.
+   *
+   * So anything that depends on HEARING the student is withheld when every
+   * scored answer is demo text. Behaviour is still reported, because it was
+   * genuinely observed.
+   */
+  const demoOnly = scored.length > 0 && scored.every((a) => isDemoTranscript(a.transcript));
+  const heardNothing = scored.length === 0 || demoOnly;
 
   const strengths: string[] = [];
-  if (heardNothing) {
+  if (demoOnly) {
+    // Praising "you used real numbers" for a canned paragraph is the same lie
+    // as the score. Only genuinely observed behaviour may be praised.
+    if (criticalFlags === 0)
+      strengths.push('You stayed on the interview screen the whole time, which is exactly right.');
+    strengths.push('You sat the interview under real conditions, with the camera on and the timer running.');
+  } else if (heardNothing) {
     // The only honest positives are things that did not depend on hearing them.
     if (criticalFlags === 0)
       strengths.push('You stayed on the interview screen the whole time, which is exactly right.');
@@ -107,11 +132,25 @@ export function buildSummary(session: InterviewSession): SessionSummary {
   }
 
   const nextSteps: string[] = [];
-  if (heardNothing) {
+  if (demoOnly) {
+    // Not a microphone problem, so do not send them to check the microphone.
+    nextSteps.push(
+      'This is practice mode. The listening is not switched on yet, so the words above are a sample and are not what you said.'
+    );
+    nextSteps.push('Nothing here is a judgement of your English. Nothing has been scored.');
+    nextSteps.push('Everything else on this page is real: the questions, the timer, and how you behaved on camera.');
+  } else if (heardNothing) {
     nextSteps.push('We could not hear any of your answers, so there is nothing to judge yet.');
     nextSteps.push('Check your microphone is not muted and that your browser is allowed to use it.');
     nextSteps.push('Do the sound check before you start, and only continue once you hear yourself.');
   } else {
+    // D-35. This must come FIRST. The percentage above is the average of the
+    // questions that were answered, and a student reading a large green number
+    // will not work that out for themselves unless we say it.
+    if (completionRate < 0.6)
+      nextSteps.push(
+        `The score above is only for the ${scored.length} question${scored.length === 1 ? '' : 's'} you answered. Sit the full interview to find out where you really stand.`
+      );
     if (specificity < 55)
       nextSteps.push('Add real details to your answers: names, numbers, dates, module titles.');
     if (genuineIntent < 55)
@@ -124,20 +163,70 @@ export function buildSummary(session: InterviewSession): SessionSummary {
       nextSteps.push('Sit the mock again in two days and try to beat this score.');
   }
 
-  const band = bandFor(overallScore);
-  const headline =
-    scored.length === 0
+  // D-27. A demo sitting gets no headline verdict either. 75% and "Almost
+  // ready" printed in the largest type on the page is the part a student
+  // believes, whatever the transcript underneath is marked.
+  const reportedScore = heardNothing ? 0 : overallScore;
+
+  /**
+   * D-35. THE MOST DANGEROUS DEFECT FOUND IN THIS PRODUCT SO FAR.
+   *
+   * A student answered ONE of ten questions, pressed "End interview", and was
+   * shown 92% with a green "Ready" badge and the words "You are close to ready
+   * for the real interview". That is not a rounding problem. It is the product
+   * telling a student they are prepared for a credibility interview on the
+   * evidence of a single answer, and a student who believes it walks into the
+   * real thing unprepared.
+   *
+   * The score itself was not wrong: 92% was the honest average of what was
+   * answered. The VERDICT was wrong, because a verdict needs coverage as well
+   * as quality. One good answer out of ten is not evidence of readiness any
+   * more than one good exam question is evidence of passing the exam.
+   *
+   * So the band is now capped by how much of the interview was actually sat.
+   * Quality can only lower the band from what coverage allows, never raise it.
+   */
+  const RELIABLE_COVERAGE = 0.9;
+  const PARTIAL_COVERAGE = 0.6;
+  const rawBand = bandFor(reportedScore);
+  const band: Band = heardNothing
+    ? rawBand
+    : completionRate >= RELIABLE_COVERAGE
+      ? rawBand
+      : completionRate >= PARTIAL_COVERAGE
+        ? // Most of it sat. A positive verdict is possible but not the top one.
+          rawBand === 'ready'
+          ? 'almost_ready'
+          : rawBand
+        : // Under 60% answered there is not enough evidence for ANY positive
+          // verdict, however well the few answered questions scored.
+          rawBand === 'ready' || rawBand === 'almost_ready'
+          ? 'needs_practice'
+          : rawBand;
+
+  /**
+   * The headline must say what actually happened, not dress a fragment up as a
+   * result. "You answered 1 of 10 questions" is the single most useful sentence
+   * we can put in the largest type on the page.
+   */
+  const tooLittleToJudge = !heardNothing && completionRate < PARTIAL_COVERAGE;
+
+  const headline = demoOnly
+    ? 'Practice mode: we were not listening yet, so this attempt has not been scored'
+    : scored.length === 0
       ? 'We could not hear enough of your answers to score this attempt'
-      : band === 'ready'
-        ? 'You are close to ready for the real interview'
-        : band === 'almost_ready'
-          ? 'You are almost there, a few things to fix'
-          : band === 'needs_practice'
-            ? 'You need more practice before the real interview'
-            : 'This attempt would be risky in the real interview';
+      : tooLittleToJudge
+        ? `You answered ${scored.length} of ${total} questions, which is not enough to judge whether you are ready`
+        : band === 'ready'
+          ? 'You are close to ready for the real interview'
+          : band === 'almost_ready'
+            ? 'You are almost there, a few things to fix'
+            : band === 'needs_practice'
+              ? 'You need more practice before the real interview'
+              : 'This attempt would be risky in the real interview';
 
   return {
-    overallScore,
+    overallScore: reportedScore,
     band,
     headline,
     // Every dimension that depends on hearing the student is null when we did

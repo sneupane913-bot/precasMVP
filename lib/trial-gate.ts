@@ -43,8 +43,8 @@ async function ipIsAllowlisted(ip: string | null): Promise<boolean> {
   return consultancies.some(
     (c) =>
       c.status === 'approved' &&
-      Array.isArray((c as { allowlistedIps?: string[] }).allowlistedIps) &&
-      ((c as { allowlistedIps?: string[] }).allowlistedIps ?? []).includes(ip)
+      Array.isArray(c.allowlistedIps) &&
+      (c.allowlistedIps ?? []).includes(ip)
   );
 }
 

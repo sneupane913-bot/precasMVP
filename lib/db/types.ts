@@ -156,6 +156,8 @@ export interface ApprovalAudit {
   action:
     | 'approve_payment'
     | 'reject_payment'
+    | 'create_consultancy'
+    | 'set_allowlisted_ips'
     | 'approve_consultancy'
     | 'suspend_consultancy'
     | 'approve_admin_student'

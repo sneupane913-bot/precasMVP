@@ -25,28 +25,38 @@ import { ENTRY_PLAN } from '@/lib/data/plans';
  */
 export function TrialGate({
   answered,
+  askedCount,
   total,
   remaining,
   onSeeReport,
 }: {
   answered: number;
+  /** How many free questions this sitting actually offered. */
+  askedCount: number;
   total: number;
   /** Questions of this same sitting that paying would unlock. */
   remaining: number;
   onSeeReport: () => void;
 }) {
+  // D-28. A student who ended early has NOT finished the trial, and telling
+  // them they have on the screen that asks for money is the worst place in the
+  // product to be wrong.
+  const finishedThem = answered >= askedCount;
   return (
     <div className="mx-auto max-w-lg px-5 py-10">
       <div className="mb-6 text-center">
         <p className="mb-2 inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-emerald-800">
-          Free questions finished
+          {finishedThem ? 'Free questions finished' : 'Interview ended'}
         </p>
         <h1 className="font-serif text-2xl leading-snug text-ink sm:text-3xl">
-          You answered all {answered} free questions
+          {finishedThem
+            ? `You answered all ${answered} free questions`
+            : `You answered ${answered} of ${askedCount} free questions`}
         </h1>
         <p className="mx-auto mt-3 max-w-md leading-relaxed text-slate-600">
-          That is the whole free trial, and you finished it. Your report is ready now, whatever you
-          decide next.
+          {finishedThem
+            ? 'That is the whole free trial, and you finished it. Your report is ready now, whatever you decide next.'
+            : 'You ended the interview early. Your report covers the answers you did give, and it is ready now.'}
         </p>
       </div>
 
@@ -55,8 +65,9 @@ export function TrialGate({
       <div className="mb-4 rounded-2xl border-2 border-ink bg-white p-6">
         <h2 className="mb-1 text-lg font-bold text-ink">See my report</h2>
         <p className="mb-4 text-sm leading-relaxed text-slate-600">
-          Free, ready now, and it is the same report a paying student gets for these {answered}{' '}
-          answers. Nothing is held back from it.
+          Free, ready now, and it is the same report a paying student gets for{' '}
+          {answered === 1 ? 'this answer' : `these ${answered} answers`}. Nothing is held back from
+          it.
         </p>
         <button
           onClick={onSeeReport}

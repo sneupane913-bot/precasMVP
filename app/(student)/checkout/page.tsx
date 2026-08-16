@@ -78,12 +78,24 @@ function Checkout() {
   }
 
   const [order, setOrder] = useState<CreatedOrder | null>(null);
+  /** D-17. Survives a failed `create`, so the way to a human never disappears. */
+  const [fallbackWhatsapp, setFallbackWhatsapp] = useState<string>('');
   const [state, setState] = useState<'choosing' | 'paying' | 'submitted' | 'verified' | 'rejected'>(
     'choosing'
   );
   const [txn, setTxn] = useState('');
   const [payerName, setPayerName] = useState('');
   const [suffix, setSuffix] = useState('');
+  /**
+   * D-19. The number the client can actually ring.
+   *
+   * Held as digits only. Accepts a bare 10-digit Nepali mobile, or the same
+   * number with a 977 country code, because students type both and refusing one
+   * of them at a payment screen would be absurd.
+   */
+  const [whatsapp, setWhatsapp] = useState('');
+  const whatsappDigits = whatsapp.replace(/\D/g, '');
+  const whatsappLooksRight = /^(977)?9[678]\d{8}$/.test(whatsappDigits);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [shotName, setShotName] = useState<string | null>(null);
@@ -160,6 +172,26 @@ function Checkout() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pack]);
 
+  /**
+   * D-17. A number to ring, held independently of the order.
+   *
+   * When `create` failed, `order` stayed null, and every contact card on this
+   * page is fed from `order.supportWhatsapp` — so the screen where a student
+   * has money in flight lost its phone number at the exact moment it mattered.
+   * This fetch does not depend on the order existing.
+   */
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await fetch('/api/platform');
+        const json = await res.json();
+        if (json?.ok && json.data?.supportWhatsapp) setFallbackWhatsapp(json.data.supportWhatsapp);
+      } catch {
+        /* A missing fallback must never break the page it exists to protect. */
+      }
+    })();
+  }, []);
+
   async function submit() {
     if (!order) return;
     setBusy(true);
@@ -174,6 +206,11 @@ function Checkout() {
           walletTxnId: txn.trim(),
           payerName: payerName.trim(),
           payerPhoneSuffix: suffix.trim(),
+          // D-19. The fields the API has always accepted and this screen never
+          // sent. Without these the payments queue can only ever say
+          // "not given", for every student, for ever.
+          whatsappNumber: whatsappDigits,
+          whatsappConfirmed: true,
         }),
       });
       const json = await res.json();
@@ -208,7 +245,12 @@ function Checkout() {
         setRejectedReason(json.data.rejectedReason ?? null);
         setState('rejected');
       }
-    }, 8000);
+      // D-17. Was every 8 seconds against a payment budget of 10 an hour, so
+      // the waiting screen locked the student out of paying after 80 seconds.
+      // The limiter no longer charges `status` at all, and this is slower
+      // anyway: approval is a human checking a bank ledger, so polling faster
+      // than once a minute buys nothing and only burns the student's data.
+    }, 60000);
     return () => clearInterval(id);
   }, [state, order]);
 
@@ -300,9 +342,25 @@ function Checkout() {
       )}
 
       {error && (
-        <p className="mb-4 rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3 font-medium text-red-800">
-          {error}
-        </p>
+        <div className="mb-4">
+          <p className="rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3 font-medium text-red-800">
+            {error}
+          </p>
+          {/* D-17. When `create` failed the page collapsed to a pack picker and
+              this red box, and the "Talk to a person" card went with it, because
+              every contact card was fed from the order that had just failed to
+              exist. A student with money already sent was left with a refusal
+              and no phone number. Never again: if we cannot serve the page, the
+              first thing we still offer is a human. */}
+          {!order && (
+            <ContactUs
+              className="mt-3"
+              whatsapp={fallbackWhatsapp}
+              message="Hello, I am trying to pay for a PreCAS Practice pack and the checkout is not working."
+              urgent
+            />
+          )}
+        </div>
       )}
 
       {state === 'submitted' && (
@@ -351,7 +409,7 @@ function Checkout() {
               changed it here. And no number written anywhere. Both fixed by
               using the order's own supportWhatsapp through ContactUs. */}
           <ContactUs
-            whatsapp={order?.supportWhatsapp}
+            whatsapp={order?.supportWhatsapp || fallbackWhatsapp}
             message={order?.supportMessage ?? undefined}
             urgent
           />
@@ -393,7 +451,7 @@ function Checkout() {
           {order && (
             <ContactUs
               urgent
-              whatsapp={order.supportWhatsapp}
+              whatsapp={order.supportWhatsapp || fallbackWhatsapp}
               message={order.supportMessage ?? undefined}
             />
           )}
@@ -493,25 +551,56 @@ function Checkout() {
               className="mb-3 w-full rounded-xl border-2 border-slate-200 px-4 py-3 outline-none focus:border-ink"
             />
 
+            {/*
+              D-19. THE WHOLE NUMBER, not four digits.
+              ------------------------------------------------------------------
+              This field used to ask for the last 4 digits only, so the platform
+              never captured a number anyone could ring. The payments queue said
+              "not given" for every student, and the super admin directory had
+              five permanently empty columns, because nothing in the product ever
+              collected them. The API had accepted `whatsappNumber` all along and
+              this screen simply never sent it.
+
+              Why it has to be the full number, in the client's own words: about
+              twenty payments a day, and students will type "I have paid" with no
+              screenshot, because the screenshot is optional and must stay
+              optional. The transaction number is what we verify, but when it
+              cannot be matched the only way to settle it is to ring the student
+              or find their WhatsApp. Without a number that is impossible, so a
+              student who really paid waits hours, and somebody who did not pay
+              slips through in the crowd.
+
+              Asking once for the whole number is also LESS work for the student
+              than asking for four digits: the last four are derived from it
+              below, so there is one field where there were two.
+            */}
             <label className="mb-1 block text-sm font-semibold text-ink">
-              Last 4 digits of your phone number
+              Your WhatsApp number
             </label>
-            {/* "the number you paid from" was ambiguous between the phone
-                number, the account number and the transaction number — three
-                different numbers all present on the same receipt. A worked
-                example removes the guess entirely. */}
             <p className="mb-2 text-xs leading-relaxed text-slate-500">
-              The phone number your wallet is registered to. If it is{' '}
-              <span className="font-mono">98432 05222</span>, type{' '}
-              <span className="font-mono font-bold text-ink">5222</span>.
+              The number your wallet is registered to. We use it only to confirm this payment, and to
+              reach you if we cannot find it. Ten digits, for example{' '}
+              <span className="font-mono">9843205222</span>.
             </p>
             <input
-              value={suffix}
-              onChange={(e) => setSuffix(e.target.value.replace(/\D/g, '').slice(0, 4))}
+              value={whatsapp}
+              onChange={(e) => {
+                const digits = e.target.value.replace(/\D/g, '').slice(0, 13);
+                setWhatsapp(digits);
+                // The wallet match still uses the last four, derived rather
+                // than asked for a second time.
+                setSuffix(digits.slice(-4));
+              }}
               inputMode="numeric"
-              placeholder="5222"
-              className="mb-4 w-full rounded-xl border-2 border-slate-200 px-4 py-3 font-mono outline-none focus:border-ink"
+              placeholder="9843205222"
+              aria-label="Your WhatsApp number"
+              className="mb-1 w-full rounded-xl border-2 border-slate-200 px-4 py-3 font-mono outline-none focus:border-ink"
             />
+            <p className="mb-4 text-xs leading-relaxed text-slate-500">
+              {whatsappLooksRight
+                ? 'We will send your confirmation to this number.'
+                : 'Please type the full number, including the 98 or 97 at the start.'}
+            </p>
 
             {/* Optional, and labelled optional. Asking for a screenshot as a
                 requirement would strand every student whose phone storage is
@@ -536,7 +625,7 @@ function Checkout() {
 
             <button
               onClick={submit}
-              disabled={busy || txn.trim().length < 4 || !payerName.trim() || suffix.length < 2}
+              disabled={busy || txn.trim().length < 4 || !payerName.trim() || !whatsappLooksRight}
               className="w-full rounded-xl bg-emerald-600 px-5 py-4 text-lg font-bold text-white disabled:bg-slate-300"
             >
               {busy ? 'Sending...' : 'I have paid'}
@@ -548,14 +637,14 @@ function Checkout() {
                 does not open, or opens the wrong account, a button is nothing.
                 ContactUs always shows the number as dialable text too. */}
             <ContactUs
-              whatsapp={order.supportWhatsapp}
+              whatsapp={order.supportWhatsapp || fallbackWhatsapp}
               message={order.supportMessage ?? undefined}
               className="mt-4"
             />
 
-            {(txn.trim().length < 4 || !payerName.trim() || suffix.length < 2) && (
+            {(txn.trim().length < 4 || !payerName.trim() || !whatsappLooksRight) && (
               <p className="mt-2 text-sm font-semibold text-red-600">
-                Fill in the transaction number, the name you paid with, and the last 4 digits.
+                Fill in the transaction number, the name you paid with, and your WhatsApp number.
               </p>
             )}
           </div>

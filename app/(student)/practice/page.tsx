@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { SiteHeader } from '@/components/SiteHeader';
-import { SiteFooter } from '@/components/SiteFooter';
+import { SiteFooterView } from '@/components/SiteFooter';
+import { useSupportNumber } from '@/lib/useSupportNumber';
 import { publicInstitutions } from '@/lib/data/institutions';
 import { CATEGORY_LABEL, type QuestionCategory } from '@/lib/types';
 
@@ -31,6 +32,8 @@ const DRILLABLE: QuestionCategory[] = [
 ];
 
 export default function PracticePage() {
+  // D-1/D-2/D-4. The footer is sync now; the number comes from here.
+  const supportNumber = useSupportNumber();
   const router = useRouter();
   const [category, setCategory] = useState<QuestionCategory | 'any'>('any');
   const [starting, setStarting] = useState(false);
@@ -136,7 +139,7 @@ export default function PracticePage() {
           This uses one practice question from your pack, not a full mock interview.
         </p>
       </main>
-      <SiteFooter />
+      <SiteFooterView whatsappDigits={supportNumber} />
     </>
   );
 }

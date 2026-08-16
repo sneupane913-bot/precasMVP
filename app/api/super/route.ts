@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
+import { z, type ZodError } from 'zod';
+import { zodMessage } from '@/lib/zod-message';
 import { isSuperAdminAsync, platform, platformDown, secretEquals } from '@/lib/platform';
 import { repo, type ApprovalAudit } from '@/lib/db';
 import { grantPack, rewardReferral, adminGrant } from '@/lib/entitlement';
@@ -113,7 +114,30 @@ const Body = z.discriminatedUnion('action', [
   z.object({
     action: z.literal('setPaymentSettings'),
     superKey: z.string().min(1),
-    payQrImageUrl: z.string().max(500).optional(),
+    /**
+     * D-11. The QR could NEVER be uploaded, and it never had been.
+     *
+     * `PaySettingsForm` accepts a file up to 400 KB and converts it to a base64
+     * data URL, which is roughly 400,000 characters. This cap was 500. Zod
+     * rejected it, the route returned the generic BAD_REQUEST, and the admin was
+     * told only "Something went wrong." every single time, with nothing naming
+     * the real limit. The client hit it repeatedly and reasonably concluded the
+     * product was broken.
+     *
+     * Both shapes are accepted now, because both are legitimate: a short https
+     * link to a hosted image, or an inline data URL from the file picker. The
+     * ceiling is sized for the 400 KB the form already enforces, with headroom
+     * for base64 expansion, and anything else is refused by SHAPE with a message
+     * that says what to do.
+     */
+    payQrImageUrl: z
+      .string()
+      .max(800_000)
+      .refine(
+        (v) => v === '' || /^https?:\/\//.test(v) || /^data:image\/(png|jpe?g|webp|gif);base64,/.test(v),
+        'The QR must be an https link to an image, or an image file.'
+      )
+      .optional(),
     payWalletName: z.string().max(80).optional(),
     payWalletNumber: z.string().max(40).optional(),
     payAccountName: z.string().max(120).optional(),
@@ -156,8 +180,9 @@ export async function POST(req: Request) {
   let body: z.infer<typeof Body>;
   try {
     body = Body.parse(await req.json());
-  } catch {
-    return NextResponse.json(apiError('BAD_REQUEST', 'invalid body', 'Something went wrong.'), {
+  } catch (e) {
+    // D-22. Name the field and the limit instead of six generic words.
+    return NextResponse.json(apiError('BAD_REQUEST', 'invalid body', zodMessage(e as ZodError)), {
       status: 400,
     });
   }
@@ -195,7 +220,22 @@ export async function POST(req: Request) {
     ]);
 
     const verified = orders.filter((o) => o.state === 'verified');
-    const revenueNpr = verified.reduce((n, o) => n + o.amountNpr, 0);
+    /**
+     * D-21. Total revenue means TOTAL revenue.
+     *
+     * This counted verified ORDERS only, which is student payments and seat
+     * purchases that went through the checkout. Money a consultancy paid up
+     * front, recorded on the consultancy row as `paidNpr` when the super admin
+     * created them, was invisible. In testing that meant the dashboard headline
+     * read "NPR 449" when NPR 25,449 had actually been taken, and the missing
+     * NPR 25,000 was the consultancy channel the whole growth plan rests on.
+     *
+     * Split as well as totalled, because "where did it come from" is the
+     * question he will actually ask of this number.
+     */
+    const revenueFromOrders = verified.reduce((n, o) => n + o.amountNpr, 0);
+    const revenueFromConsultancies = consultancies.reduce((n, c) => n + (c.paidNpr ?? 0), 0);
+    const revenueNpr = revenueFromOrders + revenueFromConsultancies;
 
     // Attribution: which consultancies our DIRECT students named. This is the
     // sales pipeline, and the strongest growth idea in the brief.
@@ -233,6 +273,8 @@ export async function POST(req: Request) {
           ordersAwaiting: orders.filter((o) => o.state === 'submitted').length,
         },
         revenueNpr,
+        revenueFromOrders,
+        revenueFromConsultancies,
         // Never any transcript or answer content. Engagement and entitlement only.
         students: students.map((s) => ({
           id: s.id,

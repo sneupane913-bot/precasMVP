@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
+import { z, type ZodError } from 'zod';
+import { zodMessage } from '@/lib/zod-message';
 import { currentStudent } from '@/lib/auth/session';
 import { repo, type PaymentOrder } from '@/lib/db';
 import { getPlan, publicPlans } from '@/lib/data/plans';
@@ -37,14 +38,6 @@ export async function POST(req: Request) {
     return NextResponse.json(apiError(down.code, down.message, down.userMessage), { status: 503 });
   }
 
-  const rl = rateLimit(`pay:${clientIp(req)}`, RL.payment);
-  if (!rl.allowed) {
-    return NextResponse.json(
-      apiError('RATE_LIMITED', 'payment attempts', 'Too many attempts. Please wait and try again.'),
-      { status: 429, headers: { 'Retry-After': String(rl.retryAfterSec) } }
-    );
-  }
-
   const student = await currentStudent();
   if (!student) {
     return NextResponse.json(
@@ -56,9 +49,10 @@ export async function POST(req: Request) {
   let body: z.infer<typeof Body>;
   try {
     body = Body.parse(await req.json());
-  } catch {
+  } catch (e) {
+    // D-22. Name the field and the limit instead of six generic words.
     return NextResponse.json(
-      apiError('BAD_REQUEST', 'invalid body', 'Please check the details you entered.'),
+      apiError('BAD_REQUEST', 'invalid body', zodMessage(e as ZodError)),
       { status: 400 }
     );
   }
@@ -210,6 +204,47 @@ export async function POST(req: Request) {
 
   // ------------------------------------------------------------------ submit
   if (body.action === 'submit') {
+    /**
+     * D-17. The limiter lives HERE, not at the top of the route.
+     *
+     * It used to sit before the action branch, so it charged `create` and
+     * `status` exactly like `submit`. Three things followed, and all three were
+     * seen live:
+     *
+     *   1. The checkout fires `create` on mount and again on every pack change,
+     *      so a student comparing NPR 449 against NPR 799 spent the budget by
+     *      looking.
+     *   2. The waiting screen polled `status` every 8 seconds against a budget
+     *      of 10 an hour, so it locked the student out after 80 seconds. The
+     *      screen they are told to wait on destroyed their ability to pay.
+     *   3. When it tripped, the whole page collapsed to a pack picker and a red
+     *      error, taking the "Talk to a person" card with it, which is the one
+     *      place the phone number lives.
+     *
+     * This exact mistake was already found and fixed on `/super`, and the
+     * reasoning is written out in `lib/rate-limit.ts`. It never reached here.
+     *
+     * Keyed on the STUDENT as well as the IP. A consultancy lab is thirty
+     * students behind one address, and `clientIp()` falls back to the literal
+     * string 'unknown' when no proxy header is present, which would otherwise
+     * pool every student on the platform into a single bucket of ten an hour.
+     */
+    const rl = rateLimit(`pay:${student.id}:${clientIp(req)}`, RL.payment);
+    if (!rl.allowed) {
+      const mins = Math.max(1, Math.ceil(rl.retryAfterSec / 60));
+      return NextResponse.json(
+        apiError(
+          'RATE_LIMITED',
+          'payment attempts',
+          // The server already knows the wait. Saying only "please wait" while
+          // holding the number is the kind of small dishonesty that makes a
+          // student who has already sent money assume the worst.
+          `You have sent this several times already. Please wait about ${mins} ${mins === 1 ? 'minute' : 'minutes'} and try once more. If you have already paid, do not pay again: message us and we will find it.`
+        ),
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfterSec) } }
+      );
+    }
+
     const order = await r.getOrder(body.orderId);
     if (!order || order.studentId !== student.id) {
       return NextResponse.json(

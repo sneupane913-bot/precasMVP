@@ -58,6 +58,19 @@ import Link from 'next/link';
 export interface SessionSnapshot {
   signedIn: boolean;
   name: string | null;
+  /**
+   * What they have left, shown in the header on every page.
+   *
+   * The client's words: "does it show it somewhere above, because it has to
+   * show it somewhere above". It did not. The balance existed only on
+   * /account, so a student who never opened that page had no idea how many
+   * mocks they had left until the moment they were refused one, and the
+   * "nearly out" nudge lived on the same page they were not visiting.
+   *
+   * Undefined means not known yet, which is never rendered as a number.
+   */
+  mocksLeft?: number;
+  practiceLeft?: number;
 }
 
 export function HeaderSession({ initial }: { initial?: SessionSnapshot }) {
@@ -75,7 +88,15 @@ export function HeaderSession({ initial }: { initial?: SessionSnapshot }) {
       .then((r) => r.json())
       .then((j) => {
         if (cancelled) return;
-        setSession({ signedIn: Boolean(j?.data?.signedIn), name: j?.data?.name ?? null });
+        // `/api/me` already carries the entitlement, so the header count stays
+        // correct after an answer is given without a page reload. Without this
+        // the client re-check would blank the number it had just rendered.
+        setSession({
+          signedIn: Boolean(j?.data?.signedIn),
+          name: j?.data?.name ?? null,
+          mocksLeft: j?.data?.entitlement?.mocksLeft,
+          practiceLeft: j?.data?.entitlement?.practiceLeft,
+        });
       })
       .catch(() => {
         // A failed check is NOT evidence of being signed out. If the server
@@ -141,6 +162,29 @@ export function HeaderSession({ initial }: { initial?: SessionSnapshot }) {
         <span className="hidden max-w-[9rem] truncate text-sm text-slate-500 md:inline">
           {session.name}
         </span>
+      )}
+      {/*
+        What they have left, on every page.
+
+        Amber at 1 or 0 so the warning finds them wherever they are, rather
+        than waiting on /account for a visit that may never come. It is a link,
+        so the answer to "how do I get more" is one tap away from the number
+        itself.
+      */}
+      {typeof session.mocksLeft === 'number' && (
+        <Link
+          href="/account"
+          title={`${session.mocksLeft} mock interviews and ${session.practiceLeft ?? 0} practice questions left`}
+          className={`hidden rounded-full px-3 py-1 text-xs font-bold transition sm:inline ${
+            session.mocksLeft <= 1
+              ? 'bg-amber-100 text-amber-800 hover:bg-amber-200'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+          }`}
+        >
+          {session.mocksLeft === 0
+            ? `No mocks left · ${session.practiceLeft ?? 0} practice`
+            : `${session.mocksLeft} mock${session.mocksLeft === 1 ? '' : 's'} · ${session.practiceLeft ?? 0} practice`}
+        </Link>
       )}
       <Link
         href="/account"

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PasscodeInput } from '@/components/PasscodeInput';
 
 /**
@@ -24,6 +24,72 @@ export default function OwnerPage() {
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
+
+  /**
+   * D-12 and D-13. Read the REAL state, and the saved message, on load.
+   *
+   * The status line said "Current state in this browser: ON. Reload to confirm
+   * against the server." I reloaded, with the platform genuinely OFF, and it
+   * still said ON: it was a client-side default that never asked anybody. The
+   * sentence next to it promised the opposite of what it did.
+   *
+   * D-13 was worse in consequence. The contact name and number came back EMPTY
+   * on every reload even though students were being shown them, so an owner who
+   * reloaded and paused again without retyping would ship an emergency screen
+   * with no phone number on it, which is the one thing that screen exists to
+   * carry.
+   */
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await fetch('/api/platform');
+        const json = await res.json();
+        if (!json?.ok) return;
+        setEnabled(Boolean(json.data.maintenanceMode));
+        if (json.data.maintenanceMode) {
+          if (json.data.maintenanceTitle) setTitle(json.data.maintenanceTitle);
+          if (json.data.maintenanceMessage) setMessage(json.data.maintenanceMessage);
+          if (json.data.contactName) setContactName(json.data.contactName);
+          if (json.data.contactPhone) setContactPhone(json.data.contactPhone);
+        }
+      } catch {
+        /* Leave the defaults rather than break the one page that turns it back on. */
+      }
+    })();
+  }, []);
+
+  /**
+   * D-13. Once the owner has typed their key, load the saved contact details.
+   *
+   * The public read cannot include these while the platform is up, so this is
+   * the only way the fields can be filled in before a pause rather than after.
+   */
+  useEffect(() => {
+    if (key.trim().length < 4) return;
+    const t = setTimeout(() => {
+      void (async () => {
+        try {
+          const res = await fetch('/api/platform', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'getMaintenance', ownerKey: key }),
+          });
+          const json = await res.json();
+          if (!json?.ok) return;
+          setEnabled(Boolean(json.data.maintenanceMode));
+          if (json.data.maintenanceTitle) setTitle(json.data.maintenanceTitle);
+          if (json.data.maintenanceMessage) setMessage(json.data.maintenanceMessage);
+          if (json.data.contactName) setContactName(json.data.contactName);
+          if (json.data.contactPhone) setContactPhone(json.data.contactPhone);
+        } catch {
+          /* never block the page that turns the platform back on */
+        }
+      })();
+      // Debounced, so typing a key does not spend the brute-force budget on
+      // every keystroke.
+    }, 800);
+    return () => clearTimeout(t);
+  }, [key]);
   // QA H3: the switch had no history. Every toggle is now recorded and shown.
   const [audit, setAudit] = useState<
     { at: string; action: string; ip: string; userAgent: string }[]
@@ -84,7 +150,7 @@ export default function OwnerPage() {
       </p>
 
       <label className="mb-1 block text-sm font-semibold text-ink">Owner key</label>
-      <PasscodeInput value={key} onChange={setKey} placeholder="Your owner key" />
+      <PasscodeInput value={key} onChange={setKey} placeholder="Your owner key" name="owner-key" />
 
       <div className="mb-6 rounded-2xl border-2 border-slate-200 bg-white p-5">
         <h2 className="mb-1 font-bold text-ink">Message students will see</h2>
@@ -210,8 +276,8 @@ export default function OwnerPage() {
       )}
 
       <p className="mt-6 text-xs leading-relaxed text-slate-400">
-        Current state in this browser: {enabled ? 'OFF' : 'ON'}. Reload to confirm against the
-        server.
+        Platform right now: <strong>{enabled ? 'OFF' : 'ON'}</strong>. Read from the server, not from
+        this browser.
       </p>
     </main>
   );

@@ -422,6 +422,17 @@ export class SupabaseRepo implements Repo {
     }));
   }
 
+  /** D-29. Stamp revoked_at so the seat counts as free again. */
+  async revokeSeat(consultancyId: string, studentId: string): Promise<boolean> {
+    const seats = await this.listSeats(consultancyId);
+    const live = seats.find((s) => s.studentId === studentId && !s.revokedAt);
+    if (!live) return false;
+    await patch('seat_allocations', `id=eq.${encodeURIComponent(live.id)}`, {
+      revoked_at: new Date().toISOString(),
+    });
+    return true;
+  }
+
   // audit and notifications
   async appendAudit(a: ApprovalAudit): Promise<void> {
     await insert('approvals_audit', {

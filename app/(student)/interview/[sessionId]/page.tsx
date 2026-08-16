@@ -175,6 +175,12 @@ export default function InterviewPage() {
       // The stored cursor is what put the client on Q3 after he pressed record
       // on Q2 and went Back with nothing recorded. See lib/resume.ts.
       startIndex={data.resumeIndex ?? 0}
+      // D-25/D-28. The room used to count only the answers given in THIS visit,
+      // so a student resuming a sitting with one answer saved was told "0 done,
+      // 10 left", and the paywall told a student who had answered 2 that they
+      // had "answered all 10 free questions". The server already returns the
+      // truth in the same payload; it was simply never passed down.
+      alreadyAnswered={data.session.answers.map((a) => a.questionId)}
       demo={data.demo}
       // D13: the gate only applies to the capped free sitting. A paying
       // student finishing their 17 goes straight to the report.

@@ -147,7 +147,41 @@ interface AuditRow {
 type Tab = 'dashboard' | 'students' | 'payments' | 'flagged' | 'consultancies' | 'questions' | 'audit' | 'settings';
 
 export default function SuperAdminPage() {
-  const [key, setKey] = useState('');
+  /**
+   * D-9. Hold the passcode for THIS TAB only.
+   *
+   * There was no session at all, so every reload signed the super admin out.
+   * The client hit it constantly: "I should not be signed out this way
+   * rigorously... this is happening again and again." It was made far worse by
+   * the QR bug, because every failed save pushed him to reload and every reload
+   * threw him out.
+   *
+   * `sessionStorage`, deliberately, not `localStorage` and not a cookie:
+   *   - it dies when the tab closes, so a shared machine does not keep it;
+   *   - it is not sent with any request, so it cannot be stolen by CSRF;
+   *   - it is per tab, so it cannot leak into another window.
+   *
+   * Security is not improved by making the real admin type a passcode twenty
+   * times a day. That only trains them to choose a short one.
+   */
+  const [key, setKey] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    try {
+      return window.sessionStorage.getItem('precas-super-key') ?? '';
+    } catch {
+      return '';
+    }
+  });
+
+  function rememberKey(k: string) {
+    setKey(k);
+    try {
+      if (k) window.sessionStorage.setItem('precas-super-key', k);
+      else window.sessionStorage.removeItem('precas-super-key');
+    } catch {
+      /* private mode: fall back to typing it each time */
+    }
+  }
   const [tab, setTab] = useState<Tab>('dashboard');
   const [data, setData] = useState<Overview | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -246,6 +280,41 @@ export default function SuperAdminPage() {
     [key]
   );
 
+  /**
+   * D-31. Mark a consultancy's network as a lab.
+   *
+   * `lib/trial-gate.ts` allows 4 distinct accounts per device normally and 40
+   * on an allowlisted network, and that 40 exists for exactly one purpose: a
+   * consultancy lab with a few shared machines must not have its students
+   * refused their free trial. The field was read there through an `as` cast and
+   * written NOWHERE, so the branch was dead and the fifth student to sit at a
+   * shared machine was always soft-denied. At the client's most important kind
+   * of customer.
+   */
+  async function setLabNetworks(c: DirectoryConsultancy) {
+    const current = window.prompt(
+      `Which networks does ${c.name} use?\n\n` +
+        'Type the public IP addresses of their office or lab, separated by commas. ' +
+        'Students on those networks can share a machine without losing their free questions. ' +
+        'Leave it empty to go back to the normal limit.',
+      ''
+    );
+    if (current === null) return;
+    const ips = current
+      .split(',')
+      .map((x) => x.trim())
+      .filter(Boolean);
+    const ok = (await platformCall({
+      action: 'setAllowlistedIps',
+      consultancyId: c.id,
+      ips,
+    })) as { message?: string } | null;
+    if (ok) {
+      setNotice(ok.message ?? 'Saved.');
+      await loadAll();
+    }
+  }
+
   async function setConsultancyStatus(c: DirectoryConsultancy, status: string) {
     const verb = status === 'approved' ? 'Approve' : status === 'suspended' ? 'Suspend' : 'Set back to pending for';
     if (
@@ -278,7 +347,8 @@ export default function SuperAdminPage() {
       | { message?: string }
       | null;
     if (!ok) return false;
-    setKey(newPasscode);
+    // Keep the tab signed in with the NEW passcode, or the next click 403s.
+    rememberKey(newPasscode);
     setNotice(ok.message ?? 'Saved. Use the new passcode from now on.');
     return true;
   }
@@ -324,7 +394,37 @@ export default function SuperAdminPage() {
     return false;
   }
 
-  async function verify(orderId: string) {
+  async function verify(orderId: string, order?: Order) {
+    /**
+     * D-20. Ask the person, do not answer for them.
+     *
+     * The API requires `confirmedInWalletLedger: z.literal(true)`, and the only
+     * reason that flag exists is to make the approver assert they have seen the
+     * money arrive. This screen hardcoded `true`, so the assertion was made by
+     * the code on the admin's behalf and meant nothing. The page even prints
+     * the instruction, "Check the transaction id in the receiver's own wallet
+     * ledger before approving. A screenshot is evidence, never proof", and then
+     * approved on one click with no confirmation of any kind.
+     *
+     * The inversion was the tell: approving a CONSULTANCY, which moves no
+     * money, showed a confirm dialog. Approving a PAYMENT, which grants credits
+     * against money that may never have arrived, showed nothing.
+     *
+     * It matters most at volume. At roughly twenty payments a day, one careless
+     * click on a row that was never paid is a pack given away, and the student
+     * who really paid is still waiting.
+     */
+    const txn = order?.walletTxnId ?? 'this transaction';
+    const amount = order ? `NPR ${order.amountNpr.toLocaleString()}` : 'this amount';
+    if (
+      !window.confirm(
+        `Have you found ${txn} in the eSewa ledger for ${amount}?\n\n` +
+          'Approve only if you have SEEN the money arrive. A screenshot from the student is not proof. ' +
+          'Approving adds the pack immediately and cannot be undone.'
+      )
+    )
+      return;
+
     const ok = await call({ action: 'verifyPayment', orderId, confirmedInWalletLedger: true });
     if (ok) {
       setNotice('Payment verified and the pack was added to that student.');
@@ -409,10 +509,11 @@ export default function SuperAdminPage() {
               office by a masked field he could not check. See PasscodeInput. */}
           <PasscodeInput
             value={key}
-            onChange={setKey}
+            onChange={rememberKey}
             onEnter={loadAll}
             placeholder="Super admin passcode"
             autoFocus
+                      name="super-passcode"
           />
           {error && <p className="mb-3 font-medium text-red-600">{error}</p>}
           <button
@@ -821,9 +922,29 @@ export default function SuperAdminPage() {
                             check against the wallet ledger. */}
                         <td className="px-3 py-3 text-xs">
                           {o.payerPhone ? (
-                            <a href={`tel:${o.payerPhone}`} className="font-semibold text-ink underline underline-offset-2">
-                              {o.payerPhone}
-                            </a>
+                            <>
+                              <a href={`tel:${o.payerPhone}`} className="font-semibold text-ink underline underline-offset-2">
+                                {o.payerPhone}
+                              </a>
+                              {/* D-19. One tap to the student's own WhatsApp
+                                  thread, because that is where "I have paid"
+                                  was actually sent. At twenty payments a day,
+                                  hunting for the right chat by hand is the
+                                  whole job; this makes it one click, with the
+                                  transaction number already in the message so
+                                  it can be compared against their receipt
+                                  without typing anything. */}
+                              <a
+                                href={`https://wa.me/${o.payerPhone.replace(/\D/g, '')}?text=${encodeURIComponent(
+                                  `Hello, this is about your PreCAS Practice payment of NPR ${o.amountNpr}. We are checking transaction number ${o.walletTxnId ?? ''}. Could you confirm this is yours?`
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="ml-2 rounded-md bg-emerald-100 px-2 py-0.5 font-semibold text-emerald-800"
+                              >
+                                WhatsApp
+                              </a>
+                            </>
                           ) : (
                             <span className="text-slate-400">not given</span>
                           )}
@@ -859,7 +980,7 @@ export default function SuperAdminPage() {
                           {o.state === 'submitted' ? (
                             <div className="flex gap-2">
                               <button
-                                onClick={() => verify(o.id)}
+                                onClick={() => verify(o.id, o)}
                                 disabled={busy}
                                 className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
                               >
@@ -1025,6 +1146,16 @@ export default function SuperAdminPage() {
                                   className="rounded-lg border-2 border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 disabled:opacity-50"
                                 >
                                   Suspend
+                                </button>
+                              )}
+                              {/* D-31. The switch that makes a lab work. */}
+                              {c.status === 'approved' && (
+                                <button
+                                  onClick={() => setLabNetworks(c)}
+                                  disabled={busy}
+                                  className="rounded-lg border-2 border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 disabled:opacity-50"
+                                >
+                                  Lab networks
                                 </button>
                               )}
                             </div>
@@ -1393,26 +1524,49 @@ export default function SuperAdminPage() {
   );
 }
 
+/**
+ * D-7. An accent that means "look at this" must not be GREEN.
+ *
+ * `accent` painted the card emerald, and it is used for exactly the states that
+ * need attention: "Speech to text: Not on", "Feedback: Not on", orders waiting,
+ * and the monthly call cap being reached. So the one colour that means "all
+ * good" was being used to say the opposite, and at a glance the dashboard read
+ * as though the AI was running when it was not.
+ *
+ * `tone` now says which it is. Green stays for genuinely good news; amber is
+ * for something the owner has to act on.
+ */
 function Stat({
   label,
   value,
   hint,
   accent = false,
+  tone = 'attention',
 }: {
   label: string;
   value: string;
   hint: string;
   accent?: boolean;
+  tone?: 'attention' | 'good';
 }) {
+  const good = tone === 'good';
   return (
     <div
       className={`rounded-2xl border p-5 ${
-        accent ? 'border-emerald-300 bg-emerald-100' : 'border-slate-200 bg-white'
+        accent
+          ? good
+            ? 'border-emerald-300 bg-emerald-100'
+            : 'border-amber-300 bg-amber-50'
+          : 'border-slate-200 bg-white'
       }`}
     >
       <p className="mb-2 text-sm text-slate-600">{label}</p>
       <p className="font-serif text-3xl font-black text-ink">{value}</p>
-      <p className={`mt-1 text-xs ${accent ? 'font-semibold text-emerald-800' : 'text-slate-500'}`}>
+      <p
+        className={`mt-1 text-xs ${
+          accent ? (good ? 'font-semibold text-emerald-800' : 'font-semibold text-amber-800') : 'text-slate-500'
+        }`}
+      >
         {hint}
       </p>
     </div>

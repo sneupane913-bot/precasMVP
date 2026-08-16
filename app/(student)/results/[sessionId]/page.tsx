@@ -9,8 +9,9 @@ import { SiteFooter } from '@/components/SiteFooter';
 import { BUILD_INFO } from '@/lib/build-info';
 import { weakestOf } from '@/lib/advice';
 import { buildSummary } from '@/lib/summary';
+import { isDemoTranscript } from '@/lib/ai/stt';
 import { getInstitution } from '@/lib/data/institutions';
-import { getQuestion, resolvedQuestion } from '@/lib/data/questions';
+import { getQuestion, resolvedQuestion , primeExtraQuestions} from '@/lib/data/questions';
 import { BAND_LABEL, CATEGORY_LABEL, FLAG_META, PEE_STEPS, type FlagType } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
@@ -21,6 +22,8 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
   // Named headerState, not `session`: this file already has a `session`, which
   // is the INTERVIEW session. Two different things called the same word in one
   // file is how the wrong one gets rendered.
+  // D-24. Extra questions must resolve here too, or a report shows a blank.
+  await primeExtraQuestions();
   const headerState = await headerSession();
   const { sessionId } = await params;
   const session = await store.get(sessionId);
@@ -36,6 +39,9 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
 
   const summary = session.summary ?? buildSummary(session);
   const scored = session.answers.filter((a) => a.evaluation !== null);
+  // D-27. Every scored answer is sample text, so nothing on this page may be
+  // presented as a judgement of the student.
+  const demoOnly = scored.length > 0 && scored.every((a) => isDemoTranscript(a.transcript));
 
   const flagCounts = new Map<FlagType, number>();
   for (const f of session.flags) flagCounts.set(f.type, (flagCounts.get(f.type) ?? 0) + 1);
@@ -72,7 +78,31 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
       <div className="mx-auto max-w-3xl space-y-5 px-4 py-6 sm:px-6">
         {/* ---------- Verdict. Label first, number second. ---------- */}
         <section className="rounded-2xl border-2 border-slate-200 bg-white p-6 text-center">
-          {scored.length === 0 ? (
+          {demoOnly ? (
+            /* D-27. With no speech key set the transcripts are a sample, not the
+               student's words. The interview room says so loudly; this page,
+               which is the artefact a student keeps and shows people, used to
+               print "Almost ready" and "75%" over the top of it. No score, no
+               band, no percentage. Everything genuinely observed still shows
+               below: the questions, the timings and the behaviour table. */
+            <>
+              <p className="mb-1 inline-block rounded-full bg-violet-100 px-4 py-1.5 text-sm font-bold text-violet-800">
+                Practice mode
+              </p>
+              <p className="mb-2 mt-2 font-serif text-2xl leading-snug text-ink">
+                We were not listening yet, so this attempt has not been scored
+              </p>
+              <p className="mx-auto max-w-md leading-relaxed text-slate-600">
+                The answers shown below are <strong>sample text, not your voice</strong>, so there is
+                no score and no judgement of your English anywhere on this page. Everything else here
+                is real: the questions you were asked, how long you took, and how you behaved on
+                camera.
+              </p>
+              <p className="mt-3 text-sm text-slate-500">
+                You answered {summary.answeredCount} of {summary.totalCount} questions
+              </p>
+            </>
+          ) : scored.length === 0 ? (
             <>
               <p className="mb-2 text-2xl font-bold text-ink">We could not score this attempt</p>
               <p className="mx-auto max-w-md leading-relaxed text-slate-600">
@@ -252,7 +282,14 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
                     <span className="rounded-md bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-500">
                       {CATEGORY_LABEL[q.category]}
                     </span>
-                    {ev && (
+                    {/* D-27. A per-question "Almost ready · 75%" badge is the same
+                        claim as the headline, made twelve more times. Withheld
+                        for sample answers. */}
+                    {ev && isDemoTranscript(a.transcript) ? (
+                      <span className="rounded-md bg-violet-100 px-2.5 py-1 text-xs font-bold text-violet-800">
+                        Sample answer, not scored
+                      </span>
+                    ) : ev ? (
                       <span
                         className={`rounded-md px-2.5 py-1 text-xs font-bold ${
                           ev.score >= 65
@@ -264,7 +301,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
                       >
                         {BAND_LABEL[ev.band]} · {ev.score}%
                       </span>
-                    )}
+                    ) : null}
                   </div>
                   <h3 className="font-serif text-lg leading-snug text-ink">{q.text}</h3>
                 </div>

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
+import { z, type ZodError } from 'zod';
+import { zodMessage } from '@/lib/zod-message';
 import { platform, secretEquals, type Consultancy, platformDown } from '@/lib/platform';
 import { repo } from '@/lib/db';
 import { approvePayment, rejectPayment, type Actor } from '@/lib/payments';
@@ -110,6 +111,22 @@ const Body = z.discriminatedUnion('action', [
     payerName: z.string().min(1).max(120),
     payerPhoneSuffix: z.string().min(2).max(6),
   }),
+  /**
+   * D-29. Take a seat back.
+   *
+   * The consultancy's student link is a plain public URL and a seat is granted
+   * automatically to anyone who signs up through it, so a link forwarded into a
+   * Facebook group spends seats they paid for on strangers. `revokedAt` existed
+   * on the allocation and was read in six places to count live seats, but
+   * nothing on earth could set it. Now they can reclaim a seat, and the count
+   * they see goes back up, because `allocateSeat` has always filtered on it.
+   */
+  z.object({
+    action: z.literal('revokeSeat'),
+    slug: z.string().min(1).max(60),
+    passcode: z.string().min(1).max(60),
+    studentId: z.string().min(1).max(64),
+  }),
   z.object({
     action: z.literal('rejectPayment'),
     slug: z.string().min(1).max(60),
@@ -141,8 +158,9 @@ export async function POST(req: Request) {
   let body: z.infer<typeof Body>;
   try {
     body = Body.parse(await req.json());
-  } catch {
-    return NextResponse.json(apiError('BAD_REQUEST', 'invalid body', 'Something went wrong.'), {
+  } catch (e) {
+    // D-22. Name the field and the limit instead of six generic words.
+    return NextResponse.json(apiError('BAD_REQUEST', 'invalid body', zodMessage(e as ZodError)), {
       status: 400,
     });
   }
@@ -204,7 +222,24 @@ export async function POST(req: Request) {
    * Deliberately AFTER the approved check, so a pending consultancy is told it
    * is pending rather than being sent to change a passcode it cannot yet use.
    */
-  if (c.passcodeIsTemporary && body.action !== 'changePasscode') {
+  /**
+   * D-15. `login` is allowed through, everything else is still refused.
+   *
+   * The gate was correct in intent and fatal in effect. It refused EVERY action
+   * including `login`, and `app/admin/page.tsx` only sets `data`/`mustChange`
+   * when `login` succeeds, with the forced-change screen guarded by
+   * `if (data && mustChange)`. So `data` was always null, the change screen
+   * never rendered, and a new consultancy was told to choose a passcode on a
+   * screen with no field to choose one. **No consultancy could enter the portal
+   * at all, ever.**
+   *
+   * Letting `login` through gives up nothing. It returns the consultancy's own
+   * name and its seat counts, which the handover code already entitles them to
+   * see, and every action that touches a student, a payment or a seat is still
+   * refused until they replace the shared secret. The gate still bites; it just
+   * no longer bites the hand reaching for the handle.
+   */
+  if (c.passcodeIsTemporary && body.action !== 'changePasscode' && body.action !== 'login') {
     return NextResponse.json(
       apiError(
         'PASSCODE_MUST_CHANGE',
@@ -419,6 +454,38 @@ export async function POST(req: Request) {
   }
 
   // N-5. Renew one of our own students, consuming a seat.
+  if (body.action === 'revokeSeat') {
+    // D-29. Only their own student, same ownership rule as every other action.
+    const students = await repo().listStudents();
+    const mine = students.find((st) => st.id === body.studentId && st.consultancyId === c.id);
+    if (!mine) {
+      return NextResponse.json(
+        apiError('NOT_FOUND', 'no student or not this consultancy', 'We could not find that student.'),
+        { status: 404 }
+      );
+    }
+    const done = await repo().revokeSeat(c.id, body.studentId);
+    if (!done) {
+      return NextResponse.json(
+        apiError(
+          'NO_SEAT',
+          'no live seat for that student',
+          'That student is not using one of your seats, so there is nothing to take back.'
+        ),
+        { status: 409 }
+      );
+    }
+    const seatsNow = (await repo().listSeats(c.id)).filter((x) => !x.revokedAt).length;
+    return NextResponse.json({
+      ok: true,
+      data: {
+        seatsLeft: Math.max(0, c.seatsTotal - seatsNow),
+        message:
+          'Seat taken back. It is available again. Anything the student has already used stays with them.',
+      },
+    });
+  }
+
   if (body.action === 'renewStudent') {
     const r1 = repo();
     const student = await r1.getStudent(body.studentId);
@@ -595,6 +662,41 @@ export async function POST(req: Request) {
   const seatOrders = orders.filter((o) => !o.studentId);
   const visibleOrders = studentOrders.map(shape);
   const mySeatOrders = seatOrders.map(shape);
+
+  /**
+   * D-15. `login` now passes the handover gate so the change screen can render,
+   * and this is the other half of that change.
+   *
+   * While the passcode is still the one WE chose, two organisations share it,
+   * so the student list is not yet theirs alone. The screen at this point needs
+   * exactly two things: who they are, and that they must change the code.
+   * It gets exactly those. Nothing about a student leaves the server until the
+   * shared secret has been replaced.
+   */
+  if (c.passcodeIsTemporary) {
+    return NextResponse.json({
+      ok: true,
+      data: {
+        consultancy: publicView(c),
+        passcodeIsTemporary: true,
+        students: [],
+        notifications: [],
+        orders: [],
+        seatOrders: [],
+        bundles: [],
+        stats: {
+          studentCount: 0,
+          activeStudents: 0,
+          seatsTotal: c.seatsTotal,
+          seatsUsed: 0,
+          seatsLeft: 0,
+          paidOrders: 0,
+          ordersAwaiting: 0,
+          seatPaymentPending: false,
+        },
+      },
+    });
+  }
 
   return NextResponse.json({
     ok: true,

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { store } from '@/lib/store';
 import { getInstitution } from '@/lib/data/institutions';
-import { getQuestion, resolvedQuestion } from '@/lib/data/questions';
+import { getQuestion, resolvedQuestion , primeExtraQuestions} from '@/lib/data/questions';
 import { transcribe, redact } from '@/lib/ai/stt';
 import { evaluateAnswer } from '@/lib/ai/evaluate';
 import { checkAudio, LIMITS } from '@/lib/credits';
@@ -25,6 +25,9 @@ export const maxDuration = 26;
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   // Owner switch, before any paid call.
+  // D-24. Questions added with no deploy join the pool before it is used.
+  await primeExtraQuestions();
+
   const down = await platformDown();
   if (down) {
     return NextResponse.json(apiError(down.code, down.message, down.userMessage), { status: 503 });
@@ -185,9 +188,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       // on. His microphone WAS on. The one thing he needed to be told was to
       // speak up, and that is now the first sentence.
       stt.status === 'silent'
-        ? 'We could not hear you — the recording came out too quiet. Your microphone is working, so please speak louder and a little closer to it, then record again. In the real interview the officer will need to hear you clearly too.'
+        ? 'We could not hear you. The recording came out too quiet. Your microphone is working, so please speak louder and a little closer to it, then record again. In the real interview the officer will need to hear you clearly too.'
         : stt.status === 'too_short'
-          ? 'We heard you, but that answer was too short for useful feedback. Aim for about thirty seconds — say your point, then one real detail to back it up.'
+          ? 'We heard you, but that answer was too short for useful feedback. Aim for about thirty seconds: say your point, then one real detail to back it up.'
           : 'Something went wrong while listening to your answer. Please record it again.';
 
     /**
@@ -239,6 +242,17 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     previousTranscripts: session.answers
       .filter((a) => a.transcriptStatus === 'ok')
       .map((a) => a.transcript),
+    /**
+     * D-39. Did the timer end this answer, or did the student?
+     *
+     * One second of tolerance, because the recorder stops a fraction after the
+     * limit and we would otherwise miss every genuine cut-off. Erring towards
+     * detecting it is the safer direction: the cost of a false positive is one
+     * extra piece of timing advice, while the cost of a false negative is the
+     * student being marked down for a sentence they were never allowed to
+     * finish, or praised for an ending the machine invented for them.
+     */
+    ranOutOfTime: durationSeconds >= question.timeLimitSeconds - 1,
   });
 
   const answer: Answer = {

@@ -10,11 +10,27 @@ import { supportWhatsapp } from '@/lib/support';
  * is unfinished and not safe to pay through. This gives the product the legal,
  * contact and trust anchor that every real product has. See docs/UX_AUDIT.md G3.
  */
-export async function SiteFooter() {
+/**
+ * D-1/D-2/D-4. The footer is SYNC. The async part is the wrapper below.
+ *
+ * This component was `async` for exactly one reason, `await supportWhatsapp()`,
+ * and eleven pages import it. On the three that carry `'use client'` --
+ * `/account`, `/practice` and `/universities` -- React cannot render an async
+ * component at all. The result was not a cosmetic warning:
+ *
+ *   - `/account` rendered nothing but an error overlay.
+ *   - `/universities` re-suspended forever, roughly one console error per
+ *     second, which is the client's "glitching a lot a lot" and the 480 errors
+ *     he saw. On a low-end Android that is a flat battery.
+ *   - The footer's own "Message us on WhatsApp" link silently hydrated to
+ *     `/pricing`, so the escape to a human went to the sales page.
+ *
+ * Taking the one await out makes it renderable everywhere. The number is now a
+ * prop, so a client page passes what it has and a server page uses the wrapper.
+ */
+export function SiteFooterView({ whatsappDigits = '' }: { whatsappDigits?: string }) {
   const year = new Date().getFullYear();
-  // The super admin's number, not the env var. Changing it in /super used to
-  // change nothing on the site.
-  const waDigits = (await supportWhatsapp()).replace(/\D/g, '');
+  const waDigits = (whatsappDigits ?? '').replace(/\D/g, '');
   const waHref = waDigits ? `https://wa.me/${waDigits}` : '/pricing';
 
   const columns: { title: string; links: { label: string; href: string; external?: boolean }[] }[] = [
@@ -117,4 +133,16 @@ export async function SiteFooter() {
       </div>
     </footer>
   );
+}
+
+/**
+ * Server wrapper. Reads the super admin's support number, then renders the view.
+ *
+ * Kept as the default thing a SERVER page imports so those eight pages did not
+ * have to change at all. The three client pages import `SiteFooterView`
+ * directly and pass the number they already hold.
+ */
+export async function SiteFooter() {
+  const digits = await supportWhatsapp();
+  return <SiteFooterView whatsappDigits={digits} />;
 }
