@@ -340,7 +340,7 @@ export default function AccountPage() {
                 When a friend buys a pack using your link, you get one extra mock interview.
               </p>
               <div className="flex flex-wrap gap-2">
-                <code className="flex-1 truncate rounded-xl bg-[#eff4ff] px-4 py-3 text-sm text-ink">
+                <code className="flex-1 truncate rounded-xl bg-surface-sunk px-4 py-3 text-sm text-ink">
                   {referralLink}
                 </code>
                 <button

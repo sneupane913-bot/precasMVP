@@ -687,7 +687,7 @@ export function InterviewRoom({
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold leading-tight">{institution.name}</p>
-            <p className="text-[11px] text-white/60">
+            <p className="text-micro text-white/60">
               {institution.interviewType} mock interview
             </p>
           </div>
@@ -695,7 +695,7 @@ export function InterviewRoom({
             <p className="text-sm font-bold tabular-nums">
               Q {index + 1}/{questions.length}
             </p>
-            <p className="text-[11px] text-white/60">
+            <p className="text-micro text-white/60">
               {answeredCount} done, {questions.length - answeredCount} left
             </p>
           </div>
@@ -722,12 +722,12 @@ export function InterviewRoom({
         {/* ================= Question and answer ================= */}
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
           <div className="mb-1 flex items-center gap-2">
-            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-slate-600">
+            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-micro font-bold uppercase tracking-wide text-slate-600">
               Question {index + 1}
             </span>
             <button
               onClick={() => speak(question.text)}
-              className="rounded-full border border-slate-200 px-2.5 py-1 text-[11px] font-semibold text-slate-600 hover:bg-slate-100"
+              className="rounded-full border border-slate-200 px-2.5 py-1 text-micro font-semibold text-slate-600 hover:bg-slate-100"
             >
               ▶ Read this to me
             </button>
@@ -737,7 +737,7 @@ export function InterviewRoom({
                 setVoiceOn(on);
                 if (!on) window.speechSynthesis?.cancel();
               }}
-              className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+              className={`rounded-full px-2.5 py-1 text-micro font-semibold ${
                 voiceOn ? 'bg-slate-200 text-slate-700' : 'text-slate-400 hover:bg-slate-100'
               }`}
             >
@@ -853,7 +853,7 @@ export function InterviewRoom({
                 said "Listening", which reads as working when it is not. So the
                 signal now drives ONE thing: telling them to speak up.
                 ---------------------------------------------------------------- */}
-            <div className="mb-5 min-h-[104px] rounded-xl bg-white/70 p-4 text-[15px] leading-relaxed text-slate-800">
+            <div className="mb-5 min-h-[104px] rounded-xl bg-white/70 p-4 text-sm leading-relaxed text-slate-800">
               {phase === 'reviewed' && finalTranscript ? (
                 <p>{finalTranscript}</p>
               ) : phase === 'recording' ? (
@@ -1041,7 +1041,7 @@ export function InterviewRoom({
                     <p className="text-sm font-bold leading-tight text-ink">
                       {i + 1}. {s.label}
                     </p>
-                    <p className="text-[13px] leading-snug text-slate-600">{s.hint}</p>
+                    <p className="text-micro leading-snug text-slate-600">{s.hint}</p>
                   </div>
                 </div>
               ))}
@@ -1055,7 +1055,7 @@ export function InterviewRoom({
                 i
               </span>
               <div className="min-w-0 flex-1">
-                <p className="mb-0.5 text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                <p className="mb-0.5 text-micro font-bold uppercase tracking-wide text-slate-500">
                   Tip {tipIndex + 1} of {question.tips.length}
                 </p>
                 <p className="text-sm leading-relaxed text-slate-700">{question.tips[tipIndex]}</p>
@@ -1095,7 +1095,7 @@ export function InterviewRoom({
                 </span>
               )}
               {phase === 'recording' && (
-                <span className="absolute left-2 top-2 flex items-center gap-1.5 rounded-md bg-red-600 px-2 py-1 text-[11px] font-bold text-white">
+                <span className="absolute left-2 top-2 flex items-center gap-1.5 rounded-md bg-red-600 px-2 py-1 text-micro font-bold text-white">
                   <span className="h-1.5 w-1.5 rounded-full bg-white" /> REC
                 </span>
               )}

@@ -106,7 +106,7 @@ export default async function ConsultancyEntryPage({
               },
             ].map((s) => (
               <div key={s.n} className="rounded-2xl border border-slate-200 bg-white p-6">
-                <div className="mb-4 grid h-10 w-10 place-items-center rounded-xl bg-[#eff4ff] font-bold text-ink">
+                <div className="mb-4 grid h-10 w-10 place-items-center rounded-xl bg-surface-sunk font-bold text-ink">
                   {s.n}
                 </div>
                 <h3 className="mb-2 font-serif text-lg font-bold text-ink">{s.t}</h3>

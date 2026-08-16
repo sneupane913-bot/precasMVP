@@ -95,7 +95,7 @@ export function PricingPacks({
                 </div>
                 {p.badge && (
                   <span
-                    className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold ${
+                    className={`shrink-0 rounded-full px-2.5 py-1 text-micro font-bold ${
                       hero ? 'bg-emerald-400 text-ink' : 'bg-slate-100 text-slate-700'
                     }`}
                   >

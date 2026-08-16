@@ -8,6 +8,7 @@ import { PasscodeChangeForm } from '@/components/PasscodeChangeForm';
 // and 30 practice questions ... NPR 799" as literal text, so changing the
 // Serious pack would have left this page quietly lying to consultancies.
 import { SEAT_GRANT, getPlan } from '@/lib/data/plans';
+import { DEFAULT_BRAND_HEX } from '@/lib/branding';
 
 /**
  * Consultancy portal, rebuilt to docs/design-reference/consultancy_admin_dashboard.
@@ -124,7 +125,7 @@ export default function AdminPage() {
   const [mustChange, setMustChange] = useState(false);
   const [passOpen, setPassOpen] = useState(false);
   const [logoUrl, setLogoUrl] = useState('');
-  const [colour, setColour] = useState('#0d1b2a');
+  const [colour, setColour] = useState(DEFAULT_BRAND_HEX);
 
   /**
    * One place every call goes through.
@@ -192,7 +193,7 @@ export default function AdminPage() {
       if (json.ok) {
         setData(json.data as AdminData);
         setLogoUrl(json.data.consultancy.logoUrl ?? '');
-        setColour(json.data.consultancy.primaryColor || '#0d1b2a');
+        setColour(json.data.consultancy.primaryColor || DEFAULT_BRAND_HEX);
       }
 
       setNotice(ok.message ?? 'Saved. Use your new passcode from now on.');
@@ -238,7 +239,7 @@ export default function AdminPage() {
       setData(d);
       setMustChange(Boolean(d.passcodeIsTemporary));
       setLogoUrl(d.consultancy.logoUrl ?? '');
-      setColour(d.consultancy.primaryColor || '#0d1b2a');
+      setColour(d.consultancy.primaryColor || DEFAULT_BRAND_HEX);
     }
   }, [call]);
 
@@ -718,7 +719,7 @@ export default function AdminPage() {
             below.
           </p>
           <div className="flex flex-wrap gap-2">
-            <code className="flex-1 truncate rounded-xl bg-[#eff4ff] px-4 py-3 text-sm text-ink">
+            <code className="flex-1 truncate rounded-xl bg-surface-sunk px-4 py-3 text-sm text-ink">
               {link}
             </code>
             <button
@@ -791,7 +792,7 @@ export default function AdminPage() {
                     onClick={() => {
                       setBrandOpen(false);
                       setLogoUrl(data.consultancy.logoUrl ?? '');
-                      setColour(data.consultancy.primaryColor || '#0d1b2a');
+                      setColour(data.consultancy.primaryColor || DEFAULT_BRAND_HEX);
                     }}
                     className="rounded-xl border-2 border-slate-300 px-5 py-3 font-semibold text-slate-700"
                   >

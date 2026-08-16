@@ -360,7 +360,7 @@ function UniCard({
               all visible and consistent. Universities with no mark of ours
               show a monogram: we never scrape a logo we are not licensed for. */}
           {i.logoUrl ? (
-            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#eff4ff] p-2">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-surface-sunk p-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={i.logoUrl}

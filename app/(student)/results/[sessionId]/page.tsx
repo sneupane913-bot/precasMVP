@@ -359,7 +359,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
                                 {s.label}
                               </p>
                               <p
-                                className={`text-[11px] ${
+                                className={`text-micro ${
                                   done ? 'text-emerald-700' : 'text-red-700'
                                 }`}
                               >
@@ -483,7 +483,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
         </p>
         {/* LIVE-004: a whole audit round was spent on a stale deployment
             because nothing proved which revision was live. */}
-        <p className="px-2 text-center text-[10px] text-slate-300">build {BUILD_INFO.shortSha}</p>
+        <p className="px-2 text-center text-micro text-slate-300">build {BUILD_INFO.shortSha}</p>
       </div>
       </main>
       <SiteFooter />

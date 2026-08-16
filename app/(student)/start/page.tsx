@@ -108,7 +108,7 @@ function StartInner() {
           Stitch "sign_in": the value proposition sits beside the button so the
           page never reads as a bare gate. Hidden on small screens, where the
           button must stay in the thumb zone. */}
-      <aside className="hidden flex-col justify-between bg-[#eff4ff] px-12 py-12 lg:flex">
+      <aside className="hidden flex-col justify-between bg-surface-sunk px-12 py-12 lg:flex">
         <Link href="/" className="font-serif text-xl font-bold text-ink">
           PreCAS Practice
         </Link>

@@ -59,7 +59,7 @@ export function MonitorPanel({
       </div>
 
       <div className="mb-3">
-        <div className="mb-1 flex items-center justify-between text-[11px] text-slate-500">
+        <div className="mb-1 flex items-center justify-between text-micro text-slate-500">
           <span>Sound level</span>
           <span>{noiseLevel > 0.045 ? 'Noisy room' : noiseLevel > 0.01 ? 'Good' : 'Very quiet'}</span>
         </div>
@@ -74,7 +74,7 @@ export function MonitorPanel({
       </div>
 
       {rows.length === 0 ? (
-        <p className="rounded-lg bg-emerald-50 px-3 py-2.5 text-[13px] leading-snug text-emerald-800">
+        <p className="rounded-lg bg-emerald-50 px-3 py-2.5 text-micro leading-snug text-emerald-800">
           No problems so far. Keep looking at the camera and stay on this screen.
         </p>
       ) : (
@@ -88,10 +88,10 @@ export function MonitorPanel({
                   ? 'border-amber-300 bg-amber-50 text-amber-900'
                   : 'border-slate-200 bg-slate-50 text-slate-700';
             return (
-              <li key={type} className={`rounded-lg border-l-4 px-3 py-2 text-[13px] ${tone}`}>
+              <li key={type} className={`rounded-lg border-l-4 px-3 py-2 text-micro ${tone}`}>
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="font-semibold">{meta.label}</span>
-                  <span className="shrink-0 rounded-full bg-white/70 px-2 py-0.5 text-[11px] font-bold">
+                  <span className="shrink-0 rounded-full bg-white/70 px-2 py-0.5 text-micro font-bold">
                     {count}
                   </span>
                 </div>
@@ -123,7 +123,7 @@ function Stat({
       : 'bg-red-50 text-red-700';
   return (
     <div className={`rounded-lg px-2 py-1.5 ${tone}`}>
-      <div className="text-[10px] font-medium uppercase tracking-wide opacity-70">{label}</div>
+      <div className="text-micro font-medium uppercase tracking-wide opacity-70">{label}</div>
       <div className="text-sm font-bold">{value}</div>
     </div>
   );

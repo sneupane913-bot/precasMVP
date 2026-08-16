@@ -2,11 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ==========================================================================
+   THE TOKENS. See REDESIGN.md Part 1.
+
+   D-1: nothing outside this file may name a colour, a duration or an easing.
+   `design-check.js` fails the build on a raw hex, a raw cubic-bezier or an
+   arbitrary Tailwind duration anywhere in app/ or components/.
+
+   The reason is F-2, the defect shape that has cost the most this week: a value
+   written down in two places is a value that will disagree with itself on
+   screen. Twelve scattered cubic-beziers are not a design decision, they are
+   the absence of one.
+   ========================================================================== */
+
 :root {
-  /* Overridden per consultancy at /c/[slug] so branding is data, not code. */
+  /* --- Brand. Overridden per consultancy at /c/[slug], so branding is data. */
   --brand: #0d1b2a;
   --brand-dark: #06101c;
   --brand-light: #1b3a5c;
+
+  /* --- Surfaces. Two greys, not six. A frightened person does not need
+         seventeen shades of card. */
+  --paper: #f7f8fb;
+  --surface: #ffffff;
+  /* A sunken tint: logo backdrops, code blocks, the sign-in aside. This value
+     was already in use in six files as a raw #eff4ff. It was not wrong, it was
+     homeless — which is F-2 waiting to happen the first time somebody adjusts
+     one of the six. */
+  --surface-sunk: #eff4ff;
+  --line: #e6e9ef;
+  --line-strong: #c9cfda;
+
+  /* --- Text. Three weights of meaning: primary, secondary, quiet. */
+  --ink: #0d1b2a;
+  --ink-soft: #475467;
+  --ink-quiet: #7a8699;
+
+  /* --- The single accent. Used for GO and for nothing else, so that when it
+         appears a student knows it means "this is the thing to press". */
+  --go: #0f9d63;
+  --go-dark: #0b7d4e;
+  --go-tint: #eaf7f0;
+
+  /* --- The two states that are not GO. Deliberately only two.
+         `warn` means "you must know this". `stop` means "this failed".
+         Nothing decorative uses either (D-9: never colour alone). */
+  --warn: #9a6209;
+  --warn-tint: #fdf5e7;
+  --stop: #b3261e;
+  --stop-tint: #fdeceb;
+
+  /* --- Focus. One ring, everywhere, never removed. */
+  --focus: #2563eb;
+
+  /* ------------------------------------------------------------------ MOTION
+     D-2. Four durations, and the context each belongs to. The rule underneath
+     the numbers: the more often an animation plays, the shorter it must be.
+     A hover fires a thousand times a day. A first-report reveal fires once. */
+  --t-tap: 120ms;    /* hover, focus, toggle, press */
+  --t-panel: 240ms;  /* modal, drawer, tab, sheet */
+  --t-route: 320ms;  /* whole-page transition */
+  /* Nothing in this product is allowed past --t-route on a UI interaction.
+     There is always a student waiting on the other side of it. */
+
+  /* D-3. Easing comes from DIRECTION, not from taste.
+     Entering decelerates into place, like arriving.
+     Exiting accelerates away, getting out of the way.
+     Exit is always more subtle than enter — enter may move and fade, exit
+     only fades. The reverse reads as an interface reluctant to let go. */
+  --e-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --e-exit: cubic-bezier(0.4, 0, 1, 1);
+  --e-move: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* --- Radii and elevation. One of each, so cards cannot drift apart. */
+  --r-control: 12px;
+  --r-card: 16px;
+  --shadow-card: 0 1px 2px rgb(13 27 42 / 0.04), 0 8px 24px rgb(13 27 42 / 0.06);
+
+  /* --- The thumb reach. D-6: on a phone the primary action sits inside this
+         band from the bottom, because that is where a thumb rests. */
+  --thumb-band: 33vh;
 }
 
 html,
@@ -18,34 +93,68 @@ body {
   @apply bg-paper text-ink antialiased;
   /* Hanken Grotesk (Stitch "Academic Clarity"), with a safe system fallback. */
   font-family: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  /* 16px minimum. The target user has weak English and needs readable text. */
+  /* D-8. 16px floor. Below 16px iOS zooms the page on input focus and the
+     layout breaks — and our student has weak English and needs readable text. */
   font-size: 16px;
   line-height: 1.6;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .animate-marquee {
-    animation: none !important;
-  }
+/* D-8. Inputs inherit the floor explicitly. A 14px input is the single most
+   common cause of the iOS zoom-and-break, and it is easy to reintroduce. */
+input,
+select,
+textarea {
+  font-size: 16px;
 }
 
-/* Every tappable control clears 48px, per AGENT_BUILDER.md. */
+/* D-6. Every tappable control clears the 44px minimum with room to spare.
+   48 rather than 44 because our target hardware is a mid-range Android held
+   one-handed, often in a hurry. */
 button,
-a[role='button'] {
+a[role='button'],
+[type='button'],
+[type='submit'] {
   min-height: 48px;
   touch-action: manipulation;
 }
 
+/* Focus is never removed, and never hidden behind an animation (D-5). */
 *:focus-visible {
-  outline: 3px solid #2563eb;
+  outline: 3px solid var(--focus);
   outline-offset: 2px;
 }
 
+/* ==========================================================================
+   D-5. REDUCED MOTION IS A REQUIREMENT.
+
+   And respecting it means delivering the FINISHED STATE, not a broken one. A
+   reduced-motion student must see the composition, just not the journey to it.
+
+   Note what this block does NOT do: it does not set duration to zero and walk
+   away. Anything that animates INTO position must be given its final position
+   here, or a student who has asked for less motion is left looking at an
+   element parked at opacity 0 — which is worse than the animation.
+   ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* The finished state, explicitly. */
+  .animate-slideUp,
+  .animate-fadeIn {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Purely decorative motion simply stops. */
+  .animate-marquee,
+  .animate-pulseRing {
+    animation: none !important;
   }
 }

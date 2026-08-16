@@ -90,7 +90,7 @@ export default async function HomePage() {
               },
             ].map((s) => (
               <div key={s.n} className="rounded-2xl border border-slate-200 bg-white p-6">
-                <div className="mb-4 grid h-10 w-10 place-items-center rounded-xl bg-[#eff4ff] font-bold text-ink">
+                <div className="mb-4 grid h-10 w-10 place-items-center rounded-xl bg-surface-sunk font-bold text-ink">
                   {s.n}
                 </div>
                 <h3 className="mb-2 font-serif text-lg font-bold text-ink">{s.t}</h3>
@@ -104,7 +104,7 @@ export default async function HomePage() {
       {/* ---------------- The wedge, with the sample report card ----------------
           design-reference/landing_page pairs the claim with a visible example,
           because "feedback on what you said" means nothing until it is shown. */}
-      <section className="bg-[#eff4ff] px-5 py-16">
+      <section className="bg-surface-sunk px-5 py-16">
         <div className="mx-auto grid max-w-5xl items-center gap-10 lg:grid-cols-2">
           <div>
             <h2 className="mb-4 font-serif text-3xl font-bold leading-tight text-ink">
@@ -210,7 +210,7 @@ export default async function HomePage() {
             ].map((f) => (
               <details
                 key={f.q}
-                className="group rounded-2xl border border-slate-200 bg-white p-5 open:bg-[#eff4ff]"
+                className="group rounded-2xl border border-slate-200 bg-white p-5 open:bg-surface-sunk"
               >
                 <summary className="cursor-pointer list-none font-semibold text-ink marker:hidden">
                   <span className="flex items-center justify-between gap-4">

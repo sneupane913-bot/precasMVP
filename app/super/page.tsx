@@ -560,7 +560,7 @@ export default function SuperAdminPage() {
   return (
     <div className="min-h-screen bg-paper lg:flex">
       {/* ---------------------------------------------------- side nav --- */}
-      <aside className="border-b border-slate-200 bg-[#eff4ff] px-5 py-5 lg:min-h-screen lg:w-64 lg:shrink-0 lg:border-b-0 lg:border-r lg:px-6 lg:py-8">
+      <aside className="border-b border-slate-200 bg-surface-sunk px-5 py-5 lg:min-h-screen lg:w-64 lg:shrink-0 lg:border-b-0 lg:border-r lg:px-6 lg:py-8">
         <div className="mb-6">
           <p className="font-serif text-xl font-bold text-ink">Admin portal</p>
           <p className="text-sm text-slate-500">PreCAS Practice</p>
@@ -698,11 +698,11 @@ export default function SuperAdminPage() {
                   <h2 className="font-serif text-lg font-bold text-ink">Where students come from</h2>
                 </div>
                 <div className="grid gap-4 p-5 sm:grid-cols-2">
-                  <div className="rounded-xl bg-[#eff4ff] p-4">
+                  <div className="rounded-xl bg-surface-sunk p-4">
                     <p className="text-sm text-slate-600">Direct students</p>
                     <p className="text-2xl font-black text-ink">{direct}</p>
                   </div>
-                  <div className="rounded-xl bg-[#eff4ff] p-4">
+                  <div className="rounded-xl bg-surface-sunk p-4">
                     <p className="text-sm text-slate-600">Through a consultancy</p>
                     <p className="text-2xl font-black text-ink">{viaConsultancy}</p>
                   </div>
@@ -742,7 +742,7 @@ export default function SuperAdminPage() {
                       {data.referralLeaderboard.slice(0, 10).map((l, i) => (
                         <li
                           key={l.code}
-                          className="flex items-center justify-between rounded-lg bg-[#eff4ff] px-3 py-2 text-sm"
+                          className="flex items-center justify-between rounded-lg bg-surface-sunk px-3 py-2 text-sm"
                         >
                           <span className="text-slate-700">
                             <span className="mr-2 font-bold text-slate-400">#{i + 1}</span>
@@ -805,7 +805,7 @@ export default function SuperAdminPage() {
                             <span className="text-slate-400">not given</span>
                           )}
                           {s.phone && s.whatsappConfirmed === false && (
-                            <span className="ml-1 block text-[11px] font-semibold text-amber-700">
+                            <span className="ml-1 block text-micro font-semibold text-amber-700">
                               not on WhatsApp
                             </span>
                           )}
@@ -949,7 +949,7 @@ export default function SuperAdminPage() {
                             <span className="text-slate-400">not given</span>
                           )}
                           {o.payerPhoneSuffix && (
-                            <span className="block text-[11px] text-slate-500">
+                            <span className="block text-micro text-slate-500">
                               paid from ...{o.payerPhoneSuffix}
                             </span>
                           )}
@@ -958,7 +958,7 @@ export default function SuperAdminPage() {
                               WhatsApp, a message will vanish and the payment
                               sits unapproved while they wait. Ring it. */}
                           {o.payerPhone && o.payerPhoneWhatsappConfirmed === false && (
-                            <span className="block text-[11px] font-semibold text-amber-700">
+                            <span className="block text-micro font-semibold text-amber-700">
                               not on WhatsApp, call instead
                             </span>
                           )}
@@ -1466,7 +1466,7 @@ export default function SuperAdminPage() {
                         {f.reason || (f.riskReasons ?? []).join('; ') || 'Flagged automatically'}
                       </p>
                       {f.fingerprintHash && (
-                        <p className="mt-0.5 font-mono text-[11px] text-slate-400">
+                        <p className="mt-0.5 font-mono text-micro text-slate-400">
                           device {f.fingerprintHash.slice(0, 18)}
                         </p>
                       )}
