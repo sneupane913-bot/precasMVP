@@ -20,6 +20,35 @@
 #
 set -uo pipefail
 
+# ---------------------------------------------------------------------------
+# LOAD THE REAL PASSCODES BEFORE ASSERTING ANYTHING WITH THEM.
+#
+# `walk-check` falls back to 'super-dev' and 'owner-dev' when it is not told
+# otherwise, and this script never told it. So against a machine with a real
+# `.env.local` every back-office step got "bad credentials", and walks 4 to 10
+# collapsed into TWENTY-THREE reported bugs that were nothing but a wrong
+# password — while the suite still exited 0, so the gate printed the bug count
+# as if it were a pass.
+#
+# Both halves of that are bad. A suite that cries wolf gets ignored, which this
+# project already learned from R-6's false positive on /refund; and a suite that
+# reports bugs and exits 0 lets the gate say green over them. With the real
+# values loaded the same run finds ONE thing instead of twenty-three.
+#
+# Nothing is printed and nothing leaves the machine: this only puts the values
+# already in `.env.local` into the environment the suites read.
+# ---------------------------------------------------------------------------
+if [ -f .env.local ]; then
+  set -a
+  # shellcheck disable=SC1091
+  . ./.env.local >/dev/null 2>&1
+  set +a
+  # walk-check reads OWNER_PASSCODE; the app calls the same secret
+  # OWNER_ACCESS_KEY. One value, two names, so map it rather than let the suite
+  # fall back to a default that cannot work.
+  export OWNER_PASSCODE="${OWNER_PASSCODE:-${OWNER_ACCESS_KEY:-}}"
+fi
+
 PORT="${QA_BASE_PORT:-3200}"
 FAILED=0
 PASSED_SUITES=0
@@ -27,7 +56,7 @@ PASSED_SUITES=0
 # Suites that read the source and need nothing running. Fast, so they go first:
 # if the copy is wrong or a feature has no door, there is no point booting a
 # server at all.
-STATIC=(reachable-check copy-check header-check route-check)
+STATIC=(reachable-check copy-check header-check route-check design-check ledger-check)
 
 # Suites that drive a running server.
 SERVER=(

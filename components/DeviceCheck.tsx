@@ -384,7 +384,7 @@ export function DeviceCheck({ onReady }: { onReady: () => void }) {
       </ul>
 
       {/* ---------------- Sound check ---------------- */}
-      <div className="mb-5 rounded-card border border-line bg-surface p-5">
+      <div className="mb-5 rounded-card border border-line bg-surface p-5 shadow-card">
         <h2 className="mb-1 font-bold text-ink">Sound check</h2>
         <p className="mb-1 text-sm leading-relaxed text-ink-soft">
           Press the button and say your name out loud for three seconds.
@@ -474,7 +474,7 @@ export function DeviceCheck({ onReady }: { onReady: () => void }) {
       <button
         onClick={onReady}
         disabled={!canStart}
-        className="w-full rounded-control bg-go px-6 py-4 text-lg font-bold text-white shadow-sm disabled:bg-line-strong"
+        className="w-full rounded-control bg-go px-6 py-4 text-lg font-bold text-white shadow-card disabled:bg-line-strong"
       >
         Start my interview
       </button>

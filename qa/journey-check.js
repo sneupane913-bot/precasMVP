@@ -77,10 +77,25 @@ function phoneSafe(html) {
     // a table is only safe if an overflow wrapper sits above it
     if (!/overflow-x-auto[\s\S]{0,400}<table/.test(html)) problems.push('table with no scroll wrapper');
   }
-  const wide = html.match(/(?:min-)?w-\[(\d{3,})px\]/g) || [];
+  /**
+   * `max-w-` IS THE FIX, NOT THE BUG.
+   *
+   * This pattern used to be /(?:min-)?w-\[(\d{3,})px\]/, which matches the
+   * substring `w-[1120px]` inside `max-w-[1120px]` — so the page frame that
+   * KEEPS the layout phone-safe was reported as the thing breaking it, eight
+   * times on the home page alone.
+   *
+   * It is the R-6 lesson a second time: the extractor gets fixed, the rule does
+   * not get relaxed. A check that cries wolf is worse than no check, because
+   * the next real finding is read as more noise. Confirmed against a real
+   * 390px viewport, where none of these pages moves sideways by a pixel.
+   *
+   * A genuine `w-[420px]` or `min-w-[640px]` is still caught.
+   */
+  const wide = html.match(/(?<!max-)\b(?:min-)?w-\[(\d{3,})px\]/g) || [];
   for (const w of wide) {
     const n = Number(w.match(/(\d{3,})/)[1]);
-    if (n > 360) problems.push(`fixed width ${n}px`);
+    if (n > 360) problems.push(`fixed width ${w}`);
   }
   return problems;
 }
@@ -109,7 +124,40 @@ function phoneSafe(html) {
   // 4 ------------------------------------------------------------ catalogue
   const unis = await req('GET', '/universities');
   t('4. can browse universities', unis.code === 200);
-  t('   finds their own university among many', /Manchester Metropolitan/.test(unis.body));
+  /**
+   * U-1 IS ABOUT REACHING YOUR UNIVERSITY, NOT ABOUT THE FIRST SCREENFUL.
+   *
+   * This used to assert that "Manchester Metropolitan" appeared in the
+   * catalogue's HTML. It stopped being true when "See all" landed: the page
+   * deliberately renders six universities and a control that opens the rest,
+   * which the client asked for and approved, with two guards already written
+   * into the page — a search or a filter shows EVERYTHING and makes the control
+   * disappear, and the count is derived rather than typed.
+   *
+   * So the old assertion was reporting an approved design as a defect. The
+   * resolution is not to soften it. It is to assert what REDESIGN.md U-1
+   * actually promises, whose falsifier is "a known university is not found by
+   * its common short form": there must be a way to every university, and the
+   * count offered must be real.
+   *
+   * WORTH KNOWING, and the reason this is asserted on the count rather than
+   * quietly deleted: this suite speaks HTTP and never runs the page's
+   * JavaScript, and the slice happens before render. So without JavaScript the
+   * remaining universities are not merely hidden, they are absent. The search
+   * box and the "See all" control are both real elements in the HTML, and the
+   * number beside "See all" is the honest total — that is what is checked here.
+   */
+  // React splits `See all {n} universities` into separate text nodes and marks
+  // the boundaries with `<!-- -->`, so the rendered HTML is literally
+  // "See all <!-- -->87<!-- --> universities". Matching the plain sentence finds
+  // nothing and would fail for a reason that has nothing to do with the product.
+  const seeAll = unis.body.replace(/<!--[\s\S]*?-->/g, '').match(/See all\s*(\d+)\s*universities/);
+  const hasSearch = /aria-label="Search universities"/.test(unis.body);
+  t('   offers a real route to every university',
+    Boolean(seeAll) && Number(seeAll[1]) > 6 && hasSearch,
+    seeAll
+      ? `search box ${hasSearch ? 'present' : 'MISSING'}, "See all ${seeAll[1]}"`
+      : 'no "See all N universities" control in the catalogue');
   t('   catalogue is phone safe', phoneSafe(unis.body).length === 0, phoneSafe(unis.body).join(', '));
 
   // 5 --------------------------------------------------------------- start

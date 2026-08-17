@@ -6,6 +6,29 @@
  * work list.
  */
 const http = require('http');
+
+/**
+ * The back-office passcodes, READ FROM THE ENVIRONMENT.
+ *
+ * These were the literals 'super-dev' and 'owner-dev'. On any machine with a
+ * real `.env.local` — which is every machine that can actually run the product
+ * — each back-office call came back 403 "bad credentials", and the suites
+ * reported that as PRODUCT defects. `walk-check` produced twenty-three of them
+ * in one run. `lifecycle-check` E8 printed "second=DOUBLE GRANTED" when nothing
+ * had been granted at all, because the FIRST approval had been refused.
+ *
+ * A suite that reports a wrong password as a double grant is worse than no
+ * suite. The next person reads twenty-three findings, discovers the first two
+ * are nonsense, and stops reading — and a real one is sitting at number
+ * nineteen. It is the same lesson as R-6's false positive on /refund: fix the
+ * harness, never relax the rule.
+ *
+ * The literal stays as the fallback, because a fresh clone with no `.env.local`
+ * really does run on the dev defaults.
+ */
+const QA_SUPER_KEY = process.env.SUPER_ADMIN_PASSCODE || 'super-dev';
+const QA_OWNER_KEY = process.env.OWNER_ACCESS_KEY || process.env.OWNER_PASSCODE || 'owner-dev';
+
 const P = Number(process.env.QA_PORT || 3012);
 let ipN = 0;
 const nextIp = () => `10.${120 + Math.floor(ipN / 250)}.${(ipN++ % 250) + 1}.6`;
@@ -154,14 +177,14 @@ async function signIn(token, opts = {}) {
 
   console.log('\n=== THE KILL SWITCH ===\n');
 
-  const own = process.env.OWNER_KEY || 'owner-dev';
+  const own = process.env.OWNER_KEY || QA_OWNER_KEY;
   const on = await req('POST', '/api/platform', { action: 'setMaintenance', ownerKey: own, enabled: true, contactName: 'Umanga', contactPhone: '9800000000' });
   const paths = ['/api/me', '/api/account', '/api/payment', '/api/session/create'];
   const codes = [];
   for (const p of paths) codes.push((await req(p === '/api/me' || p === '/api/account' ? 'GET' : 'POST', p, p.includes('payment') ? { action: 'status', orderId: 'x' } : {}, { ip: a.ip, cookie: a.jar })).code);
   t('N-41', 'While closed, every student API refuses', codes.every((c) => c === 503),
     `${paths.join(' ')} -> ${codes.join(', ')}`);
-  const superWhileDown = await req('POST', '/api/super', { action: 'overview', superKey: 'super-dev' });
+  const superWhileDown = await req('POST', '/api/super', { action: 'overview', superKey: QA_SUPER_KEY });
   t('N-42', 'Even the back office is closed, so there is no workaround',
     superWhileDown.code === 503,
     `/api/super while paused -> ${superWhileDown.code} (must be 503)`);
@@ -174,7 +197,7 @@ async function signIn(token, opts = {}) {
 
   console.log('\n=== SUPER ADMIN VISIBILITY ===\n');
 
-  const dev = await req('POST', '/api/super', { action: 'flaggedTrials', superKey: 'super-dev' });
+  const dev = await req('POST', '/api/super', { action: 'flaggedTrials', superKey: QA_SUPER_KEY });
   t('N-17', 'Devices running many Google accounts reach a human queue',
     dev.json?.ok === true, `queue reachable, ${Array.isArray(dev.json?.data) ? dev.json.data.length : '?'} entries`);
 
@@ -183,7 +206,7 @@ async function signIn(token, opts = {}) {
   const direct2 = await signIn(`n4d-${S}`);
   const stu2Ip = direct2.ip, stu2Jar = direct2.jar;
 
-  const SU = 'super-dev';
+  const SU = QA_SUPER_KEY;
   const cs = `n1-${S}`;
   const mk = await req('POST', '/api/platform',
     { action: 'createConsultancy', superKey: SU, name: cs, slug: cs, seatsTotal: 20, paidNpr: 6000, passcode: 'handover-n1' });
@@ -300,11 +323,35 @@ async function signIn(token, opts = {}) {
   // N-9. Order on the page, checked by position in the source: QR, then the
   // wallet details, then the form, then the optional photo, then the button.
   const co = fs.readFileSync('app/(student)/checkout/page.tsx', 'utf8');
+  /**
+   * ANCHOR ON MARKUP, NOT ON PROSE.
+   *
+   * N-9 asserts the order of things ON THE SCREEN using their order in the
+   * file, and it was matching bare sentences. Two of them also appear in
+   * comments: the long note explaining why we ask for a whole WhatsApp number
+   * quotes a student saying "I have paid", so `indexOf` found the BUTTON above
+   * the receipt field and reported a correctly ordered checkout as wrong.
+   *
+   * The obvious repair - strip the comments first, per REDESIGN.md Part 7 -
+   * does not work here, and the reason is worth recording because it will bite
+   * again. This page contains an accept attribute whose value is the two
+   * characters "image" followed by a slash and a star. To a regex hunting for a
+   * comment opener, that string literal OPENS one, which then runs to the next
+   * comment closer and swallows the submit button whole. A comment stripper
+   * that does not understand string literals is not a comment stripper.
+   *
+   * This very comment had to be reworded for the same reason: describing the
+   * closing marker literally would have ended the comment describing it.
+   *
+   * So this anchors on things that cannot occur in prose: the quoted string the
+   * button actually renders, and the label attribute of the field. Prose can
+   * quote a sentence; it does not quote it with its JSX punctuation attached.
+   */
   const pos = (needle) => co.indexOf(needle);
   t('N-9', 'The checkout is laid out for one hand and one phone',
-    pos('qrImageUrl') < pos('Transaction number') &&
-    pos('Transaction number') < pos('Picture of the receipt') &&
-    pos('Picture of the receipt') < pos('I have paid'),
+    pos('qrImageUrl') < pos('label="Transaction number"') &&
+    pos('label="Transaction number"') < pos('label="Picture of the receipt') &&
+    pos('label="Picture of the receipt') < pos("'I have paid'"),
     'QR -> wallet number -> details -> optional photo -> pay, in that order');
   /**
    * N-9b. This used to search the checkout source for the literal sentence
@@ -324,7 +371,7 @@ async function signIn(token, opts = {}) {
   // money-in-flight screen, which sits above the form. The guarantee is that
   // there is ALSO one after the button, so search forward from the button.
   t('N-9b', 'The WhatsApp escape sits under the button that might fail',
-    co.indexOf('<ContactUs', pos('I have paid')) !== -1,
+    co.indexOf('<ContactUs', pos("'I have paid'")) !== -1,
     'a student who has sent money and hit a problem does not have to hunt for us');
   t('N-9c', 'And the escape is not just a button: the number is dialable text',
     /href={`tel:\+\$\{digits\}`}/.test(contact) && /wa\.me\/\$\{digits\}/.test(contact),

@@ -63,7 +63,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
                 ? ` · ${new Date(session.completedAt).toLocaleDateString()}`
                 : ''}
             </p>
-            <h1 className="font-serif text-3xl font-bold text-ink sm:text-4xl">
+            <h1 className="font-serif text-display font-bold text-ink sm:text-4xl">
               Interview results
             </h1>
           </div>
@@ -141,21 +141,65 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
               <p className="mt-6 font-serif text-[3rem] font-bold leading-none text-ink">
                 {summary.overallScore}%
               </p>
-              {/* A number needs context or it is just a number. The gauge shows
-                  which band the score sits in, so 62% reads as a position
-                  rather than as a mark out of a hundred. */}
+              {/* ------------------------------------------------------------
+                  D-34. THE GAUGE, WITH A MARKER ON IT.
+
+                  The comment that used to sit here said the gauge "shows which
+                  band the score sits in, so 62% reads as a position rather than
+                  as a mark out of a hundred". It did not. It drew four coloured
+                  zones and four labels and NOTHING that said where this
+                  student's score fell, so the reader had to estimate their own
+                  position by comparing a number above the bar with the widths
+                  of four blocks below it.
+
+                  That is the same shape as F-5 one layer down: the INTENT was
+                  written into the file and mistaken for the thing being done.
+                  The marker is what the comment was describing.
+
+                  It carries its meaning three ways over, because this is the
+                  single sentence a frightened student takes away: a position on
+                  the bar, the band's name written under it, and an aria-label
+                  that says the whole thing in one breath for anyone who cannot
+                  see the bar at all. Colour is the fourth carrier, never the
+                  first (D-9).
+                  ------------------------------------------------------------ */}
               <div className="mx-auto mt-4 max-w-sm">
-                <div className="flex h-2 overflow-hidden rounded-full">
-                  <span className="w-1/4 bg-stop/40" />
-                  <span className="w-1/4 bg-warn/40" />
-                  <span className="w-1/4 bg-line-strong" />
-                  <span className="w-1/4 bg-go/50" />
-                </div>
-                <div className="mt-1.5 flex justify-between text-micro text-ink-quiet">
-                  <span>At risk</span>
-                  <span>Needs practice</span>
-                  <span>Almost</span>
-                  <span>Ready</span>
+                <div
+                  role="img"
+                  aria-label={`Your score is ${summary.overallScore} per cent${
+                    summary.band ? `, which is in the ${BAND_LABEL[summary.band]} band` : ''
+                  }. The scale runs from At risk through Needs practice and Almost to Ready.`}
+                >
+                  <div className="relative">
+                    <div className="flex h-2 overflow-hidden rounded-full">
+                      <span className="w-1/4 bg-stop/40" />
+                      <span className="w-1/4 bg-warn/40" />
+                      <span className="w-1/4 bg-line-strong" />
+                      <span className="w-1/4 bg-go/50" />
+                    </div>
+                    {/* Clamped so a 0 or a 100 still sits ON the bar rather than
+                        half off the end of it. */}
+                    <span
+                      className="absolute -top-1 h-4 w-1 -translate-x-1/2 rounded-full bg-ink ring-2 ring-surface"
+                      style={{
+                        left: `${Math.max(2, Math.min(98, summary.overallScore))}%`,
+                      }}
+                      aria-hidden
+                    />
+                  </div>
+                  <div className="mt-1.5 flex justify-between text-micro text-ink-quiet">
+                    <span>At risk</span>
+                    <span>Needs practice</span>
+                    <span>Almost</span>
+                    <span>Ready</span>
+                  </div>
+                  {/* The marker in words, directly under it, so the position is
+                      never something the student has to measure. */}
+                  {summary.band && (
+                    <p className="mt-2 text-sm font-semibold text-ink">
+                      That puts you in {BAND_LABEL[summary.band]}.
+                    </p>
+                  )}
                 </div>
               </div>
               <p className="mt-4 text-sm text-ink-quiet">
@@ -238,7 +282,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
         </section>
 
         {/* ---------- Behaviour table ---------- */}
-        <section className="overflow-hidden rounded-card border border-line bg-surface">
+        <section className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
           <div className="border-b border-line p-5">
             <h2 className="font-bold text-ink">How you behaved in the interview</h2>
             <p className="text-sm text-ink-soft">These are the same things a real interviewer watches.</p>
@@ -247,7 +291,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
               screen. Scrolling the table beats scrolling the page sideways. */}
           <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-surface-sunk text-micro uppercase tracking-wide text-ink-quiet">
+            <thead className="bg-surface-sunk text-micro font-bold uppercase tracking-[0.08em] text-ink-quiet">
               <tr>
                 <th className="px-5 py-2.5 font-semibold">What we checked</th>
                 <th className="px-3 py-2.5 font-semibold">Result</th>
@@ -315,7 +359,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
             return (
               <article
                 key={`${a.questionId}-${a.attemptNumber}`}
-                className="overflow-hidden rounded-card border border-line bg-surface"
+                className="overflow-hidden rounded-card border border-line bg-surface shadow-card"
               >
                 <div className="border-b border-line p-5">
                   <div className="mb-2 flex flex-wrap items-center gap-2">

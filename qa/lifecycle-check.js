@@ -1,4 +1,27 @@
 const http = require('http');
+
+/**
+ * The back-office passcodes, READ FROM THE ENVIRONMENT.
+ *
+ * These were the literals 'super-dev' and 'owner-dev'. On any machine with a
+ * real `.env.local` — which is every machine that can actually run the product
+ * — each back-office call came back 403 "bad credentials", and the suites
+ * reported that as PRODUCT defects. `walk-check` produced twenty-three of them
+ * in one run. `lifecycle-check` E8 printed "second=DOUBLE GRANTED" when nothing
+ * had been granted at all, because the FIRST approval had been refused.
+ *
+ * A suite that reports a wrong password as a double grant is worse than no
+ * suite. The next person reads twenty-three findings, discovers the first two
+ * are nonsense, and stops reading — and a real one is sitting at number
+ * nineteen. It is the same lesson as R-6's false positive on /refund: fix the
+ * harness, never relax the rule.
+ *
+ * The literal stays as the fallback, because a fresh clone with no `.env.local`
+ * really does run on the dev defaults.
+ */
+const QA_SUPER_KEY = process.env.SUPER_ADMIN_PASSCODE || 'super-dev';
+const QA_OWNER_KEY = process.env.OWNER_ACCESS_KEY || process.env.OWNER_PASSCODE || 'owner-dev';
+
 const P = Number(process.env.QA_PORT || 3012);
 const jar = {};                       // accumulate cookies across the whole journey
 function cookieHeader() { return Object.entries(jar).map(([k, v]) => `${k}=${v}`).join('; '); }
@@ -125,8 +148,8 @@ function t(id, ok, detail) { (ok ? pass++ : fail++); console.log(`  ${ok ? 'PASS
   t('E6', friend?.error?.code === 'TXN_ALREADY_USED', `friend reuses the same txn -> ${friend?.error?.code || 'ACCEPTED (DEFECT)'}`);
 
   // E8 idempotent allocation
-  const v1 = J((await req('POST', '/api/super', { action: 'verifyPayment', superKey: 'super-dev', orderId: oid, confirmedInWalletLedger: true })).body);
-  const v2 = J((await req('POST', '/api/super', { action: 'verifyPayment', superKey: 'super-dev', orderId: oid, confirmedInWalletLedger: true })).body);
+  const v1 = J((await req('POST', '/api/super', { action: 'verifyPayment', superKey: QA_SUPER_KEY, orderId: oid, confirmedInWalletLedger: true })).body);
+  const v2 = J((await req('POST', '/api/super', { action: 'verifyPayment', superKey: QA_SUPER_KEY, orderId: oid, confirmedInWalletLedger: true })).body);
   // The prep pack is 6 mocks. This student finished their free questions
   // moments ago, so the post-trial window (I9) is open and legitimately adds a
   // bonus mock. The guarantee under test is that the SECOND approval grants

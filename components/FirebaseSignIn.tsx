@@ -294,7 +294,7 @@ export function FirebaseSignIn({
       <button
         onClick={signIn}
         disabled={busy}
-        className="flex w-full items-center justify-center gap-3 rounded-control border-2 border-line-strong bg-surface px-6 py-4 text-lg font-bold text-ink-soft transition active:scale-[0.99] disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-3 rounded-control border-2 border-line-strong bg-surface px-6 py-4 text-lg font-bold text-ink-soft transition-colors duration-tap ease-move active:scale-[0.99] disabled:opacity-60"
       >
         <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden>
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />

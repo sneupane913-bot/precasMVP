@@ -32,7 +32,7 @@ export function MonitorPanel({
 
   return (
     <section
-      className="rounded-card border border-line bg-surface p-4 shadow-sm"
+      className="rounded-card border border-line bg-surface p-4 shadow-card"
       aria-label="Interview monitor"
     >
       <header className="mb-3 flex items-center justify-between">

@@ -1,9 +1,10 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { PasscodeInput } from '@/components/PasscodeInput';
 import { PaySettingsForm, type PaySettings } from '@/components/PaySettingsForm';
 import { PasscodeChangeForm } from '@/components/PasscodeChangeForm';
+import { Card, Button, Banner, Status, Pill, type Tone } from '@/components/ui';
 
 /**
  * Super admin, rebuilt to docs/design-reference/super_admin_dashboard.
@@ -146,6 +147,58 @@ interface AuditRow {
 
 type Tab = 'dashboard' | 'students' | 'payments' | 'flagged' | 'consultancies' | 'questions' | 'audit' | 'settings';
 
+/**
+ * D-32. THE STATUS DOTS, GIVEN WORDS.
+ *
+ * The defect was recorded as "super admin status dots unclear", and there were
+ * two things wrong rather than one.
+ *
+ * The first is D-9: a coloured pill carries its meaning in its colour, and
+ * green against amber is the pair roughly one man in twelve cannot separate.
+ * Every one of these now renders through `Status`, which cannot be drawn
+ * without a word beside the dot.
+ *
+ * The second is the one that actually made them unclear to the CLIENT, who has
+ * no trouble seeing colour. The pills printed the RAW STORED VALUE — "submitted",
+ * "verified", "active" — which are names chosen for a database, not for the
+ * person deciding whether to approve a payment. "submitted" says who did
+ * something; it does not say that the row is waiting for HIM. So the words
+ * below are what the state means to the reader, and the mapping lives here,
+ * once, rather than as three copies of a ternary inside three tables.
+ */
+const ORDER_STATE: Record<string, { label: string; tone: Tone }> = {
+  submitted: { label: 'Waiting for you to check', tone: 'warn' },
+  verified: { label: 'Approved', tone: 'go' },
+  rejected: { label: 'Not matched', tone: 'stop' },
+  created: { label: 'Not paid yet', tone: 'neutral' },
+  expired: { label: 'Expired', tone: 'neutral' },
+};
+
+const STUDENT_STATE: Record<string, { label: string; tone: Tone }> = {
+  active: { label: 'Active', tone: 'go' },
+  blocked: { label: 'Blocked', tone: 'stop' },
+  suspended: { label: 'Suspended', tone: 'stop' },
+};
+
+const CONSULTANCY_STATE: Record<string, { label: string; tone: Tone }> = {
+  approved: { label: 'Approved', tone: 'go' },
+  pending: { label: 'Waiting for approval', tone: 'warn' },
+  paused: { label: 'Paused', tone: 'stop' },
+  rejected: { label: 'Rejected', tone: 'stop' },
+};
+
+/**
+ * Falls back to the raw value rather than to a blank or a guess. An unknown
+ * state is a real thing that can happen after a schema change, and showing its
+ * name is how somebody finds out; showing nothing is how it hides.
+ */
+function stateOf(
+  map: Record<string, { label: string; tone: Tone }>,
+  value: string
+): { label: string; tone: Tone } {
+  return map[value] ?? { label: value, tone: 'neutral' };
+}
+
 export default function SuperAdminPage() {
   /**
    * D-9. Hold the passcode for THIS TAB only.
@@ -245,6 +298,54 @@ export default function SuperAdminPage() {
     const au = (await call({ action: 'audit' })) as AuditRow[] | null;
     if (au) setAuditRows(au);
   }, [call]);
+
+  /**
+   * D-42. RELOADING /super SIGNED THE SUPER ADMIN OUT.
+   *
+   * The passcode itself was already being kept, in `sessionStorage`, from the
+   * D-9 work. What was missing is subtler and is the whole defect: the gate
+   * below is `if (!data)`, and `data` only exists once `loadAll()` has run.
+   * Nothing ran it on mount. So after a reload the page held a perfectly good
+   * passcode and still drew the passcode box, because it had never asked the
+   * server anything with it.
+   *
+   * That is F-1 in the shape this project keeps meeting: a CONCLUSION ("you are
+   * signed out") rendered where a STATE ("we have a key and have not used it
+   * yet") was the truth. The client's complaint — "I should not be signed out
+   * this way rigorously... this is happening again and again" — was describing
+   * a screen that was wrong, not a policy that was strict.
+   *
+   * So: if a key survived the reload, use it. `attempted` makes this run once,
+   * so a passcode the server rejects lands on the box with the reason showing
+   * rather than retrying for ever.
+   */
+  const restoreAttempted = useRef(false);
+  useEffect(() => {
+    if (restoreAttempted.current) return;
+    if (!key) return;
+    restoreAttempted.current = true;
+    void loadAll();
+  }, [key, loadAll]);
+
+  /**
+   * D-42, the other half. There was no way OUT.
+   *
+   * A back office that holds every student record we have, on a machine that
+   * may be shared in an office, with no log out, is not a small omission. The
+   * key is dropped from `sessionStorage` and every loaded record is dropped
+   * from memory, so the next person sees the passcode box and nothing else.
+   */
+  function logOut() {
+    rememberKey('');
+    setData(null);
+    setOrders([]);
+    setFlagged([]);
+    setDirectory(null);
+    setAuditRows([]);
+    setError(null);
+    setNotice(null);
+    restoreAttempted.current = false;
+  }
 
   // -------------------------------------------------------- consultancies --
   //
@@ -501,10 +602,10 @@ export default function SuperAdminPage() {
   // ------------------------------------------------------------ sign in ---
   if (!data) {
     return (
-      <main className="grid min-h-screen place-items-center bg-paper px-5">
-        <div className="w-full max-w-sm">
-          <h1 className="mb-1 font-serif text-2xl font-bold text-ink">Super admin</h1>
-          <p className="mb-6 text-ink-soft">Everything across the platform.</p>
+      <main className="grid min-h-screen place-items-center bg-paper px-4">
+        <Card className="w-full max-w-sm">
+          <h1 className="font-serif text-title font-bold text-ink">Super admin</h1>
+          <p className="mb-6 mt-1 text-ink-soft">Everything across the platform.</p>
           {/* Readable on request. The client was locked out of his own back
               office by a masked field he could not check. See PasscodeInput. */}
           <PasscodeInput
@@ -513,20 +614,20 @@ export default function SuperAdminPage() {
             onEnter={loadAll}
             placeholder="Super admin passcode"
             autoFocus
-                      name="super-passcode"
+            name="super-passcode"
           />
-          {error && <p className="mb-3 font-medium text-stop">{error}</p>}
-          <button
-            onClick={loadAll}
-            disabled={!key || busy}
-            className="w-full rounded-control bg-ink px-6 py-3.5 font-bold text-white disabled:bg-line-strong"
-          >
+          {error && (
+            <p className="mb-3 text-sm font-semibold text-stop" role="alert">
+              {error}
+            </p>
+          )}
+          <Button variant="secondary" onClick={loadAll} disabled={!key || busy} full>
             {busy ? 'Checking...' : 'Open'}
-          </button>
+          </Button>
           {!key && (
             <p className="mt-2 text-sm font-semibold text-stop">Enter the passcode to continue.</p>
           )}
-        </div>
+        </Card>
       </main>
     );
   }
@@ -562,7 +663,7 @@ export default function SuperAdminPage() {
       {/* ---------------------------------------------------- side nav --- */}
       <aside className="border-b border-line bg-surface-sunk px-5 py-5 lg:min-h-screen lg:w-64 lg:shrink-0 lg:border-b-0 lg:border-r lg:px-6 lg:py-8">
         <div className="mb-6">
-          <p className="font-serif text-xl font-bold text-ink">Admin portal</p>
+          <p className="font-serif text-lg font-bold text-ink">Admin portal</p>
           <p className="text-sm text-ink-quiet">PreCAS Practice</p>
         </div>
         <nav className="flex gap-2 overflow-x-auto lg:flex-col lg:gap-1">
@@ -570,8 +671,9 @@ export default function SuperAdminPage() {
             <button
               key={n.id}
               onClick={() => setTab(n.id)}
-              className={`whitespace-nowrap rounded-control px-4 py-2.5 text-left text-sm font-semibold transition ${
-                tab === n.id ? 'bg-go text-ink' : 'text-ink-soft hover:bg-surface'
+              aria-current={tab === n.id ? 'page' : undefined}
+              className={`min-h-tap whitespace-nowrap rounded-control px-4 py-2.5 text-left text-sm font-semibold transition-colors duration-tap ease-move ${
+                tab === n.id ? 'bg-go text-white' : 'text-ink-soft hover:bg-surface'
               }`}
             >
               {n.label}
@@ -584,35 +686,35 @@ export default function SuperAdminPage() {
       <main className="flex-1 px-5 py-8 lg:px-10">
         <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="font-serif text-3xl font-bold text-ink">System overview</h1>
+            <h1 className="font-serif text-[2rem] font-bold leading-tight tracking-tight text-ink md:text-display">
+              System overview
+            </h1>
             <p className="text-ink-soft">Analytics and approvals</p>
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={loadAll}
-              disabled={busy}
-              className="rounded-control border-2 border-line-strong px-4 py-2.5 text-sm font-semibold text-ink-soft disabled:opacity-50"
-            >
+          <div className="flex flex-wrap gap-2">
+            <Button variant="tertiary" onClick={loadAll} disabled={busy}>
               {busy ? 'Loading...' : 'Refresh'}
-            </button>
-            <button
-              onClick={exportCsv}
-              className="rounded-control bg-ink px-4 py-2.5 text-sm font-bold text-white"
-            >
+            </Button>
+            <Button variant="secondary" onClick={exportCsv}>
               Export to CSV
-            </button>
+            </Button>
+            {/* D-42. There was no way out of a screen holding every student
+                record we have, on a machine that may be shared in an office. */}
+            <Button variant="tertiary" onClick={logOut}>
+              Log out
+            </Button>
           </div>
         </div>
 
         {error && (
-          <p className="mb-4 rounded-control border-2 border-stop/30 bg-stop-tint px-4 py-3 font-medium text-stop">
-            {error}
-          </p>
+          <div className="mb-4">
+            <Banner tone="stop" title={error} />
+          </div>
         )}
         {notice && (
-          <p className="mb-4 rounded-control border-2 border-go/30 bg-go-tint px-4 py-3 font-medium text-go-dark">
-            {notice}
-          </p>
+          <div className="mb-4">
+            <Banner tone="go" title={notice} />
+          </div>
         )}
 
         {/* ------------------------------------------------- dashboard --- */}
@@ -693,18 +795,18 @@ export default function SuperAdminPage() {
             )}
 
             <div className="grid gap-6 lg:grid-cols-3">
-              <section className="rounded-card border border-line bg-surface lg:col-span-2">
+              <section className="rounded-card border border-line bg-surface shadow-card lg:col-span-2">
                 <div className="border-b border-line p-5">
                   <h2 className="font-serif text-lg font-bold text-ink">Where students come from</h2>
                 </div>
                 <div className="grid gap-4 p-5 sm:grid-cols-2">
                   <div className="rounded-control bg-surface-sunk p-4">
                     <p className="text-sm text-ink-soft">Direct students</p>
-                    <p className="text-2xl font-black text-ink">{direct}</p>
+                    <p className="font-serif text-title font-bold text-ink">{direct}</p>
                   </div>
                   <div className="rounded-control bg-surface-sunk p-4">
                     <p className="text-sm text-ink-soft">Through a consultancy</p>
-                    <p className="text-2xl font-black text-ink">{viaConsultancy}</p>
+                    <p className="font-serif text-title font-bold text-ink">{viaConsultancy}</p>
                   </div>
                 </div>
                 <div className="border-t border-line p-5">
@@ -729,7 +831,7 @@ export default function SuperAdminPage() {
                 </div>
               </section>
 
-              <section className="rounded-card border border-line bg-surface">
+              <section className="rounded-card border border-line bg-surface shadow-card">
                 <div className="border-b border-line p-5">
                   <h2 className="font-serif text-lg font-bold text-ink">Referral leaders</h2>
                   <p className="text-sm text-ink-soft">Counted only when the friend paid.</p>
@@ -761,7 +863,7 @@ export default function SuperAdminPage() {
 
         {/* -------------------------------------------------- students --- */}
         {tab === 'students' && (
-          <section className="overflow-hidden rounded-card border border-line bg-surface">
+          <section className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
             <div className="border-b border-line p-5">
               <h2 className="font-serif text-lg font-bold text-ink">Students</h2>
               <p className="text-sm text-ink-soft">
@@ -775,7 +877,7 @@ export default function SuperAdminPage() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-surface-sunk text-micro uppercase tracking-wide text-ink-quiet">
+                  <thead className="bg-surface-sunk text-micro font-bold uppercase tracking-[0.08em] text-ink-quiet">
                     <tr>
                       <th className="px-5 py-3 font-semibold">Student</th>
                       <th className="px-3 py-3 font-semibold">Phone</th>
@@ -823,15 +925,9 @@ export default function SuperAdminPage() {
                           {directory?.students.find((d) => d.id === s.id)?.mocksLeft ?? '-'}
                         </td>
                         <td className="px-3 py-3">
-                          <span
-                            className={`rounded-full px-2.5 py-1 text-micro font-bold ${
-                              s.status === 'active'
-                                ? 'bg-go-tint text-go-dark'
-                                : 'bg-stop-tint text-stop'
-                            }`}
-                          >
-                            {s.status}
-                          </span>
+                          <Status tone={stateOf(STUDENT_STATE, s.status).tone}>
+                            {stateOf(STUDENT_STATE, s.status).label}
+                          </Status>
                         </td>
                         <td className="px-5 py-3">
                           <div className="flex flex-wrap gap-1.5">
@@ -839,21 +935,19 @@ export default function SuperAdminPage() {
                                 wrong, or who was soft-denied unfairly, could
                                 only be helped by a redeploy before this. The
                                 action existed the whole time. */}
-                            <button
+                            <Button variant="primary" size="sm"
                               onClick={() => grantCredit(s.id, s.name || s.email || 'this student')}
                               disabled={busy}
-                              className="rounded-control bg-go px-3 py-1.5 text-micro font-bold text-white disabled:opacity-50"
                             >
                               Give credit
-                            </button>
-                            <button
+                            </Button>
+                            <Button variant="tertiary" size="sm"
                               onClick={() =>
                                 setStudentStatus(s.id, s.status === 'active' ? 'disabled' : 'active')
                               }
-                              className="rounded-control border-2 border-line-strong px-3 py-1.5 text-micro font-bold text-ink-soft"
                             >
                               {s.status === 'active' ? 'Disable' : 'Enable'}
-                            </button>
+                            </Button>
                           </div>
                         </td>
                       </tr>
@@ -867,23 +961,17 @@ export default function SuperAdminPage() {
 
         {/* -------------------------------------------------- payments --- */}
         {tab === 'payments' && (
-          <section className="overflow-hidden rounded-card border border-line bg-surface">
+          <section className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
             <div className="border-b border-line p-5">
               <h2 className="font-serif text-lg font-bold text-ink">Payments</h2>
               <p className="mb-3 text-sm text-ink-soft">
                 Check the transaction id in the receiver&apos;s own wallet ledger before approving. A
                 screenshot is evidence, never proof.
               </p>
-              <div className="flex flex-wrap gap-2 text-micro font-bold">
-                <span className="rounded-full bg-warn-tint px-3 py-1 text-warn">
-                  {awaiting.length} waiting
-                </span>
-                <span className="rounded-full bg-go-tint px-3 py-1 text-go-dark">
-                  {approvedCount} approved
-                </span>
-                <span className="rounded-full bg-stop-tint px-3 py-1 text-stop">
-                  {rejectedCount} rejected
-                </span>
+              <div className="flex flex-wrap gap-4">
+                <Status tone="warn">{awaiting.length} waiting for you</Status>
+                <Status tone="go">{approvedCount} approved</Status>
+                <Status tone="stop">{rejectedCount} not matched</Status>
               </div>
             </div>
             {orders.length === 0 ? (
@@ -891,7 +979,7 @@ export default function SuperAdminPage() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-surface-sunk text-micro uppercase tracking-wide text-ink-quiet">
+                  <thead className="bg-surface-sunk text-micro font-bold uppercase tracking-[0.08em] text-ink-quiet">
                     <tr>
                       <th className="px-5 py-3 font-semibold">Student</th>
                       <th className="px-3 py-3 font-semibold">Pack</th>
@@ -964,35 +1052,25 @@ export default function SuperAdminPage() {
                           )}
                         </td>
                         <td className="px-3 py-3">
-                          <span
-                            className={`rounded-full px-2.5 py-1 text-micro font-bold ${
-                              o.state === 'verified'
-                                ? 'bg-go-tint text-go-dark'
-                                : o.state === 'rejected'
-                                  ? 'bg-stop-tint text-stop'
-                                  : 'bg-warn-tint text-warn'
-                            }`}
-                          >
-                            {o.state}
-                          </span>
+                          <Status tone={stateOf(ORDER_STATE, o.state).tone}>
+                            {stateOf(ORDER_STATE, o.state).label}
+                          </Status>
                         </td>
                         <td className="px-5 py-3">
                           {o.state === 'submitted' ? (
                             <div className="flex gap-2">
-                              <button
+                              <Button variant="primary" size="sm"
                                 onClick={() => verify(o.id, o)}
                                 disabled={busy}
-                                className="rounded-control bg-go px-3 py-1.5 text-micro font-bold text-white disabled:opacity-50"
                               >
                                 Approve
-                              </button>
-                              <button
+                              </Button>
+                              <Button variant="danger" size="sm"
                                 onClick={() => reject(o.id)}
                                 disabled={busy}
-                                className="rounded-control border-2 border-stop/40 px-3 py-1.5 text-micro font-bold text-stop disabled:opacity-50"
                               >
                                 Reject
-                              </button>
+                              </Button>
                             </div>
                           ) : (
                             <span className="text-micro text-ink-quiet">done</span>
@@ -1014,7 +1092,7 @@ export default function SuperAdminPage() {
             growth plan is consultancies, that is not a missing nicety. */}
         {tab === 'consultancies' && (
           <section>
-            <div className="mb-6 rounded-card border border-line bg-surface p-5">
+            <div className="mb-6 rounded-card border border-line bg-surface p-5 shadow-card">
               <h2 className="mb-1 font-serif text-lg font-bold text-ink">Add a consultancy</h2>
               <p className="mb-4 text-sm leading-relaxed text-ink-soft">
                 They get their own link and their own portal. Nothing works until you approve them
@@ -1062,18 +1140,17 @@ export default function SuperAdminPage() {
                   required
                 />
                 <div className="flex items-end">
-                  <button
+                  <Button variant="secondary" size="md" full
                     type="submit"
                     disabled={busy}
-                    className="w-full rounded-control bg-ink px-5 py-3 font-bold text-white disabled:opacity-50"
                   >
                     {busy ? 'Working...' : 'Create'}
-                  </button>
+                  </Button>
                 </div>
               </form>
             </div>
 
-            <div className="overflow-hidden rounded-card border border-line bg-surface">
+            <div className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
               <div className="border-b border-line p-5">
                 <h2 className="font-serif text-lg font-bold text-ink">Consultancies</h2>
                 <p className="text-sm text-ink-soft">
@@ -1085,7 +1162,7 @@ export default function SuperAdminPage() {
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm">
-                    <thead className="bg-surface-sunk text-micro uppercase tracking-wide text-ink-quiet">
+                    <thead className="bg-surface-sunk text-micro font-bold uppercase tracking-[0.08em] text-ink-quiet">
                       <tr>
                         <th className="px-5 py-3 font-semibold">Consultancy</th>
                         <th className="px-3 py-3 font-semibold">Seats</th>
@@ -1116,47 +1193,36 @@ export default function SuperAdminPage() {
                             NPR {c.paidNpr.toLocaleString()}
                           </td>
                           <td className="px-3 py-3">
-                            <span
-                              className={`rounded-full px-2.5 py-1 text-micro font-bold ${
-                                c.status === 'approved'
-                                  ? 'bg-go-tint text-go-dark'
-                                  : c.status === 'pending'
-                                    ? 'bg-warn-tint text-warn'
-                                    : 'bg-stop-tint text-stop'
-                              }`}
-                            >
-                              {c.status}
-                            </span>
+                            <Status tone={stateOf(CONSULTANCY_STATE, c.status).tone}>
+                              {stateOf(CONSULTANCY_STATE, c.status).label}
+                            </Status>
                           </td>
                           <td className="px-5 py-3">
                             <div className="flex flex-wrap gap-2">
                               {c.status !== 'approved' && (
-                                <button
+                                <Button variant="primary" size="sm"
                                   onClick={() => setConsultancyStatus(c, 'approved')}
                                   disabled={busy}
-                                  className="rounded-control bg-go px-3 py-1.5 text-micro font-bold text-white disabled:opacity-50"
                                 >
                                   Approve
-                                </button>
+                                </Button>
                               )}
                               {c.status === 'approved' && (
-                                <button
+                                <Button variant="tertiary" size="sm"
                                   onClick={() => setConsultancyStatus(c, 'suspended')}
                                   disabled={busy}
-                                  className="rounded-control border-2 border-line-strong px-3 py-1.5 text-micro font-semibold text-ink-soft disabled:opacity-50"
                                 >
                                   Suspend
-                                </button>
+                                </Button>
                               )}
                               {/* D-31. The switch that makes a lab work. */}
                               {c.status === 'approved' && (
-                                <button
+                                <Button variant="tertiary" size="sm"
                                   onClick={() => setLabNetworks(c)}
                                   disabled={busy}
-                                  className="rounded-control border-2 border-line-strong px-3 py-1.5 text-micro font-semibold text-ink-soft disabled:opacity-50"
                                 >
                                   Lab networks
-                                </button>
+                                </Button>
                               )}
                             </div>
                           </td>
@@ -1174,7 +1240,7 @@ export default function SuperAdminPage() {
             N-25. Add a question to the live bank with no deploy. The action
             worked from the day it was written; nothing ever called it. */}
         {tab === 'questions' && (
-          <section className="rounded-card border border-line bg-surface p-5">
+          <section className="rounded-card border border-line bg-surface p-5 shadow-card">
             <h2 className="mb-1 font-serif text-lg font-bold text-ink">Add a question</h2>
             <p className="mb-4 text-sm leading-relaxed text-ink-soft">
               It goes into the live bank straight away, with no deploy. Write what a real
@@ -1225,13 +1291,12 @@ export default function SuperAdminPage() {
                 placeholder="A named person, their real occupation, and awareness of the actual amount."
                 className="mb-4 w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
               />
-              <button
+              <Button variant="secondary" size="md"
                 type="submit"
                 disabled={busy}
-                className="rounded-control bg-ink px-5 py-3 font-bold text-white disabled:opacity-50"
               >
                 {busy ? 'Adding...' : 'Add to the bank'}
-              </button>
+              </Button>
             </form>
           </section>
         )}
@@ -1242,7 +1307,7 @@ export default function SuperAdminPage() {
             that justifies letting consultancies approve payments was invisible
             to the one person it protects. */}
         {tab === 'audit' && (
-          <section className="overflow-hidden rounded-card border border-line bg-surface">
+          <section className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
             <div className="border-b border-line p-5">
               <h2 className="font-serif text-lg font-bold text-ink">Who did what</h2>
               <p className="text-sm text-ink-soft">
@@ -1255,7 +1320,7 @@ export default function SuperAdminPage() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-surface-sunk text-micro uppercase tracking-wide text-ink-quiet">
+                  <thead className="bg-surface-sunk text-micro font-bold uppercase tracking-[0.08em] text-ink-quiet">
                     <tr>
                       <th className="px-5 py-3 font-semibold">When</th>
                       <th className="px-3 py-3 font-semibold">Who</th>
@@ -1328,7 +1393,7 @@ export default function SuperAdminPage() {
                 countdown feature: the deadline a student sees is a real server
                 timestamp tied to a named reason. A lever that could turn it
                 into a fake urgency banner would be worse than no lever. */}
-            <section className="mt-6 rounded-card border border-line bg-surface p-5">
+            <section className="mt-6 rounded-card border border-line bg-surface p-5 shadow-card">
               <h2 className="mb-1 font-serif text-lg font-bold text-ink">
                 The offer after the free questions
               </h2>
@@ -1360,7 +1425,7 @@ export default function SuperAdminPage() {
                     type="checkbox"
                     name="active"
                     defaultChecked={data.rewardRule.active}
-                    className="h-5 w-5 accent-emerald-600"
+                    className="h-5 w-5 accent-go"
                   />
                   <span className="text-sm font-semibold text-ink">Offer switched on</span>
                 </label>
@@ -1431,13 +1496,12 @@ export default function SuperAdminPage() {
                   not discount, so a student who paid yesterday was not overcharged.
                 </p>
 
-                <button
+                <Button variant="secondary" size="md"
                   type="submit"
                   disabled={busy}
-                  className="rounded-control bg-ink px-5 py-3 font-bold text-white disabled:opacity-50"
                 >
                   {busy ? 'Saving...' : 'Save the offer'}
-                </button>
+                </Button>
               </form>
             </section>
           </>
@@ -1445,7 +1509,7 @@ export default function SuperAdminPage() {
 
         {/* --------------------------------------------------- flagged --- */}
         {tab === 'flagged' && (
-          <section className="overflow-hidden rounded-card border border-line bg-surface">
+          <section className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
             <div className="border-b border-line p-5">
               <h2 className="font-serif text-lg font-bold text-ink">Flagged free trials</h2>
               <p className="text-sm text-ink-soft">
@@ -1472,20 +1536,18 @@ export default function SuperAdminPage() {
                       )}
                     </div>
                     <div className="flex gap-2">
-                      <button
+                      <Button variant="primary" size="sm"
                         onClick={() => resolveFlag(f.id, true)}
                         disabled={busy}
-                        className="rounded-control bg-go px-3 py-2 text-micro font-bold text-white disabled:opacity-50"
                       >
                         Switch free questions on
-                      </button>
-                      <button
+                      </Button>
+                      <Button variant="tertiary" size="sm"
                         onClick={() => resolveFlag(f.id, false)}
                         disabled={busy}
-                        className="rounded-control border-2 border-line-strong px-3 py-2 text-micro font-bold text-ink-soft disabled:opacity-50"
                       >
                         Keep held
-                      </button>
+                      </Button>
                       {/* N-18. Stop this DEVICE, not this person.
                           `setDeviceBlock` existed with no screen, so the only
                           answer to a farm running twenty accounts off one
@@ -1495,13 +1557,12 @@ export default function SuperAdminPage() {
                           the machine may be a shared lab PC with real students
                           on it tomorrow. */}
                       {f.fingerprintHash && (
-                        <button
+                        <Button variant="warn" size="sm"
                           onClick={() => blockDevice(f.fingerprintHash as string, f.studentName)}
                           disabled={busy}
-                          className="rounded-control border-2 border-warn/40 px-3 py-2 text-micro font-bold text-warn disabled:opacity-50"
                         >
                           Stop free trials from this device
-                        </button>
+                        </Button>
                       )}
                     </div>
                   </li>
@@ -1561,7 +1622,7 @@ function Stat({
       }`}
     >
       <p className="mb-2 text-sm text-ink-soft">{label}</p>
-      <p className="font-serif text-3xl font-black text-ink">{value}</p>
+      <p className="font-serif text-display font-bold text-ink">{value}</p>
       <p
         className={`mt-1 text-micro ${
           accent ? (good ? 'font-semibold text-go-dark' : 'font-semibold text-warn') : 'text-ink-quiet'

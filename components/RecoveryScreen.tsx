@@ -35,14 +35,14 @@ export function RecoveryScreen({
   return (
     <main className="grid min-h-screen place-items-center bg-paper px-5 py-16">
       <div className="w-full max-w-md">
-        <Link href="/" className="mb-10 block text-center font-serif text-xl font-bold text-ink">
+        <Link href="/" className="mb-10 block text-center font-serif text-lg font-bold text-ink">
           PreCAS Practice
         </Link>
 
-        <h1 className="mb-3 text-center font-serif text-3xl font-bold text-ink">{title}</h1>
+        <h1 className="mb-3 text-center font-serif text-display font-bold text-ink">{title}</h1>
         <p className="mb-6 text-center leading-relaxed text-ink-soft">{lead}</p>
 
-        <div className="mb-8 rounded-card border border-line bg-surface p-5">
+        <div className="mb-8 rounded-card border border-line bg-surface p-5 shadow-card">
           <p className="mb-3 font-semibold text-ink">The usual reasons</p>
           <ul className="space-y-2.5 text-sm leading-relaxed text-ink-soft">
             {reasons.map(([head, body]) => (

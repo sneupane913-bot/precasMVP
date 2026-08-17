@@ -8,6 +8,7 @@ import { FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
 import { DeviceCheck } from '@/components/DeviceCheck';
 import { InterviewRoom } from '@/components/InterviewRoom';
 import { RecoveryScreen, WRONG_DEVICE, CLEARED_DATA } from '@/components/RecoveryScreen';
+import { Card, Button, Banner, Spinner } from '@/components/ui';
 
 type Loaded = {
   session: InterviewSession;
@@ -57,8 +58,8 @@ export default function InterviewPage() {
   if (stage === 'loading') {
     return (
       <div className="grid min-h-screen place-items-center px-6 text-center">
-        <div>
-          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-line border-t-ink" />
+        <div className="flex flex-col items-center gap-4">
+          <Spinner className="h-10 w-10 text-ink-quiet" />
           <p className="text-ink-soft">Getting your interview ready...</p>
         </div>
       </div>
@@ -127,37 +128,44 @@ export default function InterviewPage() {
 
   if (stage === 'consent') {
     return (
-      <main className="mx-auto max-w-lg p-5 sm:p-6">
-        <h1 className="mb-2 text-2xl font-bold text-ink">Before you start</h1>
-        <p className="mb-5 leading-relaxed text-ink-soft">
-          This works like the real interview, so please read these four things.
-        </p>
+      /* Deliberately not `Page`. This is a gate on the way into the interview,
+         not a document, and it keeps the narrow single-column measure that the
+         room itself uses so the two do not feel like different products. */
+      <main className="mx-auto flex w-full max-w-lg flex-col gap-5 p-4 sm:p-6">
+        <header>
+          <h1 className="font-serif text-title font-bold text-ink">Before you start</h1>
+          <p className="mt-2 text-ink-soft">
+            This works like the real interview, so please read these four things.
+          </p>
+        </header>
 
-        <ul className="mb-6 space-y-3">
+        <ul className="flex flex-col gap-3">
           {CONSENT_POINTS.map(([t, d]) => (
-            <li key={t} className="rounded-control border border-line bg-surface p-4">
-              <p className="mb-0.5 font-semibold text-ink">{t}</p>
-              <p className="text-sm leading-relaxed text-ink-soft">{d}</p>
-            </li>
+            <Card as="li" key={t} className="p-4 md:p-4">
+              <p className="font-semibold text-ink">{t}</p>
+              <p className="mt-0.5 text-sm text-ink-soft">{d}</p>
+            </Card>
           ))}
         </ul>
 
-        {consentError && (
-          <p className="mb-3 rounded-control border-2 border-stop/30 bg-stop-tint px-4 py-3 font-medium text-stop">
-            {consentError}
-          </p>
-        )}
+        {consentError && <Banner tone="stop" title={consentError} />}
 
-        <button
-          onClick={acceptConsent}
-          disabled={consentBusy}
-          className="w-full rounded-control bg-ink px-6 py-4 text-lg font-bold text-white disabled:bg-line-strong"
-        >
-          {consentBusy ? 'Saving...' : 'I understand, continue'}
-        </button>
-        <p className="mt-3 text-center text-micro text-ink-quiet">
-          We record that you agreed, and when. Version {CONSENT_VERSION}.
-        </p>
+        {/* D-6. The one action sits last, in the thumb band. */}
+        <div>
+          <Button variant="secondary" onClick={acceptConsent} disabled={consentBusy} full>
+            {consentBusy ? (
+              <>
+                <Spinner />
+                Saving...
+              </>
+            ) : (
+              'I understand, continue'
+            )}
+          </Button>
+          <p className="mt-3 text-center text-micro text-ink-quiet">
+            We record that you agreed, and when. Version {CONSENT_VERSION}.
+          </p>
+        </div>
       </main>
     );
   }

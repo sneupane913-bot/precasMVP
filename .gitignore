@@ -2,9 +2,17 @@ node_modules/
 .next/
 out/
 build/
+# Anything that even LOOKS like an env file.
+#
+# This used to be three exact patterns, and a routine `cp .env.local
+# .env.local.backup-<timestamp>` produced a filename none of them matched. It
+# was one `git add` away from every secret in this project landing in a public
+# repository. A rule that lists the filenames you thought of is not a rule.
 .env
-.env.local
+.env.*
+*.env
 .env*.local
+!.env.example
 .DS_Store
 *.tsbuildinfo
 next-env.d.ts

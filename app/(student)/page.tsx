@@ -178,7 +178,7 @@ export default async function HomePage() {
           </div>
 
           {/* Illustrative example of the report, clearly labelled as a sample. */}
-          <div className="rounded-card bg-surface p-6 shadow-sm">
+          <div className="rounded-card bg-surface p-6 shadow-card">
             <div className="mb-4 flex items-center justify-between border-b border-line pb-3">
               <p className="text-micro font-semibold uppercase tracking-wider text-ink-quiet">
                 Question analysis
@@ -232,7 +232,7 @@ export default async function HomePage() {
           Native details/summary so it works with no JavaScript. */}
       <section className="bg-surface px-5 py-16">
         <div className="mx-auto max-w-2xl">
-          <h2 className="mb-8 text-center font-serif text-3xl font-bold text-ink">
+          <h2 className="mb-8 text-center font-serif text-display font-bold text-ink">
             Questions students ask
           </h2>
           <div className="space-y-3">

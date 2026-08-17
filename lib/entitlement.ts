@@ -145,9 +145,52 @@ function entry(
   };
 }
 
-/** The free trial: one mock credit, capped at 10 questions by entitlementFor. */
+/**
+ * The free trial: one mock credit, capped at 10 questions by entitlementFor.
+ *
+ * ---------------------------------------------------------------------------
+ * D-44. THE CHIP READ "2 MOCKS LEFT" BEFORE ANY SITTING.
+ *
+ * The reconciliation the defect asked for, and the answer is worth writing
+ * down because it is the opposite of what it looked like:
+ *
+ *   THE CHIP DID NOT LIE. The ledger really did hold 2.
+ *
+ * The header count is `session.mocksLeft` from `/api/me`, which is
+ * `entitlementFor()`, which is `repo().balance(id, 'mock')`, which is
+ * `SUM(delta)` over the ledger and nothing else. There is no second source of
+ * truth between the ledger and the pill, so a wrong number on screen can only
+ * mean a wrong number in the ledger. It was a wrong number in the ledger.
+ *
+ * Where the second credit came from. The sign-in route reads:
+ *
+ *     if (decision.outcome !== 'already_claimed') {
+ *       await r.createTrialClaim(...);
+ *       if (decision.outcome === 'granted') await grantTrial(student.id);
+ *     }
+ *
+ * `evaluateTrial` decides `already_claimed` by looking for an existing claim.
+ * Two sign-ins that overlap — a double tap on the Google button, or a retry
+ * after a slow first response, both entirely normal on Nepali mobile data —
+ * both read "no claim yet", both decide `granted`, and both call this
+ * function. Two `trial_grant` rows, balance 2, before the student has answered
+ * a single question.
+ *
+ * `grantPack` was made idempotent for precisely this reason, and its comment
+ * says so: "Re-verifying a payment must never hand out a second pack." The
+ * trial is the same class of operation and never got the same guard. So the
+ * guard is here now, in the same shape: the ledger itself is the lock, because
+ * the ledger is the only thing both racing requests can see.
+ *
+ * This cannot take a trial away from anybody. A student with no `trial_grant`
+ * still gets exactly one. It only refuses the second.
+ * ---------------------------------------------------------------------------
+ */
 export async function grantTrial(studentId: string): Promise<void> {
-  await repo().appendLedger(entry(studentId, 'mock', 1, 'trial_grant'));
+  const r = repo();
+  const ledger = await r.listLedger(studentId);
+  if (ledger.some((e) => e.reason === 'trial_grant')) return; // already granted
+  await r.appendLedger(entry(studentId, 'mock', 1, 'trial_grant'));
 }
 
 /**

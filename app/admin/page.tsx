@@ -3,6 +3,7 @@
 import { useCallback, useState } from 'react';
 import { PasscodeInput } from '@/components/PasscodeInput';
 import { PasscodeChangeForm } from '@/components/PasscodeChangeForm';
+import { Card, Button, Banner, Status, Field, Input, type Tone } from '@/components/ui';
 // Never type a price, a mock count or a practice count by hand. `copy-check`
 // fails the build for it, and rightly: the seat copy said "12 mock interviews
 // and 30 practice questions ... NPR 799" as literal text, so changing the
@@ -105,6 +106,19 @@ interface AdminData {
     seatPaymentPending: boolean;
   };
 }
+
+/**
+ * D-32, on this side of the wall too.
+ *
+ * The consultancy portal had the same coloured pill printing the same raw
+ * stored value. A consultancy owner reading "active" in green has to learn our
+ * schema to use our product.
+ */
+const STUDENT_STATE: Record<string, { label: string; tone: Tone }> = {
+  active: { label: 'Active', tone: 'go' },
+  blocked: { label: 'Blocked', tone: 'stop' },
+  suspended: { label: 'Suspended', tone: 'stop' },
+};
 
 export default function AdminPage() {
   const [slug, setSlug] = useState('');
@@ -367,7 +381,7 @@ export default function AdminPage() {
     return (
       <main className="grid min-h-screen place-items-center bg-paper px-5 py-10">
         <div className="w-full max-w-md">
-          <p className="mb-1 font-serif text-xl font-bold text-ink">{data.consultancy.name}</p>
+          <p className="mb-1 font-serif text-lg font-bold text-ink">{data.consultancy.name}</p>
           <p className="mb-6 text-sm text-ink-quiet">One thing before you start</p>
           {error && (
             <p className="mb-4 rounded-control border-2 border-stop/30 bg-stop-tint px-4 py-3 font-medium text-stop">
@@ -389,44 +403,51 @@ export default function AdminPage() {
 
   if (!data) {
     return (
-      <main className="grid min-h-screen place-items-center bg-paper px-5">
-        <div className="w-full max-w-sm">
-          <h1 className="mb-1 font-serif text-2xl font-bold text-ink">Consultancy portal</h1>
-          <p className="mb-6 text-ink-soft">Sign in to see your own students.</p>
+      <main className="grid min-h-screen place-items-center bg-paper px-4">
+        <Card className="flex w-full max-w-sm flex-col gap-4">
+          <div>
+            <h1 className="font-serif text-title font-bold text-ink">Consultancy portal</h1>
+            <p className="mt-1 text-ink-soft">Sign in to see your own students.</p>
+          </div>
 
-          <label className="mb-1 block text-sm font-semibold text-ink">Your short name</label>
-          <input
-            value={slug}
-            onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-            placeholder="for example kathmandu-hub"
-            className="mb-4 w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
-          />
+          <Field label="Your short name" id="consultancy-slug">
+            <Input
+              id="consultancy-slug"
+              value={slug}
+              onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+              placeholder="for example kathmandu-hub"
+            />
+          </Field>
 
-          <label className="mb-1 block text-sm font-semibold text-ink">Passcode</label>
-          <PasscodeInput
-            value={passcode}
-            onChange={setPasscode}
-            onEnter={() => slug && passcode && login()}
-            placeholder="Passcode"
-            label="Consultancy passcode"
-                      name="consultancy-passcode"
-          />
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-ink" htmlFor="consultancy-passcode">
+              Passcode
+            </label>
+            <PasscodeInput
+              value={passcode}
+              onChange={setPasscode}
+              onEnter={() => slug && passcode && login()}
+              placeholder="Passcode"
+              label="Consultancy passcode"
+              name="consultancy-passcode"
+            />
+          </div>
 
-          {error && <p className="mb-3 font-medium text-stop">{error}</p>}
+          {error && (
+            <p className="text-sm font-semibold text-stop" role="alert">
+              {error}
+            </p>
+          )}
 
-          <button
-            onClick={login}
-            disabled={!slug || !passcode || busy}
-            className="w-full rounded-control bg-ink px-6 py-3.5 font-bold text-white disabled:bg-line-strong"
-          >
+          <Button variant="secondary" onClick={login} disabled={!slug || !passcode || busy} full>
             {busy ? 'Checking...' : 'Sign in'}
-          </button>
+          </Button>
           {(!slug || !passcode) && (
-            <p className="mt-2 text-sm font-semibold text-stop">
+            <p className="text-sm font-semibold text-stop">
               Enter both your short name and your passcode.
             </p>
           )}
-        </div>
+        </Card>
       </main>
     );
   }
@@ -445,30 +466,26 @@ export default function AdminPage() {
       <header className="border-b border-line bg-surface">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-4">
           <div>
-            <p className="font-serif text-xl font-bold text-ink">{data.consultancy.name}</p>
+            <p className="font-serif text-lg font-bold text-ink">{data.consultancy.name}</p>
             <p className="text-sm text-ink-quiet">Consultancy portal</p>
           </div>
-          <button
-            onClick={login}
-            disabled={busy}
-            className="rounded-control border-2 border-line-strong px-4 py-2.5 text-sm font-semibold text-ink-soft disabled:opacity-50"
-          >
+          <Button variant="tertiary" onClick={login} disabled={busy}>
             {busy ? 'Loading...' : 'Refresh'}
-          </button>
+          </Button>
         </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-5 py-8">
         {/* Never both at once. `call()` clears each before it sets the other. */}
         {error && (
-          <p className="mb-4 rounded-control border-2 border-stop/30 bg-stop-tint px-4 py-3 font-medium text-stop">
-            {error}
-          </p>
+          <div className="mb-4">
+            <Banner tone="stop" title={error} />
+          </div>
         )}
         {notice && !error && (
-          <p className="mb-4 rounded-control border-2 border-go/30 bg-go-tint px-4 py-3 font-medium text-go-dark">
-            {notice}
-          </p>
+          <div className="mb-4">
+            <Banner tone="go" title={notice} />
+          </div>
         )}
 
         {/* Notifications, including "super admin approved this for you". */}
@@ -539,20 +556,18 @@ export default function AdminPage() {
                     )}
                   </div>
                   <div className="flex gap-2">
-                    <button
+                    <Button variant="primary" size="md"
                       onClick={() => decide(o, true)}
                       disabled={deciding === o.id}
-                      className="rounded-control bg-go px-5 py-3 font-bold text-white disabled:opacity-50"
                     >
                       {deciding === o.id ? 'Working...' : 'Approve'}
-                    </button>
-                    <button
+                    </Button>
+                    <Button variant="tertiary" size="md"
                       onClick={() => decide(o, false)}
                       disabled={deciding === o.id}
-                      className="rounded-control border-2 border-line-strong bg-surface px-5 py-3 font-semibold text-ink-soft disabled:opacity-50"
                     >
                       Cannot confirm
-                    </button>
+                    </Button>
                   </div>
                 </li>
               ))}
@@ -588,7 +603,7 @@ export default function AdminPage() {
             transaction id, super admin approval. One approval queue and one set
             of money guarantees, rather than a special B2B path where a
             different mistake could happen. */}
-        <section className="mb-6 rounded-card border border-line bg-surface p-5">
+        <section className="mb-6 rounded-card border border-line bg-surface p-5 shadow-card">
           <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="font-serif text-lg font-bold text-ink">Buy more seats</h2>
             <span className={`text-sm font-semibold ${s.seatsLeft === 0 ? 'text-warn' : 'text-ink-quiet'}`}>
@@ -655,19 +670,17 @@ export default function AdminPage() {
                 className="mb-3 w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
               />
               <div className="flex flex-col gap-2 sm:flex-row">
-                <button
+                <Button variant="primary" size="md" className="flex-1"
                   onClick={submitSeatPayment}
                   disabled={busy || seatTxn.trim().length < 4 || !seatPayer.trim() || seatSuffix.length < 2}
-                  className="flex-1 rounded-control bg-go px-5 py-3.5 font-bold text-white disabled:bg-line-strong"
                 >
                   {busy ? 'Sending...' : 'I have paid'}
-                </button>
-                <button
+                </Button>
+                <Button variant="tertiary" size="md"
                   onClick={() => setSeatOrder(null)}
-                  className="rounded-control border-2 border-line-strong px-5 py-3.5 font-semibold text-ink-soft"
                 >
                   Not now
-                </button>
+                </Button>
               </div>
               {(seatTxn.trim().length < 4 || !seatPayer.trim() || seatSuffix.length < 2) && (
                 <p className="mt-2 text-sm font-semibold text-stop">
@@ -691,7 +704,7 @@ export default function AdminPage() {
                     className="rounded-control border-2 border-line p-4 text-left transition hover:border-ink disabled:opacity-50"
                   >
                     <p className="font-bold text-ink">{b.name}</p>
-                    <p className="font-serif text-2xl font-black text-ink">
+                    <p className="font-serif font-serif text-title font-bold text-ink">
                       NPR {b.priceNpr.toLocaleString()}
                     </p>
                     <p className="text-sm text-ink-quiet">
@@ -712,7 +725,7 @@ export default function AdminPage() {
         </section>
 
         {/* Share link */}
-        <section className="mb-6 rounded-card border border-line bg-surface p-5">
+        <section className="mb-6 rounded-card border border-line bg-surface p-5 shadow-card">
           <h2 className="mb-1 font-serif text-lg font-bold text-ink">Your student link</h2>
           <p className="mb-4 text-sm text-ink-soft">
             Give this to your students. Anyone who signs up through it belongs to you and appears
@@ -781,13 +794,12 @@ export default function AdminPage() {
                   <code className="rounded-control bg-surface-sunk px-3 py-2 text-sm text-ink">{colour}</code>
                 </div>
                 <div className="flex flex-col gap-2 sm:flex-row">
-                  <button
+                  <Button variant="secondary" size="md"
                     onClick={saveBranding}
                     disabled={busy}
-                    className="rounded-control bg-ink px-5 py-3 font-bold text-white disabled:opacity-50"
                   >
                     {busy ? 'Saving...' : 'Save'}
-                  </button>
+                  </Button>
                   <button
                     onClick={() => {
                       setBrandOpen(false);
@@ -817,7 +829,7 @@ export default function AdminPage() {
         </section>
 
         {/* Students */}
-        <section className="overflow-hidden rounded-card border border-line bg-surface">
+        <section className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
           <div className="border-b border-line p-5">
             <h2 className="font-serif text-lg font-bold text-ink">Your students</h2>
             <p className="text-sm text-ink-soft">
@@ -836,7 +848,7 @@ export default function AdminPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-surface-sunk text-micro uppercase tracking-wide text-ink-quiet">
+                <thead className="bg-surface-sunk text-micro font-bold uppercase tracking-[0.08em] text-ink-quiet">
                   <tr>
                     <th className="px-5 py-3 font-semibold">Student</th>
                     <th className="px-3 py-3 font-semibold">Mocks left</th>
@@ -859,15 +871,9 @@ export default function AdminPage() {
                         {new Date(st.lastSeenAt).toLocaleDateString()}
                       </td>
                       <td className="px-3 py-3">
-                        <span
-                          className={`rounded-full px-2.5 py-1 text-micro font-bold ${
-                            st.status === 'active'
-                              ? 'bg-go-tint text-go-dark'
-                              : 'bg-stop-tint text-stop'
-                          }`}
-                        >
-                          {st.status}
-                        </span>
+                        <Status tone={(STUDENT_STATE[st.status] ?? { tone: 'neutral' as Tone }).tone}>
+                          {(STUDENT_STATE[st.status] ?? { label: st.status }).label}
+                        </Status>
                       </td>
                       {/* N-5. The consultancy tops a student back up out of
                           their own seats. `renewStudent` worked on the server
@@ -879,13 +885,12 @@ export default function AdminPage() {
                         {st.mocksLeft > 0 ? (
                           <span className="text-micro text-ink-quiet">not needed yet</span>
                         ) : s.seatsLeft > 0 ? (
-                          <button
+                          <Button variant="secondary" size="sm"
                             onClick={() => renew(st)}
                             disabled={renewing === st.id || busy}
-                            className="rounded-control bg-ink px-3 py-1.5 text-micro font-bold text-white disabled:opacity-50"
                           >
                             {renewing === st.id ? 'Working...' : 'Use a seat'}
-                          </button>
+                          </Button>
                         ) : (
                           <span className="text-micro font-semibold text-warn">
                             no seats left
@@ -894,13 +899,12 @@ export default function AdminPage() {
                         {/* D-29. The way back. Only shown for a student who is
                             actually holding one of their seats. */}
                         {st.mocksLeft > 0 && (
-                          <button
+                          <Button variant="tertiary" size="sm"
                             onClick={() => revokeSeat(st)}
                             disabled={busy}
-                            className="ml-2 rounded-control border border-line-strong px-3 py-1.5 text-micro font-semibold text-ink-soft disabled:opacity-50"
                           >
                             Take seat back
-                          </button>
+                          </Button>
                         )}
                       </td>
                     </tr>
@@ -915,7 +919,7 @@ export default function AdminPage() {
             without messaging us. Deliberately below the students table: it is
             a record, not a task. */}
         {settled.length > 0 && (
-          <section className="mt-6 overflow-hidden rounded-card border border-line bg-surface">
+          <section className="mt-6 overflow-hidden rounded-card border border-line bg-surface shadow-card">
             <div className="border-b border-line p-5">
               <h2 className="font-serif text-lg font-bold text-ink">Payments already decided</h2>
               <p className="text-sm text-ink-soft">
@@ -972,7 +976,7 @@ function Stat({
       }`}
     >
       <p className="mb-2 text-sm text-ink-soft">{label}</p>
-      <p className="font-serif text-3xl font-black text-ink">{value}</p>
+      <p className="font-serif text-display font-bold text-ink">{value}</p>
       <p className="mt-1 text-micro text-ink-quiet">{hint}</p>
     </div>
   );

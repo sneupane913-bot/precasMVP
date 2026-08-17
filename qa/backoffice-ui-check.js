@@ -21,8 +21,31 @@
  * Run:  QA_PORT=3096 node qa/backoffice-ui-check.js
  */
 const http = require('http');
+
+/**
+ * The back-office passcodes, READ FROM THE ENVIRONMENT.
+ *
+ * These were the literals 'super-dev' and 'owner-dev'. On any machine with a
+ * real `.env.local` — which is every machine that can actually run the product
+ * — each back-office call came back 403 "bad credentials", and the suites
+ * reported that as PRODUCT defects. `walk-check` produced twenty-three of them
+ * in one run. `lifecycle-check` E8 printed "second=DOUBLE GRANTED" when nothing
+ * had been granted at all, because the FIRST approval had been refused.
+ *
+ * A suite that reports a wrong password as a double grant is worse than no
+ * suite. The next person reads twenty-three findings, discovers the first two
+ * are nonsense, and stops reading — and a real one is sitting at number
+ * nineteen. It is the same lesson as R-6's false positive on /refund: fix the
+ * harness, never relax the rule.
+ *
+ * The literal stays as the fallback, because a fresh clone with no `.env.local`
+ * really does run on the dev defaults.
+ */
+const QA_SUPER_KEY = process.env.SUPER_ADMIN_PASSCODE || 'super-dev';
+const QA_OWNER_KEY = process.env.OWNER_ACCESS_KEY || process.env.OWNER_PASSCODE || 'owner-dev';
+
 const P = Number(process.env.QA_PORT || 3096);
-const SU = process.env.SUPER_ADMIN_PASSCODE || 'super-dev';
+const SU = process.env.SUPER_ADMIN_PASSCODE || QA_SUPER_KEY;
 function req(m,p,b,ip='198.51.60.5',cookie){return new Promise(r=>{const d=b?JSON.stringify(b):null;const h={'x-forwarded-for':ip};if(d)h['Content-Type']='application/json';if(cookie)h['Cookie']=cookie;const q=http.request({host:'127.0.0.1',port:P,path:p,method:m,headers:h},s=>{let x='';s.on('data',c=>x+=c);s.on('end',()=>{let j=null;try{j=JSON.parse(x)}catch{}r({code:s.statusCode,json:j,sc:s.headers['set-cookie']||[],body:x});});});q.on('error',e=>r({code:0,body:''+e}));if(d)q.write(d);q.end();});}
 const jar=r=>(r.sc||[]).map(c=>c.split(';')[0]).join('; ');
 let ok=0,bad=0;

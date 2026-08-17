@@ -7,6 +7,7 @@ import { SiteFooterView } from '@/components/SiteFooter';
 import { useSupportNumber } from '@/lib/useSupportNumber';
 import { publicInstitutions } from '@/lib/data/institutions';
 import { CATEGORY_LABEL, type QuestionCategory } from '@/lib/types';
+import { Page, Card, SectionTitle, Pill, Button, Banner, Spinner } from '@/components/ui';
 
 /**
  * D18 practice mode: one question at a time.
@@ -15,6 +16,9 @@ import { CATEGORY_LABEL, type QuestionCategory } from '@/lib/types';
  * between, and it exists because the fastest useful loop in this product is:
  * answer one question, hear what you actually said, say it better. A student
  * who has ten minutes will do this. They will not start a 30 minute mock.
+ *
+ * ON THE CONVERSION TO THE KIT: layout only. `start()` is untouched, including
+ * the 401 branch that carries the student to sign-in and back again.
  */
 
 // The themes worth drilling. Ordered by how often students actually struggle,
@@ -77,68 +81,60 @@ export default function PracticePage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto min-h-screen max-w-2xl px-5 py-12">
-        <h1 className="mb-2 text-center font-serif text-3xl font-bold text-ink sm:text-4xl">
-          Practise one question
-        </h1>
-        <p className="mx-auto mb-10 max-w-lg text-center leading-relaxed text-ink-soft">
-          One question, answered out loud, with feedback on what you actually said. It takes about
-          two minutes, so you can do it while you wait for a bus.
-        </p>
+      <Page>
+        <div className="mx-auto flex w-full max-w-[680px] flex-col gap-8">
+          <header className="text-center">
+            <h1 className="font-serif text-[2rem] font-bold leading-tight tracking-tight text-ink md:text-display">
+              Practise one question
+            </h1>
+            <p className="mx-auto mt-2 max-w-lg text-ink-soft">
+              One question, answered out loud, with feedback on what you actually said. It takes
+              about two minutes, so you can do it while you wait for a bus.
+            </p>
+          </header>
 
-        <section className="mb-6 rounded-card border border-line bg-surface p-6">
-          <h2 className="mb-1 font-serif text-lg font-bold text-ink">
-            What do you want to practise?
-          </h2>
-          <p className="mb-5 text-sm text-ink-soft">
-            Pick the one that worries you most, or let us choose.
-          </p>
+          <Card className="flex flex-col gap-4">
+            <div>
+              <SectionTitle>What do you want to practise?</SectionTitle>
+              <p className="mt-3 text-sm text-ink-soft">
+                Pick the one that worries you most, or let us choose.
+              </p>
+            </div>
 
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setCategory('any')}
-              className={`rounded-full px-4 py-2.5 text-sm font-semibold transition ${
-                category === 'any'
-                  ? 'bg-go text-ink'
-                  : 'border border-line text-ink-soft hover:border-line-strong'
-              }`}
-            >
-              Anything
-            </button>
-            {DRILLABLE.map((c) => (
-              <button
-                key={c}
-                onClick={() => setCategory(c)}
-                className={`rounded-full px-4 py-2.5 text-sm font-semibold transition ${
-                  category === c
-                    ? 'bg-go text-ink'
-                    : 'border border-line text-ink-soft hover:border-line-strong'
-                }`}
-              >
-                {CATEGORY_LABEL[c]}
-              </button>
-            ))}
+            <div className="flex flex-wrap gap-2">
+              <Pill selected={category === 'any'} onClick={() => setCategory('any')}>
+                Anything
+              </Pill>
+              {DRILLABLE.map((c) => (
+                <Pill key={c} selected={category === c} onClick={() => setCategory(c)}>
+                  {CATEGORY_LABEL[c]}
+                </Pill>
+              ))}
+            </div>
+          </Card>
+
+          {error && <Banner tone="stop" title={error} />}
+
+          {/* D-6. The primary action is the last thing on the page, so on a
+              phone it lands in the thumb band rather than above the fold where
+              a thumb has to stretch for it. */}
+          <div className="flex flex-col gap-3">
+            <Button onClick={start} disabled={starting} full>
+              {starting ? (
+                <>
+                  <Spinner />
+                  Starting...
+                </>
+              ) : (
+                'Start practising'
+              )}
+            </Button>
+            <p className="text-center text-sm text-ink-quiet">
+              This uses one practice question from your pack, not a full mock interview.
+            </p>
           </div>
-        </section>
-
-        {error && (
-          <p className="mb-4 rounded-control border-2 border-stop/30 bg-stop-tint px-4 py-3 font-medium text-stop">
-            {error}
-          </p>
-        )}
-
-        <button
-          onClick={start}
-          disabled={starting}
-          className="w-full rounded-control bg-ink px-6 py-4 text-lg font-bold text-white transition active:scale-[0.99] disabled:opacity-60"
-        >
-          {starting ? 'Starting...' : 'Start practising'}
-        </button>
-
-        <p className="mt-4 text-center text-sm text-ink-quiet">
-          This uses one practice question from your pack, not a full mock interview.
-        </p>
-      </main>
+        </div>
+      </Page>
       <SiteFooterView whatsappDigits={supportNumber} />
     </>
   );

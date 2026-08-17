@@ -68,7 +68,7 @@ export function ContactUs({
         href={`https://wa.me/${digits}${message ? `?text=${encodeURIComponent(message)}` : ''}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="mb-3 flex w-full items-center justify-center gap-2 rounded-control bg-go px-6 py-4 text-base font-bold text-white transition active:scale-[0.98]"
+        className="mb-3 flex w-full items-center justify-center gap-2 rounded-control bg-go px-6 py-4 text-base font-bold text-white transition-colors duration-tap ease-move active:scale-[0.98]"
       >
         <WhatsAppMark className="h-5 w-5" light />
         Message us on WhatsApp

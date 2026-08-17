@@ -91,7 +91,7 @@ export function PaySettingsForm({
 
   return (
     <div className="rounded-card border border-line bg-surface p-6">
-      <h2 className="mb-1 font-serif text-xl font-bold text-ink">Payment and support details</h2>
+      <h2 className="mb-1 font-serif text-lg font-bold text-ink">Payment and support details</h2>
       <p className="mb-6 text-sm leading-relaxed text-ink-soft">
         These appear on the checkout page. Changing them here takes effect immediately, with no
         deploy. A wallet number that needs a code release is a number that will be wrong on the day

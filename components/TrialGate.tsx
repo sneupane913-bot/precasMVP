@@ -71,7 +71,7 @@ export function TrialGate({
         </p>
         <button
           onClick={onSeeReport}
-          className="w-full rounded-control bg-ink px-6 py-4 text-lg font-bold text-white transition active:scale-[0.98]"
+          className="w-full rounded-control bg-ink px-6 py-4 text-lg font-bold text-white transition-colors duration-tap ease-move active:scale-[0.98]"
         >
           See my report
         </button>
@@ -86,7 +86,7 @@ export function TrialGate({
         </p>
         <Link
           href="/pricing"
-          className="flex w-full items-center justify-center rounded-control bg-go px-6 py-4 text-lg font-bold text-white transition active:scale-[0.98]"
+          className="flex w-full items-center justify-center rounded-control bg-go px-6 py-4 text-lg font-bold text-white transition-colors duration-tap ease-move active:scale-[0.98]"
         >
           See the packs
         </Link>

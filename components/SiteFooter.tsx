@@ -89,7 +89,7 @@ export function SiteFooterView({ whatsappDigits = '' }: { whatsappDigits?: strin
               <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-white/40">
                 {col.title}
               </p>
-              <ul className="space-y-2.5">
+              <ul className="flex flex-col gap-0.5">
                 {col.links.map((l) => (
                   <li key={l.label}>
                     {l.external ? (
@@ -97,12 +97,15 @@ export function SiteFooterView({ whatsappDigits = '' }: { whatsappDigits?: strin
                         href={l.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-white/75 transition hover:text-white"
+                        className="inline-flex min-h-tap items-center py-2.5 text-sm text-white/75 transition-colors duration-tap ease-move hover:text-white"
                       >
                         {l.label}
                       </a>
                     ) : (
-                      <Link href={l.href} className="text-sm text-white/75 transition hover:text-white">
+                      <Link
+                        href={l.href}
+                        className="inline-flex min-h-tap items-center py-2.5 text-sm text-white/75 transition-colors duration-tap ease-move hover:text-white"
+                      >
                         {l.label}
                       </Link>
                     )}

@@ -30,7 +30,7 @@ export function SiteHeader({ session }: { session?: SessionSnapshot } = {}) {
       <div className="mx-auto flex h-16 max-w-[1120px] items-center justify-between px-4 md:px-10">
         <Link
           href="/"
-          className="flex items-center gap-2.5 rounded-control transition-opacity duration-tap ease-move hover:opacity-80"
+          className="flex min-h-tap items-center gap-2.5 rounded-control transition-opacity duration-tap ease-move hover:opacity-80"
         >
           <span className="grid h-8 w-8 place-items-center rounded-control bg-go font-serif font-black text-white">
             P
@@ -43,7 +43,7 @@ export function SiteHeader({ session }: { session?: SessionSnapshot } = {}) {
             <Link
               key={n.label}
               href={n.href}
-              className="text-sm font-medium text-ink-soft transition-colors duration-tap ease-move hover:text-ink"
+              className="inline-flex min-h-tap items-center text-sm font-medium text-ink-soft transition-colors duration-tap ease-move hover:text-ink"
             >
               {n.label}
             </Link>

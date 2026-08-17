@@ -2,6 +2,7 @@ import { PricingPacks, PriceComparison } from '@/components/PricingPacks';
 import { SiteHeader } from '@/components/SiteHeader';
 import { headerSession } from '@/lib/auth/header-session';
 import { SiteFooter } from '@/components/SiteFooter';
+import { Page } from '@/components/ui';
 
 export const metadata = { title: 'Price | PreCAS Practice' };
 
@@ -22,17 +23,21 @@ export default async function PricingPage() {
   return (
     <>
       <SiteHeader session={session} />
-      <main className="px-4 py-8 sm:px-6">
-        <div className="mx-auto max-w-4xl">
-          <h1 className="mb-2 text-center font-serif text-3xl text-ink">Price</h1>
-          <p className="mx-auto mb-8 max-w-lg text-center leading-relaxed text-ink-soft">
-            Pay once. No monthly bill, nothing to cancel. Your credits do not expire.
-          </p>
+      <Page>
+        <div className="mx-auto flex w-full max-w-[900px] flex-col gap-10">
+          <header className="text-center">
+            <h1 className="font-serif text-[2rem] font-bold leading-tight tracking-tight text-ink md:text-display">
+              Price
+            </h1>
+            <p className="mx-auto mt-2 max-w-lg text-ink-soft">
+              Pay once. No monthly bill, nothing to cancel. Your credits do not expire.
+            </p>
+          </header>
 
           <PricingPacks signedIn={Boolean(session?.signedIn)} />
           <PriceComparison />
         </div>
-      </main>
+      </Page>
       <SiteFooter />
     </>
   );

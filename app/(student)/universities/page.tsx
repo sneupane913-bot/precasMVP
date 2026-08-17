@@ -270,7 +270,7 @@ function UniversityBrowser() {
             </p>
             <Link
               href={`/interview/${inProgress.sessionId}`}
-              className="inline-flex items-center justify-center rounded-control bg-go px-6 py-3.5 text-base font-bold text-white transition active:scale-[0.98]"
+              className="inline-flex items-center justify-center rounded-control bg-go px-6 py-3.5 text-base font-bold text-white transition-colors duration-tap ease-move active:scale-[0.98]"
             >
               Continue your interview
             </Link>
@@ -315,7 +315,7 @@ function UniversityBrowser() {
               "Most applied"; the rest of the UK is listed below so a student
               can always find their own university. */}
           {featured.length > 0 && (
-            <h2 className="mb-4 flex items-center gap-2 font-serif text-xl font-bold text-ink">
+            <h2 className="mb-4 flex items-center gap-2 font-serif text-lg font-bold text-ink">
               <span className="text-go" aria-hidden>
                 ★
               </span>

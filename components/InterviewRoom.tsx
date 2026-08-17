@@ -7,6 +7,7 @@ import { FLAG_META } from '@/lib/types';
 import { useMonitor } from '@/lib/useMonitor';
 import { MonitorPanel } from '@/components/MonitorPanel';
 import { TrialGate } from '@/components/TrialGate';
+import { Card, Chip, Button } from '@/components/ui';
 
 type Phase =
   | 'ready'        // question shown, not yet recording
@@ -83,7 +84,41 @@ export function InterviewRoom({
   const [liveText, setLiveText] = useState('');
   const [finalTranscript, setFinalTranscript] = useState('');
   const [message, setMessage] = useState<string | null>(null);
-  const [attemptsLeft, setAttemptsLeft] = useState(2);
+  /**
+   * D-43. Tries left on THIS question, as the SERVER counts them.
+   *
+   * `null` means "we have not been told yet", and null is the honest value.
+   * This used to be `useState(2)` — a hard-coded guess at the server's
+   * `LIMITS.maxAttemptsPerQuestion` minus one. That is F-2: the retry budget
+   * written down in two places and free to disagree. It is the worst possible
+   * place for that shape, too, because the number is only ever on screen after
+   * something has already gone wrong, so nobody would notice it drifting.
+   *
+   * We now show a count only when the server has given us one, and never
+   * invent the total.
+   */
+  const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null);
+
+  /**
+   * D-38. WHY the last attempt failed, which is what decides whether offering
+   * to re-send the SAME audio is honest.
+   *
+   *   'network'  it never reached us. Nothing was transcribed, nothing was
+   *              charged, and the recording in memory is perfectly good.
+   *              Sending it again is the right first offer.
+   *   'provider' it reached us and the transcriber itself errored. The audio is
+   *              fine, so trying the same recording is reasonable — and it does
+   *              cost a paid call, which the screen now says out loud (D-43).
+   *   'content'  silent, or too short. The audio genuinely has nothing usable in
+   *              it. Re-sending would spend a paid call on a certain second
+   *              failure, so this is the ONE case where asking the student to
+   *              speak again is the honest ask, and the screen explains why.
+   *
+   * Before this, the resend button appeared only after a network error, so
+   * every other failure told a student to re-record an answer we were still
+   * holding in memory. That is D-38 exactly.
+   */
+  const [lastFailure, setLastFailure] = useState<'network' | 'provider' | 'content' | null>(null);
   /** Whether this browser can give us a live hearing signal at all. */
   const [liveSupported, setLiveSupported] = useState(false);
   /** S-28. True when the upload failed for network reasons and the audio survives. */
@@ -336,6 +371,18 @@ export function InterviewRoom({
   // --- Upload and evaluate ------------------------------------------------
   const upload = useCallback(async () => {
     setPhase('uploading');
+    /**
+     * Drop any earlier recording BEFORE this attempt can fail.
+     *
+     * `pendingRef` used to be written only after the silence guard below had
+     * passed, so a recording that came back empty left the PREVIOUS question's
+     * audio sitting in the ref. Offering "send the same recording again" in
+     * that state would have posted the wrong question's answer. Clearing first
+     * means the ref is either this question's audio or nothing.
+     */
+    pendingRef.current = null;
+    setCanResend(false);
+    setLastFailure(null);
     const durationSeconds = (Date.now() - startedAtRef.current) / 1000;
     const blob = new Blob(chunksRef.current, {
       type: chunksRef.current[0]?.type || 'audio/webm',
@@ -347,6 +394,8 @@ export function InterviewRoom({
       setMessage(
         'We could not hear anything at all. Check that your microphone is not muted, then record again.'
       );
+      // Nothing usable was captured, so there is nothing worth sending twice.
+      setLastFailure('content');
       setPhase('retry');
       return;
     }
@@ -366,6 +415,9 @@ export function InterviewRoom({
      * out.
      */
     pendingRef.current = { blob, questionId: question.id, durationSeconds };
+    // From here on we HOLD this question's audio, so any failure that is not
+    // about the audio's own content can be answered by sending it again.
+    setCanResend(true);
 
     const form = new FormData();
     form.append('audio', blob, 'answer.webm');
@@ -381,6 +433,7 @@ export function InterviewRoom({
 
       if (!json.ok) {
         setMessage(json.error.userMessage);
+        setLastFailure('provider');
         setPhase('retry');
         return;
       }
@@ -390,12 +443,21 @@ export function InterviewRoom({
         // We stop, explain, and let the student choose. Never auto-advance.
         setAttemptsLeft(json.data.attemptsLeft ?? 0);
         setMessage(json.data.userMessage ?? 'We could not hear your answer. Please record it again.');
+        // D-38. 'silent' and 'too_short' are facts about the RECORDING, so the
+        // same bytes will fail the same way and re-sending them would only
+        // spend another paid call. Anything else is a fault at our end, and the
+        // recording we are holding is still good.
+        const contentFailure =
+          json.data.transcriptStatus === 'silent' || json.data.transcriptStatus === 'too_short';
+        setLastFailure(contentFailure ? 'content' : 'provider');
+        if (contentFailure) setCanResend(false);
         setPhase('retry');
         return;
       }
 
       setFinalTranscript(json.data.transcript ?? '');
       setAnsweredIds((prev) => new Set(prev).add(question.id));
+      setLastFailure(null);
       /**
        * Order matters. A student who was only half heard AND whose review
        * failed should be told the thing they can act on, which is the
@@ -418,6 +480,7 @@ export function InterviewRoom({
     } catch {
       // Our failure, not theirs, and the recording is safe.
       setCanResend(true);
+      setLastFailure('network');
       setMessage(
         'Your answer was recorded but could not reach us. Your connection dropped. Nothing is lost. Send the same recording again.'
       );
@@ -431,11 +494,19 @@ export function InterviewRoom({
     uploadRef.current = upload;
   }, [upload]);
 
-  /** S-28. Send the recording we already have, without making them speak again. */
+  /**
+   * S-28 and D-38. Send the recording we already have, without making them
+   * speak again.
+   *
+   * D-43: this DOES cost a transcription and a marking call, and it counts
+   * against the three tries the server allows on a question. The button that
+   * calls it says so before it is pressed, rather than after.
+   */
   const resend = useCallback(async () => {
     const pending = pendingRef.current;
     if (!pending) return;
     setCanResend(false);
+    setLastFailure(null);
     setMessage('Sending your answer again...');
     setPhase('uploading');
     const form = new FormData();
@@ -447,21 +518,33 @@ export function InterviewRoom({
       const json = (await res.json()) as UploadResponse;
       if (!json.ok) {
         setMessage(json.error.userMessage);
+        // The recording is still ours and still good, so the offer stands.
+        setCanResend(true);
+        setLastFailure('provider');
         setPhase('retry');
         return;
       }
       if (json.data.transcriptStatus !== 'ok') {
         setAttemptsLeft(json.data.attemptsLeft ?? 0);
         setMessage(json.data.userMessage ?? 'We could not hear your answer. Please record it again.');
+        // Same rule as the first upload: silence and too-short are facts about
+        // the recording, and sending the identical bytes again would only buy a
+        // second identical failure at our expense and theirs.
+        const contentFailure =
+          json.data.transcriptStatus === 'silent' || json.data.transcriptStatus === 'too_short';
+        setCanResend(!contentFailure);
+        setLastFailure(contentFailure ? 'content' : 'provider');
         setPhase('retry');
         return;
       }
       setFinalTranscript(json.data.transcript ?? '');
       setAnsweredIds((prev) => new Set(prev).add(pending.questionId));
       setMessage(null);
+      setLastFailure(null);
       setPhase('reviewed');
     } catch {
       setCanResend(true);
+      setLastFailure('network');
       setMessage('Still no connection. Your recording is safe \u2014 try again in a moment.');
       setPhase('retry');
     }
@@ -661,35 +744,30 @@ export function InterviewRoom({
 
   if (error) {
     return (
-      <div className="mx-auto max-w-md p-6 text-center">
-        <h1 className="mb-3 text-xl font-bold text-ink">We cannot start your interview</h1>
-        <p className="mb-6 text-ink-soft">{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="w-full rounded-control bg-ink px-6 py-3.5 text-base font-semibold text-white"
-        >
+      <main className="mx-auto flex w-full max-w-md flex-col gap-4 p-6 text-center">
+        <h1 className="font-serif text-title font-bold text-ink">We cannot start your interview</h1>
+        <p className="text-ink-soft">{error}</p>
+        <Button variant="secondary" onClick={() => window.location.reload()} full>
           Reload and try again
-        </button>
-      </div>
+        </Button>
+      </main>
     );
   }
 
   return (
     <div className="min-h-screen bg-paper pb-28 lg:pb-8">
       {/* ---- Exam header: institution, progress, remaining ---- */}
-      <header className="sticky top-0 z-30 bg-ink text-white shadow-lg">
+      <header className="sticky top-0 z-30 bg-ink text-white shadow-card">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3">
           <div
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-control text-sm font-black"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-control font-serif text-sm font-bold"
             style={{ backgroundColor: institution.accent }}
           >
             {institution.monogram}
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold leading-tight">{institution.name}</p>
-            <p className="text-micro text-white/60">
-              {institution.interviewType} mock interview
-            </p>
+            <p className="text-micro text-white/60">{institution.interviewType} mock interview</p>
           </div>
           <div className="shrink-0 text-right">
             <p className="text-sm font-bold tabular-nums">
@@ -700,13 +778,16 @@ export function InterviewRoom({
             </p>
           </div>
         </div>
-        {/* progress dots */}
+        {/* Progress dots.
+            D-4: the width changes between states but is NOT transitioned. An
+            animated width is a layout pass on every frame, on a mid-range
+            Android, while the student is being recorded. */}
         <div className="mx-auto flex max-w-7xl items-center gap-1.5 overflow-x-auto px-4 pb-2.5">
           {questions.map((q, i) => (
             <span
               key={q.id}
               aria-label={`Question ${i + 1}`}
-              className={`h-2 shrink-0 rounded-full transition-all ${
+              className={`h-2 shrink-0 rounded-full transition-colors duration-tap ease-move ${
                 i === index
                   ? 'w-6 bg-surface'
                   : answeredIds.has(q.id)
@@ -720,16 +801,14 @@ export function InterviewRoom({
 
       <main className="mx-auto grid max-w-7xl gap-4 p-4 lg:grid-cols-[1fr_320px]">
         {/* ================= Question and answer ================= */}
-        <div className="rounded-card border border-line bg-surface p-5 shadow-sm sm:p-7">
-          <div className="mb-1 flex items-center gap-2">
-            <span className="rounded-full bg-surface-sunk px-2.5 py-1 text-micro font-bold uppercase tracking-wide text-ink-soft">
-              Question {index + 1}
-            </span>
+        <Card>
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <Chip>Question {index + 1}</Chip>
             <button
               onClick={() => speak(question.text)}
-              className="rounded-full border border-line px-2.5 py-1 text-micro font-semibold text-ink-soft hover:bg-surface-sunk"
+              className="min-h-tap rounded-full border border-line px-3 py-1 text-micro font-bold text-ink-soft transition-colors duration-tap ease-move hover:bg-surface-sunk"
             >
-              ▶ Read this to me
+              Read this to me
             </button>
             <button
               onClick={() => {
@@ -737,8 +816,11 @@ export function InterviewRoom({
                 setVoiceOn(on);
                 if (!on) window.speechSynthesis?.cancel();
               }}
-              className={`rounded-full px-2.5 py-1 text-micro font-semibold ${
-                voiceOn ? 'bg-line text-ink-soft' : 'text-ink-quiet hover:bg-surface-sunk'
+              aria-pressed={voiceOn}
+              className={`min-h-tap rounded-full border px-3 py-1 text-micro font-bold transition-colors duration-tap ease-move ${
+                voiceOn
+                  ? 'border-line-strong bg-surface-sunk text-ink'
+                  : 'border-line text-ink-quiet hover:bg-surface-sunk'
               }`}
             >
               {voiceOn ? 'Auto voice: on' : 'Auto voice: off'}
@@ -746,14 +828,17 @@ export function InterviewRoom({
           </div>
 
           {demo.stt && (
-            <div className="mb-4 rounded-control border-2 border-purple-300 bg-purple-50 px-4 py-3">
-              <p className="font-bold text-purple-900">Demo mode: we are not really listening yet</p>
+            /* Was purple — a colour that exists nowhere else in the product, so
+               it read as a different application's error. It is a WARNING: this
+               screen is not doing the thing the student thinks it is doing. */
+            <div className="mb-4 rounded-control border-2 border-warn/40 bg-warn-tint px-4 py-3">
+              <p className="font-bold text-warn">Demo mode: we are not really listening yet</p>
               {/* D-26. This used to name DEEPGRAM_API_KEY while /super named
                   GROQ_API_KEY for the same feature. Groq is the primary in
                   lib/ai/stt.ts and costs $0.111 an hour against Deepgram's
                   $0.258, so following this screen meant buying the fallback at
                   more than double the price. One name, in both places. */}
-              <p className="mt-1 text-sm leading-relaxed text-purple-900/90">
+              <p className="mt-1 text-sm text-ink-soft">
                 No speech-to-text key is set, so the transcript below is sample text, not your
                 voice. Nothing here is scored and nothing is a judgement of your English. Everything
                 else on this screen is real.
@@ -761,17 +846,17 @@ export function InterviewRoom({
             </div>
           )}
 
-          <h1 className="mb-5 font-serif text-2xl leading-snug text-ink sm:text-3xl">
+          <h1 className="mb-5 font-serif text-title font-bold leading-snug text-ink">
             {question.text}
           </h1>
 
           {/* ---- Live flag, placed where the eye already is ---- */}
           {latestFlag && phase === 'recording' && (
             <div
-              className={`mb-3 animate-slideUp rounded-control border-l-4 px-4 py-2.5 text-sm font-medium ${
+              className={`mb-3 animate-slideUp rounded-control border-l-4 px-4 py-2.5 text-sm font-semibold ${
                 FLAG_META[latestFlag.type].severity === 'critical'
-                  ? 'border-stop/40 bg-stop-tint text-stop'
-                  : 'border-warn/40 bg-warn-tint text-warn'
+                  ? 'border-stop bg-stop-tint text-stop'
+                  : 'border-warn bg-warn-tint text-warn'
               }`}
               role="status"
             >
@@ -779,18 +864,21 @@ export function InterviewRoom({
             </div>
           )}
 
-          {/* ---- Answer space ---- */}
-          <div className="rounded-card bg-gradient-to-b from-sky-50 to-emerald-50/60 p-5">
+          {/* ---- Answer space ----
+              Was a sky-to-emerald gradient, two colours from outside the
+              palette. The sunk surface is what this is: a well inside a card. */}
+          <div className="rounded-card bg-surface-sunk p-5">
             {/* Unmistakable state banner. The previous version only changed the
                 button label, and it was not obvious that recording had begun. */}
             {phase === 'recording' && (
+              /* The 20-second warning state used to be `bg-warn-tint`, a pale
+                 cream, underneath `text-white`. That is roughly 1.05:1 — the
+                 warning was invisible at the exact moment it was needed, and it
+                 is the palette sweep's fingerprint (`bg-amber-500` became the
+                 TINT rather than the colour). It is `bg-warn` now. */
               <div
-                className={`mb-4 flex items-center gap-3 rounded-control px-4 py-3 text-white transition-colors ${
-                  secondsLeft <= 10
-                    ? 'bg-stop'
-                    : secondsLeft <= 20
-                      ? 'bg-warn-tint'
-                      : 'bg-go'
+                className={`mb-4 flex items-center gap-3 rounded-control px-4 py-3 text-white transition-colors duration-tap ease-move ${
+                  secondsLeft <= 10 ? 'bg-stop' : secondsLeft <= 20 ? 'bg-warn' : 'bg-go'
                 }`}
               >
                 <span className="relative flex h-3 w-3 shrink-0">
@@ -808,13 +896,13 @@ export function InterviewRoom({
                   </p>
                 </div>
                 {/* Big countdown, always visible while answering. */}
-                <span className="shrink-0 text-4xl font-black tabular-nums leading-none">
+                <span className="shrink-0 font-serif text-display font-bold tabular-nums leading-none">
                   {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}
                 </span>
               </div>
             )}
             {phase === 'ready' && (
-              <div className="mb-4 rounded-control bg-surface/70 px-4 py-3">
+              <div className="mb-4 rounded-control bg-surface px-4 py-3">
                 <p className="text-base font-bold text-ink">Read the question, then press start</p>
                 <p className="text-sm text-ink-soft">
                   You have {question.timeLimitSeconds} seconds. Nothing is recorded until you press
@@ -852,15 +940,18 @@ export function InterviewRoom({
                 found that speaking quietly produced nothing while the screen
                 said "Listening", which reads as working when it is not. So the
                 signal now drives ONE thing: telling them to speak up.
+
+                D-7: the box reserves its height, so the words arriving never
+                shove the record button under a thumb already moving.
                 ---------------------------------------------------------------- */}
-            <div className="mb-5 min-h-[104px] rounded-control bg-surface/70 p-4 text-sm leading-relaxed text-ink">
+            <div className="mb-5 min-h-[104px] rounded-control bg-surface p-4 text-base leading-relaxed text-ink">
               {phase === 'reviewed' && finalTranscript ? (
                 <p>{finalTranscript}</p>
               ) : phase === 'recording' ? (
                 notHearingYou ? (
                   <div>
                     <p className="mb-1 font-bold text-warn">We cannot hear you yet</p>
-                    <p className="text-sm leading-relaxed text-warn">
+                    <p className="text-sm text-warn">
                       Speak louder, and a little closer to the microphone. Nothing is being picked
                       up, so this answer would come back empty. The officer will need to hear you
                       clearly too.
@@ -886,7 +977,12 @@ export function InterviewRoom({
                   className="group flex flex-col items-center gap-2"
                   aria-label="Start recording your answer"
                 >
-                  <span className="relative grid h-20 w-20 place-items-center rounded-full bg-surface shadow-lg ring-2 ring-go/30/40 transition group-active:scale-95">
+                  {/* `ring-go/30/40` was here — two opacity modifiers on one
+                      class, so Tailwind emitted nothing and the microphone had
+                      no ring at all. Same family as the eighteen
+                      `bg-surface-sunk300` classes: a class that does not exist
+                      looks exactly like a class you never wrote. */}
+                  <span className="relative grid h-20 w-20 place-items-center rounded-full bg-surface shadow-card ring-2 ring-go/30 transition-transform duration-tap ease-move group-active:scale-95">
                     <MicIcon className="h-8 w-8 text-go-dark" />
                   </span>
                   <span className="text-lg font-bold text-go-dark">Start answering</span>
@@ -900,17 +996,20 @@ export function InterviewRoom({
                   className="flex flex-col items-center gap-2"
                   aria-label="Stop recording"
                 >
-                  <span className="relative grid h-20 w-20 place-items-center rounded-full bg-stop shadow-lg">
+                  <span className="relative grid h-20 w-20 place-items-center rounded-full bg-stop shadow-card">
                     <span
                       className="absolute inset-0 rounded-full bg-stop/40"
-                      style={{ transform: `scale(${1 + noiseLevel * 2.2})`, transition: 'transform 90ms' }}
+                      style={{
+                        transform: `scale(${1 + noiseLevel * 2.2})`,
+                        // Token-sourced. A hand-typed 90ms was a fifth duration
+                        // in a system that declares four (D-2).
+                        transition: 'transform var(--t-tap) var(--e-move)',
+                      }}
                     />
                     <span className="relative h-6 w-6 rounded bg-surface" />
                   </span>
                   <span className="text-lg font-bold text-stop">I have finished answering</span>
-                  <span className="text-sm text-ink-quiet">
-                    Or wait for the timer to run out
-                  </span>
+                  <span className="text-sm text-ink-quiet">Or wait for the timer to run out</span>
                 </button>
               )}
 
@@ -926,7 +1025,7 @@ export function InterviewRoom({
 
               {/* ---- Failure. Never auto-advance. The student chooses. ---- */}
               {phase === 'retry' && (
-                <div className="w-full animate-slideUp rounded-control border-2 border-warn/40 bg-warn-tint p-4">
+                <div className="w-full animate-slideUp rounded-card border-2 border-warn/40 bg-warn-tint p-4">
                   {/* E-4: no error blames the student for OUR failure.
                       In demo mode there is no speech-to-text key at all, so
                       the answer was never listened to — saying "we could not
@@ -934,48 +1033,75 @@ export function InterviewRoom({
                       problem when the problem is a missing key of ours. The
                       client hit this three times in a row and reasonably
                       thought the product was broken. */}
-                  <p className="mb-1 font-bold text-warn">
-                    {demo?.stt ? 'Demo mode: we are not listening yet' : 'We could not use that answer'}
+                  <p className="mb-1 font-serif text-lg font-bold text-warn">
+                    {demo?.stt
+                      ? 'Demo mode: we are not listening yet'
+                      : 'We could not use that answer'}
                   </p>
-                  <p className="mb-4 text-sm leading-relaxed text-warn/90">{message}</p>
+                  <p className="mb-4 text-ink-soft">{message}</p>
 
-                  {/* S-28. When the recording survived, sending it again is the
-                      first and best option. Re-recording an answer you already
-                      gave, because our network failed, is not acceptable. */}
+                  {/* ------------------------------------------------------------
+                      D-38. The recording we are HOLDING, offered back.
+
+                      This used to appear only after a network error. Every other
+                      failure — a transcriber hiccup, a rejected request — showed
+                      "Record again" while the student's audio sat in memory two
+                      feet away. Asking somebody to re-speak an answer we already
+                      have, on a question with three tries, is the defect.
+
+                      D-43. It is not free, and the screen says so BEFORE the tap
+                      rather than after. Sending it again buys a fresh
+                      transcription and a fresh marking, and the server counts it
+                      as one of the three tries on this question.
+                      ------------------------------------------------------------ */}
                   {canResend && (
-                    <button
-                      onClick={resend}
-                      className="mb-2 w-full rounded-control bg-go px-5 py-3 text-base font-bold text-white"
-                    >
-                      Send the same recording again
-                    </button>
+                    <div className="mb-3">
+                      <Button onClick={resend} full>
+                        Send the same recording again
+                      </Button>
+                      <p className="mt-2 text-sm text-ink-soft">
+                        {lastFailure === 'network'
+                          ? 'Your answer never reached us, so nothing was marked and nothing was used up. This sends the recording you already made — you do not have to speak again.'
+                          : 'This sends the recording you already made, so you do not have to speak again. It will be listened to and marked afresh, which uses one of your tries for this question.'}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Why re-speaking is the right ask here, said plainly, so the
+                      absence of the resend button is not read as us losing it. */}
+                  {lastFailure === 'content' && (
+                    <p className="mb-3 text-sm text-ink-soft">
+                      We are still holding what you recorded, but there is not enough in it to mark
+                      — sending it again would come back the same. Recording once more is the way
+                      forward.
+                    </p>
                   )}
 
                   <div className="flex flex-col gap-2 sm:flex-row">
-                    <button
+                    <Button
+                      variant="secondary"
+                      className="flex-1"
                       onClick={() => {
                         setMessage(null);
                         setCanResend(false);
+                        setLastFailure(null);
+                        pendingRef.current = null;
                         setSecondsLeft(question.timeLimitSeconds);
                         setPhase('ready');
                       }}
-                      disabled={attemptsLeft <= 0}
-                      className="flex-1 rounded-control bg-ink px-5 py-3 text-base font-semibold text-white disabled:opacity-40"
+                      disabled={attemptsLeft !== null && attemptsLeft <= 0}
                     >
                       Record again
-                      {attemptsLeft > 0 && attemptsLeft < 3 ? ` (${attemptsLeft} left)` : ''}
-                    </button>
-                    <button
-                      onClick={skip}
-                      className="flex-1 rounded-control border-2 border-line-strong px-5 py-3 text-base font-semibold text-ink-soft"
-                    >
+                      {attemptsLeft !== null ? ` (${attemptsLeft} left)` : ''}
+                    </Button>
+                    <Button variant="tertiary" className="flex-1" onClick={skip}>
                       Skip this question
-                    </button>
+                    </Button>
                   </div>
-                  {attemptsLeft <= 0 && (
-                    <p className="mt-2 text-sm font-medium text-stop">
-                      You have used all your tries for this question. Skip it for now and practise it
-                      afterwards.
+                  {attemptsLeft !== null && attemptsLeft <= 0 && (
+                    <p className="mt-2 text-sm font-semibold text-stop">
+                      You have used all your tries for this question. Skip it for now and practise
+                      it afterwards.
                     </p>
                   )}
                 </div>
@@ -989,26 +1115,45 @@ export function InterviewRoom({
                     </p>
                   )}
                   <div className="flex flex-col gap-2 sm:flex-row">
-                    <button
-                      onClick={next}
-                      className="flex-1 rounded-control bg-go px-5 py-3.5 text-base font-bold text-white shadow-sm"
-                    >
+                    <Button onClick={next} className="flex-1">
                       {isLast ? 'Finish and see my results' : 'Saved. Next question'}
-                    </button>
+                    </Button>
                     {!isLast && (
-                      <button
+                      <Button
+                        variant="tertiary"
+                        disabled={attemptsLeft !== null && attemptsLeft <= 0}
                         onClick={() => {
                           setSecondsLeft(question.timeLimitSeconds);
                           setFinalTranscript('');
                           setLiveText('');
+                          setCanResend(false);
+                          setLastFailure(null);
+                          pendingRef.current = null;
                           setPhase('ready');
                         }}
-                        className="rounded-control border-2 border-line-strong px-5 py-3.5 text-base font-semibold text-ink-soft"
                       >
                         Answer again
-                      </button>
+                        {attemptsLeft !== null ? ` (${attemptsLeft} left)` : ''}
+                      </Button>
                     )}
                   </div>
+                  {/* ------------------------------------------------------------
+                      D-43. "Answer again" is a paid action and used to say
+                      nothing at all.
+
+                      It throws away the answer that has just been accepted,
+                      records a new one, and buys a fresh transcription and a
+                      fresh marking — and the server counts it against the three
+                      tries on this question. A student pressing it to "tidy up"
+                      an answer they were happy with had no way to know any of
+                      that. Now they do, before they press it.
+                      ------------------------------------------------------------ */}
+                  {!isLast && (
+                    <p className="mt-2 text-sm text-ink-quiet">
+                      Answering again replaces the answer above. It is listened to and marked
+                      afresh, and it uses one of your tries for this question.
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -1023,18 +1168,18 @@ export function InterviewRoom({
 
           {/* ---- PEE + Wrap-up: the house answer method ---- */}
           <div className="mt-5 rounded-control border border-line bg-surface p-4">
-            <p className="mb-3 text-micro font-bold uppercase tracking-wide text-ink-quiet">
+            <p className="mb-3 text-micro font-bold uppercase tracking-[0.08em] text-ink-quiet">
               Build every answer this way
             </p>
             <div className="grid gap-2 sm:grid-cols-2">
               {STRUCTURE.map((s, i) => (
                 <div
                   key={s.label}
-                  className={`flex gap-3 rounded-control p-3 ${
-                    phase === 'recording' ? 'bg-go-tint/70' : 'bg-surface-sunk'
+                  className={`flex gap-3 rounded-control p-3 transition-colors duration-tap ease-move ${
+                    phase === 'recording' ? 'bg-go-tint' : 'bg-surface-sunk'
                   }`}
                 >
-                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-ink text-sm font-black text-white">
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-control bg-ink font-serif text-sm font-bold text-white">
                     {s.n}
                   </span>
                   <div className="min-w-0">
@@ -1055,15 +1200,15 @@ export function InterviewRoom({
                 i
               </span>
               <div className="min-w-0 flex-1">
-                <p className="mb-0.5 text-micro font-bold uppercase tracking-wide text-ink-quiet">
+                <p className="mb-0.5 text-micro font-bold uppercase tracking-[0.08em] text-ink-quiet">
                   Tip {tipIndex + 1} of {question.tips.length}
                 </p>
-                <p className="text-sm leading-relaxed text-ink-soft">{question.tips[tipIndex]}</p>
+                <p className="text-sm text-ink-soft">{question.tips[tipIndex]}</p>
               </div>
               {question.tips.length > 1 && (
                 <button
                   onClick={() => setTipIndex((i) => (i + 1) % question.tips.length)}
-                  className="shrink-0 rounded-control px-2 py-1 text-sm font-semibold text-ink-quiet hover:bg-line"
+                  className="min-h-tap shrink-0 rounded-control px-3 text-sm font-semibold text-ink-quiet transition-colors duration-tap ease-move hover:bg-line"
                   aria-label="Next tip"
                 >
                   Next
@@ -1071,11 +1216,11 @@ export function InterviewRoom({
               )}
             </div>
           )}
-        </div>
+        </Card>
 
         {/* ================= Camera and monitor ================= */}
-        <aside className="space-y-4">
-          <div className="overflow-hidden rounded-card border border-line bg-ink shadow-sm">
+        <aside className="flex flex-col gap-4">
+          <div className="overflow-hidden rounded-card border border-line bg-ink shadow-card">
             <div className="relative aspect-[4/3]">
               <video
                 ref={videoRef}
@@ -1090,21 +1235,20 @@ export function InterviewRoom({
                 </div>
               )}
               {phase === 'recording' && (
-                <span className="absolute bottom-2 right-2 rounded-md bg-black/70 px-2 py-1 text-micro font-bold tabular-nums text-white">
+                <span className="absolute bottom-2 right-2 rounded-control bg-ink/70 px-2 py-1 text-micro font-bold tabular-nums text-white">
                   {String(Math.floor(secondsLeft / 60))}:{String(secondsLeft % 60).padStart(2, '0')}
                 </span>
               )}
               {phase === 'recording' && (
-                <span className="absolute left-2 top-2 flex items-center gap-1.5 rounded-md bg-stop px-2 py-1 text-micro font-bold text-white">
+                <span className="absolute left-2 top-2 flex items-center gap-1.5 rounded-control bg-stop px-2 py-1 text-micro font-bold text-white">
                   <span className="h-1.5 w-1.5 rounded-full bg-surface" /> REC
                 </span>
               )}
-              {/* countdown bar */}
-              <div className="absolute inset-x-0 bottom-0 h-1 bg-black/30">
+              {/* Countdown bar. `bg-warn-tint` here meant the bar turned PALER
+                  as time ran out instead of amber — the palette sweep again. */}
+              <div className="absolute inset-x-0 bottom-0 h-1 bg-ink/30">
                 <div
-                  className={`h-full transition-all duration-1000 ${
-                    secondsLeft <= 15 ? 'bg-warn-tint' : 'bg-go'
-                  }`}
+                  className={`h-full ${secondsLeft <= 15 ? 'bg-warn' : 'bg-go'}`}
                   style={{ width: `${Math.min(100, pct * 100)}%` }}
                 />
               </div>
@@ -1115,7 +1259,7 @@ export function InterviewRoom({
                 setCameraOn(on);
                 streamRef.current?.getVideoTracks().forEach((t) => (t.enabled = on));
               }}
-              className="w-full py-2.5 text-micro font-medium text-white/70 hover:bg-surface/5"
+              className="w-full py-2.5 text-micro font-semibold text-white/70 transition-colors duration-tap ease-move hover:bg-white/5"
             >
               {cameraOn ? 'Turn camera off' : 'Turn camera on'}
             </button>
@@ -1132,21 +1276,24 @@ export function InterviewRoom({
             }
           />
 
-          <button
+          <Button
+            variant="tertiary"
+            full
             onClick={() => {
               // Finishing the last question is not "ending early". Only ask
               // when there is genuinely something left to lose.
               if (answeredCount >= questions.length) finish();
               else setEndConfirm(true);
             }}
-            className="w-full rounded-control border-2 border-line-strong bg-surface py-3 text-sm font-semibold text-ink-soft"
           >
             End interview and see results
-          </button>
+          </Button>
         </aside>
       </main>
 
-      {/* D-33. Names the exact cost, in the student's own numbers. */}
+      {/* D-33. Names the exact cost, in the student's own numbers.
+          DB-3 permits this: it is opened by the student's own tap on "End
+          interview", never by the product deciding to interrupt them. */}
       {endConfirm && (
         <div
           role="dialog"
@@ -1154,13 +1301,13 @@ export function InterviewRoom({
           aria-labelledby="end-early-title"
           className="fixed inset-0 z-50 flex items-center justify-center bg-ink/70 p-4"
         >
-          <div className="w-full max-w-md rounded-card bg-surface p-6 shadow-2xl">
-            <h2 id="end-early-title" className="text-xl font-bold text-ink">
+          <Card className="w-full max-w-md">
+            <h2 id="end-early-title" className="font-serif text-title font-bold text-ink">
               You still have {questions.length - answeredCount} question
               {questions.length - answeredCount === 1 ? '' : 's'} left
             </h2>
 
-            <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+            <p className="mt-3 text-ink-soft">
               A report is made once, when the interview ends. If you stop now, this mock is used up
               and the {questions.length - answeredCount} question
               {questions.length - answeredCount === 1 ? '' : 's'} you have not answered cannot be
@@ -1174,20 +1321,14 @@ export function InterviewRoom({
             </div>
 
             <div className="mt-5 flex flex-col gap-2">
-              <button
-                onClick={() => setEndConfirm(false)}
-                className="w-full rounded-control bg-ink py-3 text-sm font-semibold text-white"
-              >
+              <Button variant="secondary" onClick={() => setEndConfirm(false)} full>
                 Go back and finish the interview
-              </button>
-              <button
-                onClick={finish}
-                className="w-full rounded-control border border-line-strong bg-surface py-3 text-sm font-medium text-ink-soft"
-              >
+              </Button>
+              <Button variant="tertiary" onClick={finish} full>
                 Stop anyway and use up this mock
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
     </div>

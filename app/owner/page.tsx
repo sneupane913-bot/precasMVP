@@ -2,6 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import { PasscodeInput } from '@/components/PasscodeInput';
+import {
+  Page,
+  Card,
+  SectionTitle,
+  Field,
+  Input,
+  Textarea,
+  Button,
+  Banner,
+  Status,
+  Spinner,
+} from '@/components/ui';
 
 /**
  * Owner control. Not linked from anywhere in the product.
@@ -10,6 +22,15 @@ import { PasscodeInput } from '@/components/PasscodeInput';
  * unusual here is only who holds it: OWNER_ACCESS_KEY is a separate secret from
  * SUPER_ADMIN_PASSCODE, so a super admin can run the whole business and still
  * cannot reach this page or flip this switch.
+ *
+ * ON THE CONVERSION TO THE KIT: layout only. Both effects, `apply()`, the
+ * confirm step and the audit list are unchanged.
+ *
+ * One thing the kit fixes for free. The live state used to be a sentence in
+ * 13px grey at the very bottom of the page — the single most important fact on
+ * a screen whose only job is "is the platform up?", placed where nobody looks.
+ * It is now a `Status` at the TOP, which is a dot AND a word, because a colour
+ * on its own would be D-32 all over again on the highest-stakes switch we own.
  */
 export default function OwnerPage() {
   const [key, setKey] = useState('');
@@ -143,142 +164,144 @@ export default function OwnerPage() {
   }
 
   return (
-    <main className="mx-auto max-w-xl p-5 sm:p-8">
-      <h1 className="mb-1 text-2xl font-bold text-ink">Owner control</h1>
-      <p className="mb-6 text-ink-soft">
-        This page is not linked from anywhere. Only your owner key opens it.
-      </p>
-
-      <label className="mb-1 block text-sm font-semibold text-ink">Owner key</label>
-      <PasscodeInput value={key} onChange={setKey} placeholder="Your owner key" name="owner-key" />
-
-      <div className="mb-6 rounded-card border-2 border-line bg-surface p-5">
-        <h2 className="mb-1 font-bold text-ink">Message students will see</h2>
-        <p className="mb-4 text-sm text-ink-soft">
-          Shown on every page while the platform is off.
-        </p>
-
-        <label className="mb-1 block text-sm font-semibold text-ink">Heading</label>
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="mb-4 w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
-        />
-
-        <label className="mb-1 block text-sm font-semibold text-ink">Message</label>
-        <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          rows={4}
-          className="mb-4 w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
-        />
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="mb-1 block text-sm font-semibold text-ink">Contact name</label>
-            <input
-              value={contactName}
-              onChange={(e) => setContactName(e.target.value)}
-              placeholder="Your name"
-              className="w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-semibold text-ink">Contact number</label>
-            <input
-              value={contactPhone}
-              onChange={(e) => setContactPhone(e.target.value)}
-              placeholder="98XXXXXXXX"
-              className="w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
-            />
-          </div>
-        </div>
-      </div>
-
-      {error && (
-        <p className="mb-4 rounded-control border-2 border-stop/30 bg-stop-tint px-4 py-3 font-medium text-stop">
-          {error}
-        </p>
-      )}
-      {result && (
-        <p className="mb-4 rounded-control border-2 border-go/30 bg-go-tint px-4 py-3 font-medium text-go-dark">
-          {result}
-        </p>
-      )}
-
-      {!confirming ? (
-        <div className="flex flex-col gap-3">
-          <button
-            onClick={() => setConfirming(true)}
-            disabled={!key || busy}
-            className="w-full rounded-control bg-stop px-6 py-4 text-lg font-bold text-white disabled:bg-line-strong"
-          >
-            Turn the platform OFF
-          </button>
-          <button
-            onClick={() => apply(false)}
-            disabled={!key || busy}
-            className="w-full rounded-control border-2 border-line-strong px-6 py-3.5 text-base font-semibold text-ink-soft disabled:opacity-40"
-          >
-            Turn the platform back ON
-          </button>
-        </div>
-      ) : (
-        <div className="rounded-card border-2 border-stop/40 bg-stop-tint p-5">
-          <p className="mb-1 font-bold text-stop">Turn the whole platform off?</p>
-          <p className="mb-4 text-sm leading-relaxed text-stop/90">
-            Every student, every consultancy, everyone. They will see your message and your phone
-            number. You can turn it back on from this page at any time. Nothing is deleted.
+    <Page>
+      <div className="mx-auto flex w-full max-w-[640px] flex-col gap-6">
+        <header className="flex flex-col gap-3">
+          <h1 className="font-serif text-[2rem] font-bold leading-tight tracking-tight text-ink md:text-display">
+            Owner control
+          </h1>
+          <p className="text-ink-soft">
+            This page is not linked from anywhere. Only your owner key opens it.
           </p>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <button
-              onClick={() => apply(true)}
-              disabled={busy}
-              className="flex-1 rounded-control bg-stop px-5 py-3.5 font-bold text-white"
-            >
-              {busy ? 'Working...' : 'Yes, turn it off now'}
-            </button>
-            <button
-              onClick={() => setConfirming(false)}
-              className="flex-1 rounded-control border-2 border-line-strong bg-surface px-5 py-3.5 font-semibold text-ink-soft"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+          {/* The live state, first and stated in words. Read from the server,
+              not from this browser — which is the whole of D-12. */}
+          <Card tone={enabled ? 'stop' : 'go'} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+            <Status tone={enabled ? 'stop' : 'go'}>
+              {enabled ? 'Platform is OFF for everyone' : 'Platform is ON and working normally'}
+            </Status>
+            <span className="text-micro text-ink-quiet">read from the server</span>
+          </Card>
+        </header>
 
-      {/* QA H3: a switch whose stated purpose is a commercial dispute needs a
-          record, because later somebody will ask who paused it and when. */}
-      {audit.length > 0 && (
-        <section className="mt-8 overflow-hidden rounded-card border-2 border-line bg-surface">
-          <div className="border-b border-line p-5">
-            <h2 className="font-bold text-ink">History of this switch</h2>
-            <p className="text-sm text-ink-soft">Newest first. Kept as a record.</p>
-          </div>
-          <ul className="divide-y divide-line">
-            {audit.map((a, i) => (
-              <li key={`${a.at}-${i}`} className="flex flex-wrap justify-between gap-2 px-5 py-3">
-                <span
-                  className={`font-semibold ${
-                    a.action === 'paused' ? 'text-stop' : 'text-go-dark'
-                  }`}
-                >
-                  {a.action === 'paused' ? 'Platform paused' : 'Platform resumed'}
-                </span>
-                <span className="text-sm text-ink-quiet">
-                  {new Date(a.at).toLocaleString()} · {a.ip || 'unknown source'}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+        <Field label="Owner key" id="owner-key">
+          <PasscodeInput
+            value={key}
+            onChange={setKey}
+            placeholder="Your owner key"
+            name="owner-key"
+          />
+        </Field>
 
-      <p className="mt-6 text-micro leading-relaxed text-ink-quiet">
-        Platform right now: <strong>{enabled ? 'OFF' : 'ON'}</strong>. Read from the server, not from
-        this browser.
-      </p>
-    </main>
+        <Card className="flex flex-col gap-4">
+          <div>
+            <SectionTitle>Message students will see</SectionTitle>
+            <p className="mt-3 text-sm text-ink-soft">
+              Shown on every page while the platform is off.
+            </p>
+          </div>
+
+          <Field label="Heading" id="maintenance-title">
+            <Input
+              id="maintenance-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </Field>
+
+          <Field label="Message" id="maintenance-message">
+            <Textarea
+              id="maintenance-message"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              rows={4}
+            />
+          </Field>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Contact name" id="contact-name">
+              <Input
+                id="contact-name"
+                value={contactName}
+                onChange={(e) => setContactName(e.target.value)}
+                placeholder="Your name"
+              />
+            </Field>
+            <Field label="Contact number" id="contact-phone">
+              <Input
+                id="contact-phone"
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
+                placeholder="98XXXXXXXX"
+              />
+            </Field>
+          </div>
+        </Card>
+
+        {error && <Banner tone="stop" title={error} />}
+        {result && <Banner tone="go" title={result} />}
+
+        {!confirming ? (
+          <div className="flex flex-col gap-3">
+            <Button variant="danger" onClick={() => setConfirming(true)} disabled={!key || busy} full>
+              Turn the platform OFF
+            </Button>
+            <Button variant="tertiary" onClick={() => apply(false)} disabled={!key || busy} full>
+              Turn the platform back ON
+            </Button>
+          </div>
+        ) : (
+          /* Not a modal. The client rejected dismissible popups outright, and a
+             confirmation that appears in place is one a thumb is already near. */
+          <Card tone="stop" className="flex flex-col gap-4">
+            <div>
+              <p className="font-serif text-lg font-bold text-stop">Turn the whole platform off?</p>
+              <p className="mt-1 text-ink-soft">
+                Every student, every consultancy, everyone. They will see your message and your
+                phone number. You can turn it back on from this page at any time. Nothing is
+                deleted.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Button variant="danger" onClick={() => apply(true)} disabled={busy} className="flex-1">
+                {busy ? (
+                  <>
+                    <Spinner />
+                    Working...
+                  </>
+                ) : (
+                  'Yes, turn it off now'
+                )}
+              </Button>
+              <Button variant="tertiary" onClick={() => setConfirming(false)} className="flex-1">
+                Cancel
+              </Button>
+            </div>
+          </Card>
+        )}
+
+        {/* QA H3: a switch whose stated purpose is a commercial dispute needs a
+            record, because later somebody will ask who paused it and when. */}
+        {audit.length > 0 && (
+          <section className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
+            <header className="border-b border-line p-5">
+              <h2 className="font-serif text-title font-semibold text-ink">History of this switch</h2>
+              <p className="text-sm text-ink-soft">Newest first. Kept as a record.</p>
+            </header>
+            <ul className="divide-y divide-line">
+              {audit.map((a, i) => (
+                <li key={`${a.at}-${i}`} className="flex flex-wrap items-center justify-between gap-2 px-5 py-3">
+                  <Status tone={a.action === 'paused' ? 'stop' : 'go'}>
+                    {a.action === 'paused' ? 'Platform paused' : 'Platform resumed'}
+                  </Status>
+                  <span className="text-sm text-ink-quiet">
+                    {new Date(a.at).toLocaleString()} · {a.ip || 'unknown source'}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+    </Page>
   );
 }

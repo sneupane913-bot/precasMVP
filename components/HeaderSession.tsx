@@ -140,7 +140,7 @@ export function HeaderSession({ initial }: { initial?: SessionSnapshot }) {
       <>
         <Link
           href="/start"
-          className="hidden text-sm font-semibold text-ink-soft transition-colors duration-tap ease-move hover:text-ink sm:inline"
+          className="hidden min-h-tap items-center px-2 text-sm font-semibold text-ink-soft transition-colors duration-tap ease-move hover:text-ink sm:inline-flex"
         >
           Sign in
         </Link>
@@ -175,7 +175,7 @@ export function HeaderSession({ initial }: { initial?: SessionSnapshot }) {
         <Link
           href="/account"
           title={`${session.mocksLeft} mock interviews and ${session.practiceLeft ?? 0} practice questions left`}
-          className={`hidden rounded-full border px-3 py-1.5 text-micro font-bold transition-colors duration-tap ease-move sm:inline ${
+          className={`hidden min-h-tap items-center rounded-full border px-3 py-1.5 text-micro font-bold transition-colors duration-tap ease-move sm:inline-flex ${
             session.mocksLeft <= 1
               ? 'border-warn/30 bg-warn-tint text-warn hover:bg-warn-tint/70'
               : 'border-line bg-surface-sunk text-ink-soft hover:bg-surface'
@@ -192,7 +192,7 @@ export function HeaderSession({ initial }: { initial?: SessionSnapshot }) {
           door does not exist. */}
       <Link
         href="/dashboard"
-        className="hidden text-sm font-semibold text-ink-soft transition-colors duration-tap ease-move hover:text-ink sm:inline"
+        className="hidden min-h-tap items-center px-2 text-sm font-semibold text-ink-soft transition-colors duration-tap ease-move hover:text-ink sm:inline-flex"
       >
         My practice
       </Link>

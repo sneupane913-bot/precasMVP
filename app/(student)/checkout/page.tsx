@@ -5,6 +5,17 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ContactUs } from '@/components/ContactUs';
 import { publicPlans } from '@/lib/data/plans';
+import {
+  Card,
+  Field,
+  Input,
+  Button,
+  ButtonLink,
+  Banner,
+  Check,
+  Spinner,
+  Status,
+} from '@/components/ui';
 
 /**
  * The packs offered on this page, read from plans.ts.
@@ -59,6 +70,22 @@ export default function CheckoutPage() {
  * The other thing this screen must do is tell the student exactly where they
  * are. A student who has paid and sees nothing happen concludes they have been
  * cheated, and that is the biggest trust risk in the product.
+ *
+ * ---------------------------------------------------------------------------
+ * ON THE CONVERSION TO THE KIT
+ *
+ * Layout only. `createOrder`, `submit`, `uploadShot`, the re-price effect, the
+ * D-17 fallback-number effect and the 60-second poll are unchanged, and so is
+ * every disabled condition on the submit button. This is the screen where money
+ * moves; nothing here was rewritten for looks.
+ *
+ * The one visible change worth naming: the "we have your details" step used to
+ * draw its three-step progress as a bulleted list with a tick and two dots, so
+ * the student's position in the queue was carried by PUNCTUATION. It is now
+ * three `Status` rows, each with a word. Same three steps, same order — but
+ * "Checking our bank record" now says it is the one happening rather than
+ * leaving a bullet to imply it.
+ * ---------------------------------------------------------------------------
  */
 function Checkout() {
   const params = useSearchParams();
@@ -97,6 +124,16 @@ function Checkout() {
   const whatsappDigits = whatsapp.replace(/\D/g, '');
   const whatsappLooksRight = /^(977)?9[678]\d{8}$/.test(whatsappDigits);
   const [error, setError] = useState<string | null>(null);
+  /**
+   * The REASON for the refusal, not just its wording.
+   *
+   * The code was being thrown away and only `userMessage` kept, which is why
+   * the screen below could show a refusal it had no way to answer. Branching on
+   * the code rather than on the sentence matters: the sentence is copy and will
+   * be reworded, and a check that greps English is a check that breaks silently
+   * the first time somebody improves the English.
+   */
+  const [errorCode, setErrorCode] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [shotName, setShotName] = useState<string | null>(null);
   const [shotNote, setShotNote] = useState<string | null>(null);
@@ -138,6 +175,7 @@ function Checkout() {
   async function createOrder() {
     setBusy(true);
     setError(null);
+    setErrorCode(null);
     try {
       const res = await fetch('/api/payment', {
         method: 'POST',
@@ -148,8 +186,10 @@ function Checkout() {
       const json = await res.json();
       if (!json.ok) {
         setError(json.error.userMessage);
+        setErrorCode(json.error.code ?? null);
         return;
       }
+      setErrorCode(null);
       setOrder(json.data);
       setState('paying');
     } catch {
@@ -256,46 +296,50 @@ function Checkout() {
 
   if (state === 'verified') {
     return (
-      <main className="mx-auto max-w-md px-5 py-12 text-center">
-        <div className="mb-4 text-5xl">✓</div>
-        <h1 className="mb-2 font-serif text-2xl text-ink">Payment approved</h1>
-        <p className="mb-6 leading-relaxed text-ink-soft">
+      <main className="mx-auto flex w-full max-w-md flex-col items-center gap-4 px-4 py-12 text-center">
+        <span className="grid h-16 w-16 place-items-center rounded-full bg-go-tint">
+          <Check className="h-8 w-8" />
+        </span>
+        <h1 className="font-serif text-title font-bold text-ink">Payment approved</h1>
+        <p className="text-ink-soft">
           Your credits have been added. You can finish the questions you started and take your full
           mock interviews.
         </p>
-        <a
-          href="/universities"
-          className="inline-flex w-full items-center justify-center rounded-control bg-go px-6 py-4 text-lg font-bold text-white"
-        >
+        <ButtonLink href="/universities" full className="mt-2">
           Continue practising
-        </a>
+        </ButtonLink>
       </main>
     );
   }
 
   return (
-    <main className="mx-auto max-w-md px-5 py-8">
+    <main className="mx-auto flex w-full max-w-md flex-col gap-5 px-4 py-8">
       {/* B22: a student paying money had no branding and no way out of this
           page. Both matter most exactly here, at the moment they part with
           cash. Deliberately minimal so nothing competes with paying. */}
-      <div className="mb-8 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-control bg-go font-black text-white">
+      <div className="flex items-center justify-between">
+        <Link href="/" className="flex min-h-tap items-center gap-2">
+          <span className="grid h-8 w-8 place-items-center rounded-control bg-go font-serif font-bold text-white">
             P
           </span>
-          <span className="font-serif text-base text-ink">PreCAS Practice</span>
+          <span className="font-serif text-base font-semibold text-ink">PreCAS Practice</span>
         </Link>
-        <Link href="/pricing" className="text-sm font-semibold text-ink-quiet hover:text-ink">
+        <Link
+          href="/pricing"
+          className="inline-flex min-h-tap items-center px-2 text-sm font-semibold text-ink-quiet transition-colors duration-tap ease-move hover:text-ink"
+        >
           Back to packs
         </Link>
       </div>
 
-      <h1 className="mb-1 font-serif text-2xl text-ink">Pay to continue</h1>
-      {order && (
-        <p className="mb-4 text-ink-soft">
-          {order.packName}: {order.mocks} mock interviews and {order.practice} practice sessions.
-        </p>
-      )}
+      <header>
+        <h1 className="font-serif text-title font-bold text-ink">Pay to continue</h1>
+        {order && (
+          <p className="mt-1 text-ink-soft">
+            {order.packName}: {order.mocks} mock interviews and {order.practice} practice sessions.
+          </p>
+        )}
+      </header>
 
       {/* ------------------------------------------------------------------
           SWITCH PACK HERE. Client's request, and it removes a real trap:
@@ -309,43 +353,74 @@ function Checkout() {
           come from plans.ts so they cannot drift from the ledger.
           ------------------------------------------------------------------ */}
       {state === 'choosing' && (
-        <fieldset className="mb-6 rounded-card border border-line bg-surface p-4">
-          <legend className="px-1 text-sm font-semibold text-ink">Which pack?</legend>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {PACK_CHOICES.map((p) => {
-              const on = pack === p.code;
-              return (
-                <label
-                  key={p.code}
-                  className={`flex cursor-pointer items-start gap-3 rounded-control border-2 p-3 transition ${
-                    on ? 'border-go bg-go-tint' : 'border-line hover:border-line-strong'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="pack"
-                    checked={on}
-                    onChange={() => switchPack(p.code)}
-                    className="mt-1 h-4 w-4 accent-emerald-600"
-                  />
-                  <span>
-                    <span className="block font-bold text-ink">NPR {p.priceNpr}</span>
-                    <span className="block text-sm text-ink-soft">
-                      {p.mockInterviews} mock interviews, {p.practiceSessions} practice
+        <Card as="section">
+          <fieldset>
+            <legend className="mb-3 text-sm font-semibold text-ink">Which pack?</legend>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {PACK_CHOICES.map((p) => {
+                const on = pack === p.code;
+                return (
+                  <label
+                    key={p.code}
+                    className={`flex min-h-tap cursor-pointer items-start gap-3 rounded-control border-2 p-3 transition-colors duration-tap ease-move ${
+                      on ? 'border-go bg-go-tint' : 'border-line hover:border-line-strong'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="pack"
+                      checked={on}
+                      onChange={() => switchPack(p.code)}
+                      className="mt-1 h-4 w-4 accent-go"
+                    />
+                    <span>
+                      <span className="block font-bold text-ink">NPR {p.priceNpr}</span>
+                      <span className="block text-sm text-ink-soft">
+                        {p.mockInterviews} mock interviews, {p.practiceSessions} practice
+                      </span>
                     </span>
-                  </span>
-                </label>
-              );
-            })}
-          </div>
-        </fieldset>
+                  </label>
+                );
+              })}
+            </div>
+          </fieldset>
+        </Card>
       )}
 
       {error && (
-        <div className="mb-4">
-          <p className="rounded-control border-2 border-stop/30 bg-stop-tint px-4 py-3 font-medium text-stop">
-            {error}
-          </p>
+        <div className="flex flex-col gap-3">
+          {/* ------------------------------------------------------------------
+              A REFUSAL WITH NOTHING TO PRESS IS A DEAD END.
+
+              A signed-out student who follows a price button, or returns to a
+              bookmarked /checkout, got a red box reading "Please sign in before
+              paying." and NOTHING else — no sign-in control, and the ContactUs
+              fallback under it renders empty whenever no support number has been
+              set. So the one screen whose entire job is to take money ended in a
+              refusal the student could not answer.
+
+              This is the same rule `/universities` already follows (WALK 1.11):
+              the server sends the way out WITH the refusal, and it is rendered
+              as a real button under the sentence.
+
+              The `?next=` carries the chosen pack through the sign-in detour, so
+              a student who picked Serious comes back to Serious rather than to
+              the default — which is the exact fix PricingPacks makes on the
+              button that sent them here.
+              ------------------------------------------------------------------ */}
+          <Banner
+            tone={errorCode === 'NOT_SIGNED_IN' ? 'warn' : 'stop'}
+            title={error}
+            action={
+              errorCode === 'NOT_SIGNED_IN' ? (
+                <ButtonLink
+                  href={`/start?next=${encodeURIComponent(`/checkout?pack=${pack}`)}`}
+                >
+                  Sign in and carry on
+                </ButtonLink>
+              ) : undefined
+            }
+          />
           {/* D-17. When `create` failed the page collapsed to a pack picker and
               this red box, and the "Talk to a person" card went with it, because
               every contact card was fed from the order that had just failed to
@@ -354,7 +429,6 @@ function Checkout() {
               first thing we still offer is a human. */}
           {!order && (
             <ContactUs
-              className="mt-3"
               whatsapp={fallbackWhatsapp}
               message="Hello, I am trying to pay for a PreCAS Practice pack and the checkout is not working."
               urgent
@@ -364,43 +438,57 @@ function Checkout() {
       )}
 
       {state === 'submitted' && (
-        <div className="rounded-card border-2 border-line-strong bg-surface-sunk p-5">
-          <p className="mb-1 font-bold text-brand-light">We have your payment details</p>
-          <p className="mb-3 text-sm leading-relaxed text-brand-light/90">
-            A person checks this against our bank record, so please allow up to{' '}
-            <strong>{order?.waitHours ?? 4} hours</strong>. You do not need to pay again, and you do
-            not need to stay on this page. Your credits switch on by themselves the moment it is
-            approved.
-          </p>
+        <Card tone="sunk" className="flex flex-col gap-4">
+          <div>
+            <p className="font-serif text-lg font-bold text-brand-light">
+              We have your payment details
+            </p>
+            <p className="mt-1 text-ink-soft">
+              A person checks this against our bank record, so please allow up to{' '}
+              <strong>{order?.waitHours ?? 4} hours</strong>. You do not need to pay again, and you
+              do not need to stay on this page. Your credits switch on by themselves the moment it
+              is approved.
+            </p>
+          </div>
+
           {/* The client's point: a student who has sent real money and heard
               nothing has exactly one question — "who do I call" — and this
-              screen did not answer it. */}
-          <ol className="mb-4 space-y-1 text-sm text-brand-light/90">
-            <li>✓ Payment details received</li>
-            <li>• Checking our bank record</li>
-            <li>• Credits added</li>
+              screen did not answer it.
+
+              D-9. Each step carries a word for where it is, not a bullet
+              character that a student has to decode. */}
+          <ol className="flex flex-col gap-2">
+            <li>
+              <Status tone="go">Payment details received</Status>
+            </li>
+            <li>
+              <Status tone="warn">Checking our bank record — happening now</Status>
+            </li>
+            <li>
+              <Status tone="neutral">Credits added — not yet</Status>
+            </li>
           </ol>
 
           {/* Their own copy of what we hold. A student who has paid and can
               quote a reference back to us is a student who does not feel
               cheated while they wait. */}
           {order && (
-            <dl className="mb-4 rounded-control bg-surface/70 p-4 text-sm">
+            <dl className="rounded-control bg-surface p-4 text-sm">
               <div className="flex justify-between gap-3 py-0.5">
-                <dt className="text-brand-light/70">Amount</dt>
-                <dd className="font-bold text-brand-light">NPR {order.amountNpr.toLocaleString()}</dd>
+                <dt className="text-ink-quiet">Amount</dt>
+                <dd className="font-bold text-ink">NPR {order.amountNpr.toLocaleString()}</dd>
               </div>
               <div className="flex justify-between gap-3 py-0.5">
-                <dt className="text-brand-light/70">Transaction number</dt>
-                <dd className="font-mono font-bold text-brand-light">{txn.trim()}</dd>
+                <dt className="text-ink-quiet">Transaction number</dt>
+                <dd className="font-mono font-bold text-ink">{txn.trim()}</dd>
               </div>
               <div className="flex justify-between gap-3 py-0.5">
-                <dt className="text-brand-light/70">Reference</dt>
-                <dd className="font-mono text-brand-light">{order.orderId.slice(0, 8)}</dd>
+                <dt className="text-ink-quiet">Reference</dt>
+                <dd className="font-mono text-ink">{order.orderId.slice(0, 8)}</dd>
               </div>
             </dl>
           )}
-          <p className="mb-4 text-micro leading-relaxed text-brand-light/70">
+          <p className="text-micro leading-relaxed text-ink-quiet">
             Keep this reference. If anything goes wrong, quoting it lets us find your payment
             straight away.
           </p>
@@ -413,38 +501,41 @@ function Checkout() {
             message={order?.supportMessage ?? undefined}
             urgent
           />
-        </div>
+        </Card>
       )}
 
       {state === 'rejected' && (
-        <div className="rounded-card border-2 border-warn/40 bg-warn-tint p-5">
-          <p className="mb-1 font-bold text-warn">We could not match that payment yet</p>
+        <Card tone="warn" className="flex flex-col gap-4">
+          <p className="font-serif text-lg font-bold text-warn">
+            We could not match that payment yet
+          </p>
 
           {/* The approver's own words. "The number is one digit short" is
               something a student can act on; "we could not match it" is not. */}
           {rejectedReason && (
-            <p className="mb-3 rounded-control bg-surface/70 px-4 py-3 text-sm font-medium text-warn">
+            <p className="rounded-control bg-surface px-4 py-3 text-sm font-semibold text-warn">
               What we found: {rejectedReason}
             </p>
           )}
 
-          <p className="mb-4 text-sm leading-relaxed text-warn/90">
+          <p className="text-ink-soft">
             This is almost always the transaction number typed slightly wrong. Nothing has been
             taken from you by us, and nothing is closed off. Check the number in your wallet app and
             send it again. If you are sure it is right, message or call us and we will look properly
             with you.
           </p>
-          <button
+          <Button
+            variant="secondary"
+            full
             onClick={() => {
               setState('choosing');
               setTxn('');
               setRejectedReason(null);
               void createOrder();
             }}
-            className="mb-3 w-full rounded-control bg-ink px-5 py-3 font-bold text-white"
           >
             Check the number and try again
-          </button>
+          </Button>
 
           {/* A refusal must never be a dead end. This is the client's rule:
               always a soft rejection, never one they cannot work around. */}
@@ -455,14 +546,18 @@ function Checkout() {
               message={order.supportMessage ?? undefined}
             />
           )}
-        </div>
+        </Card>
       )}
 
       {state === 'paying' && order && (
         <>
-          <div className="mb-5 rounded-card border-2 border-ink bg-surface p-5 text-center">
-            <p className="text-sm text-ink-quiet">Amount to pay</p>
-            <p className="mb-4 text-4xl font-black text-ink">NPR {order.amountNpr.toLocaleString()}</p>
+          <Card className="flex flex-col gap-4 border-2 border-ink text-center">
+            <div>
+              <p className="text-sm text-ink-quiet">Amount to pay</p>
+              <p className="font-serif text-display font-bold text-ink">
+                NPR {order.amountNpr.toLocaleString()}
+              </p>
+            </div>
             {order.payTo.walletNumber ? (
               <>
                 {/* The QR is a convenience, not the only route. Many students
@@ -470,12 +565,14 @@ function Checkout() {
                     work, so the number is always given as well and is always
                     copyable. */}
                 {order.payTo.qrImageUrl && (
-                  <div className="mb-4">
+                  <div>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={order.payTo.qrImageUrl}
                       alt={`${order.payTo.walletName} payment QR code for ${order.payTo.accountName}`}
-                      className="mx-auto h-56 w-56 rounded-control border-2 border-line bg-surface object-contain p-2"
+                      width={224}
+                      height={224}
+                      className="mx-auto h-56 w-56 rounded-control border border-line bg-surface object-contain p-2"
                     />
                     <p className="mt-2 text-micro text-ink-quiet">
                       Scan with your wallet app, then type the amount yourself.
@@ -489,17 +586,18 @@ function Checkout() {
                   <p className="font-bold text-ink">{order.payTo.walletName}</p>
                   <p className="font-mono text-lg font-bold text-ink">{order.payTo.walletNumber}</p>
                   <p className="mb-3 text-ink-soft">{order.payTo.accountName}</p>
-                  <button
+                  <Button
                     type="button"
+                    variant="tertiary"
+                    full
                     onClick={() => {
                       void navigator.clipboard?.writeText(order.payTo.walletNumber);
                       setCopied(true);
                       setTimeout(() => setCopied(false), 2000);
                     }}
-                    className="w-full rounded-control border-2 border-line-strong px-4 py-2 text-sm font-semibold text-ink-soft"
                   >
                     {copied ? 'Copied' : 'Copy the number'}
-                  </button>
+                  </Button>
                 </div>
               </>
             ) : (
@@ -507,16 +605,17 @@ function Checkout() {
                 Payment details are not set up yet. Please contact us on WhatsApp to pay.
               </p>
             )}
-          </div>
+          </Card>
 
-          <div className="rounded-card border border-line bg-surface p-5">
-            <h2 className="mb-1 font-bold text-ink">After you have paid</h2>
-            <p className="mb-4 text-sm leading-relaxed text-ink-soft">
-              Open your wallet app and copy the transaction number from the receipt. That number is
-              how we find your payment.
-            </p>
+          <Card className="flex flex-col gap-4">
+            <div>
+              <h2 className="font-serif text-lg font-bold text-ink">After you have paid</h2>
+              <p className="mt-1 text-ink-soft">
+                Open your wallet app and copy the transaction number from the receipt. That number
+                is how we find your payment.
+              </p>
+            </div>
 
-            <label className="mb-1 block text-sm font-semibold text-ink">Transaction number</label>
             {/* --------------------------------------------------------------
                 The placeholder used to read "0011ABCD2233", which matches no
                 wallet anybody in Nepal actually uses. Three real receipts:
@@ -531,25 +630,34 @@ function Checkout() {
                 Naming all three names is what makes this findable, and real
                 examples are what stop somebody typing the amount instead.
                 -------------------------------------------------------------- */}
-            <p className="mb-2 text-micro leading-relaxed text-ink-quiet">
-              On your receipt this may be called <strong>Transaction Code</strong>,{' '}
-              <strong>Transaction ID</strong> or <strong>Reference Code</strong>. They are all the
-              same thing. Examples: <span className="font-mono">1NOH8C2</span> from eSewa, or{' '}
-              <span className="font-mono">697873804</span> from a bank transfer.
-            </p>
-            <input
-              value={txn}
-              onChange={(e) => setTxn(e.target.value)}
-              placeholder="1NOH8C2  or  697873804"
-              className="mb-3 w-full rounded-control border-2 border-line px-4 py-3 font-mono outline-none focus:border-ink"
-            />
+            <Field
+              label="Transaction number"
+              id="txn"
+              hint={
+                <>
+                  On your receipt this may be called <strong>Transaction Code</strong>,{' '}
+                  <strong>Transaction ID</strong> or <strong>Reference Code</strong>. They are all
+                  the same thing. Examples: <span className="font-mono">1NOH8C2</span> from eSewa,
+                  or <span className="font-mono">697873804</span> from a bank transfer.
+                </>
+              }
+            >
+              <Input
+                id="txn"
+                value={txn}
+                onChange={(e) => setTxn(e.target.value)}
+                placeholder="1NOH8C2  or  697873804"
+                className="font-mono"
+              />
+            </Field>
 
-            <label className="mb-1 block text-sm font-semibold text-ink">Name you paid with</label>
-            <input
-              value={payerName}
-              onChange={(e) => setPayerName(e.target.value)}
-              className="mb-3 w-full rounded-control border-2 border-line px-4 py-3 outline-none focus:border-ink"
-            />
+            <Field label="Name you paid with" id="payer-name">
+              <Input
+                id="payer-name"
+                value={payerName}
+                onChange={(e) => setPayerName(e.target.value)}
+              />
+            </Field>
 
             {/*
               D-19. THE WHOLE NUMBER, not four digits.
@@ -574,62 +682,77 @@ function Checkout() {
               than asking for four digits: the last four are derived from it
               below, so there is one field where there were two.
             */}
-            <label className="mb-1 block text-sm font-semibold text-ink">
-              Your WhatsApp number
-            </label>
-            <p className="mb-2 text-micro leading-relaxed text-ink-quiet">
-              The number your wallet is registered to. We use it only to confirm this payment, and to
-              reach you if we cannot find it. Ten digits, for example{' '}
-              <span className="font-mono">9843205222</span>.
-            </p>
-            <input
-              value={whatsapp}
-              onChange={(e) => {
-                const digits = e.target.value.replace(/\D/g, '').slice(0, 13);
-                setWhatsapp(digits);
-                // The wallet match still uses the last four, derived rather
-                // than asked for a second time.
-                setSuffix(digits.slice(-4));
-              }}
-              inputMode="numeric"
-              placeholder="9843205222"
-              aria-label="Your WhatsApp number"
-              className="mb-1 w-full rounded-control border-2 border-line px-4 py-3 font-mono outline-none focus:border-ink"
-            />
-            <p className="mb-4 text-micro leading-relaxed text-ink-quiet">
-              {whatsappLooksRight
-                ? 'We will send your confirmation to this number.'
-                : 'Please type the full number, including the 98 or 97 at the start.'}
-            </p>
+            <Field
+              label="Your WhatsApp number"
+              id="whatsapp"
+              hint={
+                whatsappLooksRight
+                  ? 'We will send your confirmation to this number.'
+                  : 'The number your wallet is registered to. We use it only to confirm this payment, and to reach you if we cannot find it. Ten digits, including the 98 or 97 at the start.'
+              }
+            >
+              <Input
+                id="whatsapp"
+                value={whatsapp}
+                onChange={(e) => {
+                  const digits = e.target.value.replace(/\D/g, '').slice(0, 13);
+                  setWhatsapp(digits);
+                  // The wallet match still uses the last four, derived rather
+                  // than asked for a second time.
+                  setSuffix(digits.slice(-4));
+                }}
+                inputMode="numeric"
+                placeholder="9843205222"
+                aria-label="Your WhatsApp number"
+                className="font-mono"
+              />
+            </Field>
 
             {/* Optional, and labelled optional. Asking for a screenshot as a
                 requirement would strand every student whose phone storage is
                 full or whose connection drops on a 2 MB upload. */}
-            <label className="mb-1 block text-sm font-semibold text-ink">
-              Picture of the receipt <span className="font-normal text-ink-quiet">(optional)</span>
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) void uploadShot(f);
-              }}
-              className="mb-1 w-full rounded-control border-2 border-dashed border-line px-4 py-3 text-sm file:mr-3 file:rounded-control file:border-0 file:bg-surface-sunk file:px-3 file:py-2 file:text-sm file:font-semibold file:text-ink"
-            />
-            <p className="mb-4 text-micro leading-relaxed text-ink-quiet">
-              {shotNote
-                ? `${shotName ? shotName + ' — ' : ''}${shotNote}`
-                : 'It helps us find your payment faster, but the transaction number above is what we actually check. You can skip this.'}
-            </p>
+            <Field
+              label="Picture of the receipt (optional)"
+              id="receipt"
+              hint={
+                shotNote
+                  ? `${shotName ? shotName + ' — ' : ''}${shotNote}`
+                  : 'It helps us find your payment faster, but the transaction number above is what we actually check. You can skip this.'
+              }
+            >
+              <input
+                id="receipt"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) void uploadShot(f);
+                }}
+                className="w-full rounded-control border-2 border-dashed border-line px-4 py-3 text-sm file:mr-3 file:rounded-control file:border-0 file:bg-surface-sunk file:px-3 file:py-2 file:text-sm file:font-semibold file:text-ink"
+              />
+            </Field>
 
-            <button
+            <Button
               onClick={submit}
               disabled={busy || txn.trim().length < 4 || !payerName.trim() || !whatsappLooksRight}
-              className="w-full rounded-control bg-go px-5 py-4 text-lg font-bold text-white disabled:bg-line-strong"
+              full
             >
-              {busy ? 'Sending...' : 'I have paid'}
-            </button>
+              {busy ? (
+                <>
+                  <Spinner />
+                  Sending...
+                </>
+              ) : (
+                'I have paid'
+              )}
+            </Button>
+
+            {(txn.trim().length < 4 || !payerName.trim() || !whatsappLooksRight) && (
+              <p className="text-sm font-semibold text-stop">
+                Fill in the transaction number, the name you paid with, and your WhatsApp number.
+              </p>
+            )}
+
             {/* N-12. The escape hatch, under the button that might fail.
                 A student who has sent money and hit a problem must not have to
                 hunt for us, and must not have to compose the message. */}
@@ -639,15 +762,8 @@ function Checkout() {
             <ContactUs
               whatsapp={order.supportWhatsapp || fallbackWhatsapp}
               message={order.supportMessage ?? undefined}
-              className="mt-4"
             />
-
-            {(txn.trim().length < 4 || !payerName.trim() || !whatsappLooksRight) && (
-              <p className="mt-2 text-sm font-semibold text-stop">
-                Fill in the transaction number, the name you paid with, and your WhatsApp number.
-              </p>
-            )}
-          </div>
+          </Card>
         </>
       )}
     </main>
