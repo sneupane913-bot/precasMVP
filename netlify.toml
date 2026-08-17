@@ -3,6 +3,18 @@
   publish = ".next"
 
   [build.environment]
+    # Pin the Node major, and pin it in TWO places that agree.
+    #
+    # There was no pin at all, so a fresh Netlify site built on whatever its
+    # default happened to be that week. Next 16 needs Node 20.9 or newer; the
+    # default is currently 22 and this would have worked by luck. A build that
+    # works by luck on the day you move accounts, hours before two students sit
+    # a pilot, is not a build you want.
+    #
+    # `.nvmrc` says 22 as well. Netlify reads that file first and this second,
+    # and they must not disagree.
+    NODE_VERSION = "22"
+
     # Netlify's secret scanner fails the build when it finds an env var value
     # inside the build output. NEXT_PUBLIC_FIREBASE_API_KEY is *meant* to be in
     # the client bundle: a Firebase Web API key identifies the project, it does
