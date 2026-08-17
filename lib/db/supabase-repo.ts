@@ -120,10 +120,37 @@ async function rest(
   };
   const url = `${URL_BASE()}/rest/v1/${path}`;
   try {
-    return await fetch(url, { ...init, headers, cache: 'no-store' });
+    /**
+     * A HANG IS WORSE THAN A REFUSAL, BECAUSE NOTHING GETS TO REPORT IT.
+     *
+     * The site was answering `Unexpected end of JSON input` — an EMPTY body.
+     * Not an error page, nothing at all. That is a Netlify function being
+     * killed: the platform caps them at 10 seconds, and a database that accepts
+     * the connection but never replies burns all ten. The function dies mid
+     * sentence, so every `catch` written below never runs, and the browser is
+     * handed a zero-length response.
+     *
+     * A paused Supabase project behaves exactly like this. The free plan pauses
+     * a project after about a week of inactivity, and a paused project stops
+     * answering without refusing.
+     *
+     * Five seconds is well inside the platform's ten, so WE decide the outcome
+     * rather than the executioner. A real query against a healthy project takes
+     * tens of milliseconds; anything near five seconds is broken regardless.
+     */
+    return await fetch(url, {
+      ...init,
+      headers,
+      cache: 'no-store',
+      signal: AbortSignal.timeout(5000),
+    });
   } catch (e) {
     const cause = (e as { cause?: { code?: string; message?: string } })?.cause;
-    const why = cause?.code ?? cause?.message ?? (e as Error)?.message ?? 'unknown';
+    const named = (e as Error)?.name;
+    const why =
+      named === 'TimeoutError' || named === 'AbortError'
+        ? 'no reply within 5 seconds (the project is most likely PAUSED)'
+        : (cause?.code ?? cause?.message ?? (e as Error)?.message ?? 'unknown');
     const host = hostOf(URL_BASE());
     console.error(`[supabase] cannot reach ${host}: ${why}`);
     throw new SupabaseUnavailable(
