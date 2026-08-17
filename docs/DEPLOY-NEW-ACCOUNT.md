@@ -95,23 +95,64 @@ actually reads, checked against the source rather than remembered.
 |---|---|
 | `DEEPGRAM_API_KEY` | Only runs if Groq **fails** — an outage, or Groq's free hourly ceiling during a busy evening. Costs nothing while Groq is healthy. You chose to keep this. |
 
-### The database — check this one carefully
+### THE AI KEYS ARE NOT ON THE OLD NETLIFY
+
+Read on 17 August from the old site's variable list, which sorts
+alphabetically and begins at `NEXT_PUBLIC_FIREBASE_API_KEY`. Everything that
+would sort before that letter is simply absent:
+
+    DEEPGRAM_API_KEY   GEMINI_API_KEY   GEMINI_MODEL   GROQ_API_KEY
+    MAX_ANSWER_SECONDS   MAX_MOCKS_PER_ACCOUNT_PER_DAY
+    MAX_PAID_CALLS_PER_MONTH   MAX_TRANSCRIPT_WORDS
+    PAY_ACCOUNT_NAME   PAY_QR_IMAGE_URL   PAY_WALLET_NAME
+    REFERRAL_LIFETIME_CAP
+
+If that is right, **the live site has never had speech to text or marking**.
+`sttIsMocked()` returns true when neither `GROQ_API_KEY` nor
+`DEEPGRAM_API_KEY` is set, and `/super` would have been showing *"The AI is not
+switched on yet"* the whole time. Students get clearly-marked sample text
+instead of their own words, and no score is invented from it — the product is
+honest about it — but a pilot run that way measures nothing.
+
+**Check before anything else:** type `GROQ` into the filter box on the old
+site's variables page. If nothing comes back, this is real.
+
+The values you need are in `.env.local` on your Mac, not in Netlify:
+`GROQ_API_KEY` (renamed today from `GROQ_API_KEY_PARKED`), `DEEPGRAM_API_KEY`,
+`GEMINI_API_KEY`, `GEMINI_MODEL`.
+
+### The values Netlify will not show you
+
+Four variables carry a padlock, and Netlify will never display those again —
+that is what "Contains secret values" means, and it is working as designed:
+
+    NEXT_PUBLIC_FIREBASE_API_KEY   OWNER_ACCESS_KEY
+    SESSION_SECRET                 SUPER_ADMIN_PASSCODE
+
+**All four are sitting readable in `.env.local` on your Mac.** Open it in a text
+editor and copy from there. Nothing is lost.
+
+The rest of the old site's variables are unlocked and can be read straight off
+the page: both `NEXT_PUBLIC_SUPABASE_*`, `SUPABASE_SERVICE_ROLE_KEY`,
+`NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`,
+`NEXT_PUBLIC_SUPPORT_WHATSAPP`, `PAY_WALLET_NUMBER`.
+
+Between the two sources you have a complete set. Neither has it alone.
+
+### The database — good news, confirmed 17 August
 
 | Variable | Why |
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Only if the old site had them. |
 | `SUPABASE_SERVICE_ROLE_KEY` | Only if the old site had them. |
 
-**Look for these two in the old site's variables before you do anything else.**
+**Both are present on the old site.** So the store is Supabase, not Netlify
+Blobs, and that settles the question that mattered: copy these two across and
+the new site sees exactly the same students, payments and reports. Nothing is
+left behind, and nothing has to be migrated.
 
-- **If they are there:** copy them, and the new site sees all the same students
-  and payments. Nothing is lost.
-- **If they are NOT there:** the old site was storing everything in Netlify
-  Blobs, which belong to the old site and **do not come with you**. The new site
-  starts completely empty: no students, no payment history, no reports. For a
-  pilot with two fresh students that is fine, and arguably cleaner. But any
-  existing student is left behind on the old site, so do not switch the domain
-  over until you are happy with that.
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` is also set there. No code in this project
+reads it, so it is harmless either way — copy it if you like the symmetry.
 
 ### Cost guards — copy them so the new site behaves like the old one
 
