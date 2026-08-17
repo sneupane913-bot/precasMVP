@@ -56,7 +56,7 @@ PASSED_SUITES=0
 # Suites that read the source and need nothing running. Fast, so they go first:
 # if the copy is wrong or a feature has no door, there is no point booting a
 # server at all.
-STATIC=(reachable-check copy-check header-check route-check design-check ledger-check)
+STATIC=(reachable-check copy-check header-check route-check design-check ledger-check cookie-check)
 
 # Suites that drive a running server.
 SERVER=(

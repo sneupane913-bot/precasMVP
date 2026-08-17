@@ -28,21 +28,53 @@ export async function readOwnerId(): Promise<string | null> {
   return jar.get(OWNER_COOKIE)?.value ?? null;
 }
 
-/** Read it, creating and setting one if absent. Only valid in a route handler. */
-export async function ensureOwnerId(): Promise<string> {
-  const jar = await cookies();
-  const existing = jar.get(OWNER_COOKIE)?.value;
-  if (existing) return existing;
+const OWNER_COOKIE_OPTIONS = {
+  httpOnly: true, // JavaScript cannot read or forge it
+  sameSite: 'lax' as const,
+  secure: process.env.NODE_ENV === 'production',
+  path: '/',
+  maxAge: ONE_YEAR,
+};
 
-  const id = crypto.randomUUID();
-  jar.set(OWNER_COOKIE, id, {
-    httpOnly: true, // JavaScript cannot read or forge it
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    path: '/',
-    maxAge: ONE_YEAR,
-  });
-  return id;
+/**
+ * ---------------------------------------------------------------------------
+ * THE SAME BUG AS THE SIGN-IN COOKIE, AND WORSE IN ITS CONSEQUENCE.
+ *
+ * This used to write the cookie into the ambient jar via `cookies()` and then
+ * `/api/session/create` returned its own `NextResponse`. On Netlify that
+ * `Set-Cookie` is never sent, so the browser has no owner id — and EVERY later
+ * call on that interview (`GET /api/session/[id]`, consent, answer, skip,
+ * complete) guards on `ownsSession(session.ownerId)` and refuses.
+ *
+ * So a student could create an interview and then be locked out of the very
+ * interview they had just created, on the request immediately afterwards. The
+ * session row in the database was perfect. See lib/auth/session.ts for the full
+ * write-up; the rule is the same one: the cookie goes on the response that is
+ * actually returned.
+ * ---------------------------------------------------------------------------
+ */
+
+/** A fresh owner id. The CALLER must attach it with `withOwnerId`. */
+export function newOwnerId(): string {
+  return crypto.randomUUID();
+}
+
+/** Read the caller's id, or mint one. Attaching it is the caller's job. */
+export async function ensureOwnerId(): Promise<string> {
+  return (await readOwnerId()) ?? newOwnerId();
+}
+
+/** Put the owner id on the response that is actually returned. */
+export function withOwnerId<T extends { cookies: { set: (...a: never[]) => unknown } }>(
+  res: T,
+  id: string
+): T {
+  (res.cookies.set as unknown as (n: string, v: string, o: typeof OWNER_COOKIE_OPTIONS) => void)(
+    OWNER_COOKIE,
+    id,
+    OWNER_COOKIE_OPTIONS
+  );
+  return res;
 }
 
 /**

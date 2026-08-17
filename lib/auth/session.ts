@@ -33,15 +33,92 @@ function safeEqual(a: string, b: string): boolean {
   return timingSafeEqual(ab, bb);
 }
 
+/**
+ * ---------------------------------------------------------------------------
+ * THE SIGN-IN LOOP, AND WHY IT SURVIVED EVERY TEST WE WROTE.
+ *
+ * 17 August, on the live Netlify site, a real sign-in produced exactly this:
+ *
+ *     POST /api/auth/firebase  ->  200  {"ok":true,"isNew":true,...
+ *                                        "trial":{"outcome":"granted"}}
+ *     GET  /api/me             ->  200  {"signedIn":false}
+ *     GET  /api/me             ->  200  {"signedIn":false}
+ *
+ * The sign-in WORKED. The account was created, the trial was granted, the
+ * server was happy. And the very next request said the student was signed out,
+ * so every page bounced them back to /start, where they signed in again, for
+ * ever. That is the loop the client has reported three times, and it is not
+ * Firebase, not the authorised domains, not the environment variables, and not
+ * the data store — all four were verified healthy while this was happening.
+ *
+ * THE CAUSE. `setStudentSession` wrote the cookie through `cookies()` from
+ * `next/headers`, and the route handler then returned a BRAND NEW
+ * `NextResponse.json(...)`. Next's own dev server stitches the two together.
+ * The Netlify adapter does not: the cookie is written to a jar that the
+ * returned response never consults, so no `Set-Cookie` header is ever sent.
+ * The browser is then behaving perfectly correctly by not having a session.
+ *
+ * WHY NOTHING CAUGHT IT. Every server suite drives the API with its own cookie
+ * jar and asserts on JSON bodies, and the JSON body here was `{"ok":true}` —
+ * completely truthful. `next dev` locally stitches the cookie on, so it worked
+ * on this machine every single time. It is F-5 in its purest form: proof of the
+ * code mistaken for proof of the product, and only a real browser against the
+ * real deploy could tell the difference.
+ *
+ * THE RULE FROM HERE. In a route handler the cookie goes ON THE RESPONSE THAT
+ * IS RETURNED. Never into an ambient jar the response cannot see. The two
+ * functions below make that the only convenient way to do it.
+ * ---------------------------------------------------------------------------
+ */
+
+/** Everything about the cookie except which response it rides on. */
+export const SESSION_COOKIE = COOKIE;
+
+export function sessionCookieValue(studentId: string): string {
+  return `${studentId}.${sign(studentId)}`;
+}
+
+export const SESSION_COOKIE_OPTIONS = {
+  httpOnly: true,
+  sameSite: 'lax' as const,
+  secure: process.env.NODE_ENV === 'production',
+  path: '/',
+  maxAge: MAX_AGE,
+};
+
+/** A response that carries a signed-in session. Use this in route handlers. */
+export function withStudentSession<T extends { cookies: { set: (...a: never[]) => unknown } }>(
+  res: T,
+  studentId: string
+): T {
+  (res.cookies.set as unknown as (n: string, v: string, o: typeof SESSION_COOKIE_OPTIONS) => void)(
+    COOKIE,
+    sessionCookieValue(studentId),
+    SESSION_COOKIE_OPTIONS
+  );
+  return res;
+}
+
+/** A response that clears the session. Use this in route handlers. */
+export function withoutStudentSession<T extends { cookies: { set: (...a: never[]) => unknown } }>(
+  res: T
+): T {
+  (res.cookies.set as unknown as (n: string, v: string, o: Record<string, unknown>) => void)(
+    COOKIE,
+    '',
+    { ...SESSION_COOKIE_OPTIONS, maxAge: 0 }
+  );
+  return res;
+}
+
+/**
+ * The ambient-jar versions. Still correct inside a Server Action or a page,
+ * where Next owns the response. NOT to be used in a route handler that
+ * constructs its own response — see the note above.
+ */
 export async function setStudentSession(studentId: string): Promise<void> {
   const jar = await cookies();
-  jar.set(COOKIE, `${studentId}.${sign(studentId)}`, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    path: '/',
-    maxAge: MAX_AGE,
-  });
+  jar.set(COOKIE, sessionCookieValue(studentId), SESSION_COOKIE_OPTIONS);
 }
 
 export async function clearStudentSession(): Promise<void> {

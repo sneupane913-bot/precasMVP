@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { clearStudentSession } from '@/lib/auth/session';
+import { withoutStudentSession } from '@/lib/auth/session';
 
 export const runtime = 'nodejs';
 
@@ -17,6 +17,7 @@ export const runtime = 'nodejs';
  * and quietly sign people out just for hovering near it.
  */
 export async function POST(req: Request) {
-  await clearStudentSession();
-  return NextResponse.redirect(new URL('/?signedout=1', req.url), { status: 303 });
+  return withoutStudentSession(
+    NextResponse.redirect(new URL('/?signedout=1', req.url), { status: 303 })
+  );
 }

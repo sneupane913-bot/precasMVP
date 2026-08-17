@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { verifyFirebaseIdToken } from '@/lib/auth/firebase';
-import { setStudentSession, newReferralCode } from '@/lib/auth/session';
+import { withStudentSession, newReferralCode } from '@/lib/auth/session';
 import { repo, type Student } from '@/lib/db';
 import { evaluateTrial } from '@/lib/trial-gate';
 import { grantTrial, grantSeat } from '@/lib/entitlement';
@@ -174,7 +174,9 @@ export async function POST(req: Request) {
     if (decision.outcome === 'granted') await grantTrial(student.id);
   }
 
-  await setStudentSession(student.id);
+  // The session rides on the response we actually return. Writing it to the
+  // ambient cookie jar left this route answering {"ok":true} while the browser
+  // received no Set-Cookie at all — the sign-in loop. See lib/auth/session.ts.
 
   const result: ApiResult<{
     isNew: boolean;
@@ -194,5 +196,5 @@ export async function POST(req: Request) {
       trial: { outcome: decision.outcome, message: decision.message },
     },
   };
-  return NextResponse.json(result);
+  return withStudentSession(NextResponse.json(result), student.id);
 }

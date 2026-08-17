@@ -13,7 +13,7 @@ import { weakestCategoryFor } from '@/lib/advice';
 import { platformDown } from '@/lib/platform';
 import { supportWhatsapp } from '@/lib/support';
 import { rateLimit, clientIp, LIMITS as RL, maxMocksPerDay } from '@/lib/rate-limit';
-import { ensureOwnerId } from '@/lib/owner-session';
+import { ensureOwnerId, withOwnerId } from '@/lib/owner-session';
 import { currentStudent, currentStudentEvenIfDisabled } from '@/lib/auth/session';
 import { entitlementFor } from '@/lib/entitlement';
 import { repo } from '@/lib/db';
@@ -320,5 +320,8 @@ export async function POST(req: Request) {
     ok: true,
     data: { sessionId: session.id, questions, questionLimit },
   };
-  return NextResponse.json(result);
+  // The owner id must ride on THIS response. Without it the browser never
+  // receives the cookie, and the student is refused by every guard on the
+  // interview they have just created. See lib/owner-session.ts.
+  return withOwnerId(NextResponse.json(result), ownerId);
 }

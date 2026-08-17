@@ -130,6 +130,8 @@ process, the reason is stated on the line.
 | S-67 | A normal answer is never wrongly told we missed some of it | **BUILT + PROVEN** | ai AI-23 |
 | S-68 | Personal numbers are stripped before storage or before reaching a model | **BUILT + SOURCE-CHECKED** | ai AI-14. Cannot be driven without a real transcript containing a passport number |
 | S-69 | Whisper's stock hallucinations on silence are treated as silence | **BUILT + SOURCE-CHECKED** | ai AI-13. Needs the real provider to drive |
+| S-69a | Deepgram is the primary transcriber whenever its key exists; Groq is tried only when Deepgram fails. Broken if both keys are set and the first paid request goes to Groq, or if silence/too-short audio is charged to both providers | **NOT BUILT** | Planned provider contract STT-1 to STT-3 |
+| S-69b | No product instructions or interview vocabulary are sent to Groq as a conditioning prompt. Broken if any `prompt` field leaves this app and can reappear as words the student never said | **NOT BUILT** | Planned provider contract STT-4 |
 | S-70 | Feedback quotes the student's own words back | **BUILT + PROVEN** | ai AI-6 |
 | S-71 | Marked against the same four steps the student saw on screen | **BUILT + PROVEN** | ai AI-7 |
 | S-72 | The trial gate never bans. The worst case is a soft deny that can still browse and buy | **BUILT + PROVEN** | walk 2.3, 2.4 |

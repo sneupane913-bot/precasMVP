@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { currentStudent, clearStudentSession } from '@/lib/auth/session';
+import { currentStudent, withoutStudentSession } from '@/lib/auth/session';
 import { entitlementFor } from '@/lib/entitlement';
 import { activeOfferFor } from '@/lib/rewards';
 import { repo } from '@/lib/db';
@@ -195,6 +195,5 @@ export async function DELETE() {
   }
 
 
-  await clearStudentSession();
-  return NextResponse.json({ ok: true, data: { signedOut: true } });
+  return withoutStudentSession(NextResponse.json({ ok: true, data: { signedOut: true } }));
 }

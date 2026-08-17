@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { currentStudent, clearStudentSession } from '@/lib/auth/session';
+import { currentStudent, withoutStudentSession } from '@/lib/auth/session';
 import { entitlementFor } from '@/lib/entitlement';
 import { activeOfferFor } from '@/lib/rewards';
 import { store } from '@/lib/store';
@@ -228,7 +228,7 @@ export async function POST(req: Request) {
     createdAt: new Date().toISOString(),
   });
 
-  await clearStudentSession();
-
-  return NextResponse.json({ ok: true, data: { sessionsRemoved: removed } });
+  return withoutStudentSession(
+    NextResponse.json({ ok: true, data: { sessionsRemoved: removed } })
+  );
 }
