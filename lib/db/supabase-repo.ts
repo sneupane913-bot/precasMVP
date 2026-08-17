@@ -54,9 +54,68 @@ async function rest(
   return fetch(`${URL_BASE()}/rest/v1/${path}`, { ...init, headers, cache: 'no-store' });
 }
 
+/**
+ * ---------------------------------------------------------------------------
+ * A BROKEN STORE IS AN OUTAGE. IT IS NOT "NO ROWS".
+ *
+ * These four helpers used to swallow every error:
+ *
+ *     if (!res.ok) return [];      // selectRows
+ *     if (!res.ok) return null;    // selectOne / insert / patch
+ *
+ * So a wrong service-role key, a missing table, a denied policy or a typo in
+ * the project URL all came back as "that student does not exist" — and the
+ * product believed it. On 17 August the live site did this on every sign-in:
+ *
+ *     POST /api/auth/firebase -> 200 {"ok":true,"isNew":true,...}
+ *     GET  /api/me            -> 200 {"signedIn":false}
+ *
+ * `isNew:true` EVERY TIME, with a fresh referral code each time, because
+ * `getStudentByAuthId` could not read back the student it had just written.
+ * And `currentStudent()` returned null for the same reason, so every page
+ * bounced the student to /start and they signed in again, for ever.
+ *
+ * This is PILOT-01 exactly, the worst bug in this project's history, which was
+ * found and fixed in `blob-repo.ts` and never fixed here. Its own comment says
+ * it: "a BROKEN STORE looks exactly like A STUDENT WHO DOES NOT EXIST".
+ *
+ * WHY IT HID FOR SO LONG. `.env.local` has no Supabase keys, so every local
+ * run and every test suite uses the in-memory store and passes. Supabase is
+ * only ever exercised on Netlify. "It works on localhost" was true and told us
+ * nothing, because localhost was not running this code path at all.
+ *
+ * From here an outage is loud, and it carries Postgres's own words — the
+ * message that says `relation "students" does not exist`, or `invalid API
+ * key`, instead of a shrug.
+ * ---------------------------------------------------------------------------
+ */
+export class SupabaseUnavailable extends Error {
+  readonly status: number;
+  constructor(what: string, status: number, body: string) {
+    super(
+      `Supabase ${what} failed with ${status}. ` +
+        `Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, and that ` +
+        `supabase/schema.sql has been run on this project. Supabase said: ${body.slice(0, 300)}`
+    );
+    this.name = 'SupabaseUnavailable';
+    this.status = status;
+  }
+}
+
+async function failLoudly(what: string, res: Response): Promise<never> {
+  let body = '';
+  try {
+    body = await res.text();
+  } catch {
+    body = '(no body)';
+  }
+  console.error(`[supabase] ${what} -> ${res.status} ${body.slice(0, 300)}`);
+  throw new SupabaseUnavailable(what, res.status, body);
+}
+
 async function selectRows(path: string): Promise<Row[]> {
   const res = await rest(path);
-  if (!res.ok) return [];
+  if (!res.ok) await failLoudly(`read ${path.split('?')[0]}`, res);
   return (await res.json()) as Row[];
 }
 
@@ -71,7 +130,10 @@ async function insert(table: string, row: Row): Promise<Row | null> {
     body: JSON.stringify(row),
     prefer: 'return=representation',
   });
-  if (!res.ok) return null;
+  // 409 is a unique-index conflict, which is a real answer rather than an
+  // outage: the caller asked to create something that already exists.
+  if (res.status === 409) return null;
+  if (!res.ok) await failLoudly(`insert into ${table}`, res);
   const rows = (await res.json()) as Row[];
   return rows[0] ?? null;
 }
@@ -82,7 +144,7 @@ async function patch(table: string, filter: string, row: Row): Promise<Row | nul
     body: JSON.stringify(row),
     prefer: 'return=representation',
   });
-  if (!res.ok) return null;
+  if (!res.ok) await failLoudly(`update ${table}`, res);
   const rows = (await res.json()) as Row[];
   return rows[0] ?? null;
 }
