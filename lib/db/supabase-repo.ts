@@ -31,14 +31,81 @@ import type {
  * Schema: supabase/schema.sql. Run it once before switching this on.
  */
 
-const URL_BASE = () => (process.env.NEXT_PUBLIC_SUPABASE_URL ?? '').replace(/\/$/, '');
-const KEY = () => process.env.SUPABASE_SERVICE_ROLE_KEY ?? '';
+/**
+ * CLEAN THE VALUES BEFORE USING THEM, BECAUSE THEY WERE TYPED BY A HUMAN.
+ *
+ * These two are pasted by hand into a dashboard, and a paste picks up things
+ * you cannot see: a trailing newline, a stray space, the quotes from a .env
+ * line. Each has a different and thoroughly confusing failure:
+ *
+ *   - a newline or space in the KEY makes it an ILLEGAL HTTP HEADER VALUE, and
+ *     `fetch` then throws `TypeError: fetch failed` BEFORE any request is sent.
+ *     It looks exactly like the database being unreachable, when the database is
+ *     perfectly fine and the header is malformed.
+ *   - whitespace or quotes in the URL produce a malformed request URL, which
+ *     throws in the same indistinguishable way.
+ *
+ * The old code trimmed a trailing slash and nothing else. Trimming everything
+ * costs nothing and removes a whole family of failures that are invisible in
+ * the dashboard — the value LOOKS right, because the damage is a character you
+ * cannot see.
+ */
+function clean(v: string | undefined): string {
+  return (v ?? '')
+    .trim()
+    .replace(/^['"]|['"]$/g, '') // quotes copied from a .env line
+    .replace(/[\r\n\t]/g, '') // newlines and tabs from a wrapped paste
+    .trim();
+}
+
+const URL_BASE = () => clean(process.env.NEXT_PUBLIC_SUPABASE_URL).replace(/\/$/, '');
+const KEY = () => clean(process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 export function supabaseConfigured(): boolean {
   return Boolean(URL_BASE() && KEY());
 }
 
 type Row = Record<string, unknown>;
+
+/**
+ * THE REQUEST NEVER ARRIVING IS A DIFFERENT FAULT FROM IT BEING REFUSED.
+ *
+ * `fetch` throws a bare `TypeError: fetch failed` when the connection cannot be
+ * made at all — the host does not resolve, nothing is listening, or the request
+ * times out. That is what the live site was reporting, and it says nothing
+ * about WHICH of those happened, so it left us guessing between a wrong URL, a
+ * deleted project and a paused one.
+ *
+ * Node hides the real reason one level down, in `error.cause`. This digs it out
+ * and names the host, neither of which is a secret: a Supabase project URL is a
+ * public endpoint, and the key is never included. The next failure will say
+ * `ENOTFOUND xyz.supabase.co` or `ECONNREFUSED` or `timeout` in plain sight
+ * instead of "fetch failed".
+ *
+ * The most common cause on a free plan, by a distance: Supabase PAUSES a
+ * project after about a week of inactivity, and a paused project simply stops
+ * answering. Resuming it is one button in their dashboard.
+ */
+export class SupabaseUnavailable extends Error {
+  readonly status: number;
+  constructor(what: string, status: number, body: string) {
+    super(
+      `Supabase ${what} failed with ${status}. ` +
+        `Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, and that ` +
+        `supabase/schema.sql has been run on this project. Supabase said: ${body.slice(0, 300)}`
+    );
+    this.name = 'SupabaseUnavailable';
+    this.status = status;
+  }
+}
+
+function hostOf(u: string): string {
+  try {
+    return new URL(u).host;
+  } catch {
+    return u ? `(unparseable URL: ${u.slice(0, 60)})` : '(NEXT_PUBLIC_SUPABASE_URL is empty)';
+  }
+}
 
 async function rest(
   path: string,
@@ -51,7 +118,22 @@ async function rest(
     ...(init.prefer ? { Prefer: init.prefer } : {}),
     ...((init.headers as Record<string, string>) ?? {}),
   };
-  return fetch(`${URL_BASE()}/rest/v1/${path}`, { ...init, headers, cache: 'no-store' });
+  const url = `${URL_BASE()}/rest/v1/${path}`;
+  try {
+    return await fetch(url, { ...init, headers, cache: 'no-store' });
+  } catch (e) {
+    const cause = (e as { cause?: { code?: string; message?: string } })?.cause;
+    const why = cause?.code ?? cause?.message ?? (e as Error)?.message ?? 'unknown';
+    const host = hostOf(URL_BASE());
+    console.error(`[supabase] cannot reach ${host}: ${why}`);
+    throw new SupabaseUnavailable(
+      `reach ${host}`,
+      0,
+      `${why}. The database did not answer at all. Most often this is a Supabase ` +
+        `project that has been PAUSED for inactivity — open the Supabase dashboard ` +
+        `and press Restore. Otherwise check NEXT_PUBLIC_SUPABASE_URL.`
+    );
+  }
 }
 
 /**
@@ -89,19 +171,6 @@ async function rest(
  * key`, instead of a shrug.
  * ---------------------------------------------------------------------------
  */
-export class SupabaseUnavailable extends Error {
-  readonly status: number;
-  constructor(what: string, status: number, body: string) {
-    super(
-      `Supabase ${what} failed with ${status}. ` +
-        `Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, and that ` +
-        `supabase/schema.sql has been run on this project. Supabase said: ${body.slice(0, 300)}`
-    );
-    this.name = 'SupabaseUnavailable';
-    this.status = status;
-  }
-}
-
 async function failLoudly(what: string, res: Response): Promise<never> {
   let body = '';
   try {

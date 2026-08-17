@@ -113,16 +113,25 @@ export function FirebaseSignIn({
         });
         const json = (await res.json()) as
           | { ok: true; data: { isNew: boolean; trial: { outcome: string; message: string | null } } }
-          | { ok: false; error: { code: string; userMessage: string } };
+          | { ok: false; error: { code: string; userMessage: string; message?: string } };
         if (!json.ok) {
           setError(json.error.userMessage);
-          setDetail(`server: ${json.error.code}`);
+          // `message` carries the engineer-facing detail — which database, which
+          // host, which error code. It was being thrown away in favour of the
+          // bare code, so a store outage read as "server: STORE_UNAVAILABLE"
+          // and the actual cause lived only in a log nobody was watching.
+          setDetail(json.error.message ? `${json.error.code}: ${json.error.message}` : `server: ${json.error.code}`);
           return;
         }
         onSignedIn(json.data);
-      } catch {
+      } catch (e) {
+        // This catch also fires when the server answered with something that is
+        // not JSON — an unhandled 500 renders an HTML page, and `res.json()`
+        // throws. Saying "check your connection" then points the student at
+        // their own wifi for a fault that is entirely ours, so the real thrown
+        // message is kept and shown.
         setError('We could not reach our server. Check your connection and try again.');
-        setDetail('network: fetch failed');
+        setDetail(`network: ${(e as Error)?.message ?? 'fetch failed'}`);
       } finally {
         setBusy(false);
       }

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { StoreUnavailableError } from '@/lib/db/blob-repo';
+import { SupabaseUnavailable } from '@/lib/db/supabase-repo';
 import { apiError } from '@/lib/types';
 
 /**
@@ -15,11 +16,21 @@ import { apiError } from '@/lib/types';
  * returning 503 here is what breaks the loop.
  */
 export function storeErrorResponse(e: unknown): NextResponse | null {
-  if (!(e instanceof StoreUnavailableError)) return null;
+  /**
+   * BOTH stores, not just the blob one.
+   *
+   * `SupabaseUnavailable` was falling straight through here, so the route threw,
+   * Next answered with an HTML 500, and the browser's `res.json()` blew up. The
+   * student was then shown "We could not reach our server ... network: fetch
+   * failed" — which points at THEIR connection, when the truth was our database
+   * refusing us. Two hours were spent looking at the wrong machine because of
+   * that one missing case.
+   */
+  if (!(e instanceof StoreUnavailableError) && !(e instanceof SupabaseUnavailable)) return null;
 
   // Deliberately logged. A silent storage outage is the worst possible
   // failure: the site looks healthy and simply forgets everybody.
-  console.error('[STORE UNAVAILABLE]', e.message, e.cause);
+  console.error('[STORE UNAVAILABLE]', e.message, (e as { cause?: unknown }).cause);
 
   return NextResponse.json(
     apiError(
