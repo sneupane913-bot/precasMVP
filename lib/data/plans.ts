@@ -67,7 +67,24 @@ export const PLANS: Plan[] = [
   },
   {
     code: 'serious',
-    isPublic: true,
+    /**
+     * WITHDRAWN FROM PUBLIC SALE, 18 August 2026, until the bank grows.
+     *
+     * This pack promises ten sittings. A sitting is 17 questions and the bank
+     * holds 22 root questions, so a student who bought this saw substantially
+     * the whole bank in sitting one and then met it again nine more times.
+     * That is not a product; it is the same mock sold ten times.
+     *
+     * Nothing else changes. The pack still exists, consultancy seats are still
+     * derived from it, and anyone who already holds it keeps exactly what they
+     * bought. It is simply not offered to new buyers.
+     *
+     * TO PUT IT BACK: load the reviewed question bank (401 harvested, sourced,
+     * in PreCAS-question-bank.xlsx) so the bank holds at least 3 x 17 = 51 root
+     * questions, then flip this to true. qa/promise-check.js enforces the rule
+     * and will tell you the moment it is satisfied.
+     */
+    isPublic: false,
     name: 'Serious',
     tagline: 'Build real confidence',
     priceNpr: 799,
