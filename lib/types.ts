@@ -3,6 +3,8 @@
 
 export type VerticalSlug = 'uk-precas';
 
+import type { AnswerKind } from '@/lib/data/timing';
+
 export type QuestionCategory =
   | 'identity'
   | 'education'
@@ -75,7 +77,38 @@ export interface Question {
   institutionId: string | null;
   category: QuestionCategory;
   text: string;
+  /**
+   * The hard cap on the recording. DERIVED from `answerKind` -- see
+   * lib/data/timing.ts, which carries the published sources for every number.
+   * It stays on the type because the room, the API and the evaluator all read
+   * it, and because a question added by an admin may set it directly.
+   */
   timeLimitSeconds: number;
+  /**
+   * What shape of answer the question wants, which is what decides how long
+   * the student gets. Topic does not decide it: "what is your course called"
+   * and "why this university over the others" need very different amounts of
+   * time. Optional so an admin-added question still type-checks; it defaults
+   * to 'explanatory'.
+   */
+  answerKind?: AnswerKind;
+  /**
+   * Seconds to read the question before recording arms. Oxford Brookes is the
+   * only institution in the sector publishing this, and it is 15 seconds.
+   */
+  readSeconds?: number;
+  /**
+   * A probe is a second-level question an interviewer fires AFTER an answer --
+   * "you said your uncle is funding you; how long has the money been in his
+   * account?". Real interviews are made of these, and a bank of first-level
+   * questions alone rehearses a conversation that does not happen.
+   *
+   * A probe is never chosen as a standalone question. It is only ever placed
+   * immediately after a question of its own category. See buildQuestionPlan.
+   */
+  isProbe?: boolean;
+  /** What kind of first answer invites this probe. Shown to the student after. */
+  probeTrigger?: string;
   /** Shown in the tips carousel during the answer. */
   tips: string[];
   /** A structure to adapt. Never presented as a script to memorise. */

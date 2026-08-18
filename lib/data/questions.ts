@@ -48,6 +48,7 @@
  */
 
 import type { Institution, Question, PublicQuestion } from '@/lib/types';
+import { type AnswerKind, answerSecondsFor, readSecondsFor } from '@/lib/data/timing';
 
 // The question bank. {{university}} and {{city}} are resolved per session, so
 // one bank serves every institution and adding institution 7 through 104 needs
@@ -57,11 +58,16 @@ import type { Institution, Question, PublicQuestion } from '@/lib/types';
 // student can actually produce. They are never presented as scripts.
 // Rubric notes are private and never leave the server.
 
-const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
+type Draft = Omit<
+  Question,
+  'id' | 'vertical' | 'institutionId' | 'timeLimitSeconds' | 'readSeconds'
+> & { answerKind: AnswerKind };
+
+const RAW: Draft[] = [
   {
     category: 'identity',
     text: 'Please introduce yourself briefly.',
-    timeLimitSeconds: 60,
+    answerKind: 'intro',
     tips: [
       'Keep it short. Name, where you are from, what you studied, what you do now.',
       'Do not tell your whole life story. Thirty to forty seconds is enough.',
@@ -75,7 +81,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'identity',
     text: 'Can you confirm the course and the university you have applied to, and when it starts?',
-    timeLimitSeconds: 45,
+    answerKind: 'factual',
     tips: [
       'Say the full course name, not a short version.',
       'Say the intake month and year.',
@@ -89,7 +95,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'education',
     text: 'Tell me about your previous qualification and why you chose that subject.',
-    timeLimitSeconds: 60,
+    answerKind: 'explanatory',
     tips: [
       'Say what you studied, where, and when you finished.',
       'Then give one honest reason you picked it.',
@@ -103,7 +109,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'education',
     text: 'How does your previous study connect with the course you want to study now?',
-    timeLimitSeconds: 60,
+    answerKind: 'explanatory',
     tips: [
       'Name one subject from your old course that links to the new one.',
       'If the subjects are different, say honestly why you are changing.',
@@ -117,7 +123,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'study_gap',
     text: 'What have you been doing since you finished your last qualification?',
-    timeLimitSeconds: 60,
+    answerKind: 'explanatory',
     tips: [
       'Be honest about the gap. Everyone has one.',
       'Say what you did, month to month if you can.',
@@ -131,7 +137,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'study_gap',
     text: 'How will your work experience help you in this course?',
-    timeLimitSeconds: 60,
+    answerKind: 'explanatory',
     tips: [
       'Give one real example of something you did at work.',
       'Then link it to one thing you will study.',
@@ -145,7 +151,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'why_uk',
     text: 'Why do you want to study in the UK rather than in Nepal?',
-    timeLimitSeconds: 60,
+    answerKind: 'comparative',
     tips: [
       'Give a reason about the course or the career, not about the country being nice.',
       'Do not say the UK is the best. Say why it is best for you.',
@@ -159,7 +165,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'why_uk',
     text: 'Did you consider Australia, Canada or the USA? Why did you choose the UK instead?',
-    timeLimitSeconds: 60,
+    answerKind: 'comparative',
     tips: [
       'It is fine to say you looked at other countries. Most students did.',
       'Give a practical reason: course length, cost, or the type of course.',
@@ -173,7 +179,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'why_university',
     text: 'Why did you choose {{university}}?',
-    timeLimitSeconds: 60,
+    answerKind: 'explanatory',
     tips: [
       'Say one thing about this university that is not true of every university.',
       'Rankings alone are a weak answer.',
@@ -187,7 +193,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'why_university',
     text: 'What do you know about {{city}}, where you will be living?',
-    timeLimitSeconds: 45,
+    answerKind: 'explanatory',
     tips: [
       'Say roughly where it is in the UK.',
       'Say one thing about living costs or transport.',
@@ -201,7 +207,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'why_course',
     text: 'Which modules will you study on this course, and which one interests you most?',
-    timeLimitSeconds: 60,
+    answerKind: 'explanatory',
     tips: [
       'Name at least two modules. Read them from the course page before your real interview.',
       'Pick one and say why it interests you.',
@@ -215,7 +221,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'why_course',
     text: 'How is this course assessed? Exams, coursework or both?',
-    timeLimitSeconds: 45,
+    answerKind: 'factual',
     tips: [
       'This is on the course page. Look it up.',
       'A short honest answer is fine.',
@@ -229,7 +235,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'progression',
     text: 'This course is at the same level as your previous qualification. Why do you need it?',
-    timeLimitSeconds: 60,
+    answerKind: 'comparative',
     tips: [
       'If this does not apply to you, say so honestly.',
       'If it does, give a career reason, not a visa reason.',
@@ -243,7 +249,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'finance',
     text: 'How will you pay your tuition fees and your living costs?',
-    timeLimitSeconds: 60,
+    answerKind: 'explanatory',
     tips: [
       'Give real numbers. The interviewer expects numbers.',
       'Say who is paying and where the money came from.',
@@ -257,7 +263,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'finance',
     text: 'Who is your sponsor, what do they do, and roughly what do they earn?',
-    timeLimitSeconds: 60,
+    answerKind: 'explanatory',
     tips: [
       'Say their relationship to you, their job, and an approximate income.',
       'If you do not know their income, find out before the real interview.',
@@ -271,7 +277,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'finance',
     text: 'What do you think your monthly living costs in the UK will be?',
-    timeLimitSeconds: 45,
+    answerKind: 'factual',
     tips: [
       'Break it down: rent, food, transport, phone.',
       'Any realistic number is better than a vague answer.',
@@ -285,7 +291,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'accommodation',
     text: 'Where do you plan to live, and how will you travel to campus?',
-    timeLimitSeconds: 45,
+    answerKind: 'explanatory',
     tips: [
       'Say whether it is university halls or private renting.',
       'Say roughly how far from campus.',
@@ -299,7 +305,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'immigration',
     text: 'Have you applied for a visa to any country before? Have you ever been refused?',
-    timeLimitSeconds: 45,
+    answerKind: 'factual',
     tips: [
       'Answer completely honestly. They already have your record.',
       'If you were refused, say so, and say what you learned.',
@@ -313,7 +319,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'future_plans',
     text: 'What do you plan to do after you complete this course?',
-    timeLimitSeconds: 60,
+    answerKind: 'explanatory',
     tips: [
       'Name a job role, not just a field.',
       'Say where: Nepal, or somewhere else. Be honest.',
@@ -327,7 +333,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'future_plans',
     text: 'How will this qualification help you specifically, back in Nepal?',
-    timeLimitSeconds: 60,
+    answerKind: 'explanatory',
     tips: [
       'Name the industry in Nepal you are aiming at.',
       'Say what you will be able to do that you cannot do now.',
@@ -341,7 +347,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'conversational',
     text: 'Tell me about a challenge you faced recently and how you handled it.',
-    timeLimitSeconds: 60,
+    answerKind: 'explanatory',
     tips: [
       'A small real story works better than a big invented one.',
       'Say what happened, what you did, and what changed.',
@@ -355,7 +361,7 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
   {
     category: 'conversational',
     text: 'Is there anything else you would like to add before we finish?',
-    timeLimitSeconds: 45,
+    answerKind: 'closing',
     tips: [
       'Do not say "no". Use it.',
       'Add one thing you did not get to say.',
@@ -366,13 +372,335 @@ const RAW: Omit<Question, 'id' | 'vertical' | 'institutionId'>[] = [
     rubricNotes:
       'The standard closing question. A flat "no" wastes the opportunity but is not a credibility failure. Reward one genuine additional point delivered briefly.',
   },
+
+  // ---------------------------------------------------------------------------
+  // PROBES.
+  //
+  // A probe is the SECOND question -- the one an interviewer asks after your
+  // first answer. "My family is funding me." -> "Where did the money in that
+  // account come from?" That second turn is where credibility interviews are
+  // actually decided, and a bank of first-level questions alone rehearses a
+  // conversation that does not happen.
+  //
+  // Every probe below was captured verbatim from a published source; 86 of the
+  // 112 harvested came from universities' own guidance pages. `probeTrigger`
+  // records the kind of first answer that invites it, which is what lets the
+  // planner place a probe where it makes sense and what the results page shows
+  // the student afterwards.
+  //
+  // A probe is never asked on its own. See buildQuestionPlan.
+  // ---------------------------------------------------------------------------
+  {
+    category: 'why_uk',
+    text: 'Why not study this course in your home country?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student names a course that is also widely available at home.',
+    tips: [
+      'Name the thing the UK course has that the Nepali one does not.',
+      'One specific difference beats three general ones.',
+      'Do not criticise Nepal. Compare the courses, not the countries.',
+    ],
+    modelAnswer:
+      'The same subject is taught in Nepal, but [one concrete difference: the UK course is one year, or it includes a placement, or it carries [accreditation]]. That matters to me because [reason tied to your plan].',
+    rubricNotes:
+      'Wants ONE concrete difference between the two options. "Better quality" and "more recognised" score zero. Naming an accreditation, a module, a placement or the one-year structure scores high.',
+  },
+  {
+    category: 'why_uk',
+    text: 'Which other countries did you consider, and what made you decide on the UK?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student gives a one-line answer about the UK having the best universities.',
+    tips: [
+      'Name at least one country you actually looked at.',
+      'Then give the reason you ruled it out.',
+      '"The UK was my only choice" sounds unresearched, not loyal.',
+    ],
+    modelAnswer:
+      'I also looked at [country]. I chose the UK because [one reason: course length, cost, the Graduate Route, a specific university]. [Country] would have meant [the trade-off you rejected].',
+    rubricNotes:
+      'Wants a real comparison with a named alternative and one decision criterion. An answer with no alternative named is a flag: it suggests an agent chose for them.',
+  },
+  {
+    category: 'why_university',
+    text: 'Which other universities did you consider?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student says this university was their first and only choice.',
+    tips: [
+      'Name one or two you genuinely applied to or looked at.',
+      'Then say what made you pick this one over them.',
+      'It is normal to apply to several. Saying so is not disloyal.',
+    ],
+    modelAnswer:
+      'I also had an offer from [university]. I chose {{university}} because [one specific thing: a module, a facility, an accreditation, the campus location].',
+    rubricNotes:
+      'Wants a named alternative plus one differentiating reason. Check the reason is actually distinctive: a claim true of every university in the peer set is not a reason.',
+  },
+  {
+    category: 'why_university',
+    text: 'What facilities are you expecting at {{university}} for your subject?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student says the university has great facilities.',
+    tips: [
+      'Name a real one. A lab, a studio, a library, a specific building.',
+      'If you do not know one, look at the course page before the real interview.',
+      'One named facility is worth ten adjectives.',
+    ],
+    modelAnswer:
+      'For my subject there is [named facility]. I am expecting to use it for [the part of the course it serves].',
+    rubricNotes:
+      'A named, checkable facility scores high. "Modern facilities" and "good labs" score zero. An invented facility is worse than an admission of not knowing.',
+  },
+  {
+    category: 'why_course',
+    text: 'What will you actually learn in the modules you just named?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student lists module names without describing their content.',
+    tips: [
+      'Pick ONE module and say what it covers.',
+      'Two sentences is enough.',
+      'Naming modules you cannot describe is worse than naming none.',
+    ],
+    modelAnswer:
+      'In [module] we cover [topic] and [topic]. I am most interested in [one of them] because [link to your plan].',
+    rubricNotes:
+      'Tests whether the module names were memorised or understood. Any content detail scores. Repeating the module title back scores zero.',
+  },
+  {
+    category: 'why_course',
+    text: 'Do you know what level your course is at?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student names the course without stating its qualification level.',
+    tips: [
+      'Say the level: RQF 7 for a Master’s, RQF 6 for a Bachelor’s.',
+      'Say it is higher than what you have already done, if it is.',
+      'This is a short answer. Do not pad it.',
+    ],
+    modelAnswer:
+      'It is a Master’s degree, RQF level 7. My bachelor’s was level 6, so this is a step up.',
+    rubricNotes:
+      'Factual. Correct level, and awareness that it is above their previous qualification. Getting the level wrong is a serious progression flag.',
+  },
+  {
+    category: 'finance',
+    text: 'Where did the money in that bank account come from?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student confirms the maintenance funds are already in the account.',
+    tips: [
+      'Say whose money it is and how it was earned or saved.',
+      'If it was sold land or a loan, say so plainly.',
+      'Money that appeared suddenly with no explanation is the single biggest refusal reason.',
+    ],
+    modelAnswer:
+      'The funds are my [relation]’s savings from [source]. They have been in the account since [month].',
+    rubricNotes:
+      'Wants a traceable origin and a length of time. Vagueness here is the strongest single credibility flag in the whole interview. Honesty about a loan or a land sale scores better than a vague "family savings".',
+  },
+  {
+    category: 'finance',
+    text: 'What does your sponsor do, and how many people depend on that income?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student names a sponsor without describing them.',
+    tips: [
+      'Job, employer, and roughly what they earn.',
+      'Then say how many people that income supports.',
+      'Know the number before the interview. Guessing sounds like guessing.',
+    ],
+    modelAnswer:
+      'My [relation] is a [job] at [employer] and earns about [amount] a year. That income supports [number] people including me.',
+    rubricNotes:
+      'Wants occupation, an income figure and a dependant count that make the funding plausible. An income that cannot cover the fees, with no other explanation, is a fail.',
+  },
+  {
+    category: 'finance',
+    text: 'Have you taken a loan? How will you pay it back?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student mentions a bank balance that appeared recently, or an education loan.',
+    tips: [
+      'If there is a loan, say the amount and the lender.',
+      'Then say how you will repay it, with a real salary figure.',
+      'Hiding a loan is far worse than having one.',
+    ],
+    modelAnswer:
+      'Yes, [amount] from [bank], secured against [asset]. I plan to repay it from my salary as a [job], which is around [amount] a month in Nepal.',
+    rubricNotes:
+      'Wants disclosure plus a repayment plan grounded in a real salary. Denying a loan when the balance appeared recently is the classic contradiction interviewers look for.',
+  },
+  {
+    category: 'accommodation',
+    text: 'How far is that from campus, and how will you get to class?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student names a hall or an area they will live in.',
+    tips: [
+      'Say the distance or the journey time.',
+      'Say bus, train or walk.',
+      'If you do not know yet, say what you will do to find out.',
+    ],
+    modelAnswer:
+      'It is about [number] minutes from campus. I will [walk / take the number [x] bus], which costs about [amount] a week.',
+    rubricNotes:
+      'Wants a journey time and a mode of travel. Shows the accommodation claim was researched rather than invented on the spot.',
+  },
+  {
+    category: 'accommodation',
+    text: 'How much will your accommodation cost each week?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student says they will stay in university halls.',
+    tips: [
+      'Give a weekly figure in pounds.',
+      'Say whether bills are included.',
+      'This number should match the living costs you gave earlier.',
+    ],
+    modelAnswer:
+      'It is about £[amount] a week including bills. Over the year that is about £[amount], which is inside the budget I described.',
+    rubricNotes:
+      'Cross-check against their stated monthly living costs and their funding. Two figures that do not reconcile is a stronger flag than either figure being high.',
+  },
+  {
+    category: 'study_gap',
+    text: 'Why is there such a long gap between your last course and this one?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student says they were working after graduating.',
+    tips: [
+      'Give the reason plainly. Work, family, money, health.',
+      'Then say what changed to make now the right time.',
+      'A gap is normal. An unexplained gap is not.',
+    ],
+    modelAnswer:
+      'I finished in [year] and worked as a [job] to [reason: save money / support my family]. I am returning now because [what changed].',
+    rubricNotes:
+      'Wants a specific reason and a trigger for returning now. Unexplained years are a standard refusal ground; a plain honest reason scores far better than an impressive vague one.',
+  },
+  {
+    category: 'study_gap',
+    text: 'What was your monthly salary in that job?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student says they worked during the gap.',
+    tips: [
+      'Give the figure in rupees.',
+      'Do not inflate it. It may be checked against your funding story.',
+      'Short answer.',
+    ],
+    modelAnswer:
+      'I earned about NPR [amount] a month as a [job] at [employer].',
+    rubricNotes:
+      'Factual, and a consistency check against the funding claim. A salary that cannot explain the savings they described is a contradiction.',
+  },
+  {
+    category: 'education',
+    text: 'Have you studied in the UK before? Why are you studying here again?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student mentions previous international travel or a previous UK qualification.',
+    tips: [
+      'Answer yes or no first.',
+      'If yes, say what and when, and why this is a step up.',
+      'Never hide a previous UK visa. It is on record.',
+    ],
+    modelAnswer:
+      '[Yes, I studied [course] at [institution] in [year]. I am returning because [how this course is higher or different].] / [No, this is my first time studying in the UK.]',
+    rubricNotes:
+      'Previous UK study demands a clear progression argument. Concealment discovered later is fatal; disclosure with a progression reason is fine.',
+  },
+  {
+    category: 'future_plans',
+    text: 'What jobs could you actually do after this course?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student says the course will improve their career prospects.',
+    tips: [
+      'Name one or two real job titles.',
+      'Name a type of employer, or a real company.',
+      '"Good opportunities" is not an answer.',
+    ],
+    modelAnswer:
+      'I am aiming to work as a [job title] at a [type of employer], for example [named company or sector] in [city].',
+    rubricNotes:
+      'Wants named roles and a named sector or employer. Generic ambition scores zero; a specific role that connects to a named module scores highest.',
+  },
+  {
+    category: 'future_plans',
+    text: 'What salary do you expect when you go home?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student says they will return home to work after graduating.',
+    tips: [
+      'Give a figure in rupees, monthly or yearly.',
+      'Say why the UK degree raises it.',
+      'If you took a loan, this number must be able to repay it.',
+    ],
+    modelAnswer:
+      'A [job title] with a UK master’s earns about NPR [amount] a month in Nepal, compared with about [amount] without one.',
+    rubricNotes:
+      'Wants a plausible figure that justifies the spend and, where a loan exists, can repay it. The return-on-investment arithmetic is what this question is really testing.',
+  },
+  {
+    category: 'immigration',
+    text: 'Do you know how many hours you are allowed to work during term time?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student says they intend to work part-time while studying.',
+    tips: [
+      'Know the number for your course level before the interview.',
+      'Say that studying comes first.',
+      'Do not say you are coming to the UK to work.',
+    ],
+    modelAnswer:
+      'On a Student visa for my course I may work up to [number] hours a week in term time, and full time in the holidays. My study comes first.',
+    rubricNotes:
+      'Factual and non-negotiable. Getting this wrong, or framing work as the purpose of coming, is a direct hit on genuine-student credibility.',
+  },
+  {
+    category: 'immigration',
+    text: 'Have you made any previous visa applications? Were they successful?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student says this is their first UK application, or mentions previous travel.',
+    tips: [
+      'Answer honestly. Refusals are on record.',
+      'If you were refused, say which country, when, and why.',
+      'A declared refusal is survivable. A hidden one is not.',
+    ],
+    modelAnswer:
+      '[I have applied for a [country] visa in [year], which was [granted / refused because [reason]].] / [No, this is my first visa application.]',
+    rubricNotes:
+      'Concealment is the failure mode, not the refusal itself. An honest disclosure with the reason and what changed since scores acceptably; a discovered omission does not.',
+  },
 ];
 
+/**
+ * TIMING IS DERIVED, NEVER TYPED IN.
+ *
+ * `Draft` deliberately has no `timeLimitSeconds`, so it is not possible to add
+ * a question whose time contradicts the kind of answer it asks for. Every
+ * number comes from lib/data/timing.ts, which carries the published sources.
+ *
+ * The bank previously held hand-set 45s and 60s limits that nobody had checked.
+ * Both sit BELOW the floor of the only per-question specification any UK
+ * university publishes (Oxford Brookes: one to two minutes), on a page that
+ * also requires "at least two facts or examples" in the answer. You cannot give
+ * two facts and a conclusion in 45 seconds, so the product was training
+ * students to under-answer the real interview.
+ */
 export const QUESTIONS: Question[] = RAW.map((q, i) => ({
   ...q,
   id: `q-${String(i + 1).padStart(2, '0')}`,
   vertical: 'uk-precas',
   institutionId: null,
+  timeLimitSeconds: answerSecondsFor(q.answerKind),
+  readSeconds: readSecondsFor(q.answerKind),
 }));
 
 function fill(text: string, inst: Institution): string {
@@ -509,9 +837,24 @@ export function eligiblePool(): Question[] {
   return pool();
 }
 
+/**
+ * Questions that can open a topic. Probes are excluded: a probe asked cold
+ * ("Where did the money in that account come from?" as question one) is
+ * nonsense, and it would also give away that the product does not understand
+ * its own material.
+ */
+function rootPool(): Question[] {
+  return pool().filter((q) => !q.isProbe);
+}
+
+/** Probes for one category, shuffled. */
+function probesFor(category: string): Question[] {
+  return shuffled(pool().filter((q) => q.isProbe && q.category === category));
+}
+
 export function buildQuestionPlan(limit: number): string[] {
-  const QUESTIONS = pool();
-  if (limit >= QUESTIONS.length) return QUESTIONS.map((q) => q.id);
+  const QUESTIONS = rootPool();
+  if (limit >= QUESTIONS.length) return withProbes(QUESTIONS.map((q) => q.id), limit);
 
   // Openers first. A real interview starts by asking who you are, so the
   // 'identity' category always fills slot one.
@@ -542,7 +885,50 @@ export function buildQuestionPlan(limit: number): string[] {
       }
     }
   }
-  return picked;
+  return withProbes(picked, limit);
+}
+
+/**
+ * Put probes where an interviewer would put them: straight after an answer on
+ * the same topic, never anywhere else.
+ *
+ * This is deliberately NOT conditional on how the student answered. Branching
+ * on a live evaluation would mean the interview could not be planned in
+ * advance, and every guard in this product -- resume, entitlement, the stored
+ * plan -- assumes a plan that exists before the first question is asked.
+ * Placing the probe unconditionally gives the student the real experience of
+ * being followed up on, without turning a working state machine into a
+ * research project the week we ship.
+ *
+ * The count is bounded at about a third of the sitting. A mock that is half
+ * probes stops being an interview and becomes an interrogation, and the
+ * published banks are mostly first-level questions.
+ */
+function withProbes(rootIds: string[], limit: number): string[] {
+  const maxProbes = Math.floor(limit / 3);
+  if (maxProbes < 1) return rootIds.slice(0, limit);
+
+  const used = new Set<string>();
+  const out: string[] = [];
+
+  for (const id of rootIds) {
+    if (out.length >= limit) break;
+    out.push(id);
+
+    if (out.length >= limit) break;
+    if (used.size >= maxProbes) continue;
+
+    const root = getQuestion(id);
+    // The closing question ends the interview. Nothing follows it.
+    if (!root || root.answerKind === 'closing' || root.category === 'identity') continue;
+
+    const probe = probesFor(root.category).find((x) => !used.has(x.id));
+    if (probe) {
+      used.add(probe.id);
+      out.push(probe.id);
+    }
+  }
+  return out.slice(0, limit);
 }
 
 /**
@@ -557,7 +943,9 @@ export function buildPracticePlan(category?: string): string[] {
   // D-24. Practice draws from the merged pool too, or a question the admin
   // added is asked in a mock and never in a drill.
   const all = pool();
-  const bucket = category ? all.filter((q) => q.category === category) : all;
+  // A probe only makes sense after an answer, so practice draws from roots.
+  const roots = all.filter((q) => !q.isProbe);
+  const bucket = category ? roots.filter((q) => q.category === category) : roots;
   const from = bucket.length > 0 ? bucket : all;
   const pick = from[Math.floor(Math.random() * from.length)]!;
   return [pick.id];
