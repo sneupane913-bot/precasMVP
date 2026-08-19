@@ -180,6 +180,15 @@ export async function POST(req: Request) {
 
   const result: ApiResult<{
     isNew: boolean;
+    /**
+     * N-30. True until we hold a WhatsApp number for this student.
+     *
+     * Computed on the SERVER from the stored record, never assumed from
+     * `isNew`. A student who signed in last week, skipped the screen by
+     * closing the tab, and came back today is still missing, and asking
+     * `isNew` would wave them straight through.
+     */
+    needsProfile: boolean;
     name: string | null;
     email: string | null;
     referralCode: string;
@@ -188,6 +197,7 @@ export async function POST(req: Request) {
     ok: true,
     data: {
       isNew,
+      needsProfile: !student.whatsappNumber,
       name: student.name,
       email: student.email,
       referralCode: student.referralCode,

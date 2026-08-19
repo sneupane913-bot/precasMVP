@@ -42,6 +42,8 @@ interface Overview {
     lastSeenAt: string;
     phone: string | null;
     whatsappConfirmed: boolean | null;
+    /** N-30. How many accounts share this number. 1 is unique. */
+    accountsOnThisNumber?: number;
   }[];
   paySettings: PaySettings;
   /** The post-trial offer actually in force, not the defaults. */
@@ -565,6 +567,8 @@ export default function SuperAdminPage() {
     // Engagement and entitlement only. Never transcripts, never secrets.
     const head = [
       'name',
+      'whatsapp',
+      'accounts_on_this_number',
       'email',
       'source',
       'created_via',
@@ -578,6 +582,8 @@ export default function SuperAdminPage() {
     const rows = data.students.map((s) =>
       [
         s.name ?? '',
+        s.phone ?? '',
+        s.accountsOnThisNumber ?? '',
         s.email ?? '',
         s.source,
         s.createdVia ?? '',
@@ -907,9 +913,36 @@ export default function SuperAdminPage() {
                           ) : (
                             <span className="text-ink-quiet">not given</span>
                           )}
+                          {/**
+                            * N-30. This used to read "not on WhatsApp", which
+                            * became false the moment the welcome screen started
+                            * collecting numbers: every new student arrives with
+                            * whatsappConfirmed false, meaning only that nobody
+                            * has checked yet. Printing "not on WhatsApp" beside
+                            * a perfectly good number would have had the owner
+                            * distrusting numbers that were fine.
+                            */}
                           {s.phone && s.whatsappConfirmed === false && (
-                            <span className="ml-1 block text-micro font-semibold text-warn">
-                              not on WhatsApp
+                            <span className="ml-1 block text-micro font-semibold text-ink-quiet">
+                              not checked yet
+                            </span>
+                          )}
+                          {/**
+                            * N-30. THE ANTI-ABUSE SIGNAL, AND IT IS A COUNT, NOT
+                            * A VERDICT.
+                            *
+                            * Ten free questions cost real money, and one person
+                            * with three Gmail addresses is thirty of them. Email
+                            * is free and unlimited; a Nepali mobile number is
+                            * not. So the number is what we count.
+                            *
+                            * Shown, never enforced. A family sharing one phone
+                            * is a real student and an automatic ban would give
+                            * them no way to appeal. The owner looks and decides.
+                            */}
+                          {(s.accountsOnThisNumber ?? 0) > 1 && (
+                            <span className="ml-1 mt-1 inline-block rounded-full bg-warn-tint px-2 py-0.5 text-micro font-bold text-warn">
+                              {s.accountsOnThisNumber} accounts on this number
                             </span>
                           )}
                         </td>

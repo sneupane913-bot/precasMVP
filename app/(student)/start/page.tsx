@@ -225,6 +225,22 @@ function StartInner() {
                  * Asked here rather than assumed, because the trial grant may
                  * have just changed what they are entitled to.
                  */
+                /**
+                 * N-30. Before anything else: do we have a number for them?
+                 *
+                 * Placed AHEAD of `explicitNext` on purpose. A student arriving
+                 * on a consultancy link with ?next= would otherwise skip the
+                 * screen entirely, and consultancy students are exactly the
+                 * ones the owner most needs to be able to ring.
+                 *
+                 * The real destination travels with them, so the screen is one
+                 * step in their journey and not a detour that loses their place.
+                 */
+                if (r.needsProfile) {
+                  const after = explicitNext ?? '/universities';
+                  router.push(`/welcome?next=${encodeURIComponent(after)}`);
+                  return;
+                }
                 if (explicitNext) {
                   router.push(explicitNext);
                   return;

@@ -93,7 +93,12 @@ export function FirebaseSignIn({
   via?: string;
   /** N-1. Seat size code from the consultancy link. */
   seat?: string;
-  onSignedIn: (r: { isNew: boolean; trial: { outcome: string; message: string | null } }) => void;
+  onSignedIn: (r: {
+    isNew: boolean;
+    /** N-30. No WhatsApp number on file yet. */
+    needsProfile?: boolean;
+    trial: { outcome: string; message: string | null };
+  }) => void;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

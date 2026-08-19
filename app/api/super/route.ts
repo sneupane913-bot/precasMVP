@@ -277,6 +277,27 @@ export async function POST(req: Request) {
         revenueFromConsultancies,
         // Never any transcript or answer content. Engagement and entitlement only.
         students: students.map((s) => ({
+          /**
+           * N-30. HOW MANY OTHER ACCOUNTS SHARE THIS NUMBER.
+           *
+           * The free trial is ten questions we pay a provider for. Google
+           * sign-in cannot stop one person taking them again from a second
+           * Gmail, and an email address is free and unlimited while a Nepali
+           * mobile number is not. That asymmetry is the whole defence.
+           *
+           * We do NOT block anyone automatically, and this deliberately is not
+           * a score or a verdict. It is a count, put in front of a person, who
+           * can look at the three accounts and decide. An automatic ban would
+           * eventually lock out a real student sharing a family phone, and
+           * there is no way for them to appeal to a rule.
+           *
+           * 1 means the number is unique. 3 means it is worth a look.
+           */
+          accountsOnThisNumber: (() => {
+            const n = s.whatsappNumber ?? s.phoneE164 ?? null;
+            if (!n) return 0;
+            return students.filter((o) => (o.whatsappNumber ?? o.phoneE164) === n).length;
+          })(),
           id: s.id,
           name: s.name,
           email: s.email,
