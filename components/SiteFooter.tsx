@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { supportWhatsapp } from '@/lib/support';
+import { BRAND_NAME } from '@/lib/branding';
 
 /**
  * Global footer for the public marketing pages (home, universities, pricing,
@@ -74,9 +75,9 @@ export function SiteFooterView({ whatsappDigits = '' }: { whatsappDigits?: strin
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2.5">
               <span className="grid h-9 w-9 place-items-center rounded-control bg-go font-black text-white">
-                P
+                E
               </span>
-              <span className="font-serif text-lg">PreCAS Practice</span>
+              <span className="font-serif text-lg">{BRAND_NAME}</span>
             </div>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/60">
               Practise your UK Pre-CAS interview and find out exactly what to fix, before it counts.
@@ -130,7 +131,7 @@ export function SiteFooterView({ whatsappDigits = '' }: { whatsappDigits?: strin
 
         {/* Bottom bar */}
         <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-sm text-white/50 sm:flex-row">
-          <p>© {year} PreCAS Practice. All rights reserved.</p>
+          <p>© {year} {BRAND_NAME}. All rights reserved.</p>
           <p>For Nepali students applying to the UK.</p>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { HeaderSession, type SessionSnapshot } from '@/components/HeaderSession';
+import { BRAND_NAME } from '@/lib/branding';
 
 /**
  * Global header for the public pages. NOT used inside the interview room,
@@ -33,9 +34,9 @@ export function SiteHeader({ session }: { session?: SessionSnapshot } = {}) {
           className="flex min-h-tap items-center gap-2.5 rounded-control transition-opacity duration-tap ease-move hover:opacity-80"
         >
           <span className="grid h-8 w-8 place-items-center rounded-control bg-go font-serif font-black text-white">
-            P
+            E
           </span>
-          <span className="font-serif text-lg font-bold text-ink">PreCAS Practice</span>
+          <span className="font-serif text-lg font-bold text-ink">{BRAND_NAME}</span>
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">

@@ -82,41 +82,86 @@ export default function DashboardPage() {
   const [sessions, setSessions] = useState<Sess[]>([]);
   const [seatBacked, setSeatBacked] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [retryNonce, setRetryNonce] = useState(0);
 
+  /**
+   * WALK, 18 Aug — the spinner that never left.
+   *
+   * The client reported the dashboard stuck on "Loading your practice..."
+   * forever. Watching it happen: /api/me and /api/account both came back 200
+   * with correct data — the fetches were never the problem — but the screen
+   * never updated. The old code called `setLoading(false)` as the LAST line
+   * inside a `.then()` with no `.catch()` on the combinator itself. Anything
+   * throwing between "the data arrived" and that last line — a bad row shape,
+   * a remount racing the fetch, a browser extension touching the page,
+   * anything — left `loading` true with no way out and no error shown. A
+   * silent hang is worse than a visible failure: at least a failure can be
+   * retried.
+   *
+   * The fix has two parts:
+   *   1. `finally` guarantees `setLoading(false)` runs no matter what happens
+   *      above it, success or exception. The spinner cannot outlive the
+   *      request that's supposed to end it.
+   *   2. A 12s safety net independent of the fetches themselves. Netlify's
+   *      synchronous functions cap at 10s (see netlify.toml) — 12s gives that
+   *      a moment to actually fail before we decide it's hung, without asking
+   *      a student to stare at a spinner indefinitely on a slow connection.
+   *      On timeout we show a retry state, never a silent freeze.
+   */
   useEffect(() => {
     let off = false;
-    Promise.all([
-      fetch('/api/me').then((r) => r.json()).catch(() => null),
-      fetch('/api/account').then((r) => r.json()).catch(() => null),
-    ]).then(([me, acc]) => {
-      if (off) return;
-      const ent = me?.data?.entitlement;
-      setName(me?.data?.name ?? null);
-      setMocksLeft(typeof ent?.mocksLeft === 'number' ? ent.mocksLeft : null);
-      setPracticeLeft(typeof ent?.practiceLeft === 'number' ? ent.practiceLeft : null);
-      setInProgress(ent?.inProgress ?? null);
-      setSeatBacked(Boolean(me?.data?.seatBacked));
-      const rows: Sess[] = acc?.data?.sessions ?? [];
-      setSessions(rows);
-      /**
-       * The ring's denominator.
-       *
-       * Derived from the largest balance we have actually seen, never a
-       * hard-coded pack size. F-2: a "of 10" written into this page would be
-       * wrong the moment the client changes a pack, exactly as "12 mocks a
-       * seat" was wrong on /consultancy for a week.
-       */
-      const m = typeof ent?.mocksLeft === 'number' ? ent.mocksLeft : 0;
-      const p = typeof ent?.practiceLeft === 'number' ? ent.practiceLeft : 0;
-      const usedMocks = rows.filter((s) => !s.isPractice).length;
-      setPackMocks(Math.max(m + usedMocks, m, 1));
-      setPackPractice(Math.max(p, 1));
-      setLoading(false);
-    });
+    setLoading(true);
+    setLoadFailed(false);
+
+    const timeout = setTimeout(() => {
+      if (!off) {
+        setLoadFailed(true);
+        setLoading(false);
+      }
+    }, 12_000);
+
+    (async () => {
+      try {
+        const [me, acc] = await Promise.all([
+          fetch('/api/me').then((r) => r.json()).catch(() => null),
+          fetch('/api/account').then((r) => r.json()).catch(() => null),
+        ]);
+        if (off) return;
+        const ent = me?.data?.entitlement;
+        setName(me?.data?.name ?? null);
+        setMocksLeft(typeof ent?.mocksLeft === 'number' ? ent.mocksLeft : null);
+        setPracticeLeft(typeof ent?.practiceLeft === 'number' ? ent.practiceLeft : null);
+        setInProgress(ent?.inProgress ?? null);
+        setSeatBacked(Boolean(me?.data?.seatBacked));
+        const rows: Sess[] = acc?.data?.sessions ?? [];
+        setSessions(rows);
+        /**
+         * The ring's denominator.
+         *
+         * Derived from the largest balance we have actually seen, never a
+         * hard-coded pack size. F-2: a "of 10" written into this page would be
+         * wrong the moment the client changes a pack, exactly as "12 mocks a
+         * seat" was wrong on /consultancy for a week.
+         */
+        const m = typeof ent?.mocksLeft === 'number' ? ent.mocksLeft : 0;
+        const p = typeof ent?.practiceLeft === 'number' ? ent.practiceLeft : 0;
+        const usedMocks = rows.filter((s) => !s.isPractice).length;
+        setPackMocks(Math.max(m + usedMocks, m, 1));
+        setPackPractice(Math.max(p, 1));
+      } catch {
+        if (!off) setLoadFailed(true);
+      } finally {
+        clearTimeout(timeout);
+        if (!off) setLoading(false);
+      }
+    })();
+
     return () => {
       off = true;
+      clearTimeout(timeout);
     };
-  }, []);
+  }, [retryNonce]);
 
   const greeting = (() => {
     const h = new Date().getHours();
@@ -149,6 +194,14 @@ export default function DashboardPage() {
           <Card className="flex items-center gap-3 text-ink-soft">
             <Spinner className="text-ink-quiet" />
             <span>Loading your practice...</span>
+          </Card>
+        ) : loadFailed ? (
+          <Card className="flex flex-col items-start gap-3 text-ink-soft">
+            <span>
+              This is taking longer than it should. Your practice history and balance are safe —
+              this screen just could not load them just now.
+            </span>
+            <Button onClick={() => setRetryNonce((n) => n + 1)}>Try again</Button>
           </Card>
         ) : (
           <>

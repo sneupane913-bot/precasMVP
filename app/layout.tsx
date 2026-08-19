@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { BRAND_NAME } from '@/lib/branding';
 
 /**
  * Fonts: Stitch "Academic Clarity" pairs Noto Serif (display) with Hanken
@@ -14,11 +15,11 @@ import './globals.css';
  */
 
 export const metadata: Metadata = {
-  title: 'PreCAS Practice | Practise your UK interview',
+  title: `${BRAND_NAME} | Practise your UK interview`,
   description:
     'Sit a real mock Pre-CAS credibility interview for your university and find out exactly what to fix before the real one.',
   manifest: '/manifest.json',
-  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'PreCAS' },
+  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: BRAND_NAME },
   // QA-211: /icon-192.png, /icon-512.png and the Apple touch icon all 404'd,
   // so the manifest was valid and unusable.
   icons: {

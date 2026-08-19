@@ -2,8 +2,9 @@ import { SiteHeader } from '@/components/SiteHeader';
 import { headerSession } from '@/lib/auth/header-session';
 import { SiteFooter } from '@/components/SiteFooter';
 import { Page, Card, SectionTitle } from '@/components/ui';
+import { BRAND_NAME } from '@/lib/branding';
 
-export const metadata = { title: 'Privacy policy | PreCAS Practice' };
+export const metadata = { title: `Privacy policy | ${BRAND_NAME}` };
 
 /**
  * Working draft, grounded in the data decisions already recorded in HANDOFF.md

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FirebaseSignIn, type FirebaseWebConfig } from '@/components/FirebaseSignIn';
 import { Card, Button, ButtonLink, Check } from '@/components/ui';
+import { BRAND_NAME } from '@/lib/branding';
 
 export default function StartPage() {
   return (
@@ -142,7 +143,7 @@ function StartInner() {
           href="/"
           className="inline-flex min-h-tap items-center self-start font-serif text-lg font-bold text-ink"
         >
-          PreCAS Practice
+          {BRAND_NAME}
         </Link>
 
         <div className="max-w-md">
@@ -192,7 +193,7 @@ function StartInner() {
             href="/"
             className="mb-10 flex min-h-tap items-center justify-center font-serif text-lg font-bold text-ink lg:hidden"
           >
-            PreCAS Practice
+            {BRAND_NAME}
           </Link>
 
           <h1 className="mb-2 text-center font-serif text-[2rem] font-bold leading-tight tracking-tight text-ink">

@@ -3,8 +3,9 @@ import { SiteHeader } from '@/components/SiteHeader';
 import { headerSession } from '@/lib/auth/header-session';
 import { SiteFooter } from '@/components/SiteFooter';
 import { Page } from '@/components/ui';
+import { BRAND_NAME } from '@/lib/branding';
 
-export const metadata = { title: 'Price | PreCAS Practice' };
+export const metadata = { title: `Price | ${BRAND_NAME}` };
 
 /**
  * The cards and the comparison table now live in `components/PricingPacks.tsx`

@@ -7,6 +7,7 @@ import {
   ENTRY_PLAN,
   COMPETITOR_ENTRY,
 } from '@/lib/data/plans';
+import { BRAND_NAME } from '@/lib/branding';
 import {
   Card,
   Chip,
@@ -258,7 +259,7 @@ export function PriceComparison() {
         </THead>
         <TBody>
           <tr className="bg-go-tint">
-            <TD className="font-semibold text-ink">PreCAS Practice</TD>
+            <TD className="font-semibold text-ink">{BRAND_NAME}</TD>
             <TD className="font-bold tabular-nums text-go-dark">
               {/* Ours. Derived — a hand-typed price is one the next price change misses. */}
               NPR {ENTRY_PLAN.priceNpr}

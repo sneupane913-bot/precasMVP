@@ -3,6 +3,7 @@ import { BUNDLES, SEAT_GRANT, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans'
 import { SiteFooter } from '@/components/SiteFooter';
 import { supportWhatsapp } from '@/lib/support';
 import { Page, Card, SectionTitle, Eyebrow, ButtonLink, Check } from '@/components/ui';
+import { BRAND_NAME } from '@/lib/branding';
 
 export const metadata = {
   title: 'Partner pricing',
@@ -37,9 +38,9 @@ export default async function ConsultancyPage() {
         <div className="mx-auto flex max-w-[900px] items-center justify-between px-4 py-4 md:px-10">
           <Link href="/" className="flex min-h-tap items-center gap-2.5">
             <span className="grid h-8 w-8 place-items-center rounded-control bg-go font-serif font-bold text-white">
-              P
+              E
             </span>
-            <span className="font-serif text-lg font-semibold text-ink">PreCAS Practice</span>
+            <span className="font-serif text-lg font-semibold text-ink">{BRAND_NAME}</span>
           </Link>
           <Link
             href="/admin"

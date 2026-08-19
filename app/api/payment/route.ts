@@ -7,6 +7,7 @@ import { getPlan, publicPlans } from '@/lib/data/plans';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
 import { platformDown, platform } from '@/lib/platform';
 import { apiError, type ApiResult } from '@/lib/types';
+import { BRAND_NAME } from '@/lib/branding';
 
 export const runtime = 'nodejs';
 
@@ -176,7 +177,7 @@ export async function POST(req: Request) {
          * message already written and only their name to confirm.
          */
         supportWhatsapp: settings.supportWhatsapp || process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || '',
-        supportMessage: `Hello, I am having a problem with my payment on PreCAS Practice. My name is ${student.name ?? ''} and my reference is ${order.id.slice(0, 8)}.`,
+        supportMessage: `Hello, I am having a problem with my payment on ${BRAND_NAME}. My name is ${student.name ?? ''} and my reference is ${order.id.slice(0, 8)}.`,
         payTo: {
           /**
            * N-11. Settings first, environment second.

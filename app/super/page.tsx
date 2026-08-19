@@ -5,6 +5,7 @@ import { PasscodeInput } from '@/components/PasscodeInput';
 import { PaySettingsForm, type PaySettings } from '@/components/PaySettingsForm';
 import { PasscodeChangeForm } from '@/components/PasscodeChangeForm';
 import { Card, Button, Banner, Status, Pill, type Tone } from '@/components/ui';
+import { BRAND_NAME } from '@/lib/branding';
 
 /**
  * Super admin, rebuilt to docs/design-reference/super_admin_dashboard.
@@ -664,7 +665,7 @@ export default function SuperAdminPage() {
       <aside className="border-b border-line bg-surface-sunk px-5 py-5 lg:min-h-screen lg:w-64 lg:shrink-0 lg:border-b-0 lg:border-r lg:px-6 lg:py-8">
         <div className="mb-6">
           <p className="font-serif text-lg font-bold text-ink">Admin portal</p>
-          <p className="text-sm text-ink-quiet">PreCAS Practice</p>
+          <p className="text-sm text-ink-quiet">{BRAND_NAME}</p>
         </div>
         <nav className="flex gap-2 overflow-x-auto lg:flex-col lg:gap-1">
           {nav.map((n) => (
@@ -1024,7 +1025,7 @@ export default function SuperAdminPage() {
                                   without typing anything. */}
                               <a
                                 href={`https://wa.me/${o.payerPhone.replace(/\D/g, '')}?text=${encodeURIComponent(
-                                  `Hello, this is about your PreCAS Practice payment of NPR ${o.amountNpr}. We are checking transaction number ${o.walletTxnId ?? ''}. Could you confirm this is yours?`
+                                  `Hello, this is about your ${BRAND_NAME} payment of NPR ${o.amountNpr}. We are checking transaction number ${o.walletTxnId ?? ''}. Could you confirm this is yours?`
                                 )}`}
                                 target="_blank"
                                 rel="noopener noreferrer"

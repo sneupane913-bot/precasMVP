@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { BRAND_NAME } from '@/lib/branding';
 
 /**
  * QA round 2, M1: an unknown URL showed the bare Next.js 404 with no branding
@@ -10,7 +11,7 @@ export default function NotFound() {
     <main className="grid min-h-screen place-items-center bg-paper px-5 py-16">
       <div className="w-full max-w-md text-center">
         <Link href="/" className="mb-10 inline-block font-serif text-xl font-bold text-ink">
-          PreCAS Practice
+          {BRAND_NAME}
         </Link>
 
         <h1 className="mb-3 font-serif text-3xl font-bold text-ink">We could not find that page</h1>

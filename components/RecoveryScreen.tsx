@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { BRAND_NAME } from '@/lib/branding';
 
 /**
  * The one screen a student sees when a link does not work (K11, K12).
@@ -36,7 +37,7 @@ export function RecoveryScreen({
     <main className="grid min-h-screen place-items-center bg-paper px-5 py-16">
       <div className="w-full max-w-md">
         <Link href="/" className="mb-10 block text-center font-serif text-lg font-bold text-ink">
-          PreCAS Practice
+          {BRAND_NAME}
         </Link>
 
         <h1 className="mb-3 text-center font-serif text-display font-bold text-ink">{title}</h1>

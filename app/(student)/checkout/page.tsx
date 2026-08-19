@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ContactUs } from '@/components/ContactUs';
 import { publicPlans } from '@/lib/data/plans';
+import { BRAND_NAME } from '@/lib/branding';
 import {
   Card,
   Field,
@@ -320,9 +321,9 @@ function Checkout() {
       <div className="flex items-center justify-between">
         <Link href="/" className="flex min-h-tap items-center gap-2">
           <span className="grid h-8 w-8 place-items-center rounded-control bg-go font-serif font-bold text-white">
-            P
+            E
           </span>
-          <span className="font-serif text-base font-semibold text-ink">PreCAS Practice</span>
+          <span className="font-serif text-base font-semibold text-ink">{BRAND_NAME}</span>
         </Link>
         <Link
           href="/pricing"
@@ -430,7 +431,7 @@ function Checkout() {
           {!order && (
             <ContactUs
               whatsapp={fallbackWhatsapp}
-              message="Hello, I am trying to pay for a PreCAS Practice pack and the checkout is not working."
+              message={`Hello, I am trying to pay for a ${BRAND_NAME} pack and the checkout is not working.`}
               urgent
             />
           )}

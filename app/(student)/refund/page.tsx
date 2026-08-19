@@ -2,8 +2,9 @@ import { SiteHeader } from '@/components/SiteHeader';
 import { headerSession } from '@/lib/auth/header-session';
 import { SiteFooter } from '@/components/SiteFooter';
 import { Page, Card, SectionTitle } from '@/components/ui';
+import { BRAND_NAME } from '@/lib/branding';
 
-export const metadata = { title: 'Refunds | PreCAS Practice' };
+export const metadata = { title: `Refunds | ${BRAND_NAME}` };
 
 /**
  * Working draft. Confirm the exact refund rule with the client before launch.

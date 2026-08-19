@@ -2,8 +2,9 @@ import { SiteHeader } from '@/components/SiteHeader';
 import { headerSession } from '@/lib/auth/header-session';
 import { SiteFooter } from '@/components/SiteFooter';
 import { Page, Card, SectionTitle } from '@/components/ui';
+import { BRAND_NAME } from '@/lib/branding';
 
-export const metadata = { title: 'Terms of use | PreCAS Practice' };
+export const metadata = { title: `Terms of use | ${BRAND_NAME}` };
 
 /**
  * Working draft. Review with a Nepali legal adviser before a paid launch.
@@ -43,7 +44,7 @@ export default async function TermsPage() {
             <section className="flex flex-col gap-3">
               <SectionTitle>What this is</SectionTitle>
               <p>
-                PreCAS Practice is a tool to help you practise a UK Pre-CAS credibility interview and
+                {BRAND_NAME} is a tool to help you practise a UK Pre-CAS credibility interview and
                 get feedback. It is practice only. We help you explain your own true situation clearly.
               </p>
             </section>

@@ -1,5 +1,6 @@
 import { platform } from '@/lib/platform';
 import { repo } from '@/lib/db';
+import { BRAND_NAME } from '@/lib/branding';
 
 /**
  * The trial gate.
@@ -149,7 +150,7 @@ export function blockedMessage(settings: { supportWhatsapp?: string; contactPhon
 export function blockedWhatsappLink(settings: { supportWhatsapp?: string }, name: string | null): string {
   const num = (settings.supportWhatsapp ?? '').replace(/\D/g, '');
   const msg = encodeURIComponent(
-    `Hello, my free trial on PreCAS Practice is blocked on this device. My name is ${name ?? ''}. Please can you check it.`
+    `Hello, my free trial on ${BRAND_NAME} is blocked on this device. My name is ${name ?? ''}. Please can you check it.`
   );
   return num ? `https://wa.me/${num}?text=${msg}` : '';
 }

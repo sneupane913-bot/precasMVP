@@ -15,6 +15,15 @@
  * Run: see qa/README.md. Needs `next dev` and no .env.local in the mirror.
  */
 const http = require('http');
+const fsBrand = require('fs');
+
+/** Pulled from lib/branding.ts rather than re-typed, so a rename here cannot drift from the product. */
+const BRAND_NAME = (() => {
+  const src = fsBrand.readFileSync(require('path').join(__dirname, '..', 'lib', 'branding.ts'), 'utf8');
+  const m = src.match(/export const BRAND_NAME = '([^']+)'/);
+  if (!m) throw new Error('rules-check: could not read BRAND_NAME from lib/branding.ts');
+  return m[1];
+})();
 
 /**
  * The back-office passcodes, READ FROM THE ENVIRONMENT.
@@ -143,7 +152,7 @@ const PUBLIC_PAGES = ['/', '/pricing', '/universities', '/consultancy', '/privac
 
   const four04 = await text('/no-such-page-' + S);
   t('V-7', 'An unknown URL is branded and offers two ways out',
-    four04.code === 404 && four04.text.includes('PreCAS Practice') && (four04.html.match(/href="\/[^"]*"/g) || []).length >= 2,
+    four04.code === 404 && four04.text.includes(BRAND_NAME) && (four04.html.match(/href="\/[^"]*"/g) || []).length >= 2,
     `${four04.code}, branded, ${(four04.html.match(/href="\/[^"]*"/g) || []).length} links out`);
 
   const start = await text('/start');
