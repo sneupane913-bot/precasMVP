@@ -527,9 +527,19 @@ export class SupabaseRepo implements Repo {
    * by a check that two racing requests could both pass.
    */
   async claimWalletTxnId(walletTxnId: string, orderId: string): Promise<boolean> {
+    /**
+     * SECURITY AUDIT 21 Aug (finding #4). Normalise EXACTLY as blob-repo does.
+     * The unique column is the whole anti-double-claim control; writing the
+     * raw browser value here while the route later stores the trimmed,
+     * upper-cased one meant a re-used transaction id with different case or
+     * whitespace slipped past this claim and collided later as a 500 instead
+     * of a clean TXN_ALREADY_USED. One control, one canonical form, both
+     * stores.
+     */
+    const canonical = walletTxnId.trim().toUpperCase();
     const res = await rest(`payment_orders?id=eq.${orderId}`, {
       method: 'PATCH',
-      body: JSON.stringify({ wallet_txn_id: walletTxnId }),
+      body: JSON.stringify({ wallet_txn_id: canonical }),
       prefer: 'return=representation',
     });
     if (!res.ok) return false; // 409 from the unique index means already claimed

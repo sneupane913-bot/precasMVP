@@ -396,7 +396,17 @@ export function Monogram({
     >
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt="" width={size - 16} height={size - 16} className="object-contain" />
+        /* QA B2 (applied here too): bpp.svg and uel.svg are white/reversed
+           artwork (fill:#fff) and vanished on this light tile. brightness(0)
+           flattens every mark to solid ink — all visible, all consistent,
+           exactly as the TrustedBy strip and /start already render them. */
+        <img
+          src={src}
+          alt=""
+          width={size - 16}
+          height={size - 16}
+          className="object-contain [filter:brightness(0)]"
+        />
       ) : (
         <span className="font-serif text-[1.05rem] font-bold tracking-wide text-ink">{initials}</span>
       )}

@@ -91,6 +91,11 @@ async function signIn(handle, opts = {}) {
   else newStudentIp();
   const r = await req('POST', '/api/auth/firebase',
     { idToken: `dev:${handle}`, fingerprint: opts.fingerprint, via: opts.via, ref: opts.ref }, opts);
+  // N-30: the welcome form is mandatory before any interview.
+  let h = 7;
+  for (const c of String(handle)) h = (h * 31 + c.charCodeAt(0)) | 0;
+  await req('POST', '/api/student/profile',
+    { fullName: `QA ${handle}`.slice(0, 60), whatsappNumber: '98' + String(Math.abs(h)).padStart(8, '0').slice(-8) }, opts);
   return J(r.body);
 }
 const signOut = () => req('DELETE', '/api/me');
@@ -646,8 +651,14 @@ async function buyPack(packCode = 'prep', txn = 'WALK-' + Date.now() + Math.floo
       await staff('/api/super', { action: 'setStudentStatus', superKey: SUPER, studentId: him.id, status: 'disabled' });
     }
     jar = keep;
+    // D-30: a disabled student is refused with a 403 ACCOUNT_DISABLED that
+    // SAYS the account is paused — not a 401 that sends them round the sign-in
+    // loop for ever. The old `=== 401` here predated that fix and was asserting
+    // the exact loop D-30 exists to prevent.
+    const disCreate = await req('POST', '/api/session/create', { institution: 'bpp-university', mode: 'test' });
     t('9.1  a disabled student cannot start an interview',
-      (await req('POST', '/api/session/create', { institution: 'bpp-university', mode: 'test' })).code === 401);
+      disCreate.code === 403 && J(disCreate.body)?.error?.code === 'ACCOUNT_DISABLED',
+      `-> ${disCreate.code} ${J(disCreate.body)?.error?.code}`);
     t('9.2  and cannot pay either', (await req('POST', '/api/payment', { action: 'create', packCode: 'prep' })).code === 401);
     t('9.3  but the site does not crash on him', (await req('GET', '/')).code === 200);
   }

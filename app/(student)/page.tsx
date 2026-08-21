@@ -36,9 +36,18 @@ export default async function HomePage() {
           headline.
           ------------------------------------------------------------------ */}
       <section className="relative isolate overflow-hidden bg-ink text-white">
+        {/* Two crops of the same shoot, one per orientation. hero-mobile.png
+            existed in public/img and was referenced nowhere, so phones — which
+            is most of this audience — were stretching the landscape crop. The
+            portrait crop keeps the student and the phone in frame. */}
         <div
           aria-hidden
-          className="absolute inset-0 -z-20 bg-cover bg-center opacity-70"
+          className="absolute inset-0 -z-20 bg-cover bg-center opacity-70 md:hidden"
+          style={{ backgroundImage: "image-set(url('/img/hero-mobile.png') 1x)" }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-20 hidden bg-cover bg-center opacity-70 md:block"
           style={{ backgroundImage: "image-set(url('/img/hero-desktop.png') 1x)" }}
         />
         <div
@@ -112,7 +121,10 @@ export default async function HomePage() {
                 n: '3',
                 t: 'Get real feedback',
                 d: 'We tell you what you actually said and how to say it better.',
-                img: '/img/dashboard-welcome.png',
+                // step-3-report.png is the same portrait series as steps 1 and
+                // 2 (same shoot, same 1122x1402 crop) and shows the report
+                // itself — dashboard-welcome was a landscape odd-one-out here.
+                img: '/img/step-3-report.png',
               },
             ].map((s) => (
               /* One person's journey across three photographs, so the section

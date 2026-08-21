@@ -106,6 +106,20 @@ function StartInner() {
       try {
         const me = await withTimeout('/api/me');
         if (!cancelled && me?.data?.signedIn) {
+          /**
+           * N-30. The gap this closed: a student who signed in yesterday and
+           * closed /welcome without filling it came back, and THIS branch sent
+           * them straight past the profile screen for ever. The fresh sign-in
+           * path checked `needsProfile`; the already-signed-in path never did.
+           * Same rule on both paths now, and the server refuses session
+           * creation anyway (PROFILE_REQUIRED), so this is the polite door,
+           * not the lock.
+           */
+          if (me?.data?.needsProfile) {
+            const after = explicitNext ?? '/universities';
+            router.replace(`/welcome?next=${encodeURIComponent(after)}`);
+            return;
+          }
           // DB-1. Decide from the ledger, not from a default. An explicit
           // ?next= still wins, because that is what carries a chosen pack
           // through the sign-in detour.
@@ -138,7 +152,15 @@ function StartInner() {
           Stitch "sign_in": the value proposition sits beside the button so the
           page never reads as a bare gate. Hidden on small screens, where the
           button must stay in the thumb zone. */}
-      <aside className="hidden flex-col justify-between bg-surface-sunk px-12 py-12 lg:flex">
+      <aside className="relative hidden flex-col justify-between overflow-hidden bg-surface-sunk px-12 py-12 lg:flex">
+        {/* signin-aside.png — the same photo series as the landing page, shot
+            for exactly this panel and previously referenced nowhere. Kept
+            faint under a surface wash so the checklist stays readable. */}
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-cover bg-center opacity-[0.14]"
+          style={{ backgroundImage: "url('/img/signin-aside.png')" }}
+        />
         <Link
           href="/"
           className="inline-flex min-h-tap items-center self-start font-serif text-lg font-bold text-ink"

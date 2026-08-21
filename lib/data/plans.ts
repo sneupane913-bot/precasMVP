@@ -68,23 +68,20 @@ export const PLANS: Plan[] = [
   {
     code: 'serious',
     /**
-     * WITHDRAWN FROM PUBLIC SALE, 18 August 2026, until the bank grows.
+     * BACK ON PUBLIC SALE, 21 August 2026.
      *
-     * This pack promises ten sittings. A sitting is 17 questions and the bank
-     * holds 22 root questions, so a student who bought this saw substantially
-     * the whole bank in sitting one and then met it again nine more times.
-     * That is not a product; it is the same mock sold ten times.
+     * It was withdrawn on 18 August because ten sittings of 17 cannot be
+     * honestly filled from a bank of 22 root questions — a student met the
+     * whole bank in sitting one and then met it again nine more times.
      *
-     * Nothing else changes. The pack still exists, consultancy seats are still
-     * derived from it, and anyone who already holds it keeps exactly what they
-     * bought. It is simply not offered to new buyers.
-     *
-     * TO PUT IT BACK: load the reviewed question bank (401 harvested, sourced,
-     * in PreCAS-question-bank.xlsx) so the bank holds at least 3 x 17 = 51 root
-     * questions, then flip this to true. qa/promise-check.js enforces the rule
-     * and will tell you the moment it is satisfied.
+     * The condition for its return was always stated in this comment: load the
+     * reviewed question bank. That is now done — lib/data/questions.ts holds
+     * 72 root questions (plus probes), drawn from the 17 August harvest of 401
+     * sourced questions (PreCAS-question-bank.xlsx). 72 roots support
+     * 3 x floor(72/17) = 12 sittings, so ten is inside the honesty rule and
+     * qa/promise-check.js confirms it green.
      */
-    isPublic: false,
+    isPublic: true,
     name: 'Serious',
     tagline: 'Build real confidence',
     priceNpr: 799,

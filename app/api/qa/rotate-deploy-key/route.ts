@@ -32,6 +32,18 @@ export async function POST(req: Request) {
     // Indistinguishable from a route that was never deployed.
     return new NextResponse('Not found', { status: 404 });
   }
+  /**
+   * SECURITY AUDIT 21 Aug (finding #2). `NODE_ENV` alone is not a lock: a
+   * staging deploy, a preview build, or a misconfigured container can run with
+   * NODE_ENV !== 'production' while being reachable from the internet — and
+   * this route would then let ANY anonymous caller set the super admin
+   * passcode. So it now also requires the QA harness secret. The harness sets
+   * QA_ALLOW_DEV_TOKENS=1 already (see lib/auth/firebase.ts); without that
+   * flag the route refuses to exist even in development.
+   */
+  if (process.env.QA_ALLOW_DEV_TOKENS !== '1') {
+    return new NextResponse('Not found', { status: 404 });
+  }
 
   let body: z.infer<typeof Body>;
   try {

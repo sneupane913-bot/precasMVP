@@ -75,14 +75,29 @@ async function signInSeat(token, via, seat) {
   const ip = nextIp();
   const r = await req('POST', '/api/auth/firebase',
     { idToken: `dev:${token}`, fingerprint: token, via, seat }, { ip });
-  return { jar: jarOf(r), ip, res: r };
+  const out = { jar: jarOf(r), ip, res: r };
+  // N-30: seat students fill the welcome form too — they are exactly the ones
+  // the owner most needs to be able to ring.
+  await req('POST', '/api/student/profile',
+    { fullName: `QA ${token}`.slice(0, 60), whatsappNumber: qaPhone(token) }, { ip, cookie: out.jar });
+  return out;
+}
+
+function qaPhone(token) {
+  let h = 7;
+  for (const c of String(token)) h = (h * 31 + c.charCodeAt(0)) | 0;
+  return '98' + String(Math.abs(h)).padStart(8, '0').slice(-8);
 }
 
 async function signIn(token, opts = {}) {
   const ip = opts.ip || nextIp();
   const r = await req('POST', '/api/auth/firebase',
     { idToken: `dev:${token}`, fingerprint: opts.fp || token, ...(opts.via ? { via: opts.via } : {}) }, { ip });
-  return { jar: jarOf(r), ip, res: r };
+  const out = { jar: jarOf(r), ip, res: r };
+  // N-30: the welcome form is mandatory before any interview.
+  await req('POST', '/api/student/profile',
+    { fullName: `QA ${token}`.slice(0, 60), whatsappNumber: qaPhone(token) }, { ip, cookie: out.jar });
+  return out;
 }
 
 (async () => {

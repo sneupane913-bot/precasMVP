@@ -332,7 +332,9 @@ export const platform: PlatformStore =
 export function isOwner(key: string | undefined | null): boolean {
   const expected = process.env.OWNER_ACCESS_KEY;
   if (!expected) return process.env.NODE_ENV !== 'production' && key === 'owner-dev';
-  return Boolean(key) && key === expected;
+  // Constant-time, like the super admin comparison below. `===` leaks how much
+  // of a guess matched through response timing. (Security audit 21 Aug, #7.)
+  return Boolean(key) && secretEquals(key ?? '', expected);
 }
 
 /**

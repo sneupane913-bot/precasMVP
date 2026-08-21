@@ -121,6 +121,16 @@ function phoneSafe(html) {
   t('3. signs in with Google', signed?.ok === true);
   t('   is given the free trial', signed?.data?.trial?.outcome === 'granted', signed?.data?.trial?.outcome);
 
+  // 3b -------------------------------------------------- the welcome form
+  // N-30: mandatory since 21 Aug. The journey now includes the form, because
+  // a student cannot start an interview without it and neither can this test.
+  const noProfile = await req('POST', '/api/session/create', { institution: 'bpp-university', mode: 'test' });
+  t('3b. cannot start before giving name and WhatsApp number',
+    noProfile.code === 403, `code ${noProfile.code}`);
+  const prof = J((await req('POST', '/api/student/profile',
+    { fullName: 'Journey Student', whatsappNumber: '9812345678' })).body);
+  t('    gives name and WhatsApp number', prof?.ok === true);
+
   // 4 ------------------------------------------------------------ catalogue
   const unis = await req('GET', '/universities');
   t('4. can browse universities', unis.code === 200);

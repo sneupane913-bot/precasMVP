@@ -141,7 +141,15 @@ async function newStudent(tag, ip) {
   // `cookie` is the name `req` reads. Naming it `jar` here silently sent every
   // later request signed out, which is a good reminder that a test harness can
   // fail in exactly the way the product must not.
-  return { cookie: jarOf(r), ip };
+  const out = { cookie: jarOf(r), ip };
+  // N-30: the welcome form is mandatory before any interview, so the harness
+  // fills it exactly as a student must.
+  let h = 7;
+  for (const c of String(tag)) h = (h * 31 + c.charCodeAt(0)) | 0;
+  await req('POST', '/api/student/profile',
+    { fullName: `QA ${tag}`.slice(0, 60), whatsappNumber: '98' + String(Math.abs(h)).padStart(8, '0').slice(-8) },
+    { ip, cookie: out.cookie });
+  return out;
 }
 
 (async () => {

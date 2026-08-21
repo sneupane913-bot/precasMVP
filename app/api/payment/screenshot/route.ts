@@ -74,9 +74,37 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
-  if (file.type && !ALLOWED.has(file.type)) {
+  /**
+   * SECURITY AUDIT 21 Aug (finding #3). The old check read
+   * `if (file.type && ...)`, so a request with an EMPTY content type skipped
+   * the allowlist entirely and any 2 MB of anything could be stored labelled
+   * image/jpeg. Content type is attacker-supplied either way, so the real
+   * check is the magic bytes below; the declared type is now merely required
+   * to be an image one when present.
+   */
+  if (!file.type || !ALLOWED.has(file.type)) {
     return NextResponse.json(
-      apiError('BAD_TYPE', file.type, 'Please send a picture, not another kind of file.'),
+      apiError('BAD_TYPE', file.type || 'missing content type', 'Please send a picture, not another kind of file.'),
+      { status: 400 }
+    );
+  }
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const looksLikeImage =
+    // JPEG
+    (bytes.length > 2 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) ||
+    // PNG
+    (bytes.length > 7 &&
+      bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) ||
+    // WebP: RIFF....WEBP
+    (bytes.length > 11 &&
+      bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 &&
+      bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50) ||
+    // HEIC/HEIF: ....ftyp
+    (bytes.length > 11 &&
+      bytes[4] === 0x66 && bytes[5] === 0x74 && bytes[6] === 0x79 && bytes[7] === 0x70);
+  if (!looksLikeImage) {
+    return NextResponse.json(
+      apiError('BAD_TYPE', 'magic bytes are not an image', 'Please send a picture, not another kind of file.'),
       { status: 400 }
     );
   }
@@ -97,7 +125,7 @@ export async function POST(req: Request) {
     if (process.env.NETLIFY === 'true' || process.env.NETLIFY_BLOBS_CONTEXT) {
       const { getStore } = await import('@netlify/blobs');
       const store = getStore({ name: 'precas-receipts', consistency: 'strong' });
-      await store.set(key, await file.arrayBuffer(), {
+      await store.set(key, bytes.buffer as ArrayBuffer, {
         metadata: { orderId: order.id, studentId: student.id, contentType: file.type || 'image/jpeg' },
       });
     }

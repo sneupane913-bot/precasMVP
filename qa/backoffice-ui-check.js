@@ -62,8 +62,18 @@ const t=(n,c,d='')=>{if(c){ok++;console.log('  ok   '+n)}else{bad++;console.log(
  t('super admin can approve it', appr.code===200, `${appr.code}`);
  // The code we set them is a HANDOVER code: it opens the door once and shows
  // them nothing, because until they replace it we and they share one secret.
+ // D-15: login on the handover code now RETURNS 200 so the change-passcode
+ // screen can render — but it must return an EMPTY view. The old assertion
+ // (a PASSCODE_MUST_CHANGE refusal on login itself) tested the exact lockout
+ // D-15 removed. What must still be true: no student, order or notification
+ // leaves the server until the shared secret is replaced.
  const stillGated=await req('POST','/api/admin',{action:'login',slug:'newhub-'+S,passcode:'handover-hub1'});
- t('an approved consultancy still cannot read anything on our handover code', stillGated.json?.error?.code==='PASSCODE_MUST_CHANGE', `${stillGated.code} ${stillGated.json?.error?.code}`);
+ t('an approved consultancy still cannot read anything on our handover code',
+   stillGated.code===200 && stillGated.json?.data?.passcodeIsTemporary===true
+     && (stillGated.json?.data?.students??[]).length===0
+     && (stillGated.json?.data?.orders??[]).length===0
+     && (stillGated.json?.data?.notifications??[]).length===0,
+   `${stillGated.code} temp=${stillGated.json?.data?.passcodeIsTemporary} students=${(stillGated.json?.data?.students??[]).length}`);
  const chose=await req('POST','/api/admin',{action:'changePasscode',slug:'newhub-'+S,passcode:'handover-hub1',newPasscode:'hubpass1'});
  t('they can choose their own passcode', chose.code===200, `${chose.code} ${chose.body.slice(0,120)}`);
  const login=await req('POST','/api/admin',{action:'login',slug:'newhub-'+S,passcode:'hubpass1'});

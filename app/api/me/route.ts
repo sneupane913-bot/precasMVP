@@ -43,6 +43,14 @@ export async function GET() {
     referralCode: string;
     referralsRewarded: number;
     profileComplete: boolean;
+    /**
+     * N-30. True when we still hold no name or WhatsApp number for them.
+     * Pages that route a signed-in student PAST /welcome (the /start
+     * short-circuit) must check this, or a student who closed the welcome
+     * screen once is never asked again — which is exactly how /super ended up
+     * showing students with no phone number at all.
+     */
+    needsProfile: boolean;
     entitlement: typeof ent;
     offer: typeof offer;
     /**
@@ -71,6 +79,7 @@ export async function GET() {
       // trial. Forcing a form on a nervous student before any value is the
       // funnel mistake the marketing analyst correctly pushed back on.
       profileComplete: Boolean(student.name && student.attributionConsultancy),
+      needsProfile: !student.whatsappNumber || !student.name,
       entitlement: ent,
       offer,
     },

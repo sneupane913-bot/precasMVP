@@ -40,3 +40,7 @@
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"
     Permissions-Policy = "camera=(self), microphone=(self)"
+    # Security audit 21 Aug (#5): the site is HTTPS-only (Netlify), so pin it.
+    # One year, subdomains included. A student on hostel wifi should never be
+    # downgradable to plain HTTP on the page that takes their money.
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"

@@ -18,6 +18,20 @@ export const metadata: Metadata = {
   title: `${BRAND_NAME} | Practise your UK interview`,
   description:
     'Sit a real mock Pre-CAS credibility interview for your university and find out exactly what to fix before the real one.',
+  // og-share.png sat in public/img and was wired to nothing, so every link
+  // shared on WhatsApp — the one channel this product spreads through —
+  // rendered with no picture. The image card is most of a WhatsApp preview.
+  openGraph: {
+    title: `${BRAND_NAME} | Practise your UK interview`,
+    description:
+      'Sit a real mock Pre-CAS credibility interview for your university and find out exactly what to fix before the real one.',
+    images: [{ url: '/img/og-share.png', width: 1672, height: 941 }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/img/og-share.png'],
+  },
   manifest: '/manifest.json',
   appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: BRAND_NAME },
   // QA-211: /icon-192.png, /icon-512.png and the Apple touch icon all 404'd,

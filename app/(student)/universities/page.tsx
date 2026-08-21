@@ -157,13 +157,28 @@ function UniversityBrowser() {
       });
       const json = (await res.json()) as
         | { ok: true; data: { sessionId: string } }
-        | { ok: false; error: { userMessage: string; action?: { label: string; href: string } } };
+        | {
+            ok: false;
+            error: { code?: string; userMessage: string; action?: { label: string; href: string } };
+          };
 
       if (!json.ok) {
         // Session expired between load and tap: recover by signing in again
         // rather than showing a dead error.
         if (res.status === 401) {
           router.push(`/start?next=${encodeURIComponent('/universities?start=' + slug)}`);
+          return;
+        }
+        /**
+         * N-30. The server refuses to start an interview until we hold a name
+         * and a WhatsApp number. That refusal is not an error to read — it is
+         * one short form away, so take them there, and `?start=` brings them
+         * straight back to the university they tapped.
+         */
+        if (json.error.code === 'PROFILE_REQUIRED') {
+          router.push(
+            `/welcome?next=${encodeURIComponent('/universities?start=' + slug)}`
+          );
           return;
         }
         setError(json.error.userMessage);

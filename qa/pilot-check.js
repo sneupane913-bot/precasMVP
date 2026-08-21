@@ -79,7 +79,14 @@ async function signIn(token, opts = {}) {
   const r = await req('POST', '/api/auth/firebase',
     { idToken: `dev:${token}`, fingerprint: opts.fp || token, ...(opts.via ? { via: opts.via } : {}), ...(opts.ref ? { ref: opts.ref } : {}) },
     { ip });
-  return { jar: jarOf(r), ip, res: r };
+  const out = { jar: jarOf(r), ip, res: r };
+  // N-30: the welcome form is mandatory before any interview.
+  let h = 7;
+  for (const c of String(token)) h = (h * 31 + c.charCodeAt(0)) | 0;
+  await req('POST', '/api/student/profile',
+    { fullName: `QA ${token}`.slice(0, 60), whatsappNumber: '98' + String(Math.abs(h)).padStart(8, '0').slice(-8) },
+    { ip, cookie: out.jar });
+  return out;
 }
 
 /** Answer one question with audio that passes the guard. */
@@ -391,9 +398,28 @@ function answer(sessionId, questionId, jar, ip) {
     `transcript-ish fields in the admin payload: ${leaked.length ? leaked.join(', ') : 'none'}`);
 
   const pub = await req('GET', '/api/platform', null, { ip: nextIp() });
-  t('CS-25', 'The public read leaks nothing but the switch',
-    Object.keys(pub.json?.data ?? {}).length === 1,
-    `public payload = ${JSON.stringify(pub.json?.data)}`);
+  /**
+   * 19 Aug. This asserted the public payload had EXACTLY one key, and went red
+   * the moment D-17 deliberately added `supportWhatsapp` to it.
+   *
+   * The product is right and the test was stale. D-17 exists because a student
+   * whose checkout failed had no way to reach anybody: the support number was
+   * behind a passcode, so the one screen that needed it most could not show it.
+   * The number is printed on the site and on the QR page anyway. It is the
+   * business's own number, not a student's.
+   *
+   * So the rule becomes an ALLOWLIST rather than a count. That is stricter in
+   * the way that matters: adding a third field now fails until somebody writes
+   * down why it is safe to publish, which a bare `length === 1` never asked.
+   */
+  const PUBLIC_OK = new Set(['maintenanceMode', 'supportWhatsapp']);
+  const publicKeys = Object.keys(pub.json?.data ?? {});
+  const unexpected = publicKeys.filter((k) => !PUBLIC_OK.has(k));
+  t('CS-25', 'The public read leaks nothing but the switch and the support number',
+    publicKeys.length > 0 && unexpected.length === 0,
+    unexpected.length
+      ? `unexpected public field(s): ${unexpected.join(', ')}`
+      : `public payload = ${JSON.stringify(pub.json?.data)}`);
 
   console.log('\n=== THE LOOP THE CLIENT HIT ===\n');
 

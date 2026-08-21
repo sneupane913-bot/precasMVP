@@ -95,11 +95,27 @@ function t(rule, claim, ok, detail) {
   console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${rule.padEnd(6)} ${claim.padEnd(58)} ${detail}`);
 }
 
+/** A valid, deterministic Nepali mobile derived from the token. */
+function qaPhone(token) {
+  let h = 7;
+  for (const c of String(token)) h = (h * 31 + c.charCodeAt(0)) | 0;
+  return '98' + String(Math.abs(h)).padStart(8, '0').slice(-8);
+}
+
 async function signIn(token, opts = {}) {
   const ip = opts.ip || nextIp();
   const r = await req('POST', '/api/auth/firebase',
     { idToken: `dev:${token}`, fingerprint: opts.fp || token, ...(opts.via ? { via: opts.via } : {}) }, { ip });
-  return { jar: jarOf(r), ip, res: r };
+  const out = { jar: jarOf(r), ip, res: r };
+  // N-30: an interview cannot start until a name and WhatsApp number are on
+  // file, so the harness completes the welcome form exactly as a student must.
+  // Pass noProfile:true to test the gate itself.
+  if (!opts.noProfile) {
+    await req('POST', '/api/student/profile',
+      { fullName: `QA Student ${token}`.slice(0, 60), whatsappNumber: qaPhone(token) },
+      { ip, cookie: out.jar });
+  }
+  return out;
 }
 
 const PUBLIC_PAGES = ['/', '/pricing', '/universities', '/consultancy', '/privacy', '/terms', '/refund', '/practice', '/start'];
@@ -194,6 +210,24 @@ const PUBLIC_PAGES = ['/', '/pricing', '/universities', '/consultancy', '/privac
     bad.json?.error?.code === 'AUTH_FAILED' && !!bad.json?.error?.message,
     `rejected token -> ${bad.json?.error?.code} with an internal reason recorded`);
 
+  /**
+   * S-13, REWRITTEN 21 Aug ON THE CLIENT'S INSTRUCTION.
+   *
+   * The rule used to be "the trial needs no card, no phone and no form". The
+   * client reversed the phone half of that after /super showed students with
+   * no number at all: NOBODY starts an interview until a name and WhatsApp
+   * number are recorded. So the rule now asserts the gate exists and cannot be
+   * skipped — a session create without a profile must be refused with
+   * PROFILE_REQUIRED and a way to /welcome, and must succeed after the form.
+   * Still no card and no payment before the trial; that half stands.
+   */
+  const gateStu = await signIn(`r1gate-${S}`, { noProfile: true });
+  const refused = await req('POST', '/api/session/create', { institution: 'bpp-university', mode: 'test' }, { ip: gateStu.ip, cookie: gateStu.jar });
+  t('S-13', 'No interview starts until a name and WhatsApp number are on file',
+    refused.code === 403 && refused.json?.error?.code === 'PROFILE_REQUIRED' &&
+      /welcome/.test(refused.json?.error?.action?.href ?? ''),
+    `no-profile create -> ${refused.code} ${refused.json?.error?.code}, action ${refused.json?.error?.action?.href}`);
+
   // S-12 the trial is the first 10 of the SAME paper.
   const sess = await req('POST', '/api/session/create', { institution: 'bpp-university', mode: 'test' }, { ip: stu.ip, cookie: stu.jar });
   // session/create sets the OWNER cookie, not auth/firebase. Reading a session
@@ -201,8 +235,6 @@ const PUBLIC_PAGES = ['/', '/pricing', '/universities', '/consultancy', '/privac
   // broken endpoint and is really a broken test. (qa/README.md trap 2.)
   stu.jar = [stu.jar, jarOf(sess)].filter(Boolean).join('; ');
   const trialQs = (sess.json?.data?.questions ?? []).map((q) => q.id);
-  t('S-13', 'The trial needs no card, no phone and no form', trialQs.length === 10,
-    'account created and 10 questions served from a Google token alone');
   t('Q-3', 'A full mock is 17 questions; the trial is the first 10', trialQs.length === 10,
     `trial served ${trialQs.length}`);
 

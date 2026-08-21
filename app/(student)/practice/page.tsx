@@ -67,6 +67,11 @@ export default function PracticePage() {
           router.push('/start?next=/practice');
           return;
         }
+        // N-30. No name or number on file: one short form, then back here.
+        if (json.error.code === 'PROFILE_REQUIRED') {
+          router.push(`/welcome?next=${encodeURIComponent('/practice')}`);
+          return;
+        }
         setError(json.error.userMessage);
         setStarting(false);
         return;

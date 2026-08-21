@@ -123,7 +123,26 @@ for suite in "${SERVER[@]}"; do
   # once and looked like thirty broken features instead of one broken sign-in.
   # Asking for the hatch by name means configuring the product properly can
   # never silently disarm the tests again. It is still refused in production.
-  QA_ALLOW_DEV_TOKENS=1 npx next dev -p "$PORT" >"/tmp/qa-$suite.log" 2>&1 &
+  #
+  # AND NOW THE SAME TRAP HAS SPRUNG A SECOND TIME, WITH THE AI KEYS.
+  #
+  # 19 Aug: six ai-check rules went red at once, the day GROQ_API_KEY,
+  # DEEPGRAM_API_KEY and GEMINI_API_KEY were added to .env.local. Nothing in
+  # the product had broken. The suites post SYNTHETIC audio, a few bytes that
+  # are not speech, and were written against `mockTranscribe`, which only runs
+  # when no provider key is present. With real keys, `next dev` loads them, the
+  # fake audio is sent to Groq, and Groq correctly reports it heard nothing. The
+  # tests then failed for saying so.
+  #
+  # So the AI keys are unset for the test servers, deliberately and by name.
+  #
+  # BE HONEST ABOUT WHAT THIS COSTS: these suites no longer prove the real
+  # provider path works. They prove the SHAPE of it, on the demo transcriber.
+  # The real path is proven by sitting an actual interview, which is what X-3
+  # is for and how D-36 and D-39 were both found.
+  QA_ALLOW_DEV_TOKENS=1 \
+  GROQ_API_KEY= DEEPGRAM_API_KEY= GEMINI_API_KEY= \
+  npx next dev -p "$PORT" >"/tmp/qa-$suite.log" 2>&1 &
   SRV=$!
 
   # Wait for it to answer rather than sleeping a fixed guess.
@@ -142,8 +161,19 @@ for suite in "${SERVER[@]}"; do
     FAILED=$((FAILED + 1))
   fi
 
+  # Kill the WHOLE server, not just the npx wrapper. Next 16 holds a
+  # single-instance lock per project dir, so a surviving child makes every
+  # later suite's server refuse to start ("Another next dev server is already
+  # running") and that suite then fails with connection-refused zeros that look
+  # like thirty broken features. Kill the wrapper, its children, and whatever
+  # actually holds the port.
+  pkill -P "$SRV" 2>/dev/null
   kill "$SRV" 2>/dev/null
   wait "$SRV" 2>/dev/null
+  if command -v lsof >/dev/null 2>&1; then
+    LEFT=$(lsof -ti tcp:"$PORT" 2>/dev/null)
+    [ -n "$LEFT" ] && kill -9 $LEFT 2>/dev/null
+  fi
   sleep 1
 done
 

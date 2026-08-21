@@ -101,6 +101,33 @@ export async function POST(req: Request) {
     );
   }
 
+  /**
+   * N-30, ENFORCED AT THE ONLY DOOR THAT MATTERS.
+   *
+   * The welcome screen collects the name and the WhatsApp number, but a screen
+   * is not a rule: a student who pressed Back on /welcome, or who was already
+   * signed in when /start short-circuited past the profile check, reached here
+   * with no number on file — and /super showed exactly that: students with no
+   * phone number at all. The client's requirement is plain: nobody starts an
+   * interview until we can reach them.
+   *
+   * So the check lives HERE, on the server, where it cannot be skipped by any
+   * navigation path, old tab, or hand-crafted request. The refusal carries the
+   * way out with it (WALK 1.11): the browser sends them to /welcome and brings
+   * them straight back to what they were doing.
+   */
+  if (!student.whatsappNumber || !student.name) {
+    return NextResponse.json(
+      apiError(
+        'PROFILE_REQUIRED',
+        'student has no name or whatsapp number on file',
+        'Before your first question we need your name and your WhatsApp number, so your report is yours and we can help you if a payment goes wrong.',
+        { label: 'Add your details', href: '/welcome?next=/universities' }
+      ),
+      { status: 403 }
+    );
+  }
+
   let parsed: z.infer<typeof Body>;
   try {
     parsed = Body.parse(await req.json());

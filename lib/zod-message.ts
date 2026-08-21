@@ -27,7 +27,18 @@ export function zodMessage(err: ZodError): string {
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .toLowerCase();
 
-  const where = field && field !== 'action' ? `"${field}"` : 'one of the fields';
+  /**
+   * 19 Aug. This used to wrap the field in quotes, which produced sentences
+   * like `"order id" is missing, or is not the right kind of value.` A student
+   * reading that is being shown a database column and a type error. Naming the
+   * field was the right idea in D-22; the quotes and the machine phrasing were
+   * not.
+   *
+   * Sentence case, no quotes, and every branch now ends with something the
+   * person can DO. Naming the field and telling them what to do next are not
+   * alternatives.
+   */
+  const where = field && field !== 'action' ? sentence(field) : 'One of the fields';
 
   switch (issue.code) {
     case 'too_big': {
@@ -45,10 +56,15 @@ export function zodMessage(err: ZodError): string {
         : `${where} is too low. The least you can use is ${min}.`;
     }
     case 'invalid_type':
-      return `${where} is missing, or is not the right kind of value.`;
+      return `${where} is missing. Please check the details and try again.`;
     default:
       // A refine() carries its own written message, which is always better
       // than anything generated here.
-      return issue.message || `Please check ${where}.`;
+      return issue.message || `Please check the details and try again.`;
   }
+}
+
+/** "order id" -> "Order id". Sentence case, so the message reads like English. */
+function sentence(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }

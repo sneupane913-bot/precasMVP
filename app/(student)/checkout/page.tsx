@@ -565,6 +565,15 @@ function Checkout() {
                     scan from the same phone that shows this page, which cannot
                     work, so the number is always given as well and is always
                     copyable. */}
+                {/* The super admin has not uploaded a QR yet. Say so plainly
+                    rather than leaving the student to wonder whether the page
+                    is broken — the wallet number below still takes the money. */}
+                {!order.payTo.qrImageUrl && (
+                  <p className="rounded-control bg-surface-sunk px-4 py-3 text-sm text-ink-soft">
+                    No QR code has been added yet, so please send the money directly to the wallet
+                    number below.
+                  </p>
+                )}
                 {order.payTo.qrImageUrl && (
                   <div>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -602,8 +611,20 @@ function Checkout() {
                 </div>
               </>
             ) : (
-              <p className="rounded-control bg-warn-tint p-4 text-sm text-warn">
-                Payment details are not set up yet. Please contact us on WhatsApp to pay.
+              /* Neither a QR nor a wallet number has been set by the super
+                 admin. The client's rule: never a dead end — name the problem
+                 AND put the contact number in the same sentence. The number
+                 itself comes from platform settings (super admin sets it, no
+                 deploy), with the env var as the last fallback. */
+              <p className="rounded-control bg-warn-tint p-4 text-sm font-medium text-warn">
+                {(() => {
+                  const num = (order.supportWhatsapp || fallbackWhatsapp || '').replace(/\D/g, '');
+                  return num
+                    ? `No QR code has been added yet. Please contact ${
+                        num.length > 10 ? `+${num.slice(0, num.length - 10)} ${num.slice(-10)}` : num
+                      } on WhatsApp and we will take your payment personally.`
+                    : 'No QR code has been added yet and our contact number is being set up. Please check back shortly — nothing is wrong with your account.';
+                })()}
               </p>
             )}
           </Card>

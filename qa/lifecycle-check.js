@@ -76,6 +76,9 @@ function t(id, ok, detail) { (ok ? pass++ : fail++); console.log(`  ${ok ? 'PASS
   const auth = J((await req('POST', '/api/auth/firebase', { idToken: 'dev:qa1', fingerprint: 'fp_qa1' })).body);
   t('D1/D3', auth?.data?.isNew === true, `sign-in ok, referral ${auth?.data?.referralCode}`);
 
+  // N-30: the welcome form is mandatory before any interview.
+  await req('POST', '/api/student/profile', { fullName: 'QA One', whatsappNumber: '9810000001' });
+
   const me = J((await req('GET', '/api/me')).body);
   t('D5', me?.data?.entitlement?.mocksLeft === 1 && me?.data?.entitlement?.questionsAllowed === 10,
     `mocksLeft=${me?.data?.entitlement?.mocksLeft} questionsAllowed=${me?.data?.entitlement?.questionsAllowed}`);
@@ -182,8 +185,12 @@ function t(id, ok, detail) { (ok ? pass++ : fail++); console.log(`  ${ok ? 'PASS
   t('I-spend', typeof before === 'number' && after === before - 1,
     `3 answers in one sitting: mocksLeft ${before} -> ${after} (must drop by exactly 1)`);
 
+  // D-17 added supportWhatsapp to the public read on purpose (the checkout's
+  // fallback contact card reads it), so the assertion is now allowlist-shaped:
+  // exactly these two fields and nothing else may leak.
   const pub = J((await req('GET', '/api/platform')).body);
-  t('K8', Object.keys(pub?.data || {}).length === 1, `public read = ${JSON.stringify(pub?.data)}`);
+  const pubKeys = Object.keys(pub?.data || {}).sort().join(',');
+  t('K8', pubKeys === 'maintenanceMode,supportWhatsapp', `public read = ${JSON.stringify(pub?.data)}`);
 
   console.log(`\n  ${pass} passed, ${fail} failed`);
 })();

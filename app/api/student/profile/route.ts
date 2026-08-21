@@ -64,7 +64,17 @@ const Body = z.object({
 });
 
 export async function POST(req: Request) {
-  const rl = rateLimit(`profile:${clientIp(req)}`, RL.auth);
+  /**
+   * RL.signIn, not RL.auth, and the difference is a consultancy lab.
+   *
+   * This form is now MANDATORY before any interview (PROFILE_REQUIRED in
+   * /api/session/create), and RL.auth is 5 per 5 minutes PER IP — a lab of
+   * thirty students on one Wi-Fi would have had 25 of them refused at the
+   * welcome screen. There is no secret to brute-force here (the caller is
+   * already signed in), so the generous sign-in budget is the right one, for
+   * exactly the reason written above RL.signIn in lib/rate-limit.ts.
+   */
+  const rl = rateLimit(`profile:${clientIp(req)}`, RL.signIn);
   if (!rl.allowed) {
     return NextResponse.json(
       apiError('RATE_LIMITED', 'too many attempts', 'Please wait a moment and try again.'),

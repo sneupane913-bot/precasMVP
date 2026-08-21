@@ -126,6 +126,8 @@ function answer(sid, qid, cookie, ip, kb, durationSeconds = 30) {
 
   const signIn = await req('POST', '/api/auth/firebase', { idToken: `dev:ai-${S}`, fingerprint: `ai-${S}` }, { ip });
   let jar = jarOf(signIn);
+  // N-30: the welcome form is mandatory before any interview.
+  await req('POST', '/api/student/profile', { fullName: `AI QA ${S}`, whatsappNumber: '9811223344' }, { ip, cookie: jar });
   const created = await req('POST', '/api/session/create', { institution: 'bpp-university', mode: 'test' }, { ip, cookie: jar });
   jar = merge(jar, jarOf(created));
   const sid = created.json?.data?.sessionId;
