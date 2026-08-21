@@ -239,9 +239,20 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     question,
     transcript,
     durationSeconds,
+    /**
+     * Labelled with the question each answer belonged to, because the
+     * evaluator now runs a consistency cross-check ("earlier you said your
+     * accommodation costs X; now your budget is Y"). A bare transcript with no
+     * question attached made that comparison guesswork — the model could see
+     * the words but not what they were claimed IN ANSWER TO.
+     */
     previousTranscripts: session.answers
       .filter((a) => a.transcriptStatus === 'ok')
-      .map((a) => a.transcript),
+      .map((a) => {
+        const pq = getQuestion(a.questionId);
+        const label = pq ? resolvedQuestion(pq, institution).text : 'earlier question';
+        return `[asked: ${label.slice(0, 120)}] ${a.transcript}`;
+      }),
     /**
      * D-39. Did the timer end this answer, or did the student?
      *

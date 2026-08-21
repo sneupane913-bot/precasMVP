@@ -1006,9 +1006,9 @@ const RAW: Draft[] = [
       'A hidden settlement plan is the thing this question hunts. Honesty is the strategy.',
     ],
     modelAnswer:
-      'After graduating I [plan to apply for the Graduate Route and work in the UK for up to two years to gain experience / plan to return home directly]. That experience as a [role] would [what it adds]. My longer-term plan is [honest plan, e.g. returning to Nepal to [specific goal]], and this course is the foundation for it.',
+      'After graduating I [plan to apply for the Graduate Route and work in the UK for the period it allows, to gain experience / plan to return home directly]. That experience as a [role] would [what it adds]. My longer-term plan is [honest plan, e.g. returning to Nepal to [specific goal]], and this course is the foundation for it.',
     rubricNotes:
-      'Post-study intention. Using the Graduate Route is lawful and must NOT be penalised; incoherence or concealment is what fails. GUARDRAIL: never coach a student to hide a settlement intention — coach them to build a plan they can state honestly.',
+      'Post-study intention. Using the Graduate Route is lawful and must NOT be penalised; incoherence or concealment is what fails. FACT CHECK (verified Aug 2026): the Graduate Route is 2 years for applications made on or before 31 Dec 2026 and 18 months for applications from 1 Jan 2027 (PhDs keep 3 years) — a student quoting "two years" for a 2027+ graduation date should be gently corrected, not penalised. GUARDRAIL: never coach a student to hide a settlement intention — coach them to build a plan they can state honestly.',
   },
   {
     category: 'future_plans',
@@ -1093,6 +1093,373 @@ const RAW: Draft[] = [
       'I enjoy [real hobby]. [One concrete detail — I play futsal with my friends every Saturday / I make videos about [topic]]. When I get to {{university}} I want to join the [related society or club], which I saw they have — it will also help me make friends outside my course.',
     rubricNotes:
       'Second spontaneity sample, and a light research check if a real society is named. Score on natural delivery and a concrete detail. An obviously invented prestige hobby reads worse than an ordinary true one.',
+  },
+
+  // ---------------------------------------------------------------------------
+  // SECOND LOAD FROM THE HARVEST, 21 AUGUST 2026 (same session, deeper cut).
+  //
+  // Client instruction: the questions must challenge the student, and the bank
+  // must comfortably carry the ten-mock pack. This batch is drawn from the
+  // same sourced harvest (PreCAS-question-bank.xlsx) — the sharper, harder
+  // wordings: named course leaders, credit structures, dependants, family
+  // immigration history, second-year money, sponsor shocks, and the English
+  // ability layer the architecture doc flagged as the thin spot. Facts inside
+  // rubrics were re-verified against 2026 guidance this session (Graduate
+  // Route 2yr→18mo from 1 Jan 2027 applications; dependants restricted to
+  // postgraduate research / government-sponsored students since Jan 2024;
+  // maintenance £1,529 London / £1,171 outside, 9 months, 28-day rule; work
+  // 20h degree level, 10h below). Question text still carries NO figures —
+  // facts live in the rubric so a rule change is one edit, not forty.
+  // ---------------------------------------------------------------------------
+  {
+    category: 'education',
+    text: 'Did you have any failed subjects, backlogs or repeated years in your previous studies?',
+    answerKind: 'factual',
+    tips: [
+      'Answer honestly. Your transcript already shows it.',
+      'If yes: name the subject, say why it happened, and what you changed.',
+      'A recovered backlog told plainly is a better story than a hidden one found later.',
+    ],
+    modelAnswer:
+      '[No, I passed every subject at the first attempt.] / [Yes — I had a backlog in [subject] in [year], because [honest reason]. I cleared it in [when], and after that my marks improved because [what changed].]',
+    rubricNotes:
+      'Transcript-consistency check. Concealment is the failure, not the backlog. An honest account with a recovery arc scores well; check coherence with the stated grades and years elsewhere in the sitting.',
+  },
+  {
+    category: 'why_uk',
+    text: 'Why should you be granted a student visa? What makes you a genuine student?',
+    answerKind: 'comparative',
+    tips: [
+      'This is the whole interview in one question. Answer it as a summary of your case.',
+      'Three parts: a real study reason, money that adds up, a plan that needs this course.',
+      'Calm and specific. Do not plead, and do not recite.',
+    ],
+    modelAnswer:
+      'Because my plan holds together. I chose [course] at {{university}} for [specific reason]; my [relation] is funding it from [source] and the money is arranged; and after the course my plan is [specific next step], which needs exactly this qualification. Everything I have said today, my documents also show.',
+    rubricNotes:
+      'The summing-up question. Mark it on whether the three pillars (study logic, funding, forward plan) are each specific AND consistent with what this student said earlier in the sitting — this is the place to use the cross-check hardest. A recited generic closing scores low.',
+  },
+  {
+    category: 'why_course',
+    text: 'Who is your course leader or programme director, and have you looked at who teaches your course?',
+    answerKind: 'factual',
+    tips: [
+      'The course page usually names the programme leader. Find it before the real interview.',
+      'Naming one real lecturer or their specialism is a very strong signal.',
+      'If you cannot find a name, say what you DID find about the teaching team.',
+    ],
+    modelAnswer:
+      'The programme is led by [name], whose area is [specialism]. / I could not find one named leader, but the course page shows the teaching team comes from the [school/department], and their work focuses on [area], which matches the modules I care about.',
+    rubricNotes:
+      'A deliberately hard research question — real interviews ask it precisely because almost no coached student can answer it. Any genuine attempt (a name, a department, a specialism) scores high. Admitting they will check is acceptable; inventing a name is the worst outcome and must be flagged.',
+  },
+  {
+    category: 'why_course',
+    text: 'How many credits does your course carry, and roughly how are they spread across modules?',
+    answerKind: 'factual',
+    tips: [
+      'A UK master’s is typically 180 credits; a bachelor’s year is 120. Check yours.',
+      'Say roughly how they split: taught modules and the dissertation or project.',
+      'Short and numeric. This is a did-you-read-the-page question.',
+    ],
+    modelAnswer:
+      'My course is [number] credits in total. The taught modules carry about [number] each, and the [dissertation/final project] is [number] credits. So most of the year is [coursework/teaching], with the project at the end.',
+    rubricNotes:
+      'Factual depth check. Standard UK shapes: 180 credits for a taught master’s, 120 per undergraduate year, dissertation typically 60. A roughly right structure scores; total ignorance of how their own degree is built is a preparation flag. Never penalise a correct non-standard answer — some courses genuinely differ.',
+  },
+  {
+    category: 'why_course',
+    text: 'Does your course offer optional modules? Which ones do you plan to choose, and why?',
+    answerKind: 'explanatory',
+    tips: [
+      'Name one or two real options from the course page.',
+      'Give a reason tied to your career plan, not just interest.',
+      'If your course has no options, say so — that is also a researched answer.',
+    ],
+    modelAnswer:
+      'Yes — in [semester] I can choose between [option] and [option]. I plan to take [option] because my goal is [career goal], and that module covers [specific content]. / My course is fully fixed with no optional modules; every student takes the same [number] modules.',
+    rubricNotes:
+      'Second-level course research. A named real option plus a career-linked reason is the full answer. "I will decide later" with no options named suggests the course page was never read.',
+  },
+  {
+    category: 'why_university',
+    text: 'Which campus will your course be taught on, and what do you know about it?',
+    answerKind: 'factual',
+    tips: [
+      'Universities can have several campuses. Know YOURS by name.',
+      'One or two real details: the area, a facility, how students get there.',
+      'Naming the wrong campus is worse than naming none — check your offer.',
+    ],
+    modelAnswer:
+      'My course is taught at the [name] campus in [area of {{city}}]. It has [one real detail — the library, a named building, the subject facilities], and it is [how you would reach it] from where I plan to live.',
+    rubricNotes:
+      'TRAP per the research: multi-campus universities catch template answers describing the wrong site, and campus decides the maintenance band at some institutions. A correct campus with one checkable detail scores; a confident description of the wrong campus is a serious false-specificity flag.',
+  },
+  {
+    category: 'why_university',
+    text: 'How is teaching at a UK university different from how you studied in Nepal, and how will you adjust?',
+    answerKind: 'comparative',
+    tips: [
+      'Name two real differences: independent reading, seminars, coursework, referencing.',
+      'Then one honest sentence on which will be hardest for you.',
+      'Finish with what you will actually do about it.',
+    ],
+    modelAnswer:
+      'In Nepal my classes were mostly lectures and exams at the end. In the UK there are fewer lecture hours, much more reading on my own, and marks come from coursework through the year. The hardest change for me will be [honest one, e.g. academic writing with referencing], so I plan to [real step — use the academic skills service early / practise referencing before I arrive].',
+    rubricNotes:
+      'Preparedness and realism. Wants two accurate differences and a personal adjustment plan. A student who thinks UK study is "the same but in English" has not researched; one who names seminars, independent study and continuous assessment has.',
+  },
+  {
+    category: 'finance',
+    text: 'Do you have any personal savings of your own, separate from your sponsor?',
+    answerKind: 'factual',
+    tips: [
+      'Yes or no, then the honest amount and how you built it.',
+      'Savings from a real salary strengthen your whole story.',
+      '"No personal savings, my sponsor covers everything" is also a complete answer.',
+    ],
+    modelAnswer:
+      '[Yes — I have saved about [amount] from my salary at [employer] over [time]. It is in my account at [bank] and it covers [what it is for — my flight, my first months].] / [No — I have been [studying/supporting family], so the full funding comes from my [relation], and their resources cover everything.]',
+    rubricNotes:
+      'Coherence anchor: personal savings must reconcile with the stated salary and the gap account. Savings that outrun the salary that produced them is the contradiction to catch. Either honest answer scores.',
+  },
+  {
+    category: 'finance',
+    text: 'If you have a scholarship or discount, what exactly does it cover — and what do you still pay yourselves?',
+    answerKind: 'factual',
+    tips: [
+      'Name the scholarship and the exact amount or percentage.',
+      'Say what it does NOT cover. That half is what tests honesty.',
+      'No scholarship? Say so plainly and move on.',
+    ],
+    modelAnswer:
+      '[I received the [name] scholarship of [amount / percent] off tuition. So of the [full fee], we pay [remainder], plus all living costs — the scholarship covers tuition only.] / [I have no scholarship; we pay the full fee of [amount] ourselves, and we planned for that from the start.]',
+    rubricNotes:
+      'Scholarship inflation is a documented trap — students claim "full scholarship" for a small discount. Wants the named award, the exact value, and an accurate account of what remains payable. Cross-check the remainder against the funding plan.',
+  },
+  {
+    category: 'finance',
+    text: 'You have planned for the first year. How will you cover the second year, or the rest of your course?',
+    answerKind: 'explanatory',
+    tips: [
+      'Name the source for year two, not just year one.',
+      'Show it is not the same money counted twice.',
+      'A one-year master’s can say so — that is a complete answer.',
+    ],
+    modelAnswer:
+      '[My course is one year, so the funds we have shown cover the whole of it.] / [Year two costs about [amount]. It comes from [ongoing source — my [relation]’s yearly income of [amount] / the remaining education fund], separate from the money set aside for year one. We planned the whole course, not just the visa application.]',
+    rubricNotes:
+      'The show-money killer question: funding that exists only for the application evaporates in year two. Wants a distinct, recurring source for later years. Vagueness here after a confident year-one answer is a strong flag — name it.',
+  },
+  {
+    category: 'finance',
+    text: 'What happens to your studies if your sponsor’s circumstances change — a bad year in the business, or a job loss?',
+    answerKind: 'explanatory',
+    tips: [
+      'Show there is a buffer: savings, a second earner, an asset.',
+      'Be realistic, not defensive. Sponsors are allowed to have bad years.',
+      'One backup named plainly is enough.',
+    ],
+    modelAnswer:
+      'The plan does not stand on one month’s income. The fees for [period] are already [paid / set aside], and beyond that we have [the backup — savings of [amount] / my [relation]’s income / an asset]. So one bad year would be hard, but it would not end my course.',
+    rubricNotes:
+      'Resilience of the funding plan. Wants a named buffer distinct from the primary income. Panic, or "that will not happen", suggests the plan is thinner than presented. Never help invent a buffer that does not exist — if there is none, the honest feedback is to discuss it with the family.',
+  },
+  {
+    category: 'finance',
+    text: 'How will you manage unexpected costs — an emergency trip home, a medical need, a laptop that dies?',
+    answerKind: 'explanatory',
+    tips: [
+      'Name a real emergency fund or person, with a rough number.',
+      'Mention what is already covered — the health surcharge covers NHS care.',
+      'Short answer. This tests planning, not imagination.',
+    ],
+    modelAnswer:
+      'We kept a separate emergency amount of about [amount] with my [relation], outside the study budget. For health I have already paid the Immigration Health Surcharge, so NHS treatment is covered. For anything sudden, [how money reaches you fast — my [relation] can transfer within a day].',
+    rubricNotes:
+      'Wants a distinct emergency reserve and awareness that the IHS covers NHS access (fact: paid per year with the visa fee). A budget with zero slack, presented as complete, is the quiet flag here.',
+  },
+  {
+    category: 'finance',
+    text: 'What documents will you show to prove your funding — and have you read them yourself?',
+    answerKind: 'factual',
+    tips: [
+      'Name the actual documents: bank statements, sponsor letter, income proof, loan sanction letter.',
+      'Say the key numbers in them from memory.',
+      'A student who has never seen their own financial documents is a red flag. Read them.',
+    ],
+    modelAnswer:
+      'We will show [the documents — my [relation]’s bank statement covering the 28-day period, their income proof from [source], a sponsorship letter, and [any other]]. I have read them myself: the closing balance is about [amount] and the statement runs from [rough period]. If the interviewer asks me about any line in them, I can answer.',
+    rubricNotes:
+      'Genuineness through familiarity: coached students carry documents they have never read. Wants named document types and at least one number recalled from inside them. The 28-day rule (funds held 28 consecutive days, ending within 31 days of application) should survive contact with this answer.',
+  },
+  {
+    category: 'accommodation',
+    text: 'What is the weather like in {{city}} for most of the year, and what does an ordinary meal cost there?',
+    answerKind: 'factual',
+    tips: [
+      'Everyday research beats brochure research. Know the small real things.',
+      'A rough temperature range and one food price is a full answer.',
+      'This is also a relaxed question — answer it naturally.',
+    ],
+    modelAnswer:
+      'It is colder and greyer than Nepal — around [range] in winter and mild in summer, with rain through the year, so I am bringing proper warm clothes. A basic meal out costs about [amount], which is why I plan to cook most days; a week of groceries is around [amount].',
+    rubricNotes:
+      'Lived-detail research check, taken from a real university list. Any plausible weather account plus one realistic price scores. Tropical expectations of a UK winter, or restaurant-every-day economics, are the honest gaps to point out.',
+  },
+  {
+    category: 'accommodation',
+    text: 'What is your weekly budget in the UK, and how did you arrive at that number?',
+    answerKind: 'factual',
+    tips: [
+      'One number, then its parts: rent, food, transport, phone, small extras.',
+      'Say where the parts came from — the accommodation page, a student you know.',
+      'This number must match everything else you have said about money.',
+    ],
+    modelAnswer:
+      'About [amount] a week. Rent is [amount], food about [amount] because I will cook, transport [amount], and the rest for phone and small things. I built it from [source — the university’s cost-of-living page and prices from a senior studying there], not by guessing.',
+    rubricNotes:
+      'The tightest consistency anchor in the bank: weekly budget × 4 must reconcile with the stated monthly costs, the accommodation figure, and the maintenance amount. Wants a derivation, not just a number. Feed any mismatch with earlier answers into the fixes explicitly.',
+  },
+  {
+    category: 'immigration',
+    text: 'Will any dependants — a spouse or children — travel with you or join you in the UK later?',
+    answerKind: 'factual',
+    tips: [
+      'Answer plainly. This is a rules question as much as a personal one.',
+      'Know the current rule for taught courses before your real interview.',
+      'If you are single, one sentence is the whole answer.',
+    ],
+    modelAnswer:
+      '[No — I am [single / travelling alone]. My [family] stays in Nepal, and that is part of why I will return.] / [I am married, but my [spouse] will not be joining me: I know students on taught courses cannot bring dependants under the current rules, so my [spouse] remains in Nepal with [context], and we planned for that.]',
+    rubricNotes:
+      'FACT (verified Aug 2026): since January 2024 only postgraduate RESEARCH students and government-scholarship students may bring dependants; taught-course students may not. A married student unaware of this is underprepared; a plan that quietly assumes a spouse will join on a taught course is a serious flag. Mark knowledge of the rule up; never coach concealment of a marriage.',
+  },
+  {
+    category: 'immigration',
+    text: 'Tell me about your family’s immigration history. Has anyone applied to live, work or study abroad?',
+    answerKind: 'explanatory',
+    tips: [
+      'Cover the honest map: who went where, on what visa, and how it ended.',
+      'Refusals in the family are not your fault — but hiding them is your problem.',
+      'Nobody abroad? Say so; that is a complete answer.',
+    ],
+    modelAnswer:
+      '[My [relation] has been in [country] since [year] on a [work/study] visa, fully legally. Nobody in my family has overstayed or been refused.] / [My [relation] was refused a [country] visa in [year] because [reason]; nothing else. My own application is separate and complete.] / [No — I am the first in my family to apply abroad.]',
+    rubricNotes:
+      'ABSOLUTE GUARDRAIL: never coach concealment — family immigration history is checkable and discovered omissions are fatal. An honest map, including refusals told plainly, scores well. A family pattern of overstay demands a serious, specific account of why this application differs.',
+  },
+  {
+    category: 'immigration',
+    text: 'Have you ever overstayed a visa, or broken the conditions of one, in any country?',
+    answerKind: 'factual',
+    tips: [
+      'One word answers this if the answer is no.',
+      'If yes: say what happened, when, and what you learned. Do not dress it up.',
+      'These records exist. The only choice you have is who tells the story first.',
+    ],
+    modelAnswer:
+      '[No, never. Every visa I have held, I used exactly as it was given.] / [Yes — in [year] I [what happened, e.g. stayed [time] beyond my visa in [country]] because [plain reason]. I reported it / left voluntarily, and nothing like it has happened since. I understand why you have to ask.]',
+    rubricNotes:
+      'Binary integrity check. A clean no is complete at five seconds — do not reward padding. A disclosed breach with ownership scores better than evasion; ANY suggestion of concealment triggers the standing guardrail: tell the student plainly that immigration systems already hold this record.',
+  },
+  {
+    category: 'immigration',
+    text: 'Do you or your immediate family have any pending immigration or residency applications in another country?',
+    answerKind: 'factual',
+    tips: [
+      'Yes or no, honestly. A pending PR file elsewhere is checkable.',
+      'If yes, explain how your UK study plan fits alongside it truthfully.',
+      'Short answer, calm tone.',
+    ],
+    modelAnswer:
+      '[No — no pending applications anywhere, for me or my close family.] / [My [relation] has a pending [type] application in [country]. It does not change my plan: I chose the UK for [reason], my funding is from [source], and my own intentions are exactly as I have described.]',
+    rubricNotes:
+      'Screens for a family strategy where the UK course is a waiting room for another country’s PR queue. A disclosed family application with a coherent personal plan is acceptable; incoherence between this and the return-home story is the flag. Never coach concealment.',
+  },
+  {
+    category: 'future_plans',
+    text: 'What ties do you have at home in Nepal — family, property, work — that will bring you back?',
+    answerKind: 'explanatory',
+    tips: [
+      'Name real ties: parents, land or a family business, a job to return to, community.',
+      'The strongest tie is a concrete plan that NEEDS you in Nepal.',
+      'Do not perform emotion. Facts carry this answer.',
+    ],
+    modelAnswer:
+      'My parents are in [place], and I am [their eldest / the one who manages [responsibility]]. My family has [the tie — a business in [sector] / land in [place]] that I am expected to [role]. And my career plan itself is Nepali: the job I am aiming for — [role] at [type of employer] — is a job in Nepal. The degree is what I am going for; my life is here.',
+    rubricNotes:
+      'The classic return-intent question. Wants concrete, checkable ties plus a career plan that structurally requires returning. Generic family sentiment alone is weak. Consistency with the Graduate Route answer matters: work-then-return is coherent; "I will see" is not a plan.',
+  },
+  {
+    category: 'future_plans',
+    text: 'Salaries in the UK are much higher than in Nepal. Why would you actually come back?',
+    answerKind: 'comparative',
+    tips: [
+      'This question calls your whole story into doubt on purpose. Stay calm.',
+      'Concede the fact — then show why your plan still points home.',
+      'Position, family standing, and a UK-degree premium in Nepal are honest reasons.',
+    ],
+    modelAnswer:
+      'It is true — the same job pays more in the UK. But a [role] with a UK master’s in Nepal earns [amount], which is [multiple] of what I could earn there without it, and in Nepal that salary supports a much better life than the same money in the UK. I would rather be [the specific position — a manager in a growing sector / running our family business] at home than [junior role] abroad. The UK experience raises where I START in Nepal; it is not the destination.',
+    rubricNotes:
+      'The hardest credibility question in the harvest, asked to stress-test the return story. Reward candour about the salary gap plus purchasing-power or position logic. An answer that dodges the premise, or collapses into "maybe I will stay", undoes the whole sitting — say so honestly.',
+  },
+  {
+    category: 'future_plans',
+    text: 'What research have you done into the job market this course leads to?',
+    answerKind: 'explanatory',
+    tips: [
+      'Name where you looked: job portals, LinkedIn, people in the field.',
+      'Quote one real finding — a role, a demand trend, a salary range.',
+      'Research you actually did sounds different from research you claim.',
+    ],
+    modelAnswer:
+      'I looked at [where — merojob and LinkedIn for Nepal, and the university’s graduate outcomes page]. For [role], I found [one real finding — [number] openings in Kathmandu asking for [skill], at around [salary]]. I also spoke to [person — a senior working as [role]], who told me [one thing]. That is what convinced me the course leads somewhere real.',
+    rubricNotes:
+      'Separates a researched career plan from a recited one. Wants a named source and one specific finding. A salary or demand claim wildly out of line with reality is worth correcting gently; the point is evidence of genuine looking, not perfect data.',
+  },
+  {
+    category: 'conversational',
+    text: 'What was the most interesting topic in the subject you studied most recently?',
+    answerKind: 'explanatory',
+    tips: [
+      'Pick one real topic and explain it simply, like telling a friend.',
+      'Why it caught you matters more than how advanced it was.',
+      'This is an English-ability question. Relax and talk.',
+    ],
+    modelAnswer:
+      'In my [subject] course, the topic I liked most was [topic]. In simple words, it is about [one-sentence explanation]. It caught me because [honest reason — I saw it happen at work / it explained something I had always wondered about]. It is actually part of why I chose this course.',
+    rubricNotes:
+      'English-ability layer (the harvest’s thin spot, now covered). Unpredictable, so it defeats memorisation; mark on natural delivery and whether the explanation would make sense to a lay listener. A genuine link back to the course choice is a bonus, not a requirement.',
+  },
+  {
+    category: 'conversational',
+    text: 'Tell me about a recent book, news story or topic that interested you.',
+    answerKind: 'explanatory',
+    tips: [
+      'Anything real works — Nepali news, sports, your field, a video essay.',
+      'Say what it was and one thing you took from it.',
+      'There is no wrong answer, only an empty one.',
+    ],
+    modelAnswer:
+      'Recently I followed [real thing — the news about [event] / a book called [title] / videos about [topic]]. What stayed with me was [one specific point]. [One sentence of your own view.] I like keeping up with [area] — it is the kind of thing I hope to discuss with people on my course.',
+    rubricNotes:
+      'Pure spontaneity and English sample. Content is unmarkable beyond being real and specific; a suspiciously polished mini-essay is the only failure mode, and it feeds the memorisation signal.',
+  },
+  {
+    category: 'conversational',
+    text: 'Tell me about a typical day in your life at the moment.',
+    answerKind: 'explanatory',
+    tips: [
+      'Morning to evening, plainly. Real routines are convincing.',
+      'Include the study or work part naturally — it should already be there.',
+      'Speak, do not recite. This one cannot be prepared, and that is the point.',
+    ],
+    modelAnswer:
+      'I usually get up around [time], and [morning routine]. Most of my day is [work at [company] / classes / IELTS practice], from [time] to [time]. Evenings I [real thing — help at home / play futsal / study for this course]. Since I got my offer, part of every day goes to preparing for the UK — [one specific preparation].',
+    rubricNotes:
+      'Third English-ability sample and a quiet consistency check: the routine described should contain the job, study and preparation claimed elsewhere in the sitting. A day with no trace of the life they described earlier is worth one gentle flag.',
   },
 
   // ---------------------------------------------------------------------------
@@ -1399,6 +1766,222 @@ const RAW: Draft[] = [
       '[I have applied for a [country] visa in [year], which was [granted / refused because [reason]].] / [No, this is my first visa application.]',
     rubricNotes:
       'Concealment is the failure mode, not the refusal itself. An honest disclosure with the reason and what changed since scores acceptably; a discovered omission does not.',
+  },
+
+  // ---------------------------------------------------------------------------
+  // PROBES, SECOND LOAD (21 Aug 2026). Same rules as above: captured from the
+  // published sources in the harvest, fired only after a root of the same
+  // category. This batch adds the cross-examination layer the client asked
+  // for: money provenance, accommodation figures checked against the budget,
+  // spouses and previous visas, and the "explain your own course" test.
+  // ---------------------------------------------------------------------------
+  {
+    category: 'finance',
+    text: 'How long have those funds been in the account?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student says the money for their studies is in a bank account.',
+    tips: [
+      'Give a real length of time.',
+      'It must cover the 28-day requirement, and longer is stronger.',
+      'If money moved recently, say from where — before they ask.',
+    ],
+    modelAnswer:
+      'The funds have been in the account since [month]. Before that they were in [previous place — a fixed deposit / my [relation]’s savings account], so the money itself is older than the statement.',
+    rubricNotes:
+      'Seasoning check. Funds must sit 28 consecutive days ending within 31 days of application; a longer history reads as genuine wealth, a fresh arrival demands a source. Cross-check against the "where did the money come from" answer if both were asked.',
+  },
+  {
+    category: 'finance',
+    text: 'Are those funds still in the account today?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student describes the balance that was shown for the visa application.',
+    tips: [
+      'The only good answer is yes, said without hesitation.',
+      'If some was spent — on fees, deliberately — say exactly that.',
+      'Hesitation here is what the question is designed to catch.',
+    ],
+    modelAnswer:
+      'Yes — the funds are still there. [The only change is [amount] paid to the university for [fees/deposit], which is what the money was for.]',
+    rubricNotes:
+      'The borrowed-show-money detector, verbatim from a university list. A confident yes, or a spend that went to the university, both score. Visible uncertainty about whether the family still has the money is the single strongest flag this probe produces — name it plainly.',
+  },
+  {
+    category: 'finance',
+    text: 'Your statement shows a large deposit shortly before the application. Where did that come from?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student mentions a recent large deposit, a land sale, or newly arranged funds.',
+    tips: [
+      'Name the exact source: a land sale, a maturing deposit, a transfer from savings.',
+      'Real money leaves a paper trail. Say what the paper is.',
+      'Never say "a relative deposited it" without the relationship and reason.',
+    ],
+    modelAnswer:
+      'That deposit of [amount] came from [specific source — the sale of land in [place] on [rough date] / a fixed deposit that matured / my [relation] consolidating savings from [bank]]. We have [the document — the sale deed / bank records] showing it.',
+    rubricNotes:
+      'Provenance under pressure. Wants a specific, documentable source with a date. "Family arranged it" is the classic fail. Cross-check the source named here against the sponsor’s stated occupation and income — a driver’s salary does not produce a lakh-scale deposit, and the mismatch is the finding.',
+  },
+  {
+    category: 'finance',
+    text: 'You said your sponsor is not your parent. When did you last meet them, and why are they funding you?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student names a sponsor other than a parent — an uncle, aunt, cousin or family friend.',
+    tips: [
+      'Real relationships have recent contact. Say when you last met or spoke.',
+      'Give the honest reason they would spend this much on you.',
+      'A written sponsorship arrangement strengthens an unusual sponsor.',
+    ],
+    modelAnswer:
+      'My [relation] and I [last met / speak] [honest recency — at Dashain / every week on the phone]. They are funding me because [real reason — they have no children of their own and I am like a [son/daughter] to them / they run the family business my father works in]. It is documented in [the sponsorship letter / affidavit].',
+    rubricNotes:
+      'Non-parent sponsors attract scrutiny because rented sponsors exist. Wants recency of contact and a socially plausible motive. A sponsor the student barely knows is a serious flag; an uncle who is effectively a second father, described with texture, is fine.',
+  },
+  {
+    category: 'accommodation',
+    text: 'How does that rent fit inside the monthly budget you described?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student names an accommodation cost.',
+    tips: [
+      'Do the arithmetic out loud: rent, then what remains for everything else.',
+      'The two numbers must be the same ones you gave before.',
+      'If they do not fit, the budget is wrong — fix it before the real interview.',
+    ],
+    modelAnswer:
+      'Rent is [amount] a month, and my whole budget is [amount], so [remainder] is left for food, transport and everything else — food about [amount], transport [amount], and the rest as buffer. The numbers are the same ones in my funding plan.',
+    rubricNotes:
+      'THE cross-check probe, by design: it forces the accommodation figure and the monthly budget into one sentence. Mark the arithmetic. If it contradicts figures given earlier in the sitting, that contradiction is the first fix and gets the contradiction flag.',
+  },
+  {
+    category: 'accommodation',
+    text: 'Where did that accommodation figure come from — which website, page or person?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student quotes a specific accommodation price.',
+    tips: [
+      'Name the actual source: the university accommodation page, Rightmove, a senior.',
+      'A price with a source is research. A price without one is a guess.',
+      'Roughly when you checked matters too — prices move.',
+    ],
+    modelAnswer:
+      'From [source — the {{university}} accommodation page / a student in my network who lives there / a listings site], which I checked in [month]. The range I saw was [range], and I budgeted at [figure] to be safe.',
+    rubricNotes:
+      'Tests whether the number was researched or planted. A named source with a rough date scores; "everyone knows it costs about that" does not. A figure sourced from a different city than the campus is the false-specificity trap — check against the stated campus.',
+  },
+  {
+    category: 'why_university',
+    text: 'You had offers from other universities. Why did you turn those down?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student mentions holding offers from more than one university.',
+    tips: [
+      'Give one concrete reason per rejected offer.',
+      'Cost and location are honest reasons — use them with an academic one.',
+      'Criticising the rejected university is unnecessary. Compare, do not attack.',
+    ],
+    modelAnswer:
+      'I turned down [university] because [concrete reason — its version of the course lacked [module/placement] / the total cost in [city] was [amount] higher / the campus location did not fit my budget]. {{university}} won on [the deciding factor]. It was a real comparison, not a default.',
+    rubricNotes:
+      'Decision-audit probe. Wants one specific differentiator per declined offer. A student who cannot say why they refused an offer probably never compared — which points at an agent-made decision, the underlying thing this probe tests.',
+  },
+  {
+    category: 'why_course',
+    text: 'Leave the module names aside — explain to me in your own words what your course is actually about.',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student recites module names or brochure phrases without showing understanding.',
+    tips: [
+      'One minute, plain words, as if to a friend outside your field.',
+      'What problem does the subject solve? Who needs people trained in it?',
+      'This is the question memorisation cannot survive. Practise saying it simply.',
+    ],
+    modelAnswer:
+      'In simple words, my course teaches [the plain-language core — how businesses decide where money goes / how to build and secure computer systems]. By the end I should be able to [concrete capability]. People hire graduates like this to [real function], and that is the job I want to do.',
+    rubricNotes:
+      'Comprehension stripped of memorised scaffolding — the harvest’s "how well do you understand your course" in probe form. Mark ONLY the explanation’s clarity and ownership; vocabulary level should drop, not rise. Brochure language reappearing here confirms the memorisation signal.',
+  },
+  {
+    category: 'education',
+    text: 'Your new course is quite different from what you studied before. Why the change of field?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student’s chosen course sits in a different field from their previous qualification.',
+    tips: [
+      'Own the change — do not pretend the fields secretly match.',
+      'Give the moment or reason the switch happened.',
+      'Show one thing from the old field you still carry.',
+    ],
+    modelAnswer:
+      'Honestly, [old field] was [honest assessment — my family’s choice / where my marks took me]. The change came when [real trigger — I started working and saw [thing] / I took on [task] and found I was good at it]. [New field] is where my ability and the jobs both are. And [one skill] from [old field] still helps me — [how].',
+    rubricNotes:
+      'Field-switch coherence, a formal progression concern. Wants an owned, dated reason and one carried-over skill. "Both fields are related" claimed without substance scores below an honest "I chose wrong at 18 and corrected it".',
+  },
+  {
+    category: 'immigration',
+    text: 'What will your spouse do while you are studying in the UK?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student mentions being married or engaged.',
+    tips: [
+      'Say plainly where your spouse will be and what they will do.',
+      'Show you know the dependant rules for taught courses.',
+      'A separation plan with real logistics is credible. A vague one is not.',
+    ],
+    modelAnswer:
+      'My [wife/husband] stays in Nepal, continuing [their real work/study] and living with [family context]. We know students on taught courses cannot bring dependants, and we planned around it: [the plan — daily calls, my visits in vacations, and the course is one year]. It is a sacrifice we chose together for [the goal].',
+    rubricNotes:
+      'Married applicants face exactly this. Wants awareness of the dependant restriction (taught courses: no dependants since Jan 2024) and a concrete separation plan. A spouse whose own plans quietly include the UK is the flag. Never coach concealment of a marriage.',
+  },
+  {
+    category: 'immigration',
+    text: 'You mentioned a previous visa. Did you comply fully with its conditions?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student mentions having held a visa for any country before.',
+    tips: [
+      'A clean record answers this in one sentence: entered, complied, left on time.',
+      'Name the dates if you can — precision reads as honesty.',
+      'Any wrinkle: tell it before they find it.',
+    ],
+    modelAnswer:
+      'Yes, fully. I entered [country] on [date], [what you did there, within the visa’s purpose], and left on [date], [number] days before it expired. No warnings, no overstay, nothing on the record.',
+    rubricNotes:
+      'Compliance-history probe. Dates volunteered without prompting are the strongest positive signal. Vagueness about exit dates on a past visa is a quiet flag worth naming gently.',
+  },
+  {
+    category: 'future_plans',
+    text: 'You said you will return to Nepal to work. Which companies or organisations would you actually apply to?',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student says they will return home to work after graduating.',
+    tips: [
+      'Name two or three real employers in Nepal in your field.',
+      'One sentence on why your UK degree gets you in.',
+      'Not knowing a single employer in your own plan is the failure here.',
+    ],
+    modelAnswer:
+      'In my field the real options are [employer], [employer] and the growing [sector] companies like [example]. With this degree I would apply for [role] — they specifically ask for [skill the course teaches], which local graduates mostly do not have. [One is even connected to my current work — [how].]',
+    rubricNotes:
+      'Makes the return plan falsifiable: named employers that actually exist in Nepal. Two real names with a role scores high; inability to name any employer in a plan the student claims to hold is one of the clearest signals in the whole sitting.',
+  },
+  {
+    category: 'study_gap',
+    text: 'During that gap, was it work, exam preparation, or family responsibility — walk me through it.',
+    answerKind: 'probe',
+    isProbe: true,
+    probeTrigger: 'The student mentions a gap but accounts for it only in general terms.',
+    tips: [
+      'Break the gap into blocks with rough dates.',
+      'Every block gets one sentence: what, where, why.',
+      'Unexplained months are what interviewers circle. Leave none.',
+    ],
+    modelAnswer:
+      'From [month/year] to [month/year] I [block one — worked at [employer] as [role]]. Then [next block — prepared for IELTS and took it in [month] / handled [family responsibility] at home]. From [month] I focused on this application. Each part had a purpose, and together they led here.',
+    rubricNotes:
+      'Month-accounting under pressure. Wants the gap broken into dated blocks with no dark months. Cross-check the blocks against the salary, savings and IELTS dates given elsewhere — a gap story and a savings story that cannot share a calendar is a contradiction to flag.',
   },
 ];
 

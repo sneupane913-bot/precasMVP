@@ -54,6 +54,14 @@ You will sometimes be told the answer was CUT OFF by the timer. When that happen
 DETECTING MEMORISATION
 If the answer is unusually fluent, uses vocabulary far above conversational level, has no hesitation markers at all, or reads like written prose rather than speech, set soundsMemorised true and tell the student plainly that a real interviewer will notice and will reword the question to test them.
 
+CROSS-CHECKING FOR CONSISTENCY
+You may be shown the student's earlier answers from this same sitting, each labelled with the question it answered. A real credibility interviewer holds the whole conversation in mind, and contradictions between answers are among the strongest refusal signals — stronger than any single weak answer. So:
+- Compare every number and claim in THIS answer against the earlier ones. Accommodation cost against the monthly living budget. Sponsor income against family spending and the savings story. The city named now against the city named before. A salary against the savings it supposedly produced. Work claims against the study-gap account.
+- If two answers cannot both be true, that is your FIRST fix, named plainly and quoting both of the student's own statements: "Earlier you said your accommodation costs [X]. Now you said your monthly budget is [Y]. In the real interview those two answers together are a problem."
+- Add the string "contradiction" to flags whenever you find one.
+- Never invent a contradiction that is not clearly there, and never treat a rounding difference or a reworded phrase as one. A real conflict of facts only.
+- Consistent details across answers are worth naming as a strength once: interviewers notice coherence too.
+
 SCORING
 Score 0 to 100 on relevance, specificity, personal truth, and English clarity. Be honest and use the whole range. A generic answer scores low even when the English is good. Do not cluster scores around 40 to 50.
 
@@ -120,9 +128,15 @@ export async function evaluateAnswer(args: {
       ? `THE TIMER CUT THIS ANSWER OFF. The student did not choose to stop. Treat the final sentence as unfinished, and do not trust or quote its last words: the transcription may have guessed at them.`
       : '',
     args.previousTranscripts.length
-      ? `EARLIER ANSWERS IN THIS SESSION, for consistency and fluency comparison:\n${args.previousTranscripts
-          .slice(-3)
-          .map((t, i) => `(${i + 1}) ${t.slice(0, 400)}`)
+      ? `EARLIER ANSWERS IN THIS SESSION, labelled with their questions, for the consistency cross-check and fluency comparison:\n${args.previousTranscripts
+          // Ten, not three: the accommodation claim a student made in answer 2
+          // must still be on the table when the finance probe lands at answer
+          // 9, or the cross-check is theatre. ~300 chars x 10 is small against
+          // the model's context and adds no extra call.
+          .slice(-10)
+          // 480, because each entry now carries its question label (~120 chars)
+          // in front of the spoken words.
+          .map((t, i) => `(${i + 1}) ${t.slice(0, 480)}`)
           .join('\n')}`
       : '',
     `THE STUDENT'S ANSWER:\n"""${clean}"""`,
