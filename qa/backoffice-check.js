@@ -31,6 +31,17 @@
  * Run:  QA_PORT=3090 node qa/backoffice-check.js
  */
 const http = require('http');
+/**
+ * The Prep price, READ FROM plans.ts. This file used to hard-code 449 and went
+ * red the day the client moved Prep to 399 (3 Sep 2026): a test that restates
+ * a price is the same defect as a page that restates one (copy-check M-8).
+ */
+const PREP_PRICE = Number(
+  /code:\s*'prep'[\s\S]*?priceNpr:\s*(\d+)/.exec(
+    require('fs').readFileSync(require('path').join(__dirname, '..', 'lib/data/plans.ts'), 'utf8')
+  )[1]
+);
+
 const fs = require('fs');
 
 
@@ -201,7 +212,7 @@ async function pageLoad(ip) {
   t(
     'BO-5',
     'And the counters agree with the row',
-    (over?.counts?.ordersAwaiting ?? 99) === 0 && (over?.revenueNpr ?? 0) >= 449,
+    (over?.counts?.ordersAwaiting ?? 99) === 0 && (over?.revenueNpr ?? 0) >= PREP_PRICE,
     `awaiting ${over?.counts?.ordersAwaiting}, revenue ${over?.revenueNpr} - two screens must never disagree about whether we have been paid`
   );
 

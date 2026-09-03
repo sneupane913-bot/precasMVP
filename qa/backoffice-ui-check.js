@@ -56,10 +56,16 @@ const t=(n,c,d='')=>{if(c){ok++;console.log('  ok   '+n)}else{bad++;console.log(
  const made=await req('POST','/api/platform',{action:'createConsultancy',superKey:SU,name:'New Hub '+S,slug:'newhub-'+S,contactName:'Sita',contactPhone:'+97798',seatsTotal:0,paidNpr:0,passcode:'handover-hub1'});
  t('super admin can create a consultancy', made.code===200, `${made.code} ${made.body.slice(0,120)}`);
  const cid=made.json?.data?.id;
- const beforeApproval=await req('POST','/api/admin',{action:'login',slug:'newhub-'+S,passcode:'handover-hub1'});
- t('and it does nothing until approved', beforeApproval.code===403, `${beforeApproval.code}`);
- const appr=await req('POST','/api/platform',{action:'setConsultancyStatus',superKey:SU,consultancyId:cid,status:'approved'});
- t('super admin can approve it', appr.code===200, `${appr.code}`);
+ // 3 Sep 2026: a consultancy is APPROVED ON CREATION. They have paid in advance
+ // before the form is even opened, so a second approve click decided nothing.
+ // What still holds: on the handover code the portal opens and shows NOTHING.
+ t('and it is approved straight away, because they paid first', made.json?.data?.status==='approved', `${made.json?.data?.status}`);
+ const appr=await req('POST','/api/platform',{action:'setConsultancyStatus',superKey:SU,consultancyId:cid,status:'suspended'});
+ t('super admin can suspend it', appr.code===200 && appr.json?.data?.status==='suspended', `${appr.code}`);
+ const whileSuspended=await req('POST','/api/admin',{action:'login',slug:'newhub-'+S,passcode:'handover-hub1'});
+ t('and a suspended consultancy reads nothing', whileSuspended.code===403, `${whileSuspended.code}`);
+ const back=await req('POST','/api/platform',{action:'setConsultancyStatus',superKey:SU,consultancyId:cid,status:'approved'});
+ t('and can reactivate it', back.code===200, `${back.code}`);
  // The code we set them is a HANDOVER code: it opens the door once and shows
  // them nothing, because until they replace it we and they share one secret.
  // D-15: login on the handover code now RETURNS 200 so the change-passcode

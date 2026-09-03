@@ -145,9 +145,12 @@ scan('M-10c', 'no QUESTION COUNT is typed by hand in any page',
 
 // The specific promise that broke. Asserted by name so the report says WHY.
 const consultancy = code(path.join(ROOT, 'app/consultancy/page.tsx'));
-t('M-10', 'the consultancy seat promise is DERIVED, not written down',
-  /SEAT_GRANT\.mocks/.test(consultancy) && /SEAT_GRANT\.practice/.test(consultancy),
-  'the page that sells seats reads the same constant that grants them');
+// 3 Sep 2026: seats became coupons. The promise is now the coupon pack, and it
+// is still read from plans.ts, never typed: wholesale price, retail price,
+// margin, mocks and practice all come from couponPacks().
+t('M-10', 'the consultancy coupon promise is DERIVED, not written down',
+  /couponPacks\(\)/.test(consultancy) && /p\.mocks/.test(consultancy) && /p\.practice/.test(consultancy) && /p\.wholesaleNpr/.test(consultancy) && /p\.marginNpr/.test(consultancy),
+  'the page that sells coupons reads the same table that prices and grants them');
 
 // M-12. The per-mock rate is withdrawn: at 449 for 3 mocks we are NPR 150
 // against a competitor's 143-160, so printing it invites the one comparison we

@@ -32,3 +32,14 @@ export const DEFAULT_BRAND_HEX = '#0d1b2a';
  * rather than shipping quietly wrong.
  */
 export const BRAND_NAME = 'ExamTestAI';
+
+/**
+ * WHO MAKES THIS. Printed in the footer of every marketing page.
+ *
+ * Client request, 3 September 2026, modelled on the line at the foot of a
+ * competitor's site. Two constants rather than one sentence so the address
+ * can be corrected without touching the wording, and the footer reads them
+ * rather than typing them.
+ */
+export const COMPANY_NAME = 'WI Education Pvt. Ltd.';
+export const COMPANY_ADDRESS = 'Kathmandu';

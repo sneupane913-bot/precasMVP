@@ -57,7 +57,13 @@ export const PLANS: Plan[] = [
     isPublic: true,
     name: 'Prep',
     tagline: 'Get comfortable',
-    priceNpr: 449,
+    /**
+     * NPR 399 from 3 September 2026 (was 449). Client decision, made together
+     * with the coupon model: a consultancy buys a Prep coupon at NPR 300 and
+     * a Serious coupon at NPR 700, and the NPR 99 gap on each is the
+     * consultancy's margin. See COUPON_WHOLESALE_NPR below.
+     */
+    priceNpr: 399,
     mockInterviews: 3,
     practiceSessions: 15,
     maxQuestionsPerMock: 17,
@@ -190,6 +196,103 @@ export const BUNDLES: Bundle[] = [
   { code: 'b20', name: '20 seats', priceNpr: 6000, seats: 20, costNpr: 20 * SEAT_COST_NPR },
   { code: 'b30', name: '30 seats', priceNpr: 9000, seats: 30, costNpr: 30 * SEAT_COST_NPR },
 ];
+
+/**
+ * COUPONS. What a consultancy pays us for ONE coupon of each pack.
+ *
+ * Client decision, 3 September 2026, replacing the seat bundles below. A
+ * consultancy no longer buys twenty seats at once; it buys exactly as many
+ * coupons as it wants, of whichever pack it wants, and pays in advance:
+ *
+ *     Prep coupon     NPR 300   (a student on their own pays NPR 399)
+ *     Serious coupon  NPR 700   (a student on their own pays NPR 799)
+ *
+ * The NPR 99 on each is the consultancy's to charge their student, and it is
+ * DERIVED on every page that mentions it (retail minus wholesale), never
+ * typed. A pack with no entry here cannot be bought as a coupon.
+ *
+ * This is DATA. Changing a wholesale price is a change here, never a code
+ * change, and the super admin's price check (`couponOrderTotal`) follows it.
+ */
+export const COUPON_WHOLESALE_NPR: Record<string, number> = {
+  prep: 300,
+  serious: 700,
+};
+
+export interface CouponPack {
+  code: string;
+  name: string;
+  /** What a student pays on their own. */
+  retailNpr: number;
+  /** What the consultancy pays us for one coupon. */
+  wholesaleNpr: number;
+  /** The consultancy's room to charge the student. Derived. */
+  marginNpr: number;
+  mocks: number;
+  practice: number;
+}
+
+/** The packs a consultancy can buy coupons for: public plans with a wholesale price. */
+export function couponPacks(): CouponPack[] {
+  return publicPlans()
+    .filter((p) => COUPON_WHOLESALE_NPR[p.code] !== undefined)
+    .map((p) => ({
+      code: p.code,
+      name: p.name,
+      retailNpr: p.priceNpr,
+      wholesaleNpr: COUPON_WHOLESALE_NPR[p.code]!,
+      marginNpr: p.priceNpr - COUPON_WHOLESALE_NPR[p.code]!,
+      mocks: p.mockInterviews,
+      practice: p.practiceSessions,
+    }));
+}
+
+export function getCouponPack(code: string): CouponPack | undefined {
+  return couponPacks().find((p) => p.code === code);
+}
+
+/**
+ * The price a consultancy MUST have paid for a given basket of coupons.
+ *
+ * The super admin types the amount received and the server refuses to create
+ * the account unless it equals this to the rupee. The client's own words: the
+ * super admin "can basically try to manipulate us as well", by issuing more
+ * coupons than were paid for. So the arithmetic is done here, once, and a
+ * mismatch is refused with the working shown. Unknown pack codes are reported
+ * rather than silently skipped, because a skipped line would make a wrong
+ * total look right.
+ */
+export function couponOrderTotal(counts: Record<string, number>): {
+  totalNpr: number;
+  totalCoupons: number;
+  lines: { code: string; name: string; count: number; wholesaleNpr: number; subtotalNpr: number }[];
+  unknown: string[];
+} {
+  const lines: { code: string; name: string; count: number; wholesaleNpr: number; subtotalNpr: number }[] = [];
+  const unknown: string[] = [];
+  for (const [code, rawCount] of Object.entries(counts)) {
+    const count = Math.max(0, Math.floor(Number(rawCount) || 0));
+    if (count === 0) continue;
+    const pack = getCouponPack(code);
+    if (!pack) {
+      unknown.push(code);
+      continue;
+    }
+    lines.push({
+      code,
+      name: pack.name,
+      count,
+      wholesaleNpr: pack.wholesaleNpr,
+      subtotalNpr: count * pack.wholesaleNpr,
+    });
+  }
+  return {
+    totalNpr: lines.reduce((n, l) => n + l.subtotalNpr, 0),
+    totalCoupons: lines.reduce((n, l) => n + l.count, 0),
+    lines,
+    unknown,
+  };
+}
 
 /** What the competition charges, so our page can show the comparison honestly. */
 export const COMPETITOR_PER_MOCK_NPR = { best: 143, typical: 175, worst: 199 };

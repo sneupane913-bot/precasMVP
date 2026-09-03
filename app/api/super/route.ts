@@ -3,7 +3,9 @@ import { z, type ZodError } from 'zod';
 import { zodMessage } from '@/lib/zod-message';
 import { isSuperAdminAsync, platform, platformDown, secretEquals } from '@/lib/platform';
 import { repo, type ApprovalAudit } from '@/lib/db';
-import { grantPack, rewardReferral, adminGrant } from '@/lib/entitlement';
+import { grantPack, rewardReferral, adminGrant, tallyLedger, EMPTY_TALLY } from '@/lib/entitlement';
+import { couponPacks, getPlan } from '@/lib/data/plans';
+import { consultancyHues, couponStats, formatCouponCode } from '@/lib/coupons';
 import {
   rateLimit,
   rateLimitPeek,
@@ -213,29 +215,40 @@ export async function POST(req: Request) {
 
   // --------------------------------------------------------------- overview
   if (body.action === 'overview') {
-    const [students, consultancies, orders] = await Promise.all([
+    const [studentsRaw, consultancies, orders, coupons] = await Promise.all([
       r.listStudents(),
       platform.listConsultancies(),
       r.listOrders(),
+      r.listCoupons(),
     ]);
+    // Newest first, everywhere a date is shown. Today's sign-ups on top.
+    const students = [...studentsRaw].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+    const consultancyName = new Map(consultancies.map((c) => [c.id, c.name]));
+    const couponByStudent = new Map(
+      coupons.filter((cp) => cp.redeemedByStudentId).map((cp) => [cp.redeemedByStudentId as string, cp])
+    );
 
     const verified = orders.filter((o) => o.state === 'verified');
     /**
-     * D-21. Total revenue means TOTAL revenue.
+     * D-21. Total revenue means TOTAL revenue, and it is split by WHO paid.
      *
-     * This counted verified ORDERS only, which is student payments and seat
-     * purchases that went through the checkout. Money a consultancy paid up
-     * front, recorded on the consultancy row as `paidNpr` when the super admin
-     * created them, was invisible. In testing that meant the dashboard headline
-     * read "NPR 449" when NPR 25,449 had actually been taken, and the missing
-     * NPR 25,000 was the consultancy channel the whole growth plan rests on.
+     * Two channels, two numbers, one total, exactly as the client asked:
      *
-     * Split as well as totalled, because "where did it come from" is the
-     * question he will actually ask of this number.
+     *   - students who paid us themselves, by QR, at the retail price;
+     *   - consultancies, who paid us in advance for coupons (recorded on the
+     *     consultancy row when the super admin issued them) or, on the older
+     *     model, for a seat bundle through the checkout.
+     *
+     * `revenueFromOrders` keeps its name because the screen reads it; it now
+     * means student payments only, which is what it was always taken to mean.
      */
-    const revenueFromOrders = verified.reduce((n, o) => n + o.amountNpr, 0);
-    const revenueFromConsultancies = consultancies.reduce((n, c) => n + (c.paidNpr ?? 0), 0);
-    const revenueNpr = revenueFromOrders + revenueFromConsultancies;
+    const revenueFromStudents = verified.filter((o) => o.studentId).reduce((n, o) => n + o.amountNpr, 0);
+    const revenueFromConsultancies =
+      consultancies.reduce((n, c) => n + (c.paidNpr ?? 0), 0) +
+      verified.filter((o) => !o.studentId).reduce((n, o) => n + o.amountNpr, 0);
+    const revenueFromOrders = revenueFromStudents;
+    const revenueNpr = revenueFromStudents + revenueFromConsultancies;
+    const couponTotals = couponStats(coupons);
 
     // Attribution: which consultancies our DIRECT students named. This is the
     // sales pipeline, and the strongest growth idea in the brief.
@@ -271,10 +284,14 @@ export async function POST(req: Request) {
           consultancies: consultancies.filter((c) => c.status === 'approved').length,
           pendingConsultancies: consultancies.filter((c) => c.status === 'pending').length,
           ordersAwaiting: orders.filter((o) => o.state === 'submitted').length,
+          couponsIssued: couponTotals.total,
+          couponsRedeemed: couponTotals.used,
         },
         revenueNpr,
         revenueFromOrders,
+        revenueFromStudents,
         revenueFromConsultancies,
+        couponPacks: couponPacks(),
         // Never any transcript or answer content. Engagement and entitlement only.
         students: students.map((s) => ({
           /**
@@ -304,6 +321,19 @@ export async function POST(req: Request) {
           source: s.source,
           createdVia: s.createdVia,
           consultancyId: s.consultancyId,
+          /**
+           * NAMED, not just flagged. The client's words: a lot of the time
+           * "we can confuse with the segregation of the students", so the
+           * consultancy's name sits on the row and the row is colour coded
+           * (see `directory`, which hands out the hues).
+           */
+          consultancyName: s.consultancyId ? (consultancyName.get(s.consultancyId) ?? null) : null,
+          couponCode: couponByStudent.has(s.id)
+            ? formatCouponCode((couponByStudent.get(s.id) as { code: string }).code)
+            : null,
+          targetUniversity: s.targetUniversity ?? null,
+          level: s.level ?? null,
+          city: s.city ?? null,
           attributionConsultancy: s.attributionConsultancy,
           status: s.status,
           referralCode: s.referralCode,
@@ -456,15 +486,26 @@ export async function POST(req: Request) {
    * easier to keep rather than harder.
    */
   if (body.action === 'directory') {
-    const [students, consultancies, orders, seatsAll] = await Promise.all([
+    const [studentsRaw, consultancies, orders, coupons, ledgerAll] = await Promise.all([
       r.listStudents(),
       platform.listConsultancies(),
       r.listOrders(),
-      Promise.resolve(null),
+      r.listCoupons(),
+      r.listLedgerAll(),
     ]);
+    const students = [...studentsRaw].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+    const tally = tallyLedger(ledgerAll);
+    const hues = consultancyHues(consultancies);
+    const consultancyName = new Map(consultancies.map((c) => [c.id, c.name]));
+    const couponByStudent = new Map(
+      coupons.filter((cp) => cp.redeemedByStudentId).map((cp) => [cp.redeemedByStudentId as string, cp])
+    );
+    const studentById = new Map(students.map((st) => [st.id, st]));
 
-    const studentRows = await Promise.all(
-      students.map(async (st) => ({
+    const studentRows = students.map((st) => {
+      const t = tally.get(st.id) ?? EMPTY_TALLY;
+      const cp = couponByStudent.get(st.id);
+      return {
         id: st.id,
         name: st.name,
         email: st.email,
@@ -476,33 +517,98 @@ export async function POST(req: Request) {
         city: st.city ?? null,
         source: st.source,
         consultancyId: st.consultancyId,
+        consultancyName: st.consultancyId ? (consultancyName.get(st.consultancyId) ?? null) : null,
+        /** The hue of their consultancy's row colour, or null for a direct student. */
+        hue: st.consultancyId ? (hues.get(st.consultancyId) ?? null) : null,
+        couponCode: cp ? formatCouponCode(cp.code) : null,
+        couponPack: cp ? (getPlan(cp.packCode)?.name ?? cp.packCode) : null,
         status: st.status,
         createdAt: st.createdAt,
         lastSeenAt: st.lastSeenAt,
-        mocksLeft: await r.balance(st.id, 'mock'),
+        mocksLeft: t.mocksLeft,
+        mocksUsed: t.mocksUsed,
+        practiceLeft: t.practiceLeft,
+        practiceUsed: t.practiceUsed,
         // NEVER a transcript, at any level. G-8 has no exceptions.
-      }))
-    );
+      };
+    });
 
     const consultancyRows = await Promise.all(
-      consultancies.map(async (c) => {
-        const seats = await r.listSeats(c.id);
-        const live = seats.filter((x) => !x.revokedAt);
-        const mine = students.filter((st) => st.consultancyId === c.id);
-        return {
-          id: c.id,
-          name: c.name,
-          slug: c.slug,
-          status: c.status,
-          seatsTotal: c.seatsTotal,
-          // N-24. What the client asked to see per consultancy.
-          seatsGivenOut: live.length,
-          seatsLeft: Math.max(0, c.seatsTotal - live.length),
-          renewals: live.filter((x) => String(x.allocatedBy).startsWith('renew:')).length,
-          studentsFromLink: mine.length,
-          paidNpr: c.paidNpr,
-        };
-      })
+      consultancies
+        .slice()
+        .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+        .map(async (c) => {
+          const seats = await r.listSeats(c.id);
+          const live = seats.filter((x) => !x.revokedAt);
+          const mineCoupons = coupons.filter((cp) => cp.consultancyId === c.id);
+          const cstats = couponStats(mineCoupons);
+          const redeemers = new Set(mineCoupons.map((cp) => cp.redeemedByStudentId).filter(Boolean));
+          const mine = students.filter((st) => st.consultancyId === c.id || redeemers.has(st.id));
+          return {
+            id: c.id,
+            name: c.name,
+            slug: c.slug,
+            contactName: c.contactName,
+            contactPhone: c.contactPhone,
+            status: c.status,
+            createdAt: c.createdAt,
+            /**
+             * ACTIVE means they have signed in and chosen their own passcode.
+             * Until then the account is allocated but nobody has used it,
+             * which is the state the client wants to be able to see.
+             */
+            active: c.passcodeIsTemporary !== true,
+            hue: hues.get(c.id) ?? 0,
+            seatsTotal: c.seatsTotal,
+            // N-24. What the client asked to see per consultancy.
+            seatsGivenOut: live.length,
+            seatsLeft: Math.max(0, c.seatsTotal - live.length),
+            renewals: live.filter((x) => String(x.allocatedBy).startsWith('renew:')).length,
+            studentsFromLink: mine.length,
+            paidNpr: c.paidNpr,
+            couponsTotal: cstats.total,
+            couponsUsed: cstats.used,
+            couponsLeft: cstats.left,
+            couponsByPack: cstats.byPack,
+            /**
+             * Every coupon, with who used it. The super admin sees the whole
+             * picture: which codes are out, which are used, by which student,
+             * their phone, their university, and when.
+             */
+            coupons: mineCoupons
+              .map((cp) => {
+                const st = cp.redeemedByStudentId ? studentById.get(cp.redeemedByStudentId) : null;
+                const t = st ? (tally.get(st.id) ?? EMPTY_TALLY) : null;
+                return {
+                  id: cp.id,
+                  code: formatCouponCode(cp.code),
+                  packCode: cp.packCode,
+                  packName: getPlan(cp.packCode)?.name ?? cp.packCode,
+                  wholesaleNpr: cp.wholesaleNpr,
+                  status: cp.redeemedAt ? ('used' as const) : ('unused' as const),
+                  issuedAt: cp.issuedAt,
+                  redeemedAt: cp.redeemedAt,
+                  student:
+                    st && t
+                      ? {
+                          id: st.id,
+                          name: st.name,
+                          phone: st.whatsappNumber ?? st.phoneE164 ?? null,
+                          targetUniversity: st.targetUniversity ?? null,
+                          mocksLeft: t.mocksLeft,
+                          mocksUsed: t.mocksUsed,
+                        }
+                      : null,
+                };
+              })
+              .sort((a, b) => {
+                if (Boolean(a.redeemedAt) !== Boolean(b.redeemedAt)) return a.redeemedAt ? -1 : 1;
+                const ka = a.redeemedAt ?? a.issuedAt;
+                const kb = b.redeemedAt ?? b.issuedAt;
+                return ka < kb ? 1 : -1;
+              }),
+          };
+        })
     );
 
     return NextResponse.json({
@@ -511,6 +617,7 @@ export async function POST(req: Request) {
         students: studentRows,
         consultancies: consultancyRows,
         directPaidOrders: orders.filter((o) => o.state === 'verified' && !o.consultancyId).length,
+        couponPacks: couponPacks(),
       },
     });
   }

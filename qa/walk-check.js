@@ -19,6 +19,17 @@
  * Run:  QA_PORT=3040 node qa/walk-check.js
  */
 const http = require('http');
+/**
+ * The Prep price, READ FROM plans.ts. This file used to hard-code 449 and went
+ * red the day the client moved Prep to 399 (3 Sep 2026): a test that restates
+ * a price is the same defect as a page that restates one (copy-check M-8).
+ */
+const PREP_PRICE = Number(
+  /code:\s*'prep'[\s\S]*?priceNpr:\s*(\d+)/.exec(
+    require('fs').readFileSync(require('path').join(__dirname, '..', 'lib/data/plans.ts'), 'utf8')
+  )[1]
+);
+
 
 const P = Number(process.env.QA_PORT || 3040);
 const SUPER = process.env.SUPER_ADMIN_PASSCODE || 'super-dev';
@@ -320,7 +331,7 @@ async function buyPack(packCode = 'prep', txn = 'WALK-' + Date.now() + Math.floo
 
     // Opening the checkout page creates an order. He then closes the tab.
     const o1 = J((await req('POST', '/api/payment', { action: 'create', packCode: 'prep' })).body);
-    t('3.1  opening checkout shows him a real amount set by us', o1?.data?.amountNpr === 449, `${o1?.data?.amountNpr}`);
+    t('3.1  opening checkout shows him a real amount set by us', o1?.data?.amountNpr === PREP_PRICE, `${o1?.data?.amountNpr}`);
 
     const afterAbandon = (await me())?.entitlement;
     t('3.2  abandoning at the QR page grants him nothing',

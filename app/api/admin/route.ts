@@ -4,8 +4,10 @@ import { zodMessage } from '@/lib/zod-message';
 import { platform, secretEquals, type Consultancy, platformDown } from '@/lib/platform';
 import { repo } from '@/lib/db';
 import { approvePayment, rejectPayment, type Actor } from '@/lib/payments';
-import { renewSeat } from '@/lib/entitlement';
-import { BUNDLES } from '@/lib/data/plans';
+import { renewSeat, tallyLedger, EMPTY_TALLY } from '@/lib/entitlement';
+import { BUNDLES, getPlan, couponPacks } from '@/lib/data/plans';
+import { formatCouponCode, couponStats } from '@/lib/coupons';
+import { supportWhatsapp } from '@/lib/support';
 import {
   rateLimit,
   rateLimitPeek,
@@ -591,27 +593,108 @@ export async function POST(req: Request) {
   // reads the live repo, filtered by this consultancy's id, which is also the
   // only place the binding is decided (never from a request field).
   const r = repo();
-  const [mine, notifications, seats, orders] = await Promise.all([
+  const [bound, notifications, seats, orders, coupons, ledgerAll, waNumber] = await Promise.all([
     r.listStudents({ consultancyId: c.id }),
     r.listNotifications(c.id),
     r.listSeats(c.id),
     r.listOrders({ consultancyId: c.id }),
+    r.listCoupons({ consultancyId: c.id }),
+    r.listLedgerAll(),
+    supportWhatsapp(),
   ]);
+
+  /**
+   * WHOSE student is this? Bound to this consultancy through its link, OR
+   * redeemed one of its coupons. A student who came through another
+   * consultancy's link and then used one of ours is still shown here, because
+   * the coupon is ours and the money for it was ours.
+   */
+  const mineById = new Map(bound.map((s) => [s.id, s]));
+  for (const cp of coupons) {
+    if (cp.redeemedByStudentId && !mineById.has(cp.redeemedByStudentId)) {
+      const st = await r.getStudent(cp.redeemedByStudentId);
+      if (st) mineById.set(st.id, st);
+    }
+  }
+  // Newest first, everywhere a date is shown. The client's rule: today's
+  // sign-ups at the top, so "who joined this week" is a glance, not a sort.
+  const mine = [...mineById.values()].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+  const tally = tallyLedger(ledgerAll);
+  const couponByStudent = new Map(
+    coupons.filter((cp) => cp.redeemedByStudentId).map((cp) => [cp.redeemedByStudentId as string, cp])
+  );
 
   // Engagement and entitlement only. No transcript, answer or feedback content
   // ever reaches a consultancy admin. This is the client's stated rule.
-  const students = await Promise.all(
-    mine.map(async (s) => ({
+  // Their phone and target university ARE shown: the consultancy gave them
+  // the coupon and needs to know which of their own students is using it.
+  const students = mine.map((s) => {
+    const t = tally.get(s.id) ?? EMPTY_TALLY;
+    const cp = couponByStudent.get(s.id);
+    return {
       id: s.id,
       name: s.name,
       email: s.email,
+      phone: s.whatsappNumber ?? s.phoneE164 ?? null,
+      targetUniversity: s.targetUniversity ?? null,
+      level: s.level ?? null,
+      city: s.city ?? null,
       status: s.status,
       createdAt: s.createdAt,
       lastSeenAt: s.lastSeenAt,
-      mocksLeft: await r.balance(s.id, 'mock'),
-      practiceLeft: await r.balance(s.id, 'practice'),
-    }))
-  );
+      mocksLeft: t.mocksLeft,
+      practiceLeft: t.practiceLeft,
+      mocksUsed: t.mocksUsed,
+      practiceUsed: t.practiceUsed,
+      couponCode: cp ? formatCouponCode(cp.code) : null,
+      couponPack: cp ? (getPlan(cp.packCode)?.name ?? cp.packCode) : null,
+    };
+  });
+
+  /**
+   * THE COUPONS. Every one they paid for, which are used, by whom, and when.
+   *
+   * Sorted so the most recent activity is at the top: a coupon used today
+   * above one used last week above the unused ones. Unused coupons are what
+   * they copy and send; used ones are the record.
+   */
+  const couponRows = coupons
+    .map((cp) => {
+      const st = cp.redeemedByStudentId ? mineById.get(cp.redeemedByStudentId) : null;
+      const t = st ? (tally.get(st.id) ?? EMPTY_TALLY) : null;
+      const plan = getPlan(cp.packCode);
+      return {
+        id: cp.id,
+        code: formatCouponCode(cp.code),
+        packCode: cp.packCode,
+        packName: plan?.name ?? cp.packCode,
+        mocks: plan?.mockInterviews ?? 0,
+        practice: plan?.practiceSessions ?? 0,
+        status: cp.redeemedAt ? ('used' as const) : ('unused' as const),
+        issuedAt: cp.issuedAt,
+        redeemedAt: cp.redeemedAt,
+        student:
+          st && t
+            ? {
+                id: st.id,
+                name: st.name,
+                phone: st.whatsappNumber ?? st.phoneE164 ?? null,
+                targetUniversity: st.targetUniversity ?? null,
+                mocksLeft: t.mocksLeft,
+                mocksUsed: t.mocksUsed,
+                practiceLeft: t.practiceLeft,
+                practiceUsed: t.practiceUsed,
+              }
+            : null,
+      };
+    })
+    .sort((a, b) => {
+      const ka = a.redeemedAt ?? a.issuedAt;
+      const kb = b.redeemedAt ?? b.issuedAt;
+      if (Boolean(a.redeemedAt) !== Boolean(b.redeemedAt)) return a.redeemedAt ? -1 : 1;
+      return ka < kb ? 1 : -1;
+    });
+  const cstats = couponStats(coupons);
 
   const paid = orders.filter((o) => o.state === 'verified');
   const liveSeats = seats.filter((s) => !s.revokedAt).length;
@@ -684,6 +767,9 @@ export async function POST(req: Request) {
         orders: [],
         seatOrders: [],
         bundles: [],
+        coupons: [],
+        couponPacks: [],
+        supportWhatsapp: '',
         stats: {
           studentCount: 0,
           activeStudents: 0,
@@ -693,6 +779,9 @@ export async function POST(req: Request) {
           paidOrders: 0,
           ordersAwaiting: 0,
           seatPaymentPending: false,
+          couponsTotal: cstats.total,
+          couponsUsed: 0,
+          couponsLeft: 0,
         },
       },
     });
@@ -708,6 +797,17 @@ export async function POST(req: Request) {
       orders: visibleOrders,
       seatOrders: mySeatOrders,
       bundles: BUNDLES.map((b) => ({ code: b.code, name: b.name, seats: b.seats, priceNpr: b.priceNpr })),
+      coupons: couponRows,
+      couponPacks: couponPacks().map((p) => ({
+        code: p.code,
+        name: p.name,
+        wholesaleNpr: p.wholesaleNpr,
+        retailNpr: p.retailNpr,
+        mocks: p.mocks,
+        practice: p.practice,
+      })),
+      /** Where to ask for more coupons. Set by the super admin, no deploy. */
+      supportWhatsapp: waNumber,
       stats: {
         studentCount: mine.length,
         activeStudents: mine.filter((s) => s.status === 'active').length,
@@ -726,6 +826,9 @@ export async function POST(req: Request) {
          */
         ordersAwaiting: studentOrders.filter((o) => o.state === 'submitted').length,
         seatPaymentPending: seatOrders.some((o) => o.state === 'submitted'),
+        couponsTotal: cstats.total,
+        couponsUsed: cstats.used,
+        couponsLeft: cstats.left,
       },
     },
   });

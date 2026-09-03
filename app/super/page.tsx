@@ -1,11 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { PasscodeInput } from '@/components/PasscodeInput';
 import { PaySettingsForm, type PaySettings } from '@/components/PaySettingsForm';
 import { PasscodeChangeForm } from '@/components/PasscodeChangeForm';
 import { Card, Button, Banner, Status, Pill, type Tone } from '@/components/ui';
 import { BRAND_NAME } from '@/lib/branding';
+import { couponPacks, couponOrderTotal } from '@/lib/data/plans';
 
 /**
  * Super admin, rebuilt to docs/design-reference/super_admin_dashboard.
@@ -25,8 +26,14 @@ interface Overview {
     consultancies: number;
     pendingConsultancies: number;
     ordersAwaiting: number;
+    couponsIssued?: number;
+    couponsRedeemed?: number;
   };
   revenueNpr: number;
+  /** Students who paid us themselves, by QR. */
+  revenueFromStudents?: number;
+  /** Consultancies, who paid in advance for coupons. */
+  revenueFromConsultancies?: number;
   students: {
     id: string;
     name: string | null;
@@ -34,6 +41,11 @@ interface Overview {
     source: string;
     createdVia: string | null;
     consultancyId: string | null;
+    consultancyName?: string | null;
+    couponCode?: string | null;
+    targetUniversity?: string | null;
+    level?: string | null;
+    city?: string | null;
     attributionConsultancy: string | null;
     status: string;
     referralCode: string;
@@ -111,23 +123,71 @@ interface DirectoryStudent {
   city: string | null;
   source: string;
   consultancyId: string | null;
+  consultancyName: string | null;
+  /** Their consultancy's row colour, or null for a direct student. */
+  hue: number | null;
+  couponCode: string | null;
+  couponPack: string | null;
   status: string;
   createdAt: string;
   lastSeenAt: string;
   mocksLeft: number;
+  mocksUsed: number;
+  practiceLeft: number;
+  practiceUsed: number;
+}
+
+interface DirectoryCoupon {
+  id: string;
+  code: string;
+  packCode: string;
+  packName: string;
+  wholesaleNpr: number;
+  status: 'used' | 'unused';
+  issuedAt: string;
+  redeemedAt: string | null;
+  student: {
+    id: string;
+    name: string | null;
+    phone: string | null;
+    targetUniversity: string | null;
+    mocksLeft: number;
+    mocksUsed: number;
+  } | null;
 }
 
 interface DirectoryConsultancy {
   id: string;
   name: string;
   slug: string;
+  contactName: string;
+  contactPhone: string;
   status: string;
+  createdAt: string;
+  /** They have signed in and chosen their own passcode. */
+  active: boolean;
+  hue: number;
   seatsTotal: number;
   seatsGivenOut: number;
   seatsLeft: number;
   renewals: number;
   studentsFromLink: number;
   paidNpr: number;
+  couponsTotal: number;
+  couponsUsed: number;
+  couponsLeft: number;
+  couponsByPack: { packCode: string; name: string; total: number; used: number }[];
+  coupons: DirectoryCoupon[];
+}
+
+/** What `createConsultancy` hands back, shown ONCE so it can be sent on. */
+interface Handover {
+  name: string;
+  slug: string;
+  handoverPasscode: string;
+  coupons: { code: string; packCode: string }[];
+  /** A reset shows no coupons, only the new code. */
+  isReset?: boolean;
 }
 
 interface Directory {
@@ -187,8 +247,70 @@ const CONSULTANCY_STATE: Record<string, { label: string; tone: Tone }> = {
   approved: { label: 'Approved', tone: 'go' },
   pending: { label: 'Waiting for approval', tone: 'warn' },
   paused: { label: 'Paused', tone: 'stop' },
+  suspended: { label: 'Suspended', tone: 'stop' },
   rejected: { label: 'Rejected', tone: 'stop' },
 };
+
+/**
+ * THE ROW COLOUR FOR A CONSULTANCY.
+ *
+ * The client's request: colour every consultancy's students so they can never
+ * be confused with another's or with a direct student. The hue is handed out
+ * by the server along the golden angle (see lib/coupons.ts), so no two
+ * consultancies share one. Rendered as HSL from a number, which keeps D-1
+ * (no raw hex in components) intact: there is no colour written here, only a
+ * formula applied to a value the data carries.
+ */
+function rowTint(hue: number | null | undefined): React.CSSProperties | undefined {
+  if (hue === null || hue === undefined) return undefined;
+  return {
+    backgroundColor: `hsl(${hue} 70% 94%)`,
+    boxShadow: `inset 4px 0 0 hsl(${hue} 60% 45%)`,
+  };
+}
+function swatch(hue: number): React.CSSProperties {
+  return { backgroundColor: `hsl(${hue} 60% 45%)` };
+}
+
+const dateTime = (iso: string) =>
+  new Date(iso).toLocaleString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+const dateOnly = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+/**
+ * The message the super admin copies and sends to a new consultancy. Composed
+ * here because only the browser knows which host it is running on.
+ */
+function handoverText(h: Handover): string {
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const lines = [
+    `Hello ${h.name},`,
+    '',
+    h.isReset
+      ? `We have reset your ${BRAND_NAME} partner passcode.`
+      : `Your ${BRAND_NAME} partner account is ready.`,
+    '',
+    `Sign in here: ${origin}/admin`,
+    `Short name: ${h.slug}`,
+    `Temporary passcode: ${h.handoverPasscode}`,
+    '',
+    'The first time you sign in you will be asked to choose your own passcode. Please do that straight away. The temporary one stops working the moment you do.',
+  ];
+  if (!h.isReset) {
+    lines.push(
+      '',
+      `Your ${h.coupons.length} coupon${h.coupons.length === 1 ? '' : 's'} ${h.coupons.length === 1 ? 'is' : 'are'} waiting in your portal. Copy a coupon and send it to a student. They sign in at ${origin}, open ${origin}/pricing, enter the coupon, and their pack is switched on at once.`
+    );
+  }
+  lines.push('', 'If you ever forget your passcode, message us and we will reset it.');
+  return lines.join('\n');
+}
 
 /**
  * Falls back to the raw value rather than to a blank or a guess. An unknown
@@ -244,6 +366,14 @@ export default function SuperAdminPage() {
   const [flagged, setFlagged] = useState<FlaggedTrial[]>([]);
   const [directory, setDirectory] = useState<Directory | null>(null);
   const [auditRows, setAuditRows] = useState<AuditRow[]>([]);
+  /** The last handover shown, until dismissed. Never stored anywhere else. */
+  const [handover, setHandover] = useState<Handover | null>(null);
+  const [handoverCopied, setHandoverCopied] = useState(false);
+  /** Which consultancy's coupon list is open, and which has the add form open. */
+  const [openCoupons, setOpenCoupons] = useState<string | null>(null);
+  const [addingFor, setAddingFor] = useState<string | null>(null);
+  const [couponCounts, setCouponCounts] = useState<Record<string, number>>({});
+  const [couponPaid, setCouponPaid] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -288,7 +418,8 @@ export default function SuperAdminPage() {
     if (!d) return;
     setData(d);
     const o = (await call({ action: 'orders' })) as Order[] | null;
-    if (o) setOrders(o);
+    // Newest first, whatever order the store returned them in.
+    if (o) setOrders([...o].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1)));
     const f = (await call({ action: 'flaggedTrials' })) as FlaggedTrial[] | null;
     if (f) setFlagged(f);
     /**
@@ -436,6 +567,49 @@ export default function SuperAdminPage() {
     if (ok) {
       await loadAll();
       setNotice(`${c.name} is now ${status}.`);
+    }
+  }
+
+  /**
+   * More coupons for an existing consultancy. The server re-checks the price;
+   * the form shows the expected total so an honest typo is caught before the
+   * server has to refuse it.
+   */
+  async function addCoupons(c: DirectoryConsultancy) {
+    const paidNpr = Number(couponPaid);
+    const ok = (await platformCall({
+      action: 'addCoupons',
+      consultancyId: c.id,
+      coupons: couponCounts,
+      paidNpr: Number.isFinite(paidNpr) ? paidNpr : -1,
+    })) as { message?: string } | null;
+    if (ok) {
+      setAddingFor(null);
+      setCouponCounts({});
+      setCouponPaid('');
+      await loadAll();
+      setNotice(ok.message ?? 'Coupons added.');
+      setOpenCoupons(c.id);
+    }
+  }
+
+  /** They forgot their passcode. A new handover code, shown once. */
+  async function resetPasscode(c: DirectoryConsultancy) {
+    if (
+      !window.confirm(
+        `Reset the passcode for ${c.name}?\n\n` +
+          'Their current passcode stops working immediately. You will be shown a new temporary one to send them, and they will be asked to choose their own again.'
+      )
+    )
+      return;
+    const ok = (await platformCall({ action: 'resetConsultancyPasscode', consultancyId: c.id })) as
+      | { handoverPasscode: string; slug: string; name: string; message?: string }
+      | null;
+    if (ok) {
+      setHandover({ name: ok.name, slug: ok.slug, handoverPasscode: ok.handoverPasscode, coupons: [], isReset: true });
+      setHandoverCopied(false);
+      await loadAll();
+      setNotice(ok.message ?? 'Passcode reset.');
     }
   }
 
@@ -757,13 +931,35 @@ export default function SuperAdminPage() {
               <Stat
                 label="Total revenue"
                 value={`NPR ${data.revenueNpr.toLocaleString()}`}
-                hint="verified payments only"
+                hint="students by QR plus consultancies by coupon"
               />
               <Stat
                 label="Pending approvals"
                 value={String(c.ordersAwaiting)}
                 hint={c.ordersAwaiting ? 'Requires attention' : 'Nothing waiting'}
                 accent={c.ordersAwaiting > 0}
+              />
+            </section>
+
+            {/* WHERE THE MONEY CAME FROM. Two channels, two numbers, and the
+                coupon count beside them, exactly as the client asked: the
+                dashboard has to say how much came from how many students and
+                how much from consultancies, not one blended figure. */}
+            <section className="mb-6 grid gap-4 sm:grid-cols-3">
+              <Stat
+                label="From students, by QR"
+                value={`NPR ${(data.revenueFromStudents ?? 0).toLocaleString()}`}
+                hint={`${c.paying} paying students`}
+              />
+              <Stat
+                label="From consultancies, coupons"
+                value={`NPR ${(data.revenueFromConsultancies ?? 0).toLocaleString()}`}
+                hint="paid in advance, before coupons were issued"
+              />
+              <Stat
+                label="Coupons"
+                value={`${c.couponsRedeemed ?? 0} used of ${c.couponsIssued ?? 0}`}
+                hint="a used coupon is a student practising"
               />
             </section>
 
@@ -868,14 +1064,32 @@ export default function SuperAdminPage() {
           </>
         )}
 
-        {/* -------------------------------------------------- students --- */}
+        {/* -------------------------------------------------- students ---
+            Newest first. Every row says where the student came from BY NAME,
+            and a consultancy's rows carry that consultancy's own colour, so a
+            direct student and a coupon student can never be mistaken for one
+            another (the client's request of 3 Sep 2026). */}
         {tab === 'students' && (
           <section className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
             <div className="border-b border-line p-5">
               <h2 className="font-serif text-lg font-bold text-ink">Students</h2>
               <p className="text-sm text-ink-soft">
-                Engagement and entitlement only. Answers are never shown here.
+                Newest first. Engagement and entitlement only. Answers are never shown here.
               </p>
+              {(directory?.consultancies ?? []).length > 0 && (
+                <div className="mt-3 flex flex-wrap items-center gap-3 text-micro text-ink-soft">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="inline-block h-3 w-3 rounded-sm border border-line bg-surface" aria-hidden />
+                    Direct student
+                  </span>
+                  {(directory?.consultancies ?? []).map((k) => (
+                    <span key={k.id} className="inline-flex items-center gap-1.5">
+                      <span className="inline-block h-3 w-3 rounded-sm" style={swatch(k.hue)} aria-hidden />
+                      {k.name}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             {data.students.length === 0 ? (
               <p className="p-10 text-center text-ink-quiet">
@@ -887,20 +1101,27 @@ export default function SuperAdminPage() {
                   <thead className="bg-surface-sunk text-micro font-bold uppercase tracking-[0.08em] text-ink-quiet">
                     <tr>
                       <th className="px-5 py-3 font-semibold">Student</th>
+                      <th className="px-3 py-3 font-semibold">Signed up</th>
                       <th className="px-3 py-3 font-semibold">Phone</th>
-                      <th className="px-3 py-3 font-semibold">Source</th>
-                      <th className="px-3 py-3 font-semibold">Applying through</th>
-                      <th className="px-3 py-3 font-semibold">Mocks left</th>
+                      <th className="px-3 py-3 font-semibold">University</th>
+                      <th className="px-3 py-3 font-semibold">From</th>
+                      <th className="px-3 py-3 font-semibold">Coupon</th>
+                      <th className="px-3 py-3 font-semibold">Mocks</th>
                       <th className="px-3 py-3 font-semibold">Status</th>
                       <th className="px-5 py-3 font-semibold">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-line">
-                    {data.students.map((s) => (
-                      <tr key={s.id}>
+                    {data.students.map((s) => {
+                      const d = directory?.students.find((x) => x.id === s.id);
+                      return (
+                      <tr key={s.id} style={rowTint(d?.hue)}>
                         <td className="px-5 py-3">
                           <p className="font-semibold text-ink">{s.name || 'Unnamed'}</p>
                           <p className="text-micro text-ink-quiet">{s.email || 'no email'}</p>
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-3 text-micro text-ink-soft">
+                          {dateTime(s.createdAt)}
                         </td>
                         {/* Tappable. If the only way to act on a row is to
                             copy a number out by hand, the row is a list entry
@@ -913,33 +1134,13 @@ export default function SuperAdminPage() {
                           ) : (
                             <span className="text-ink-quiet">not given</span>
                           )}
-                          {/**
-                            * N-30. This used to read "not on WhatsApp", which
-                            * became false the moment the welcome screen started
-                            * collecting numbers: every new student arrives with
-                            * whatsappConfirmed false, meaning only that nobody
-                            * has checked yet. Printing "not on WhatsApp" beside
-                            * a perfectly good number would have had the owner
-                            * distrusting numbers that were fine.
-                            */}
                           {s.phone && s.whatsappConfirmed === false && (
                             <span className="ml-1 block text-micro font-semibold text-ink-quiet">
                               not checked yet
                             </span>
                           )}
-                          {/**
-                            * N-30. THE ANTI-ABUSE SIGNAL, AND IT IS A COUNT, NOT
-                            * A VERDICT.
-                            *
-                            * Ten free questions cost real money, and one person
-                            * with three Gmail addresses is thirty of them. Email
-                            * is free and unlimited; a Nepali mobile number is
-                            * not. So the number is what we count.
-                            *
-                            * Shown, never enforced. A family sharing one phone
-                            * is a real student and an automatic ban would give
-                            * them no way to appeal. The owner looks and decides.
-                            */}
+                          {/* N-30. THE ANTI-ABUSE SIGNAL, AND IT IS A COUNT, NOT
+                              A VERDICT. Shown, never enforced. */}
                           {(s.accountsOnThisNumber ?? 0) > 1 && (
                             <span className="ml-1 mt-1 inline-block rounded-full bg-warn-tint px-2 py-0.5 text-micro font-bold text-warn">
                               {s.accountsOnThisNumber} accounts on this number
@@ -947,16 +1148,32 @@ export default function SuperAdminPage() {
                           )}
                         </td>
                         <td className="px-3 py-3 text-ink-soft">
-                          {s.consultancyId ? 'Consultancy' : 'Direct'}
+                          {s.targetUniversity || <span className="text-ink-quiet">not said</span>}
+                          {s.level && <span className="block text-micro capitalize text-ink-quiet">{s.level}</span>}
                         </td>
-                        <td className="px-3 py-3 capitalize text-ink-soft">
-                          {s.attributionConsultancy || 'not said'}
+                        <td className="px-3 py-3 text-ink-soft">
+                          {s.consultancyId ? (
+                            <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
+                              {d?.hue !== null && d?.hue !== undefined && (
+                                <span className="inline-block h-2.5 w-2.5 rounded-full" style={swatch(d.hue)} aria-hidden />
+                              )}
+                              {s.consultancyName ?? 'Consultancy'}
+                            </span>
+                          ) : (
+                            'Direct'
+                          )}
+                          {s.attributionConsultancy && (
+                            <span className="block text-micro capitalize text-ink-quiet">
+                              named {s.attributionConsultancy}
+                            </span>
+                          )}
                         </td>
-                        {/* Giving credit without seeing what they already
-                            have is guessing. This comes from the directory,
-                            which is now loaded alongside the overview. */}
+                        <td className="px-3 py-3 font-mono text-micro text-ink-soft">
+                          {s.couponCode ?? <span className="font-sans text-ink-quiet">none</span>}
+                        </td>
+                        {/* Used and left, from the ledger, in one glance. */}
                         <td className="px-3 py-3 tabular-nums text-ink-soft">
-                          {directory?.students.find((d) => d.id === s.id)?.mocksLeft ?? '-'}
+                          {d ? `${d.mocksUsed} done, ${d.mocksLeft} left` : '-'}
                         </td>
                         <td className="px-3 py-3">
                           <Status tone={stateOf(STUDENT_STATE, s.status).tone}>
@@ -965,10 +1182,6 @@ export default function SuperAdminPage() {
                         </td>
                         <td className="px-5 py-3">
                           <div className="flex flex-wrap gap-1.5">
-                            {/* The support fix. A student whose payment went
-                                wrong, or who was soft-denied unfairly, could
-                                only be helped by a redeploy before this. The
-                                action existed the whole time. */}
                             <Button variant="primary" size="sm"
                               onClick={() => grantCredit(s.id, s.name || s.email || 'this student')}
                               disabled={busy}
@@ -985,7 +1198,8 @@ export default function SuperAdminPage() {
                           </div>
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -1015,7 +1229,8 @@ export default function SuperAdminPage() {
                 <table className="w-full text-left text-sm">
                   <thead className="bg-surface-sunk text-micro font-bold uppercase tracking-[0.08em] text-ink-quiet">
                     <tr>
-                      <th className="px-5 py-3 font-semibold">Student</th>
+                      <th className="px-5 py-3 font-semibold">When</th>
+                      <th className="px-3 py-3 font-semibold">Student</th>
                       <th className="px-3 py-3 font-semibold">Pack</th>
                       <th className="px-3 py-3 font-semibold">Amount</th>
                       <th className="px-3 py-3 font-semibold">Transaction id</th>
@@ -1027,7 +1242,12 @@ export default function SuperAdminPage() {
                   <tbody className="divide-y divide-line">
                     {orders.map((o) => (
                       <tr key={o.id}>
-                        <td className="px-5 py-3">
+                        {/* Newest first, with the date on every row: who
+                            paid today, yesterday, this month, at a glance. */}
+                        <td className="whitespace-nowrap px-5 py-3 text-micro text-ink-soft">
+                          {dateTime(o.createdAt)}
+                        </td>
+                        <td className="px-3 py-3">
                           <p className="font-semibold text-ink">{o.studentName || 'Unnamed'}</p>
                           <p className="text-micro text-ink-quiet">{o.payerName || o.studentEmail || ''}</p>
                         </td>
@@ -1120,75 +1340,99 @@ export default function SuperAdminPage() {
         )}
 
         {/* -------------------------------------------- consultancies ---
-            `createConsultancy` and `setConsultancyStatus` existed on the server
-            with NO screen anywhere, so the only way to open the consultancy
-            channel was to hand-write an HTTP request. On a product whose whole
-            growth plan is consultancies, that is not a missing nicety. */}
+            THE COUPON MODEL (3 Sep 2026). The super admin enters who, how many
+            coupons of each pack, and the amount received. The server refuses
+            the account unless the amount matches the coupons to the rupee, and
+            generates the handover passcode; nobody types one. */}
         {tab === 'consultancies' && (
           <section>
+            {handover && (
+              <div className="mb-6 rounded-card border-2 border-go bg-go-tint p-5">
+                <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h2 className="font-serif text-lg font-bold text-ink">
+                      {handover.isReset ? `New passcode for ${handover.name}` : `${handover.name} is set up`}
+                    </h2>
+                    <p className="text-sm text-ink-soft">
+                      Copy this message and send it to them. The temporary passcode is shown only
+                      here, only now. Once you close this it is gone from this screen.
+                    </p>
+                  </div>
+                  <Button variant="tertiary" size="sm" onClick={() => setHandover(null)}>
+                    Close
+                  </Button>
+                </div>
+                <textarea
+                  readOnly
+                  value={handoverText(handover)}
+                  rows={handover.isReset ? 9 : 12}
+                  className="mb-3 w-full rounded-control border-2 border-line bg-surface px-4 py-3 font-mono text-sm text-ink outline-none"
+                />
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      void navigator.clipboard?.writeText(handoverText(handover));
+                      setHandoverCopied(true);
+                      setTimeout(() => setHandoverCopied(false), 2000);
+                    }}
+                  >
+                    {handoverCopied ? 'Copied' : 'Copy the message'}
+                  </Button>
+                </div>
+                {handover.coupons.length > 0 && (
+                  <div className="mt-4">
+                    <p className="mb-2 text-micro font-semibold uppercase tracking-wide text-ink-quiet">
+                      Their {handover.coupons.length} coupons, also in their portal
+                    </p>
+                    <ul className="flex flex-wrap gap-2">
+                      {handover.coupons.map((cp) => (
+                        <li key={cp.code} className="rounded-control bg-surface px-3 py-1.5 font-mono text-sm text-ink">
+                          {cp.code} <span className="font-sans text-micro uppercase text-ink-quiet">{cp.packCode}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="mb-6 rounded-card border border-line bg-surface p-5 shadow-card">
               <h2 className="mb-1 font-serif text-lg font-bold text-ink">Add a consultancy</h2>
               <p className="mb-4 text-sm leading-relaxed text-ink-soft">
-                They get their own link and their own portal. Nothing works until you approve them
-                below, so it is safe to set one up before the money arrives.
+                Only after they have paid. Enter how many coupons of each pack they bought and the
+                exact amount received. The account is refused if the two do not agree, and a
+                temporary passcode is generated for you to send them.
               </p>
-              <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  const f = new FormData(e.currentTarget as HTMLFormElement);
-                  const ok = await platformCall({
-                    action: 'createConsultancy',
-                    name: String(f.get('name') ?? '').trim(),
-                    slug: String(f.get('slug') ?? '').trim(),
-                    contactName: String(f.get('contactName') ?? '').trim(),
-                    contactPhone: String(f.get('contactPhone') ?? '').trim(),
-                    seatsTotal: Number(f.get('seatsTotal') ?? 0),
-                    paidNpr: Number(f.get('paidNpr') ?? 0),
-                    passcode: String(f.get('passcode') ?? ''),
-                  });
+              <CreateConsultancyForm
+                busy={busy}
+                onSubmit={async (payload) => {
+                  const ok = (await platformCall({ action: 'createConsultancy', ...payload })) as
+                    | (Handover & { message?: string })
+                    | null;
                   if (ok) {
-                    (e.target as HTMLFormElement).reset();
+                    setHandover({
+                      name: ok.name,
+                      slug: ok.slug,
+                      handoverPasscode: ok.handoverPasscode,
+                      coupons: ok.coupons ?? [],
+                    });
+                    setHandoverCopied(false);
                     await loadAll();
-                    setNotice('Consultancy created, and waiting for you to approve it below.');
+                    setNotice(ok.message ?? 'Consultancy created.');
+                    return true;
                   }
+                  return false;
                 }}
-                className="grid gap-3 sm:grid-cols-2"
-              >
-                <Field name="name" label="Their name" placeholder="Kathmandu Education Hub" required />
-                <Field
-                  name="slug"
-                  label="Short name for their link"
-                  placeholder="kathmandu-hub"
-                  hint="lower case, letters, numbers and dashes"
-                  required
-                />
-                <Field name="contactName" label="Who we deal with" placeholder="Sita Sharma" />
-                <Field name="contactPhone" label="Their phone" placeholder="+977 98..." />
-                <Field name="seatsTotal" label="Seats they have paid for" type="number" placeholder="0" />
-                <Field name="paidNpr" label="What they paid, NPR" type="number" placeholder="0" />
-                <Field
-                  name="passcode"
-                  label="Portal passcode"
-                  placeholder="at least 4 characters"
-                  hint="give this to them; they use it with their short name"
-                  required
-                />
-                <div className="flex items-end">
-                  <Button variant="secondary" size="md" full
-                    type="submit"
-                    disabled={busy}
-                  >
-                    {busy ? 'Working...' : 'Create'}
-                  </Button>
-                </div>
-              </form>
+              />
             </div>
 
             <div className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
               <div className="border-b border-line p-5">
                 <h2 className="font-serif text-lg font-bold text-ink">Consultancies</h2>
                 <p className="text-sm text-ink-soft">
-                  Seats given out, seats left, and how many students came through their link.
+                  Newest first. Coupons used and left, students, what they paid, and whether they
+                  have signed in yet. Open a row to see every coupon and who used it.
                 </p>
               </div>
               {(directory?.consultancies ?? []).length === 0 ? (
@@ -1199,60 +1443,109 @@ export default function SuperAdminPage() {
                     <thead className="bg-surface-sunk text-micro font-bold uppercase tracking-[0.08em] text-ink-quiet">
                       <tr>
                         <th className="px-5 py-3 font-semibold">Consultancy</th>
-                        <th className="px-3 py-3 font-semibold">Seats</th>
+                        <th className="px-3 py-3 font-semibold">Added</th>
+                        <th className="px-3 py-3 font-semibold">Coupons</th>
                         <th className="px-3 py-3 font-semibold">Students</th>
-                        <th className="px-3 py-3 font-semibold">Paid</th>
+                        <th className="px-3 py-3 font-semibold">Paid us</th>
                         <th className="px-3 py-3 font-semibold">Status</th>
                         <th className="px-5 py-3 font-semibold">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-line">
-                      {(directory?.consultancies ?? []).map((c) => (
-                        <tr key={c.id}>
+                      {(directory?.consultancies ?? []).map((k) => (
+                        <Fragment key={k.id}>
+                        <tr style={rowTint(k.hue)}>
                           <td className="px-5 py-3">
-                            <p className="font-semibold text-ink">{c.name}</p>
-                            <p className="font-mono text-micro text-ink-quiet">/c/{c.slug}</p>
+                            <p className="font-semibold text-ink">{k.name}</p>
+                            <p className="font-mono text-micro text-ink-quiet">{k.slug}</p>
+                            {(k.contactName || k.contactPhone) && (
+                              <p className="text-micro text-ink-quiet">
+                                {[k.contactName, k.contactPhone].filter(Boolean).join(' · ')}
+                              </p>
+                            )}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-3 text-micro text-ink-soft">
+                            {dateOnly(k.createdAt)}
                           </td>
                           <td className="px-3 py-3 tabular-nums text-ink-soft">
-                            {c.seatsGivenOut} of {c.seatsTotal}
+                            {k.couponsUsed} used of {k.couponsTotal}
                             <span className="block text-micro text-ink-quiet">
-                              {c.seatsLeft} left
-                              {c.renewals > 0 ? `, ${c.renewals} top ups` : ''}
+                              {k.couponsLeft} left
+                              {k.couponsByPack.length > 0
+                                ? ` · ${k.couponsByPack.map((b) => `${b.used}/${b.total} ${b.name}`).join(', ')}`
+                                : ''}
                             </span>
+                            {k.seatsTotal > 0 && (
+                              <span className="block text-micro text-ink-quiet">
+                                older seats: {k.seatsGivenOut} of {k.seatsTotal}
+                                {k.renewals > 0 ? `, ${k.renewals} top ups` : ''}
+                              </span>
+                            )}
                           </td>
                           <td className="px-3 py-3 tabular-nums text-ink-soft">
-                            {c.studentsFromLink}
+                            {k.studentsFromLink}
                           </td>
                           <td className="px-3 py-3 tabular-nums text-ink-soft">
-                            NPR {c.paidNpr.toLocaleString()}
+                            NPR {k.paidNpr.toLocaleString()}
                           </td>
                           <td className="px-3 py-3">
-                            <Status tone={stateOf(CONSULTANCY_STATE, c.status).tone}>
-                              {stateOf(CONSULTANCY_STATE, c.status).label}
-                            </Status>
+                            {k.status === 'approved' ? (
+                              k.active ? (
+                                <Status tone="go">Active</Status>
+                              ) : (
+                                <Status tone="warn">Not signed in yet</Status>
+                              )
+                            ) : (
+                              <Status tone={stateOf(CONSULTANCY_STATE, k.status).tone}>
+                                {stateOf(CONSULTANCY_STATE, k.status).label}
+                              </Status>
+                            )}
                           </td>
                           <td className="px-5 py-3">
                             <div className="flex flex-wrap gap-2">
-                              {c.status !== 'approved' && (
-                                <Button variant="primary" size="sm"
-                                  onClick={() => setConsultancyStatus(c, 'approved')}
+                              <Button variant="tertiary" size="sm"
+                                onClick={() => setOpenCoupons(openCoupons === k.id ? null : k.id)}
+                              >
+                                {openCoupons === k.id ? 'Hide coupons' : 'Coupons'}
+                              </Button>
+                              {k.status === 'approved' && (
+                                <Button variant="secondary" size="sm"
+                                  onClick={() => {
+                                    setAddingFor(addingFor === k.id ? null : k.id);
+                                    setCouponCounts({});
+                                    setCouponPaid('');
+                                  }}
                                   disabled={busy}
                                 >
-                                  Approve
+                                  Add coupons
                                 </Button>
                               )}
-                              {c.status === 'approved' && (
+                              <Button variant="tertiary" size="sm"
+                                onClick={() => resetPasscode(k)}
+                                disabled={busy}
+                              >
+                                Reset passcode
+                              </Button>
+                              {k.status !== 'approved' && (
+                                <Button variant="primary" size="sm"
+                                  onClick={() => setConsultancyStatus(k, 'approved')}
+                                  disabled={busy}
+                                >
+                                  {k.status === 'suspended' ? 'Reactivate' : 'Approve'}
+                                </Button>
+                              )}
+                              {k.status === 'approved' && (
                                 <Button variant="tertiary" size="sm"
-                                  onClick={() => setConsultancyStatus(c, 'suspended')}
+                                  onClick={() => setConsultancyStatus(k, 'suspended')}
                                   disabled={busy}
                                 >
                                   Suspend
                                 </Button>
                               )}
                               {/* D-31. The switch that makes a lab work. */}
-                              {c.status === 'approved' && (
+                              {k.status === 'approved' && (
                                 <Button variant="tertiary" size="sm"
-                                  onClick={() => setLabNetworks(c)}
+                                  onClick={() => setLabNetworks(k)}
                                   disabled={busy}
                                 >
                                   Lab networks
@@ -1261,6 +1554,115 @@ export default function SuperAdminPage() {
                             </div>
                           </td>
                         </tr>
+                        {addingFor === k.id && (
+                          <tr>
+                            <td colSpan={7} className="bg-surface-sunk px-5 py-4">
+                              <p className="mb-3 text-sm font-semibold text-ink">
+                                More coupons for {k.name}. Enter what they bought and the exact
+                                amount received.
+                              </p>
+                              <div className="flex flex-wrap items-end gap-3">
+                                {couponPacks().map((pk) => (
+                                  <label key={pk.code} className="text-sm">
+                                    <span className="mb-1 block font-semibold text-ink">
+                                      {pk.name} coupons
+                                      <span className="font-normal text-ink-quiet"> at NPR {pk.wholesaleNpr.toLocaleString()}</span>
+                                    </span>
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      max={500}
+                                      value={couponCounts[pk.code] ?? ''}
+                                      onChange={(e) =>
+                                        setCouponCounts({ ...couponCounts, [pk.code]: Math.max(0, Math.floor(Number(e.target.value) || 0)) })
+                                      }
+                                      className="w-28 rounded-control border-2 border-line px-3 py-2 text-sm outline-none focus:border-ink"
+                                    />
+                                  </label>
+                                ))}
+                                <label className="text-sm">
+                                  <span className="mb-1 block font-semibold text-ink">
+                                    Amount received, NPR
+                                    <span className="font-normal text-ink-quiet">
+                                      {' '}(should be NPR {couponOrderTotal(couponCounts).totalNpr.toLocaleString()})
+                                    </span>
+                                  </span>
+                                  <input
+                                    type="number"
+                                    min={0}
+                                    value={couponPaid}
+                                    onChange={(e) => setCouponPaid(e.target.value)}
+                                    className="w-36 rounded-control border-2 border-line px-3 py-2 text-sm outline-none focus:border-ink"
+                                  />
+                                </label>
+                                <Button variant="secondary" size="sm" onClick={() => addCoupons(k)} disabled={busy}>
+                                  {busy ? 'Working...' : 'Issue coupons'}
+                                </Button>
+                                <Button variant="tertiary" size="sm" onClick={() => setAddingFor(null)}>
+                                  Cancel
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                        {openCoupons === k.id && (
+                          <tr>
+                            <td colSpan={7} className="bg-surface-sunk px-5 py-4">
+                              {k.coupons.length === 0 ? (
+                                <p className="text-sm text-ink-quiet">No coupons issued to {k.name} yet.</p>
+                              ) : (
+                                <table className="w-full text-left text-sm">
+                                  <thead className="text-micro font-bold uppercase tracking-[0.08em] text-ink-quiet">
+                                    <tr>
+                                      <th className="py-2 pr-3 font-semibold">Coupon</th>
+                                      <th className="py-2 pr-3 font-semibold">Pack</th>
+                                      <th className="py-2 pr-3 font-semibold">Status</th>
+                                      <th className="py-2 pr-3 font-semibold">Used by</th>
+                                      <th className="py-2 pr-3 font-semibold">Phone</th>
+                                      <th className="py-2 pr-3 font-semibold">University</th>
+                                      <th className="py-2 pr-3 font-semibold">Mocks</th>
+                                      <th className="py-2 font-semibold">When</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="divide-y divide-line">
+                                    {k.coupons.map((cp) => (
+                                      <tr key={cp.id}>
+                                        <td className="py-2 pr-3 font-mono text-micro text-ink">{cp.code}</td>
+                                        <td className="py-2 pr-3 text-ink-soft">
+                                          {cp.packName}
+                                          <span className="block text-micro text-ink-quiet">
+                                            paid NPR {cp.wholesaleNpr.toLocaleString()}
+                                          </span>
+                                        </td>
+                                        <td className="py-2 pr-3">
+                                          {cp.status === 'used' ? (
+                                            <Status tone="go">Used</Status>
+                                          ) : (
+                                            <Status tone="neutral">Unused</Status>
+                                          )}
+                                        </td>
+                                        <td className="py-2 pr-3 text-ink-soft">{cp.student?.name ?? (cp.student ? 'Unnamed' : '')}</td>
+                                        <td className="py-2 pr-3 text-ink-soft">
+                                          {cp.student?.phone ? (
+                                            <a href={`tel:${cp.student.phone}`} className="underline underline-offset-2">{cp.student.phone}</a>
+                                          ) : ''}
+                                        </td>
+                                        <td className="py-2 pr-3 text-ink-soft">{cp.student?.targetUniversity ?? ''}</td>
+                                        <td className="py-2 pr-3 tabular-nums text-ink-soft">
+                                          {cp.student ? `${cp.student.mocksUsed} done, ${cp.student.mocksLeft} left` : ''}
+                                        </td>
+                                        <td className="whitespace-nowrap py-2 text-micro text-ink-soft">
+                                          {cp.redeemedAt ? `used ${dateTime(cp.redeemedAt)}` : `issued ${dateOnly(cp.issuedAt)}`}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              )}
+                            </td>
+                          </tr>
+                        )}
+                        </Fragment>
                       ))}
                     </tbody>
                   </table>
@@ -1616,6 +2018,192 @@ export default function SuperAdminPage() {
         )}
       </main>
     </div>
+  );
+}
+
+/**
+ * THE CREATE FORM, as its own component so it can hold the running total.
+ *
+ * The short name is DERIVED from the name as they type, in the only shape the
+ * server accepts (lower case, digits, dashes), and can still be edited. The
+ * previous form left it to be typed by hand, so a space or a capital letter
+ * was refused by the server with the single word "Invalid", and the client
+ * concluded the product was broken. The expected total is shown live for the
+ * same reason: an honest typo should be caught here, not refused there.
+ *
+ * There is deliberately NO passcode field. The server generates it.
+ */
+function CreateConsultancyForm({
+  busy,
+  onSubmit,
+}: {
+  busy: boolean;
+  onSubmit: (payload: {
+    name: string;
+    slug: string;
+    contactName: string;
+    contactPhone: string;
+    coupons: Record<string, number>;
+    paidNpr: number;
+  }) => Promise<boolean>;
+}) {
+  const [name, setName] = useState('');
+  const [slug, setSlug] = useState('');
+  const [slugTouched, setSlugTouched] = useState(false);
+  const [contactName, setContactName] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
+  const [counts, setCounts] = useState<Record<string, number>>({});
+  const [paid, setPaid] = useState('');
+
+  const packs = couponPacks();
+  const expected = couponOrderTotal(counts);
+  const paidNum = Number(paid);
+  const paidMatches = paid !== '' && Number.isFinite(paidNum) && paidNum === expected.totalNpr && expected.totalCoupons > 0;
+
+  const slugify = (v: string) =>
+    v
+      .toLowerCase()
+      .replace(/&/g, ' and ')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 60);
+
+  return (
+    <form
+      onSubmit={async (e) => {
+        e.preventDefault();
+        const ok = await onSubmit({
+          name: name.trim(),
+          slug: slug.trim(),
+          contactName: contactName.trim(),
+          contactPhone: contactPhone.trim(),
+          coupons: counts,
+          paidNpr: Number.isFinite(paidNum) ? paidNum : -1,
+        });
+        if (ok) {
+          setName('');
+          setSlug('');
+          setSlugTouched(false);
+          setContactName('');
+          setContactPhone('');
+          setCounts({});
+          setPaid('');
+        }
+      }}
+      className="grid gap-4 sm:grid-cols-2"
+    >
+      <div>
+        <label htmlFor="c-name" className="mb-1 block text-sm font-semibold text-ink">Their name</label>
+        <input
+          id="c-name"
+          value={name}
+          required
+          minLength={2}
+          maxLength={120}
+          placeholder="Kathmandu Education Hub"
+          onChange={(e) => {
+            setName(e.target.value);
+            if (!slugTouched) setSlug(slugify(e.target.value));
+          }}
+          className="w-full rounded-control border-2 border-line px-4 py-3 text-sm outline-none focus:border-ink"
+        />
+      </div>
+      <div>
+        <label htmlFor="c-slug" className="mb-1 block text-sm font-semibold text-ink">Short name they sign in with</label>
+        <input
+          id="c-slug"
+          value={slug}
+          required
+          minLength={2}
+          maxLength={60}
+          pattern="[a-z0-9-]+"
+          placeholder="kathmandu-hub"
+          onChange={(e) => {
+            setSlugTouched(true);
+            setSlug(slugify(e.target.value.toLowerCase()));
+          }}
+          className="w-full rounded-control border-2 border-line px-4 py-3 font-mono text-sm outline-none focus:border-ink"
+        />
+        <p className="mt-1 text-micro text-ink-quiet">Made from their name. Lower case, numbers and dashes only.</p>
+      </div>
+      <div>
+        <label htmlFor="c-contact" className="mb-1 block text-sm font-semibold text-ink">
+          Who we deal with <span className="font-normal text-ink-quiet">(optional)</span>
+        </label>
+        <input
+          id="c-contact"
+          value={contactName}
+          maxLength={120}
+          placeholder="Sita Sharma"
+          onChange={(e) => setContactName(e.target.value)}
+          className="w-full rounded-control border-2 border-line px-4 py-3 text-sm outline-none focus:border-ink"
+        />
+      </div>
+      <div>
+        <label htmlFor="c-phone" className="mb-1 block text-sm font-semibold text-ink">
+          Their phone <span className="font-normal text-ink-quiet">(optional)</span>
+        </label>
+        <input
+          id="c-phone"
+          value={contactPhone}
+          maxLength={40}
+          placeholder="98..."
+          onChange={(e) => setContactPhone(e.target.value)}
+          className="w-full rounded-control border-2 border-line px-4 py-3 text-sm outline-none focus:border-ink"
+        />
+      </div>
+
+      <fieldset className="sm:col-span-2">
+        <legend className="mb-2 text-sm font-semibold text-ink">Coupons they have paid for</legend>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {packs.map((pk) => (
+            <label key={pk.code} className="rounded-control border-2 border-line p-3 text-sm">
+              <span className="block font-semibold text-ink">{pk.name} coupons</span>
+              <span className="block text-micro text-ink-quiet">
+                NPR {pk.wholesaleNpr.toLocaleString()} each. The student gets {pk.mocks} mock interviews and {pk.practice} practice questions.
+              </span>
+              <input
+                type="number"
+                min={0}
+                max={500}
+                value={counts[pk.code] ?? ''}
+                placeholder="0"
+                onChange={(e) =>
+                  setCounts({ ...counts, [pk.code]: Math.max(0, Math.floor(Number(e.target.value) || 0)) })
+                }
+                className="mt-2 w-full rounded-control border-2 border-line px-3 py-2 text-sm outline-none focus:border-ink"
+              />
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <div>
+        <label htmlFor="c-paid" className="mb-1 block text-sm font-semibold text-ink">Amount received, NPR</label>
+        <input
+          id="c-paid"
+          type="number"
+          min={0}
+          required
+          value={paid}
+          placeholder="0"
+          onChange={(e) => setPaid(e.target.value)}
+          className="w-full rounded-control border-2 border-line px-4 py-3 text-sm outline-none focus:border-ink"
+        />
+        <p className={`mt-1 text-micro ${paid !== '' && !paidMatches ? 'font-semibold text-warn' : 'text-ink-quiet'}`}>
+          {expected.totalCoupons === 0
+            ? 'Enter at least one coupon.'
+            : `${expected.lines.map((l) => `${l.count} ${l.name} at NPR ${l.wholesaleNpr.toLocaleString()}`).join(' + ')} = NPR ${expected.totalNpr.toLocaleString()}.${
+                paid !== '' && !paidMatches ? ' This does not match what you typed.' : ''
+              }`}
+        </p>
+      </div>
+      <div className="flex items-end">
+        <Button variant="secondary" size="md" full type="submit" disabled={busy || !paidMatches || !name.trim() || !slug.trim()}>
+          {busy ? 'Working...' : 'Create and get their sign-in'}
+        </Button>
+      </div>
+    </form>
   );
 }
 

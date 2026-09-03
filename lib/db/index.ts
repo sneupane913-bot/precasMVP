@@ -1,6 +1,7 @@
 import type {
   AdminNotification,
   ApprovalAudit,
+  Coupon,
   LedgerEntry,
   PaymentOrder,
   RewardRule,
@@ -55,6 +56,16 @@ export interface Repo {
   appendLedger(e: LedgerEntry): Promise<LedgerEntry>;
   listLedger(studentId: string): Promise<LedgerEntry[]>;
   balance(studentId: string, kind: LedgerEntry['kind']): Promise<number>;
+  /**
+   * Every ledger row on the platform, in ONE read.
+   *
+   * The back office used to call `balance()` once per student, which is one
+   * round trip per student. On Postgres over the network that is tens of
+   * milliseconds each, and Netlify kills a function at ten seconds, so a
+   * directory of a few hundred students would have died mid-render. One read,
+   * then arithmetic in memory.
+   */
+  listLedgerAll(): Promise<LedgerEntry[]>;
 
   // orders
   createOrder(o: PaymentOrder): Promise<PaymentOrder>;
@@ -101,6 +112,17 @@ export interface Repo {
   listAudit(limit?: number): Promise<ApprovalAudit[]>;
   addNotification(n: AdminNotification): Promise<void>;
   listNotifications(consultancyId: string): Promise<AdminNotification[]>;
+
+  // coupons
+  createCoupons(coupons: Coupon[]): Promise<void>;
+  getCouponByCode(code: string): Promise<Coupon | null>;
+  listCoupons(filter?: { consultancyId?: string }): Promise<Coupon[]>;
+  /**
+   * Redeem atomically. Returns the coupon if THIS call was the one that
+   * redeemed it, and null if it does not exist or somebody got there first.
+   * One coupon, one student, once: this method is the whole guarantee.
+   */
+  redeemCoupon(code: string, studentId: string): Promise<Coupon | null>;
 
   // rewards
   listRewardRules(): Promise<RewardRule[]>;

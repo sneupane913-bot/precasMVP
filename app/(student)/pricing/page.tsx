@@ -2,7 +2,8 @@ import { PricingPacks, PriceComparison } from '@/components/PricingPacks';
 import { SiteHeader } from '@/components/SiteHeader';
 import { headerSession } from '@/lib/auth/header-session';
 import { SiteFooter } from '@/components/SiteFooter';
-import { Page } from '@/components/ui';
+import { Page, Card } from '@/components/ui';
+import { CouponRedeem } from '@/components/CouponRedeem';
 import { BRAND_NAME } from '@/lib/branding';
 
 export const metadata = { title: `Price | ${BRAND_NAME}` };
@@ -36,6 +37,15 @@ export default async function PricingPage() {
           </header>
 
           <PricingPacks signedIn={Boolean(session?.signedIn)} />
+
+          {/* THE SECOND WAY TO PAY. A consultancy buys coupons from us and
+              hands one to a student; the student enters it here and the pack
+              is switched on at once. Shown to every student, because any
+              student may be given one. Server-decided, like the price. */}
+          <Card as="section" tone="sunk">
+            <CouponRedeem signedIn={Boolean(session?.signedIn)} next="/pricing#coupon" />
+          </Card>
+
           <PriceComparison />
         </div>
       </Page>

@@ -13,6 +13,17 @@
  * Run: see qa/README.md. Needs `next dev` and no .env.local in the mirror.
  */
 const http = require('http');
+/**
+ * The Prep price, READ FROM plans.ts. This file used to hard-code 449 and went
+ * red the day the client moved Prep to 399 (3 Sep 2026): a test that restates
+ * a price is the same defect as a page that restates one (copy-check M-8).
+ */
+const PREP_PRICE = Number(
+  /code:\s*'prep'[\s\S]*?priceNpr:\s*(\d+)/.exec(
+    require('fs').readFileSync(require('path').join(__dirname, '..', 'lib/data/plans.ts'), 'utf8')
+  )[1]
+);
+
 
 /**
  * The back-office passcodes, READ FROM THE ENVIRONMENT.
@@ -268,7 +279,7 @@ function answer(sessionId, questionId, jar, ip) {
   // ---------------------------------------------------------------- CS-10
   // The clever student edits the price.
   const cheat = await req('POST', '/api/payment', { action: 'create', packCode: 'prep', amountNpr: 1 }, { ip: d.ip, cookie: d.jar });
-  t('CS-10', 'Student cannot set their own price', cheat.json?.data?.amountNpr === 449,
+  t('CS-10', 'Student cannot set their own price', cheat.json?.data?.amountNpr === PREP_PRICE,
     `client sent amountNpr:1 -> server charged ${cheat.json?.data?.amountNpr}`);
 
   // ---------------------------------------------------------------- CS-11

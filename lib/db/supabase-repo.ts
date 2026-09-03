@@ -1,6 +1,7 @@
 import { DEFAULT_SEAT_SIZE } from '@/lib/data/plans';
 import type {
   Repo,
+  Coupon,
   Student,
   TrialClaim,
   LedgerEntry,
@@ -268,6 +269,29 @@ const toStudent = (r: Row): Student => ({
   referredByCode: (r.referred_by_code as string) ?? null,
   consentVersion: (r.consent_version as string) ?? null,
   consentAt: (r.consent_at as string) ?? null,
+  /**
+   * 3 SEPTEMBER 2026. THESE FIVE FIELDS WERE NEVER MAPPED, AND IT WAS A
+   * PRODUCTION DEFECT.
+   *
+   * The welcome screen (N-30) writes `whatsappNumber`, `level`,
+   * `targetUniversity` and `city`, and the checkout writes
+   * `whatsappConfirmed`. `updateStudent` passed them here, and both mapping
+   * functions dropped them on the floor, so on the live database (Supabase)
+   * a student's phone number was never saved. `needsProfile` therefore stayed
+   * true for ever, `/start` sent every returning student back to `/welcome`,
+   * and `/api/session/create` refused them with PROFILE_REQUIRED. The
+   * in-memory store used by every local run and every test suite kept the
+   * fields, so nothing here could see it: F-5, proof of the code mistaken for
+   * proof of the product, on the code path only the live site runs.
+   *
+   * `qa/schema-check.js` now fails the build if a field on `Student` is
+   * missing from either mapping or from `supabase/schema.sql`.
+   */
+  whatsappNumber: (r.whatsapp_number as string) ?? null,
+  whatsappConfirmed: r.whatsapp_confirmed === null || r.whatsapp_confirmed === undefined ? null : Boolean(r.whatsapp_confirmed),
+  city: (r.city as string) ?? null,
+  level: (r.level as Student['level']) ?? null,
+  targetUniversity: (r.target_university as string) ?? null,
   createdAt: r.created_at as string,
   lastSeenAt: r.last_seen_at as string,
 });
@@ -292,10 +316,41 @@ const fromStudent = (s: Partial<Student>): Row => {
   if (s.referredByCode !== undefined) r.referred_by_code = s.referredByCode;
   if (s.consentVersion !== undefined) r.consent_version = s.consentVersion;
   if (s.consentAt !== undefined) r.consent_at = s.consentAt;
+  if (s.whatsappNumber !== undefined) r.whatsapp_number = s.whatsappNumber;
+  if (s.whatsappConfirmed !== undefined) r.whatsapp_confirmed = s.whatsappConfirmed;
+  if (s.city !== undefined) r.city = s.city;
+  if (s.level !== undefined) r.level = s.level;
+  if (s.targetUniversity !== undefined) r.target_university = s.targetUniversity;
   if (s.createdAt !== undefined) r.created_at = s.createdAt;
   if (s.lastSeenAt !== undefined) r.last_seen_at = s.lastSeenAt;
   return r;
 };
+
+const toCoupon = (r: Row): Coupon => ({
+  id: r.id as string,
+  code: r.code as string,
+  consultancyId: r.consultancy_id as string,
+  packCode: r.pack_code as string,
+  wholesaleNpr: (r.wholesale_npr as number) ?? 0,
+  batchId: (r.batch_id as string) ?? '',
+  issuedAt: r.issued_at as string,
+  issuedBy: (r.issued_by as string) ?? '',
+  redeemedAt: (r.redeemed_at as string) ?? null,
+  redeemedByStudentId: (r.redeemed_by_student_id as string) ?? null,
+});
+
+const fromCoupon = (c: Coupon): Row => ({
+  id: c.id,
+  code: c.code,
+  consultancy_id: c.consultancyId,
+  pack_code: c.packCode,
+  wholesale_npr: c.wholesaleNpr,
+  batch_id: c.batchId,
+  issued_at: c.issuedAt,
+  issued_by: c.issuedBy,
+  redeemed_at: c.redeemedAt,
+  redeemed_by_student_id: c.redeemedByStudentId,
+});
 
 const toClaim = (r: Row): TrialClaim => ({
   id: r.id as string,
@@ -494,6 +549,9 @@ export class SupabaseRepo implements Repo {
     );
     return rows.reduce((sum, r) => sum + ((r.delta as number) ?? 0), 0);
   }
+  async listLedgerAll() {
+    return (await selectRows('ledger?select=*&order=created_at.asc&limit=100000')).map(toLedger);
+  }
 
   // orders
   async createOrder(o: PaymentOrder): Promise<PaymentOrder> {
@@ -599,6 +657,47 @@ export class SupabaseRepo implements Repo {
       revoked_at: new Date().toISOString(),
     });
     return true;
+  }
+
+  // coupons
+  async createCoupons(coupons: Coupon[]): Promise<void> {
+    if (coupons.length === 0) return;
+    const res = await rest('coupons', {
+      method: 'POST',
+      body: JSON.stringify(coupons.map(fromCoupon)),
+      prefer: 'return=minimal',
+    });
+    if (!res.ok) await failLoudly('insert into coupons', res);
+  }
+  async getCouponByCode(code: string): Promise<Coupon | null> {
+    const r = await selectOne(`coupons?code=eq.${encodeURIComponent(code)}&limit=1`);
+    return r ? toCoupon(r) : null;
+  }
+  async listCoupons(filter?: { consultancyId?: string }): Promise<Coupon[]> {
+    let q = 'coupons?select=*&order=issued_at.desc';
+    if (filter?.consultancyId) q += `&consultancy_id=eq.${encodeURIComponent(filter.consultancyId)}`;
+    return (await selectRows(q)).map(toCoupon);
+  }
+  /**
+   * A conditional UPDATE is the lock: `redeemed_by_student_id IS NULL` is part
+   * of the WHERE, so of two students racing on one code exactly one UPDATE
+   * matches a row, and the other matches nothing and is told it is used.
+   */
+  async redeemCoupon(code: string, studentId: string): Promise<Coupon | null> {
+    const res = await rest(
+      `coupons?code=eq.${encodeURIComponent(code)}&redeemed_by_student_id=is.null`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({
+          redeemed_at: new Date().toISOString(),
+          redeemed_by_student_id: studentId,
+        }),
+        prefer: 'return=representation',
+      }
+    );
+    if (!res.ok) await failLoudly('redeem coupon', res);
+    const rows = (await res.json()) as Row[];
+    return rows[0] ? toCoupon(rows[0]) : null;
   }
 
   // audit and notifications

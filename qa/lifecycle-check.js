@@ -1,4 +1,15 @@
 const http = require('http');
+/**
+ * The Prep price, READ FROM plans.ts. This file used to hard-code 449 and went
+ * red the day the client moved Prep to 399 (3 Sep 2026): a test that restates
+ * a price is the same defect as a page that restates one (copy-check M-8).
+ */
+const PREP_PRICE = Number(
+  /code:\s*'prep'[\s\S]*?priceNpr:\s*(\d+)/.exec(
+    require('fs').readFileSync(require('path').join(__dirname, '..', 'lib/data/plans.ts'), 'utf8')
+  )[1]
+);
+
 
 /**
  * The back-office passcodes, READ FROM THE ENVIRONMENT.
@@ -109,7 +120,7 @@ function t(id, ok, detail) { (ok ? pass++ : fail++); console.log(`  ${ok ? 'PASS
 
   // payment: server owns the price, hidden packs refused
   const pay = J((await req('POST', '/api/payment', { action: 'create', packCode: 'prep', amountNpr: 1 })).body);
-  t('E2/I1', pay?.data?.amountNpr === 449, `client sent amountNpr:1 -> server ${pay?.data?.amountNpr}`);
+  t('E2/I1', pay?.data?.amountNpr === PREP_PRICE, `client sent amountNpr:1 -> server ${pay?.data?.amountNpr}`);
   const hidden = J((await req('POST', '/api/payment', { action: 'create', packCode: 'pro' })).body);
   t('QA-207', hidden?.ok === false, `hidden pack -> ${hidden?.error?.code || 'ALLOWED'}`);
 

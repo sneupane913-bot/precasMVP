@@ -14,6 +14,17 @@
  * Run:  QA_PORT=3020 node qa/journey-check.js
  */
 const http = require('http');
+/**
+ * The Prep price, READ FROM plans.ts. This file used to hard-code 449 and went
+ * red the day the client moved Prep to 399 (3 Sep 2026): a test that restates
+ * a price is the same defect as a page that restates one (copy-check M-8).
+ */
+const PREP_PRICE = Number(
+  /code:\s*'prep'[\s\S]*?priceNpr:\s*(\d+)/.exec(
+    require('fs').readFileSync(require('path').join(__dirname, '..', 'lib/data/plans.ts'), 'utf8')
+  )[1]
+);
+
 
 const P = Number(process.env.QA_PORT || 3020);
 const jar = {};
@@ -210,7 +221,7 @@ function phoneSafe(html) {
   // 11 -------------------------------------------------------------- pay
   const order = J((await req('POST', '/api/payment', { action: 'create', packCode: 'prep' })).body);
   t('11. can start a payment', Boolean(order?.data?.orderId));
-  t('    the price is set by us, not the browser', order?.data?.amountNpr === 449, `${order?.data?.amountNpr}`);
+  t('    the price is set by us, not the browser', order?.data?.amountNpr === PREP_PRICE, `${order?.data?.amountNpr}`);
 
   const submitted = await req('POST', '/api/payment', {
     action: 'submit',

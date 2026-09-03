@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { BUNDLES, SEAT_GRANT, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
+import { couponPacks, FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
 import { SiteFooter } from '@/components/SiteFooter';
 import { supportWhatsapp } from '@/lib/support';
 import { Page, Card, SectionTitle, Eyebrow, ButtonLink, Check } from '@/components/ui';
@@ -11,24 +11,37 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
+// The support number is a super admin setting and can change without a
+// deploy, so this page must be rendered per request, never at build time.
+export const dynamic = 'force-dynamic';
+
 /**
- * Partner (B2B) pricing.
+ * Partner (B2B) pricing: THE COUPON MODEL, from 3 September 2026.
  *
- * Deliberately UNLISTED: no link from any student-facing navigation, reached by
- * typing the URL. Bulk seat prices on a student page invite the question "am I
- * paying more than a consultancy pays?", and create channel conflict with the
- * partners we most want.
+ * This is the page a marketer sends a consultancy after the first call. It has
+ * to answer every question they will ask, in order: what do I get, what does
+ * it cost me, what does my student get, what can I see, and how do I start.
  *
- * Unlisted is not secret. Anyone with the URL can read it. That is fine for a
- * price list; add a passcode if the client ever wants real privacy.
+ * Deliberately UNLISTED: no link from any student-facing navigation, reached
+ * by typing the URL. Wholesale prices on a student page invite the question
+ * "am I paying more than a consultancy pays?", and create channel conflict
+ * with the partners we most want. Unlisted is not secret; that is fine for a
+ * price list.
  *
- * ON THE CONVERSION TO THE KIT: layout only. In particular SEAT_GRANT stays the
- * source of the seat contents. It is READ, never typed, because this page
- * promised a consultancy 12 mocks a seat while the ledger granted 10 for a
- * week, and the fix is that the promise and the grant are the same expression.
+ * EVERY NUMBER IS DERIVED. The wholesale price, the retail price, the margin,
+ * the pack contents and the question count all come from `lib/data/plans.ts`.
+ * This page once promised 12 mocks a seat while the ledger granted 10, because
+ * somebody typed the number; `qa/copy-check.js` fails the build on a typed
+ * price or count here.
  */
 export default async function ConsultancyPage() {
   const wa = (await supportWhatsapp()).replace(/\D/g, '');
+  const packs = couponPacks();
+  const enquiry = encodeURIComponent(
+    `Hello, I run a consultancy and I would like to buy ${BRAND_NAME} coupons for my students. Please tell me how to pay.`
+  );
+  const waHref = wa ? `https://wa.me/${wa}?text=${enquiry}` : '/admin';
+
   return (
     <>
       {/* B21: this page had no shell at all, so a partner who landed here could
@@ -56,68 +69,82 @@ export default async function ConsultancyPage() {
           <header className="flex flex-col gap-3">
             <Eyebrow>For consultancies</Eyebrow>
             <h1 className="font-serif text-[2rem] font-bold leading-tight tracking-tight text-ink md:text-display">
-              Give your students the practice
+              Buy coupons. Give your students the practice.
             </h1>
             <p className="max-w-xl text-lg text-ink-soft">
-              Buy seats in bulk, put your own logo on it, and give your students their own link. You
-              keep the difference between what you pay and what you charge them.
+              You buy coupons from us at the partner price. You hand a coupon to a student, they
+              enter it on our pricing page, and their pack is switched on at once. You charge them
+              whatever you like up to the public price and keep the difference.
             </p>
           </header>
 
-          {/* The column count follows the DATA, not a guess at it. A fixed
-              three-column grid holding two bundles leaves a third of the row
-              empty and reads as a card that failed to load — which on a page
-              whose whole job is to be trusted with NPR 9,000 is not a small
-              thing. Capped at three so six bundles never become six columns. */}
-          <div
-            className={`grid gap-4 ${
-              BUNDLES.length === 1
-                ? 'sm:grid-cols-1'
-                : BUNDLES.length === 2
-                  ? 'sm:grid-cols-2'
-                  : 'sm:grid-cols-2 lg:grid-cols-3'
-            }`}
-          >
-            {BUNDLES.map((b) => (
-              <Card key={b.code} className="flex flex-col gap-1">
+          {/* The column count follows the DATA, not a guess at it. */}
+          <div className={`grid gap-4 ${packs.length === 1 ? 'sm:grid-cols-1' : 'sm:grid-cols-2'}`}>
+            {packs.map((p) => (
+              <Card key={p.code} className="flex flex-col gap-1">
                 <h2 className="text-sm font-bold uppercase tracking-wide text-ink-quiet">
-                  {b.name}
+                  {p.name} coupon
                 </h2>
                 <p className="font-serif text-title font-bold text-ink">
-                  NPR {b.priceNpr.toLocaleString()}
+                  NPR {p.wholesaleNpr.toLocaleString()}
                 </p>
-                <p className="mb-2 text-sm text-ink-quiet">one time</p>
-                <p className="font-semibold text-ink">{b.seats} student seats</p>
-                <p className="text-sm text-ink-quiet">
-                  about NPR {Math.round(b.priceNpr / b.seats)} per student
+                <p className="mb-3 text-sm text-ink-quiet">what you pay us, per coupon</p>
+                <dl className="flex flex-col gap-1 text-sm">
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-ink-soft">A student pays on their own</dt>
+                    <dd className="font-semibold tabular-nums text-ink">
+                      NPR {p.retailNpr.toLocaleString()}
+                    </dd>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-ink-soft">Yours to keep, per student</dt>
+                    <dd className="font-semibold tabular-nums text-go-dark">
+                      up to NPR {p.marginNpr.toLocaleString()}
+                    </dd>
+                  </div>
+                </dl>
+                <p className="mt-3 border-t border-line pt-3 text-sm text-ink-soft">
+                  Gives the student {p.mocks} full mock interviews and {p.practice} practice
+                  questions.
                 </p>
               </Card>
             ))}
           </div>
 
           <Card className="flex flex-col gap-4">
-            <SectionTitle>What each seat gives a student</SectionTitle>
-            {/* M-10. These two numbers were HARD-CODED at 12 and 30 — the pre-13-Aug
-                pack — and stayed wrong after the price change, so this page promised
-                a consultancy 12 mocks a seat while the ledger granted 10. Over a
-                30-seat bundle that is 60 mocks sold and not delivered, on the page
-                somebody reads before spending NPR 9,000.
+            <SectionTitle>How it works</SectionTitle>
+            <ol className="flex flex-col gap-3 text-ink-soft">
+              {[
+                'Tell us how many coupons of each kind you want. Mix them however you like.',
+                'Pay us by QR. We send you the QR on WhatsApp.',
+                'We set up your partner account and send you a sign-in. You choose your own passcode the first time you sign in.',
+                'Your coupons are waiting in your portal. Copy one and send it to a student.',
+                `The student signs in at ${BRAND_NAME}, opens the pricing page, enters the coupon, and starts practising straight away.`,
+                'When you need more coupons, message us and pay for the next batch. They appear in your portal the same day.',
+              ].map((step, i) => (
+                <li key={step} className="flex gap-3">
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-surface-sunk text-sm font-bold text-ink">
+                    {i + 1}
+                  </span>
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ol>
+          </Card>
 
-                M-10 says a seat is DERIVED from the 799 pack so it can never drift.
-                That was enforced in the entitlement code and not here, which is
-                exactly how a page can lie while every suite stays green. Read from
-                SEAT_GRANT so the promise and the grant are the same number. */}
+          <Card className="flex flex-col gap-4">
+            <SectionTitle>What each coupon gives a student</SectionTitle>
             <ul className="flex flex-col gap-3 text-ink-soft">
               <li className="flex gap-2">
                 <Check />
                 <span>
-                  {SEAT_GRANT.mocks} full mock interviews of {FULL_MOCK_QUESTION_COUNT} questions
-                  each, camera on, timed
+                  Full mock interviews of {FULL_MOCK_QUESTION_COUNT} questions each, camera on,
+                  timed, for their own university
                 </span>
               </li>
               <li className="flex gap-2">
                 <Check />
-                <span>{SEAT_GRANT.practice} practice sessions for drilling single questions</span>
+                <span>Practice sessions for drilling single questions</span>
               </li>
               <li className="flex gap-2">
                 <Check />
@@ -125,7 +152,10 @@ export default async function ConsultancyPage() {
               </li>
               <li className="flex gap-2">
                 <Check />
-                <span>Your logo and colours on the pages your students see</span>
+                <span>
+                  Exactly what a student who pays us directly gets. Your students never receive a
+                  lesser product.
+                </span>
               </li>
             </ul>
           </Card>
@@ -133,8 +163,10 @@ export default async function ConsultancyPage() {
           <Card tone="sunk" className="flex flex-col gap-4">
             <SectionTitle>What you can and cannot see</SectionTitle>
             <p className="text-ink-soft">
-              You see which of your students are practising, how much of their pack is left, and how
-              they are progressing overall.
+              In your portal you see every coupon you have bought, which are still unused, which
+              student used each one, their phone number and target university, how many mocks they
+              have done and how many they have left. Nobody else sees your students, and you never
+              see another consultancy&apos;s.
             </p>
             <p className="text-ink-soft">
               You do <strong className="text-ink">not</strong> see what they actually said. Their
@@ -145,8 +177,8 @@ export default async function ConsultancyPage() {
           </Card>
 
           <div className="flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href={`https://wa.me/${wa}`} className="flex-1">
-              Talk to us on WhatsApp
+            <ButtonLink href={waHref} className="flex-1">
+              Ask about coupons on WhatsApp
             </ButtonLink>
             <ButtonLink href="/admin" variant="tertiary" className="flex-1">
               I already have an account

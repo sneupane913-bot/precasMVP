@@ -164,6 +164,30 @@ process, the reason is stated on the line.
 | A-18 | Their passcode is never sent back to the browser | **BUILT + PROVEN** | passcode PC-14 |
 | A-19 | The change is recorded, and the audit trail does NOT contain the passcode | **BUILT + PROVEN** | passcode PC-15, PC-16 |
 
+### 2b. Coupons (the consultancy model from 3 September 2026)
+
+Seats and bundles were replaced by coupons. A consultancy pays in advance, the
+super admin issues exactly that many coupons, and a student enters one on the
+pricing page. Every row below is driven end to end by `qa/coupon-check.js`.
+
+| # | Rule | Status | Evidence |
+|---|---|---|---|
+| CP-1 | A consultancy cannot be created unless the amount received equals the coupons' wholesale price to the rupee. Broken if NPR 1,500 buys five Prep and two Serious | **BUILT + PROVEN** | coupon C-1, C-1b, C-18 |
+| CP-2 | The super admin never types a passcode. A handover code is generated, shown once, and must be replaced on first sign-in | **BUILT + PROVEN** | coupon C-4c, C-7, C-9 |
+| CP-3 | A consultancy is approved the moment it is created, because the money came first. Suspend still cuts it off | **BUILT + PROVEN** | coupon C-4b, C-20, backoffice-ui |
+| CP-4 | A coupon is twelve characters from a 32-letter alphabet and works once, for one student. A used code and an invented code get the same sentence | **BUILT + PROVEN** | coupon C-4d, C-13, C-14 |
+| CP-5 | Redeeming switches the pack on instantly, marks `hasPaid`, and unlocks the remaining questions of an open or finished trial sitting | **BUILT + PROVEN** | coupon C-11, C-11d, C-15b |
+| CP-6 | A coupon redeemed before the free ten were ever sat gives exactly the pack: the unused free try is folded in. A sat trial is never taken back | **BUILT + PROVEN** | coupon C-11b, C-15 |
+| CP-7 | The same student entering the same code twice is answered calmly and granted nothing more | **BUILT + PROVEN** | coupon C-12 |
+| CP-8 | The consultancy sees every coupon, which student used it, their phone and university, tests done and left; never a transcript | **BUILT + PROVEN** | coupon C-16 to C-16d |
+| CP-9 | The super admin sees the same per consultancy, plus every student tagged with the consultancy by name and by a colour no other consultancy shares | **BUILT + PROVEN** | coupon C-16e, browser pass 3 Sep |
+| CP-10 | No consultancy sees another's coupons or students, and one's passcode does not open another's portal | **BUILT + PROVEN** | coupon C-17 to C-17c |
+| CP-11 | A suspended consultancy's coupons stop working without being consumed, and work again on reactivation | **BUILT + PROVEN** | coupon C-20 to C-20c |
+| CP-12 | A passcode reset kills the old one and issues a fresh handover code that must be changed again | **BUILT + PROVEN** | coupon C-19 |
+| CP-13 | Guessing codes is throttled | **BUILT + PROVEN** | coupon C-25 |
+| CP-14 | Every field on `Student` and `Coupon` has a Postgres column and is read and written by the Supabase mapping. Broken if the live site accepts a value and silently loses it | **BUILT + PROVEN** | schema-check |
+| CP-15 | Students, payments and coupons are listed newest first, with the date on the row | **BUILT + PROVEN** | coupon C-16b, C-16c, C-21b |
+
 ---
 
 ## Part 3. The super admin

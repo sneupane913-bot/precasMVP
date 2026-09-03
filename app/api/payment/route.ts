@@ -8,6 +8,7 @@ import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
 import { platformDown, platform } from '@/lib/platform';
 import { apiError, type ApiResult } from '@/lib/types';
 import { BRAND_NAME } from '@/lib/branding';
+import { formatCouponCode, redeemCouponForStudent } from '@/lib/coupons';
 
 export const runtime = 'nodejs';
 
@@ -31,6 +32,15 @@ const Body = z.discriminatedUnion('action', [
     targetUniversity: z.string().max(120).optional(),
   }),
   z.object({ action: z.literal('status'), orderId: z.string().min(1).max(64) }),
+  /**
+   * The other way to pay: a coupon from a consultancy.
+   *
+   * Every student sees this option beside the QR, direct or not, because any
+   * student may be handed a coupon by a consultancy at any point. The code is
+   * the only thing sent; which pack it opens, and for whom it was bought, is
+   * decided by the coupon record on the server.
+   */
+  z.object({ action: z.literal('redeemCoupon'), code: z.string().min(4).max(40) }),
 ]);
 
 export async function POST(req: Request) {
@@ -368,6 +378,52 @@ export async function POST(req: Request) {
         state: updated?.state,
         message:
           'Thank you. We are checking your payment against our bank record. This usually takes a short while, and you will be able to continue as soon as it is approved.',
+      },
+    });
+  }
+
+  // ------------------------------------------------------------ redeemCoupon
+  if (body.action === 'redeemCoupon') {
+    /**
+     * Guessing protection, on top of a code space of 10^18. Keyed on the
+     * student as well as the address, for the same consultancy-lab reason as
+     * the payment limiter above: thirty students on one Wi-Fi each redeeming
+     * one coupon is the normal case, not an attack.
+     */
+    const rl = rateLimit(`coupon:${student.id}:${clientIp(req)}`, RL.payment);
+    if (!rl.allowed) {
+      const mins = Math.max(1, Math.ceil(rl.retryAfterSec / 60));
+      return NextResponse.json(
+        apiError(
+          'RATE_LIMITED',
+          'coupon attempts',
+          `You have tried several codes. Please wait about ${mins} ${mins === 1 ? 'minute' : 'minutes'} and try again, or ask your consultancy to check the code.`
+        ),
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfterSec) } }
+      );
+    }
+
+    const res = await redeemCouponForStudent(student, body.code);
+    if (!res.ok) {
+      return NextResponse.json(apiError(res.code, res.code, res.userMessage), {
+        status: res.code === 'COUPON_INVALID' ? 404 : 409,
+      });
+    }
+    return NextResponse.json({
+      ok: true,
+      data: {
+        redeemed: true,
+        alreadyRedeemed: res.alreadyRedeemed,
+        code: formatCouponCode(res.coupon.code),
+        packName: res.packName,
+        packCode: res.coupon.packCode,
+        mocks: res.mocks,
+        practice: res.practice,
+        consultancyName: res.consultancy.name,
+        trialSuperseded: res.trialSuperseded,
+        message: res.alreadyRedeemed
+          ? `You have already used this coupon. Your ${res.packName} pack is on your account.`
+          : `Your ${res.packName} pack from ${res.consultancy.name} is switched on. You can start straight away.`,
       },
     });
   }

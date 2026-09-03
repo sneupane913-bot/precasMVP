@@ -34,10 +34,19 @@ create table if not exists students (
   referred_by_code text,
   consent_version text,
   consent_at timestamptz,
+  -- N-30, N-22, N-23. Collected by the welcome screen and the checkout.
+  -- (Added 3 Sep 2026: these were missing, so the live site never stored a
+  -- student's phone number. See supabase/migrations/2026-09-03-*.sql.)
+  whatsapp_number text,
+  whatsapp_confirmed boolean,
+  city text,
+  level text,
+  target_university text,
   created_at timestamptz not null default now(),
   last_seen_at timestamptz not null default now()
 );
 create index if not exists students_consultancy_idx on students (consultancy_id);
+create index if not exists students_whatsapp_idx on students (whatsapp_number);
 create index if not exists students_referred_by_idx on students (referred_by_code);
 
 -- ------------------------------------------------------------ trial claims --
@@ -163,6 +172,27 @@ create table if not exists student_offers (
 );
 create index if not exists offers_student_idx on student_offers (student_id);
 
+-- ----------------------------------------------------------------- coupons --
+-- One coupon, one pack, one student, once. A consultancy pays us in advance,
+-- the super admin issues that many coupons, and a student enters one on the
+-- pricing page. UNIQUE on code is what makes a code a code; redemption is a
+-- conditional UPDATE on redeemed_by_student_id IS NULL, so a race has exactly
+-- one winner.
+create table if not exists coupons (
+  id uuid primary key,
+  code text not null unique,
+  consultancy_id text not null,
+  pack_code text not null,
+  wholesale_npr int not null,
+  batch_id text,
+  issued_at timestamptz not null default now(),
+  issued_by text,
+  redeemed_at timestamptz,
+  redeemed_by_student_id uuid references students (id) on delete set null
+);
+create index if not exists coupons_consultancy_idx on coupons (consultancy_id);
+create index if not exists coupons_redeemed_by_idx on coupons (redeemed_by_student_id);
+
 -- ---------------------------------------------------------------- sessions --
 -- Interview sessions, including the transcript. Deleted outright when a student
 -- exercises their right to be deleted, which is why cascade matters here.
@@ -199,4 +229,5 @@ alter table approvals_audit     enable row level security;
 alter table admin_notifications enable row level security;
 alter table reward_rules        enable row level security;
 alter table student_offers      enable row level security;
+alter table coupons             enable row level security;
 alter table interview_sessions  enable row level security;

@@ -114,7 +114,14 @@ export interface LedgerEntry {
     | 'session_consumed'
     | 'super_admin_grant'
     | 'seat_allocation'
-    | 'refund';
+    | 'refund'
+    /**
+     * A coupon was redeemed before the free trial was ever sat. The pack is
+     * what the student gets, the free try was "try before you buy", and they
+     * bought. Recorded as its own line so the ledger says why the trial
+     * credit went, rather than silently netting it off.
+     */
+    | 'trial_superseded';
   sessionId: string | null;
   orderId: string | null;
   note: string | null;
@@ -183,7 +190,16 @@ export interface ApprovalAudit {
     /** N-18. A device soft-blocked or released by the super admin. */
     | 'set_device_block'
     /** N-25. A question added to the live bank. */
-    | 'add_question';
+    | 'add_question'
+    /** Coupons issued to a consultancy, against money already received. */
+    | 'issue_coupons'
+    /** A student turned a coupon into a pack. */
+    | 'redeem_coupon'
+    /**
+     * The super admin issued a consultancy a fresh handover code because they
+     * forgot theirs. The code itself is never written here.
+     */
+    | 'reset_passcode';
   subjectId: string;
   before: string | null;
   after: string | null;
@@ -250,4 +266,40 @@ export interface StudentOffer {
   /** A real instant. Once past, the offer is gone and is never silently reissued. */
   endsAt: string;
   consumedAt: string | null;
+}
+
+/**
+ * A COUPON. One coupon, one pack, one student, once.
+ *
+ * This is how a consultancy buys for its students from 3 September 2026. The
+ * consultancy pays us in advance at the wholesale price, the super admin
+ * issues that many coupons, the consultancy hands a coupon to a student, and
+ * the student enters it on the pricing page to have the pack switched on
+ * instantly. No approval queue, no QR for the student, no seat arithmetic.
+ *
+ * The code is 12 characters from a 32-letter alphabet with no O/0 or I/1, so
+ * there are about 10^18 of them: like a recharge card, it cannot be guessed,
+ * and the redeem route is rate limited as well. Redemption is a single atomic
+ * write (a claim key on blobs, a conditional UPDATE on Postgres), so two
+ * students entering the same code in the same second produce exactly one
+ * winner.
+ *
+ * `wholesaleNpr` is copied onto the coupon at issue time. Prices change; what
+ * a consultancy paid for THIS coupon must not.
+ */
+export interface Coupon {
+  id: string;
+  /** Canonical form: upper case, no separators. Shown grouped in fours. */
+  code: string;
+  consultancyId: string;
+  /** Which pack it switches on. A public plan code, e.g. 'prep' or 'serious'. */
+  packCode: string;
+  /** What the consultancy paid us for this coupon. */
+  wholesaleNpr: number;
+  /** Groups the coupons issued in one purchase. */
+  batchId: string;
+  issuedAt: string;
+  issuedBy: string;
+  redeemedAt: string | null;
+  redeemedByStudentId: string | null;
 }

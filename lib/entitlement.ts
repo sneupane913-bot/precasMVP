@@ -458,3 +458,39 @@ export async function adminGrant(
 ): Promise<void> {
   await repo().appendLedger(entry(studentId, kind, amount, 'super_admin_grant', { note }));
 }
+
+/**
+ * Per-student balances and usage from ONE read of the whole ledger.
+ *
+ * The back office lists every student with what they have left and what they
+ * have used. Calling `balance()` per student is one round trip each, which on
+ * Postgres over the network and a Netlify function capped at ten seconds is a
+ * directory that dies at a few hundred students. Read once, count in memory.
+ *
+ * `mocksUsed` counts sittings actually started, which is the number a
+ * consultancy asks for: "how many tests has this student done".
+ */
+export interface LedgerTally {
+  mocksLeft: number;
+  practiceLeft: number;
+  mocksUsed: number;
+  practiceUsed: number;
+}
+
+export const EMPTY_TALLY: LedgerTally = { mocksLeft: 0, practiceLeft: 0, mocksUsed: 0, practiceUsed: 0 };
+
+export function tallyLedger(all: LedgerEntry[]): Map<string, LedgerTally> {
+  const out = new Map<string, LedgerTally>();
+  for (const e of all) {
+    const t = out.get(e.studentId) ?? { ...EMPTY_TALLY };
+    if (e.kind === 'mock') {
+      t.mocksLeft += e.delta;
+      if (e.reason === 'session_consumed') t.mocksUsed += 1;
+    } else {
+      t.practiceLeft += e.delta;
+      if (e.reason === 'session_consumed') t.practiceUsed += 1;
+    }
+    out.set(e.studentId, t);
+  }
+  return out;
+}

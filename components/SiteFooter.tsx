@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { supportWhatsapp } from '@/lib/support';
-import { BRAND_NAME } from '@/lib/branding';
+import { BRAND_NAME, COMPANY_NAME, COMPANY_ADDRESS } from '@/lib/branding';
 
 /**
  * Global footer for the public marketing pages (home, universities, pricing,
@@ -129,9 +129,13 @@ export function SiteFooterView({ whatsappDigits = '' }: { whatsappDigits?: strin
           </p>
         </div>
 
-        {/* Bottom bar */}
-        <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-sm text-white/50 sm:flex-row">
-          <p>© {year} {BRAND_NAME}. All rights reserved.</p>
+        {/* Bottom bar. The company line is the client's request of 3 Sep 2026,
+            modelled on a competitor's footer: who makes this, and where. */}
+        <div className="mt-8 flex flex-col items-center gap-3 border-t border-white/10 pt-6 text-center text-sm text-white/50">
+          <p>
+            © {year} {BRAND_NAME}. This website is a product of {COMPANY_NAME}, {COMPANY_ADDRESS}.
+            All rights reserved.
+          </p>
           <p>For Nepali students applying to the UK.</p>
         </div>
       </div>

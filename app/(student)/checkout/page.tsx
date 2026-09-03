@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ContactUs } from '@/components/ContactUs';
+import { CouponRedeem } from '@/components/CouponRedeem';
 import { publicPlans } from '@/lib/data/plans';
 import { BRAND_NAME } from '@/lib/branding';
 import {
@@ -141,6 +142,14 @@ function Checkout() {
   /** The approver's own words when a payment could not be matched. */
   const [rejectedReason, setRejectedReason] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  /**
+   * The coupon route, beside the QR. Closed by default so the screen that takes
+   * money stays about the payment in front of them; one tap opens it. Once a
+   * coupon has gone through, the QR is hidden, because asking for money after a
+   * coupon has just paid is the fastest way to be paid twice.
+   */
+  const [couponOpen, setCouponOpen] = useState(false);
+  const [couponDone, setCouponDone] = useState(false);
 
   /**
    * Upload the receipt picture.
@@ -550,7 +559,37 @@ function Checkout() {
         </Card>
       )}
 
-      {state === 'paying' && order && (
+      {/* ------------------------------------------------------------------
+          PAY WITH A COUPON INSTEAD. Every student sees this, direct or not:
+          a consultancy may hand any student a coupon at any time. The code is
+          all that is sent; the server decides which pack it opens.
+          ------------------------------------------------------------------ */}
+      {(state === 'choosing' || state === 'paying') && errorCode !== 'NOT_SIGNED_IN' && (
+        <Card as="section" tone="sunk" className="flex flex-col gap-3">
+          {couponOpen || couponDone ? (
+            <CouponRedeem
+              signedIn
+              next={`/checkout?pack=${pack}`}
+              title="Pay with a coupon from your consultancy"
+              onRedeemed={() => setCouponDone(true)}
+            />
+          ) : (
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-serif text-lg font-bold text-ink">Have a coupon?</p>
+                <p className="text-sm text-ink-soft">
+                  If your consultancy gave you a code, use it here instead of paying.
+                </p>
+              </div>
+              <Button variant="tertiary" onClick={() => setCouponOpen(true)}>
+                Use a coupon
+              </Button>
+            </div>
+          )}
+        </Card>
+      )}
+
+      {state === 'paying' && order && !couponDone && (
         <>
           <Card className="flex flex-col gap-4 border-2 border-ink text-center">
             <div>

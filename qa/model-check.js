@@ -6,6 +6,17 @@
  * work list.
  */
 const http = require('http');
+/**
+ * The Prep price, READ FROM plans.ts. This file used to hard-code 449 and went
+ * red the day the client moved Prep to 399 (3 Sep 2026): a test that restates
+ * a price is the same defect as a page that restates one (copy-check M-8).
+ */
+const PREP_PRICE = Number(
+  /code:\s*'prep'[\s\S]*?priceNpr:\s*(\d+)/.exec(
+    require('fs').readFileSync(require('path').join(__dirname, '..', 'lib/data/plans.ts'), 'utf8')
+  )[1]
+);
+
 
 /**
  * The back-office passcodes, READ FROM THE ENVIRONMENT.
@@ -556,9 +567,9 @@ async function signIn(token, opts = {}) {
   const plans = fs.readFileSync('lib/data/plans.ts', 'utf8');
   const prep = (plans.match(/code: 'prep'[\s\S]*?costNpr: (\d+)/) || [])[0] || '';
   const serious = (plans.match(/code: 'serious'[\s\S]*?costNpr: (\d+)/) || [])[0] || '';
-  t('M-8', 'NPR 449 buys 3 mocks and 15 practice',
-    /priceNpr: 449/.test(prep) && /mockInterviews: 3/.test(prep) && /practiceSessions: 15/.test(prep),
-    'prep = 449 / 3 mocks / 15 practice, costs us ~NPR 30');
+  t('M-8', `NPR ${PREP_PRICE} buys 3 mocks and 15 practice`,
+    new RegExp('priceNpr: ' + PREP_PRICE).test(prep) && /mockInterviews: 3/.test(prep) && /practiceSessions: 15/.test(prep),
+    `prep = ${PREP_PRICE} / 3 mocks / 15 practice, costs us ~NPR 30`);
   t('M-9', 'NPR 799 buys 10 mocks and 20 practice',
     /priceNpr: 799/.test(serious) && /mockInterviews: 10/.test(serious) && /practiceSessions: 20/.test(serious),
     'serious = 799 / 10 mocks / 20 practice, costs us ~NPR 98');

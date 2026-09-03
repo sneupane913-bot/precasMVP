@@ -20,6 +20,14 @@ import {
 import { apiError } from '@/lib/types';
 import { repo } from '@/lib/db';
 import type { ApprovalAudit } from '@/lib/db/types';
+import { DEFAULT_BRAND_HEX } from '@/lib/branding';
+import { couponOrderTotal, couponPacks } from '@/lib/data/plans';
+import {
+  formatCouponCode,
+  issueCoupons,
+  newHandoverPasscode,
+  priceMismatchMessage,
+} from '@/lib/coupons';
 
 export const runtime = 'nodejs';
 
@@ -39,19 +47,19 @@ export const runtime = 'nodejs';
  *
  * A single choke point rather than three call sites, so a fourth handler added
  * later cannot quietly reintroduce it.
+ *
+ * The ONE deliberate exception is the freshly generated HANDOVER code on
+ * `createConsultancy` and `resetConsultancyPasscode`: it is returned once, in
+ * its own named field, because the whole point of it is to be handed over.
  */
 /**
  * D-18. Consultancy lifecycle events were the only back-office actions with no
  * record at all.
  *
- * Creating a consultancy hands out seats and records money received. Approving
- * one switches on their link so those seats can be taken. Suspending one cuts a
- * partner off. None of the three wrote an audit row, while a consultancy
- * changing its OWN passcode was audited carefully with before and after values.
- * The discipline was applied to the smaller thing and not the larger one.
- *
- * If a consultancy ever disputes when they were approved, or how many seats
- * they were given, there has to be something to point at.
+ * Creating a consultancy hands out coupons and records money received.
+ * Suspending one cuts a partner off. If a consultancy ever disputes how many
+ * coupons they were given, or what they paid, there has to be something to
+ * point at.
  */
 async function auditPlatform(
   action: ApprovalAudit['action'],
@@ -115,6 +123,12 @@ export async function GET() {
   });
 }
 
+/**
+ * How many coupons of each pack. Keys are pack codes ('prep', 'serious'); the
+ * server checks them against the plan table, never trusts them.
+ */
+const CouponCounts = z.record(z.string().min(1).max(40), z.number().int().min(0).max(500));
+
 const Body = z.discriminatedUnion('action', [
   z.object({
     action: z.literal('setMaintenance'),
@@ -162,16 +176,58 @@ const Body = z.discriminatedUnion('action', [
     consultancyId: z.string().min(1),
     ips: z.array(z.string().min(3).max(45)).max(20),
   }),
+  /**
+   * CREATE A CONSULTANCY, the coupon way (3 September 2026).
+   *
+   * The super admin enters who they are, how many coupons of each pack they
+   * have paid for, and the amount received. The server does the arithmetic and
+   * refuses a mismatch. The passcode is GENERATED here, never typed: the
+   * client's decision is that the super admin should not choose it.
+   *
+   * `seatsTotal` and `passcode` remain accepted for the older seat model, which
+   * the regression suites still exercise and which some partners may still be
+   * on. A request with neither coupons nor seats simply creates an empty
+   * account.
+   */
   z.object({
     action: z.literal('createConsultancy'),
     superKey: z.string().min(1),
     name: z.string().min(2).max(120),
-    slug: z.string().min(2).max(60).regex(/^[a-z0-9-]+$/),
+    slug: z
+      .string()
+      .min(2)
+      .max(60)
+      .regex(
+        /^[a-z0-9-]+$/,
+        'The short name can only use lower case letters, numbers and dashes, with no spaces. For example: global-edu.'
+      ),
     contactName: z.string().max(120).default(''),
     contactPhone: z.string().max(40).default(''),
+    coupons: CouponCounts.optional(),
+    paidNpr: z.number().int().min(0).max(10_000_000).default(0),
     seatsTotal: z.number().int().min(0).max(100000).default(0),
-    paidNpr: z.number().int().min(0).default(0),
-    passcode: z.string().min(4).max(60),
+    passcode: z.string().min(4).max(60).optional(),
+  }),
+  /**
+   * More coupons for an existing consultancy, against money already received.
+   * The same price check as creation: the coupons and the amount must agree.
+   */
+  z.object({
+    action: z.literal('addCoupons'),
+    superKey: z.string().min(1),
+    consultancyId: z.string().min(1),
+    coupons: CouponCounts,
+    paidNpr: z.number().int().min(0).max(10_000_000),
+  }),
+  /**
+   * They forgot their passcode. A fresh handover code is generated, shown once,
+   * and they are made to choose their own again on the next sign-in. The super
+   * admin never types the new code either.
+   */
+  z.object({
+    action: z.literal('resetConsultancyPasscode'),
+    superKey: z.string().min(1),
+    consultancyId: z.string().min(1),
   }),
 ]);
 
@@ -257,11 +313,46 @@ export async function POST(req: Request) {
 
   // ---- Everything below is super admin. ----
   if (!(await isSuperAdminAsync(body.superKey))) {
+    rateLimitPenalise(`platform-auth:${clientIp(req)}`, RL.auth);
     return NextResponse.json(apiError('FORBIDDEN', 'bad super key', 'Not allowed.'), {
       status: 403,
     });
   }
 
+  // Authenticated work gets its own, generous budget. See LIMITS.backOffice.
+  const work = rateLimit(`platform-work:${clientIp(req)}`, RL.backOffice);
+  if (!work.allowed) {
+    return NextResponse.json(
+      apiError('RATE_LIMITED', 'back-office flood', 'That is a lot of requests at once. Give it a moment and try again.'),
+      { status: 429, headers: { 'Retry-After': String(work.retryAfterSec) } }
+    );
+  }
+
+  /**
+   * EVERY failure below comes back as JSON with the real reason.
+   *
+   * The client tried to add a consultancy and it "did not add it", with no
+   * usable explanation. A store failure used to escape as a bare 500 with an
+   * HTML body; the screen could not parse it and printed "Could not reach the
+   * server", which is not what happened. From here the sentence names the
+   * cause, and if the cause is a missing database table it says which one and
+   * what to run.
+   */
+  try {
+    return await superAdminAction(body);
+  } catch (e) {
+    const why = e instanceof Error ? e.message : String(e);
+    console.error('[platform] super admin action failed:', why);
+    return NextResponse.json(
+      apiError('STORE_ERROR', why, `We could not save this. ${why}`),
+      { status: 500 }
+    );
+  }
+}
+
+type SuperBody = Extract<z.infer<typeof Body>, { superKey: string }>;
+
+async function superAdminAction(body: SuperBody): Promise<NextResponse> {
   if (body.action === 'overview') {
     const [consultancies, students] = await Promise.all([
       platform.listConsultancies(),
@@ -301,7 +392,7 @@ export async function POST(req: Request) {
       c.id,
       c.status,
       body.status,
-      `${c.name} (${c.slug}) set to ${body.status}. ${c.seatsTotal} seats, NPR ${c.paidNpr} recorded as paid.`
+      `${c.name} (${c.slug}) set to ${body.status}. NPR ${c.paidNpr} recorded as paid.`
     );
     return NextResponse.json({ ok: true, data: withoutPasscode(updated) });
   }
@@ -332,34 +423,131 @@ export async function POST(req: Request) {
     });
   }
 
-  // createConsultancy
+  // ------------------------------------------------------------ addCoupons
+  if (body.action === 'addCoupons') {
+    const c = await platform.getConsultancy(body.consultancyId);
+    if (!c) {
+      return NextResponse.json(apiError('NOT_FOUND', 'no consultancy', 'Not found.'), { status: 404 });
+    }
+    const mismatch = priceMismatchMessage(body.coupons, body.paidNpr);
+    if (mismatch) {
+      return NextResponse.json(apiError('PRICE_MISMATCH', 'coupons vs paid', mismatch), { status: 400 });
+    }
+    const order = couponOrderTotal(body.coupons);
+    const issued = await issueCoupons(c.id, body.coupons, 'super_admin');
+    const updated: Consultancy = { ...c, paidNpr: (c.paidNpr ?? 0) + body.paidNpr };
+    await platform.saveConsultancy(updated);
+    await auditPlatform(
+      'issue_coupons',
+      c.id,
+      `NPR ${c.paidNpr ?? 0} paid so far`,
+      `NPR ${updated.paidNpr} paid so far`,
+      `${c.name} (${c.slug}) bought ${order.totalCoupons} more coupon(s): ${order.lines
+        .map((l) => `${l.count} ${l.name}`)
+        .join(', ')} for NPR ${body.paidNpr}.`
+    );
+    return NextResponse.json({
+      ok: true,
+      data: {
+        consultancy: withoutPasscode(updated),
+        coupons: issued.map((cp) => ({ code: formatCouponCode(cp.code), packCode: cp.packCode })),
+        message: `${order.totalCoupons} coupon(s) added. They appear in ${c.name}'s portal straight away.`,
+      },
+    });
+  }
+
+  // ------------------------------------------------ resetConsultancyPasscode
+  if (body.action === 'resetConsultancyPasscode') {
+    const c = await platform.getConsultancy(body.consultancyId);
+    if (!c) {
+      return NextResponse.json(apiError('NOT_FOUND', 'no consultancy', 'Not found.'), { status: 404 });
+    }
+    const handover = newHandoverPasscode();
+    await platform.saveConsultancy({
+      ...c,
+      passcode: handover,
+      passcodeIsTemporary: true,
+      passcodeChangedAt: null,
+    });
+    // Recorded, and the code itself is NEVER written to the audit trail.
+    await auditPlatform(
+      'reset_passcode',
+      c.id,
+      'own passcode',
+      'handover code',
+      `${c.name} (${c.slug}) was issued a new handover code by the super admin. They must choose their own again on the next sign-in.`
+    );
+    return NextResponse.json({
+      ok: true,
+      data: {
+        slug: c.slug,
+        name: c.name,
+        handoverPasscode: handover,
+        message: `New temporary passcode issued for ${c.name}. Send it to them; they will be asked to choose their own the first time they sign in with it.`,
+      },
+    });
+  }
+
+  // ------------------------------------------------------ createConsultancy
   const existing = await platform.getConsultancy(body.slug);
   if (existing) {
     return NextResponse.json(
-      apiError('DUPLICATE', 'slug taken', 'That short name is already used.'),
+      apiError('DUPLICATE', 'slug taken', `The short name "${body.slug}" is already used by another consultancy. Please choose a different one.`),
       { status: 409 }
     );
   }
+
+  /**
+   * THE PRICE CHECK. The whole fraud guard is these lines.
+   *
+   * When coupons are requested, the amount received must equal exactly what
+   * those coupons cost at the wholesale prices in plans.ts. No rounding, no
+   * "close enough". The super admin is shown the working when it does not.
+   */
+  const counts = body.coupons ?? {};
+  const wantsCoupons = Object.values(counts).some((n) => n > 0) || body.coupons !== undefined;
+  if (wantsCoupons) {
+    const mismatch = priceMismatchMessage(counts, body.paidNpr);
+    if (mismatch) {
+      return NextResponse.json(apiError('PRICE_MISMATCH', 'coupons vs paid', mismatch), { status: 400 });
+    }
+  }
+  const order = couponOrderTotal(counts);
+
+  const id = crypto.randomUUID();
+  const handover = body.passcode ?? newHandoverPasscode();
+
+  // Coupons FIRST. If the coupon table is missing or the store is down this
+  // throws before any consultancy row exists, so there is never an account
+  // with money recorded against it and no coupons to show for it.
+  const issued = wantsCoupons ? await issueCoupons(id, counts, 'super_admin') : [];
+
   const created: Consultancy = {
-    id: crypto.randomUUID(),
+    id,
     slug: body.slug,
     name: body.name,
     contactName: body.contactName,
     contactPhone: body.contactPhone,
     logoUrl: null,
-    primaryColor: '#0d1b2a',
-    status: 'pending',
+    primaryColor: DEFAULT_BRAND_HEX,
+    /**
+     * APPROVED ON CREATION. They have paid, in advance, before this form is
+     * even opened: that is the whole coupon lifecycle. A second "approve" click
+     * was a step with nothing to decide. Suspend still exists for the day it
+     * is needed.
+     */
+    status: 'approved',
     seatsTotal: body.seatsTotal,
     seatsUsed: 0,
     bundleCode: null,
     paidNpr: body.paidNpr,
     createdAt: new Date().toISOString(),
-    approvedAt: null,
-    passcode: body.passcode,
+    approvedAt: new Date().toISOString(),
+    passcode: handover,
     /**
-     * A HANDOVER code, not their passcode. We know it, because we just typed
-     * it, so it gets them in once and the portal refuses to show them anything
-     * until they replace it with one only they know.
+     * A HANDOVER code, not their passcode. We generated it, so we know it, so
+     * it gets them in once and the portal refuses to show them anything until
+     * they replace it with one only they know.
      */
     passcodeIsTemporary: true,
     passcodeChangedAt: null,
@@ -369,8 +557,31 @@ export async function POST(req: Request) {
     'create_consultancy',
     created.id,
     null,
-    `${created.seatsTotal} seats`,
-    `${created.name} (${created.slug}) created with ${created.seatsTotal} seats, NPR ${created.paidNpr} recorded as paid.`
+    `${order.totalCoupons} coupons`,
+    `${created.name} (${created.slug}) created with ${order.lines
+      .map((l) => `${l.count} ${l.name}`)
+      .join(', ') || 'no coupons'}${created.seatsTotal ? `, ${created.seatsTotal} seats` : ''}, NPR ${created.paidNpr} recorded as paid.`
   );
-  return NextResponse.json({ ok: true, data: withoutPasscode(created) });
+  if (issued.length > 0) {
+    await auditPlatform(
+      'issue_coupons',
+      created.id,
+      null,
+      `NPR ${created.paidNpr} paid so far`,
+      `${created.name} (${created.slug}) issued ${issued.length} coupon(s) on creation.`
+    );
+  }
+
+  return NextResponse.json({
+    ok: true,
+    data: {
+      ...withoutPasscode(created),
+      /** Returned ONCE, here, because it exists to be handed over. */
+      handoverPasscode: handover,
+      coupons: issued.map((cp) => ({ code: formatCouponCode(cp.code), packCode: cp.packCode })),
+      couponLines: order.lines,
+      couponPacks: couponPacks().map((p) => ({ code: p.code, name: p.name })),
+      message: `${created.name} is set up with ${issued.length} coupon(s). Copy the message below and send it to them.`,
+    },
+  });
 }

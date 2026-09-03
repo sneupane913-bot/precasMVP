@@ -2,6 +2,7 @@ import type { Repo } from './index';
 import type {
   AdminNotification,
   ApprovalAudit,
+  Coupon,
   LedgerEntry,
   PaymentOrder,
   RewardRule,
@@ -246,6 +247,11 @@ export class BlobRepo implements Repo {
     return rows.filter((r) => r.kind === kind).reduce((n, r) => n + r.delta, 0);
   }
 
+  async listLedgerAll(): Promise<LedgerEntry[]> {
+    const rows = await this.getMany<LedgerEntry>('ledger/');
+    return rows.sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
+  }
+
   // ------------------------------------------------------------------- orders
 
   async createOrder(o: PaymentOrder): Promise<PaymentOrder> {
@@ -347,6 +353,47 @@ export class BlobRepo implements Repo {
   async listNotifications(consultancyId: string): Promise<AdminNotification[]> {
     const rows = await this.getMany<AdminNotification>(`notif/${consultancyId}/`);
     return rows.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+  }
+
+  // ------------------------------------------------------------------ coupons
+
+  async createCoupons(coupons: Coupon[]): Promise<void> {
+    for (const c of coupons) {
+      await this.put(`coupon/${c.id}`, c);
+      await this.put(`idx/coupon/${c.code}`, c.id);
+    }
+  }
+
+  async getCouponByCode(code: string): Promise<Coupon | null> {
+    const id = await this.get<string>(`idx/coupon/${code}`);
+    return id ? this.get<Coupon>(`coupon/${id}`) : null;
+  }
+
+  async listCoupons(filter?: { consultancyId?: string }): Promise<Coupon[]> {
+    const all = await this.getMany<Coupon>('coupon/');
+    const rows = filter?.consultancyId
+      ? all.filter((c) => c.consultancyId === filter.consultancyId)
+      : all;
+    return rows.sort((a, b) => (a.issuedAt < b.issuedAt ? 1 : -1));
+  }
+
+  /**
+   * The claim key is the lock. Whoever writes `couponclaim/<code>` first wins,
+   * and only the winner rewrites the coupon record. A second student with the
+   * same code, even in the same millisecond, is told it is used.
+   */
+  async redeemCoupon(code: string, studentId: string): Promise<Coupon | null> {
+    const cur = await this.getCouponByCode(code);
+    if (!cur || cur.redeemedAt) return null;
+    const won = await this.claim(`couponclaim/${code}`, { studentId });
+    if (!won) return null;
+    const next: Coupon = {
+      ...cur,
+      redeemedAt: new Date().toISOString(),
+      redeemedByStudentId: studentId,
+    };
+    await this.put(`coupon/${cur.id}`, next);
+    return next;
   }
 
   // ------------------------------------------------------------------ rewards

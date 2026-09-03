@@ -3,7 +3,15 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { SiteHeader } from '@/components/SiteHeader';
-import { SiteFooter } from '@/components/SiteFooter';
+/**
+ * `SiteFooterView`, NOT `SiteFooter`. This is a client page, and the default
+ * export is an async server wrapper; React refuses an async client component
+ * outright, so the whole dashboard rendered "This page couldn't load". The
+ * very defect D-1/D-2/D-4 fixed on /account, /practice and /universities,
+ * reintroduced when this page was written. The support number is fetched
+ * below and handed in, the same way those three pages do it.
+ */
+import { SiteFooterView } from '@/components/SiteFooter';
 import { FULL_MOCK_QUESTION_COUNT } from '@/lib/data/plans';
 import {
   Page,
@@ -84,6 +92,21 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
   const [retryNonce, setRetryNonce] = useState(0);
+  const [supportWa, setSupportWa] = useState('');
+
+  // The footer's WhatsApp link. A missing number must never break the page.
+  useEffect(() => {
+    let off = false;
+    fetch('/api/platform')
+      .then((r) => r.json())
+      .then((j) => {
+        if (!off && j?.ok && j.data?.supportWhatsapp) setSupportWa(String(j.data.supportWhatsapp));
+      })
+      .catch(() => {});
+    return () => {
+      off = true;
+    };
+  }, []);
 
   /**
    * WALK, 18 Aug — the spinner that never left.
@@ -320,15 +343,22 @@ export default function DashboardPage() {
                 <p className="max-w-sm text-ink-soft">
                   Your credits never expire. Add a pack whenever you want.
                 </p>
-                <ButtonLink href="/pricing" variant="tertiary" className="mt-2">
-                  See the packs
-                </ButtonLink>
+                <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+                  <ButtonLink href="/pricing" variant="tertiary">
+                    See the packs
+                  </ButtonLink>
+                  {/* A consultancy may hand a coupon to ANY student, so the
+                      door to the coupon box is here too, not only on /pricing. */}
+                  <ButtonLink href="/pricing#coupon" variant="tertiary">
+                    I have a coupon
+                  </ButtonLink>
+                </div>
               </Card>
             )}
           </>
         )}
       </Page>
-      <SiteFooter />
+      <SiteFooterView whatsappDigits={supportWa} />
     </>
   );
 }
