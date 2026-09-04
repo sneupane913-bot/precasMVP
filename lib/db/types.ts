@@ -199,7 +199,13 @@ export interface ApprovalAudit {
      * The super admin issued a consultancy a fresh handover code because they
      * forgot theirs. The code itself is never written here.
      */
-    | 'reset_passcode';
+    | 'reset_passcode'
+    /**
+     * A consultancy removed outright. Only ever one whose coupons were never
+     * used and that has no students, which in practice means a test entry or
+     * a mistake; anything with real students is suspended, never deleted.
+     */
+    | 'delete_consultancy';
   subjectId: string;
   before: string | null;
   after: string | null;

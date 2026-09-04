@@ -9,6 +9,7 @@ import { platformDown, platform } from '@/lib/platform';
 import { apiError, type ApiResult } from '@/lib/types';
 import { BRAND_NAME } from '@/lib/branding';
 import { formatCouponCode, redeemCouponForStudent } from '@/lib/coupons';
+import { looksLikeUniversity, UNIVERSITY_HINT } from '@/lib/university-check';
 
 export const runtime = 'nodejs';
 
@@ -29,7 +30,11 @@ const Body = z.discriminatedUnion('action', [
     whatsappConfirmed: z.boolean().optional(),
     city: z.string().max(80).optional(),
     level: z.enum(['bachelor', 'masters']).optional(),
-    targetUniversity: z.string().max(120).optional(),
+    targetUniversity: z
+      .string()
+      .max(120)
+      .refine((v) => looksLikeUniversity(v), { message: UNIVERSITY_HINT })
+      .optional(),
   }),
   z.object({ action: z.literal('status'), orderId: z.string().min(1).max(64) }),
   /**

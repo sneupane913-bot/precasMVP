@@ -187,6 +187,8 @@ pricing page. Every row below is driven end to end by `qa/coupon-check.js`.
 | CP-13 | Guessing codes is throttled | **BUILT + PROVEN** | coupon C-25 |
 | CP-14 | Every field on `Student` and `Coupon` has a Postgres column and is read and written by the Supabase mapping. Broken if the live site accepts a value and silently loses it | **BUILT + PROVEN** | schema-check |
 | CP-15 | Students, payments and coupons are listed newest first, with the date on the row | **BUILT + PROVEN** | coupon C-16b, C-16c, C-21b |
+| CP-16 | A test consultancy can be deleted, with its unused coupons and its recorded money. Refused the moment a coupon has been used or a student is attached; the short name must be typed back | **BUILT + PROVEN** | coupon C-28 to C-28e |
+| CP-17 | A university is picked from the catalogue or, if typed, must look like a word a person wrote. "shdjkas" is refused; "Glyndwr University" is not. Blank is still allowed | **BUILT + PROVEN** | coupon C-29 to C-29c |
 
 ---
 

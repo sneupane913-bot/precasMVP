@@ -86,6 +86,15 @@ export class BlobRepo implements Repo {
     }
   }
 
+  private async del(key: string): Promise<void> {
+    if (!onNetlify()) {
+      mem().delete(key);
+      return;
+    }
+    const s = await this.store();
+    await s.delete(key);
+  }
+
   private async put<T>(key: string, value: T): Promise<void> {
     if (!onNetlify()) {
       mem().set(key, value);
@@ -394,6 +403,16 @@ export class BlobRepo implements Repo {
     };
     await this.put(`coupon/${cur.id}`, next);
     return next;
+  }
+
+  async deleteCoupons(consultancyId: string): Promise<number> {
+    const mine = (await this.getMany<Coupon>('coupon/')).filter((c) => c.consultancyId === consultancyId);
+    for (const c of mine) {
+      await this.del(`coupon/${c.id}`);
+      await this.del(`idx/coupon/${c.code}`);
+      await this.del(`couponclaim/${c.code}`);
+    }
+    return mine.length;
   }
 
   // ------------------------------------------------------------------ rewards

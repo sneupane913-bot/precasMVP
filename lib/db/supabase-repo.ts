@@ -700,6 +700,15 @@ export class SupabaseRepo implements Repo {
     return rows[0] ? toCoupon(rows[0]) : null;
   }
 
+  async deleteCoupons(consultancyId: string): Promise<number> {
+    const res = await rest(`coupons?consultancy_id=eq.${encodeURIComponent(consultancyId)}`, {
+      method: 'DELETE',
+      prefer: 'return=representation',
+    });
+    if (!res.ok) await failLoudly('delete coupons', res);
+    return ((await res.json()) as Row[]).length;
+  }
+
   // audit and notifications
   async appendAudit(a: ApprovalAudit): Promise<void> {
     await insert('approvals_audit', {

@@ -221,6 +221,7 @@ export interface PlatformStore {
   listConsultancies(): Promise<Consultancy[]>;
   saveConsultancy(c: Consultancy): Promise<void>;
   getConsultancy(idOrSlug: string): Promise<Consultancy | null>;
+  deleteConsultancy(id: string): Promise<boolean>;
   listStudents(): Promise<StudentRecord[]>;
   saveStudent(s: StudentRecord): Promise<void>;
 }
@@ -257,6 +258,11 @@ class MemoryPlatform implements PlatformStore {
   }
   async getConsultancy(idOrSlug: string) {
     return this.b.consultancies.find((c) => c.id === idOrSlug || c.slug === idOrSlug) ?? null;
+  }
+  async deleteConsultancy(id: string) {
+    const before = this.b.consultancies.length;
+    this.b.consultancies = this.b.consultancies.filter((c) => c.id !== id);
+    return this.b.consultancies.length < before;
   }
   async listStudents() {
     return this.b.students;
@@ -305,6 +311,13 @@ class BlobPlatform implements PlatformStore {
   async getConsultancy(idOrSlug: string) {
     const b = await this.read();
     return b.consultancies.find((c) => c.id === idOrSlug || c.slug === idOrSlug) ?? null;
+  }
+  async deleteConsultancy(id: string) {
+    const b = await this.read();
+    const next = b.consultancies.filter((c) => c.id !== id);
+    if (next.length === b.consultancies.length) return false;
+    await this.write({ ...b, consultancies: next });
+    return true;
   }
   async listStudents() {
     return (await this.read()).students;

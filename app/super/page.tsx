@@ -593,6 +593,31 @@ export default function SuperAdminPage() {
     }
   }
 
+  /**
+   * Delete a test consultancy. The server refuses if a coupon has been used
+   * or a student is attached; here the super admin types the short name back.
+   */
+  async function deleteConsultancy(c: DirectoryConsultancy) {
+    const typed = window.prompt(
+      `Delete ${c.name}?\n\n` +
+        'This removes the consultancy, its unused coupons, and the amount recorded against it. ' +
+        'It is refused if any coupon has been used or any student is attached.\n\n' +
+        `Type its short name, ${c.slug}, to confirm.`
+    );
+    if (typed === null) return;
+    const ok = (await platformCall({
+      action: 'deleteConsultancy',
+      consultancyId: c.id,
+      confirmSlug: typed.trim(),
+    })) as { message?: string } | null;
+    if (ok) {
+      setOpenCoupons(null);
+      setAddingFor(null);
+      await loadAll();
+      setNotice(ok.message ?? 'Deleted.');
+    }
+  }
+
   /** They forgot their passcode. A new handover code, shown once. */
   async function resetPasscode(c: DirectoryConsultancy) {
     if (
@@ -1526,6 +1551,14 @@ export default function SuperAdminPage() {
                               >
                                 Reset passcode
                               </Button>
+                              {k.couponsUsed === 0 && k.studentsFromLink === 0 && (
+                                <Button variant="danger" size="sm"
+                                  onClick={() => deleteConsultancy(k)}
+                                  disabled={busy}
+                                >
+                                  Delete
+                                </Button>
+                              )}
                               {k.status !== 'approved' && (
                                 <Button variant="primary" size="sm"
                                   onClick={() => setConsultancyStatus(k, 'approved')}

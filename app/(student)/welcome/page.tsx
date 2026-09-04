@@ -3,6 +3,10 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Page, Card, Button, Field, Input, Select, Banner } from '@/components/ui';
+import { universityChoices, looksLikeUniversity, UNIVERSITY_HINT } from '@/lib/university-check';
+
+const OTHER = '__other__';
+const CHOICES = universityChoices();
 
 /**
  * N-30. THE FIRST SCREEN AFTER GOOGLE SIGN-IN.
@@ -45,6 +49,15 @@ export default function WelcomePage() {
   const [whatsapp, setWhatsapp] = useState('');
   const [level, setLevel] = useState('');
   const [targetUniversity, setTargetUniversity] = useState('');
+  /**
+   * A picker first, free text only behind "Other". A student typed "shdjkas"
+   * as their university on 30 Aug and it sat in the directory as if it were
+   * one; a list of real names removes the temptation, and the free-text path
+   * is checked on both sides for the obvious fist-on-keyboard case.
+   */
+  const [uniChoice, setUniChoice] = useState('');
+  const uniValue = uniChoice === OTHER ? targetUniversity.trim() : uniChoice;
+  const uniLooksRight = looksLikeUniversity(uniValue);
   const [city, setCity] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +65,7 @@ export default function WelcomePage() {
   const digits = whatsapp.replace(/\D/g, '').replace(/^0+/, '');
   const numberLooksRight = /^(?:977)?9[678]\d{8}$/.test(digits);
   const nameLooksRight = fullName.trim().length >= 2;
-  const canSubmit = nameLooksRight && numberLooksRight && !busy;
+  const canSubmit = nameLooksRight && numberLooksRight && uniLooksRight && !busy;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -67,7 +80,7 @@ export default function WelcomePage() {
           fullName: fullName.trim(),
           whatsappNumber: digits,
           level: level || null,
-          targetUniversity: targetUniversity.trim() || null,
+          targetUniversity: uniValue || null,
           city: city.trim() || null,
         }),
       });
@@ -153,12 +166,33 @@ export default function WelcomePage() {
               id="targetUniversity"
               hint="Optional. It lets us give you that university's paper instead of the general one."
             >
-              <Input
+              <Select
                 id="targetUniversity"
-                value={targetUniversity}
-                onChange={(e) => setTargetUniversity(e.target.value)}
-                placeholder="For example, BPP University"
-              />
+                value={uniChoice}
+                onChange={(e) => setUniChoice(e.target.value)}
+              >
+                <option value="">Not decided yet</option>
+                {CHOICES.map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
+                <option value={OTHER}>Another university (type it)</option>
+              </Select>
+              {uniChoice === OTHER && (
+                <div className="mt-2">
+                  <Input
+                    id="targetUniversityOther"
+                    value={targetUniversity}
+                    onChange={(e) => setTargetUniversity(e.target.value)}
+                    placeholder="The full name, as on your offer letter"
+                    aria-label="Your university"
+                  />
+                  {targetUniversity.trim().length > 0 && !uniLooksRight && (
+                    <p className="mt-2 text-sm text-warn">{UNIVERSITY_HINT}</p>
+                  )}
+                </div>
+              )}
             </Field>
 
             <Field label="Which city are you in?"

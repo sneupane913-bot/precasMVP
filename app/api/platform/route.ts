@@ -229,6 +229,18 @@ const Body = z.discriminatedUnion('action', [
     superKey: z.string().min(1),
     consultancyId: z.string().min(1),
   }),
+  /**
+   * DELETE a consultancy. For a test entry or a mistake, never for a partner
+   * with real students: refused the moment one of its coupons has been used
+   * or a student is bound to it, because those rows belong to real people.
+   * The super admin has to type the short name back, so it cannot be a slip.
+   */
+  z.object({
+    action: z.literal('deleteConsultancy'),
+    superKey: z.string().min(1),
+    consultancyId: z.string().min(1),
+    confirmSlug: z.string().min(1).max(60),
+  }),
 ]);
 
 export async function POST(req: Request) {
@@ -484,6 +496,52 @@ async function superAdminAction(body: SuperBody): Promise<NextResponse> {
         name: c.name,
         handoverPasscode: handover,
         message: `New temporary passcode issued for ${c.name}. Send it to them; they will be asked to choose their own the first time they sign in with it.`,
+      },
+    });
+  }
+
+  // ------------------------------------------------------ deleteConsultancy
+  if (body.action === 'deleteConsultancy') {
+    const c = await platform.getConsultancy(body.consultancyId);
+    if (!c) {
+      return NextResponse.json(apiError('NOT_FOUND', 'no consultancy', 'Not found.'), { status: 404 });
+    }
+    if (body.confirmSlug.trim().toLowerCase() !== c.slug) {
+      return NextResponse.json(
+        apiError('CONFIRM_MISMATCH', 'slug not confirmed', `Type the short name exactly, "${c.slug}", to delete it. Nothing was changed.`),
+        { status: 400 }
+      );
+    }
+    const r = repo();
+    const [coupons, bound] = await Promise.all([
+      r.listCoupons({ consultancyId: c.id }),
+      r.listStudents({ consultancyId: c.id }),
+    ]);
+    const used = coupons.filter((cp) => cp.redeemedAt).length;
+    if (used > 0 || bound.length > 0) {
+      return NextResponse.json(
+        apiError(
+          'HAS_STUDENTS',
+          `${used} used coupons, ${bound.length} students`,
+          `${c.name} cannot be deleted: ${used} of its coupons ${used === 1 ? 'has' : 'have'} been used and ${bound.length} student${bound.length === 1 ? ' is' : 's are'} attached to it. Those records belong to real people. Suspend it instead.`
+        ),
+        { status: 409 }
+      );
+    }
+    const removed = await r.deleteCoupons(c.id);
+    await platform.deleteConsultancy(c.id);
+    await auditPlatform(
+      'delete_consultancy',
+      c.id,
+      `${coupons.length} coupons, NPR ${c.paidNpr} recorded`,
+      'deleted',
+      `${c.name} (${c.slug}) deleted by the super admin with ${removed} unused coupon(s). No student was attached.`
+    );
+    return NextResponse.json({
+      ok: true,
+      data: {
+        deleted: true,
+        message: `${c.name} deleted, with ${removed} unused coupon(s). Its NPR ${c.paidNpr.toLocaleString()} no longer counts in revenue.`,
       },
     });
   }

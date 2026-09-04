@@ -5,6 +5,7 @@ import { currentStudent } from '@/lib/auth/session';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
 import { apiError, type ApiResult } from '@/lib/types';
 import { zodMessage } from '@/lib/zod-message';
+import { looksLikeUniversity, UNIVERSITY_HINT } from '@/lib/university-check';
 
 export const runtime = 'nodejs';
 
@@ -59,7 +60,13 @@ const Body = z.object({
         'That does not look like a Nepali mobile number. It should start 98, 97 or 96 and have ten digits.',
     }),
   level: z.enum(['bachelor', 'masters']).nullable().optional(),
-  targetUniversity: z.string().trim().max(120).nullable().optional(),
+  targetUniversity: z
+    .string()
+    .trim()
+    .max(120)
+    .refine((v) => looksLikeUniversity(v), { message: UNIVERSITY_HINT })
+    .nullable()
+    .optional(),
   city: z.string().trim().max(60).nullable().optional(),
 });
 

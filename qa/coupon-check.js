@@ -332,6 +332,42 @@ const strip = (html) => html.replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>]+>/g,
   t('C-23b', 'And the audit trail holds no passcode, handover or otherwise',
     !JSON.stringify(au.json?.data ?? []).includes(A.handover) && !JSON.stringify(au.json?.data ?? []).includes(newHandover), 'no secret in the trail');
 
+  console.log('\n=== DELETING A TEST CONSULTANCY, AND JUNK UNIVERSITIES ===\n');
+
+  const delWrong = await platformCall({ action: 'deleteConsultancy', consultancyId: B.id, confirmSlug: 'wrong-name' });
+  t('C-28', 'Delete needs the short name typed back', delWrong.code === 400 && delWrong.json?.error?.code === 'CONFIRM_MISMATCH', `${delWrong.code}`);
+  const delUsed = await platformCall({ action: 'deleteConsultancy', consultancyId: A.id, confirmSlug: A.slug });
+  t('C-28b', 'A consultancy whose coupons were used is REFUSED deletion, and told to suspend instead',
+    delUsed.code === 409 && delUsed.json?.error?.code === 'HAS_STUDENTS' && /Suspend/.test(delUsed.json?.error?.userMessage ?? ''), `${delUsed.code} ${delUsed.json?.error?.code}`);
+  const revBefore = (await superCall({ action: 'overview' })).json?.data?.revenueFromConsultancies;
+  const delOk = await platformCall({ action: 'deleteConsultancy', consultancyId: B.id, confirmSlug: B.slug });
+  const dirDel = await superCall({ action: 'directory' });
+  const ovDel = await superCall({ action: 'overview' });
+  const goneFromList = !(dirDel.json?.data?.consultancies ?? []).some((c) => c.id === B.id);
+  t('C-28c', 'A test consultancy with nothing used is deleted, with its coupon and its NPR 700',
+    delOk.code === 200 && goneFromList && ovDel.json?.data?.revenueFromConsultancies === revBefore - 700,
+    `${delOk.code} gone=${goneFromList} revenue ${revBefore} -> ${ovDel.json?.data?.revenueFromConsultancies}`);
+  const bLogin = await adminCall(B.slug, B.chosen, { action: 'login' });
+  // A FRESH student: stuE was deliberately throttled in C-25, so reusing them
+  // here answered 429 for the wrong reason.
+  const stuG = await signIn(`cg-${S}`);
+  const bRedeem = await redeem(stuG, bCodes[0]);
+  t('C-28d', 'Its portal no longer opens and its coupon no longer redeems', bLogin.code === 403 && bRedeem.code === 404, `login ${bLogin.code}, redeem ${bRedeem.code}`);
+  const auDel = await superCall({ action: 'audit' });
+  t('C-28e', 'The deletion is in the audit trail', (auDel.json?.data ?? []).some((a) => a.action === 'delete_consultancy'), '');
+
+  const stuF = await signIn(`cf-${S}`);
+  const junk = await req('POST', '/api/student/profile', { fullName: 'Junk Tester', whatsappNumber: '9811110000', targetUniversity: 'shdjkas' }, { ip: stuF.ip, cookie: stuF.jar });
+  t('C-29', 'A fist on the keyboard is not a university', junk.code === 400 && /university/i.test(junk.json?.error?.userMessage ?? ''), `${junk.code}: ${(junk.json?.error?.userMessage ?? '').slice(0, 70)}`);
+  const real = [];
+  for (const u of ['University of Strathclyde', 'Glyndwr University', 'BPP University', 'Northumbria University', 'University of Wolverhampton']) {
+    const r = await req('POST', '/api/student/profile', { fullName: 'Junk Tester', whatsappNumber: '9811110000', targetUniversity: u }, { ip: stuF.ip, cookie: stuF.jar });
+    real.push([u, r.code]);
+  }
+  t('C-29b', 'Real universities, including the consonant-heavy ones, all pass', real.every(([, c]) => c === 200), real.map(([u, c]) => `${u}:${c}`).join(' '));
+  const empty = await req('POST', '/api/student/profile', { fullName: 'Junk Tester', whatsappNumber: '9811110000', targetUniversity: '' }, { ip: stuF.ip, cookie: stuF.jar });
+  t('C-29c', 'Leaving it blank is still allowed; the field is optional', empty.code === 200, `${empty.code}`);
+
   console.log('\n=== THE PAGES SAY THE RIGHT THING ===\n');
 
   const partner = await req('GET', '/consultancy', null, { ip: nextIp() });

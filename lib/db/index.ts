@@ -123,6 +123,8 @@ export interface Repo {
    * One coupon, one student, once: this method is the whole guarantee.
    */
   redeemCoupon(code: string, studentId: string): Promise<Coupon | null>;
+  /** Remove every coupon of one consultancy. Only called when none is redeemed. */
+  deleteCoupons(consultancyId: string): Promise<number>;
 
   // rewards
   listRewardRules(): Promise<RewardRule[]>;
