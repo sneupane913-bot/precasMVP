@@ -1,0 +1,31 @@
+{
+  "institutionId": "inst-cardiff-university",
+  "name": "Cardiff University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    { "text": "Cardiff University is in the heart of Cardiff, the capital city of Wales.", "sourceUrl": "https://www.cardiff.ac.uk/about", "sourceTitle": "About - Cardiff University" },
+    { "text": "The university has invested £600m in the biggest campus upgrade for a generation.", "sourceUrl": "https://www.cardiff.ac.uk/about", "sourceTitle": "About - Cardiff University" },
+    { "text": "Cardiff University's Students' Union is consistently ranked among the best in the UK.", "sourceUrl": "https://www.cardiff.ac.uk/about", "sourceTitle": "About - Cardiff University" },
+    { "text": "Cardiff University's current strategy is called 'Our future, together'.", "sourceUrl": "https://www.cardiff.ac.uk/about", "sourceTitle": "About - Cardiff University" }
+  ],
+  "sources": [
+    {
+      "url": "https://isc.cardiff.ac.uk/how-to-apply/visa-information",
+      "title": "Visa information | Cardiff University International Study Centre (Study Group pathway provider)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": ["Readiness Checks before CAS", "UKVI credibility interview with an Entry Clearance Officer"],
+      "quotes": [
+        "Why did you choose the Cardiff University International Study Centre?",
+        "Did you consider other courses?",
+        "Why do you want to study in the UK?"
+      ],
+      "questionIds": ["q-09", "q-42", "q-07"],
+      "unmapped": [],
+      "notes": "CAUTION: this is the International Study Centre (pathway college run with Study Group), not Cardiff University's own admissions; no page about a university-run pre-CAS interview for direct Cardiff University applicants was found. Verbatim: 'To help you prepare for a UKVI credibility interview and reduce your chances of a visa refusal, our UK Visa and Compliance Team conduct Readiness Checks.' 'If you have been identified as requiring a Readiness Check, then you must attend one before your CAS can be issued.' 'The purpose is for an Entry Clearance Officer (ECO) to establish that you are a genuine student.' 'Credibility interviews normally take place in your local Visa Application Centre, via a video link.' No CAS Shield mention. The related page https://isc.cardiff.ac.uk/next-steps was also fetched and only says 'Attend credibility interview: If required, participate in a visa interview to verify your intentions.' Cardiff University's own about page returned 403 to WebFetch and was read via the Browser pane."
+    }
+  ],
+  "searchesRun": ["Cardiff University credibility interview pre-CAS interview questions international students CAS Shield"]
+}

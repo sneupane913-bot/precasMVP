@@ -1,0 +1,27 @@
+{
+  "institutionId": "inst-cranfield-university",
+  "name": "Cranfield University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "facts": [
+    { "text": "Cranfield's main campus is at College Road, Cranfield, Bedfordshire, MK43 0AL, with a second campus at Shrivenham, Swindon, SN6 8LA.", "sourceUrl": "https://www.cranfield.ac.uk/about", "sourceTitle": "About | Cranfield University" },
+    { "text": "Cranfield is a specialist postgraduate university with large-scale facilities and industry partnerships, creating leaders in technology and management.", "sourceUrl": "https://www.cranfield.ac.uk/about", "sourceTitle": "About | Cranfield University" },
+    { "text": "Cranfield is the largest UK provider of master's-level graduates in engineering and offers a flagship MBA and executive education programmes.", "sourceUrl": "https://www.cranfield.ac.uk/about", "sourceTitle": "About | Cranfield University" },
+    { "text": "Cranfield's distinctive expertise is in how technology and management work together, and its research and consultancy for industry, government and business gives students a real-world learning environment.", "sourceUrl": "https://www.cranfield.ac.uk/about", "sourceTitle": "About | Cranfield University" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.cranfield.ac.uk/international/visas-and-immigration/student-visa-information",
+      "title": "Student visa information | Cranfield University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": ["your visa application and proposed study at Cranfield University", "checking the information on your CAS Shield record"],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Verbatim: 'You may also be asked to attend a credibility interview where you will be asked a series of questions about your visa application and proposed study at Cranfield University' (in the section 'How to apply for Student visa from outside of the UK'). CAS Shield is in use: 'You will be asked a series of questions to check that the information we have on your CAS Shield record is correct.' No example questions, format, duration or outcomes given. No student reports naming Cranfield were found."
+    }
+  ],
+  "searchesRun": ["Cranfield University credibility interview pre-CAS interview questions international students"]
+}

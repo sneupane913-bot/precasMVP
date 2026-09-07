@@ -1,0 +1,31 @@
+{
+  "institutionId": "inst-heriot-watt-university",
+  "name": "Heriot-Watt University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    { "text": "Heriot-Watt's story began in Edinburgh in 1821 as the world's first mechanics institute.", "sourceUrl": "https://www.hw.ac.uk/about", "sourceTitle": "About | Heriot-Watt University" },
+    { "text": "Heriot-Watt has campuses in Edinburgh (postcode EH14 4AS, Riccarton), the Scottish Borders, Orkney, Dubai and Malaysia, plus online study.", "sourceUrl": "https://www.hw.ac.uk/about", "sourceTitle": "About | Heriot-Watt University" },
+    { "text": "Heriot-Watt describes itself as 'a specialist, pioneering University, with a global presence, world renowned, innovative research and highly employable graduates.'", "sourceUrl": "https://www.hw.ac.uk/about", "sourceTitle": "About | Heriot-Watt University" },
+    { "text": "REF 2021 ranked 86.8% of Heriot-Watt's research as world-leading and internationally excellent.", "sourceUrl": "https://www.hw.ac.uk/about", "sourceTitle": "About | Heriot-Watt University" },
+    { "text": "The Watt Club, founded in 1854, is the UK's oldest graduate club.", "sourceUrl": "https://www.hw.ac.uk/about", "sourceTitle": "About | Heriot-Watt University" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.hw.ac.uk/study/how-to-apply/international-students",
+      "title": "International students | Heriot-Watt University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched; page explains what a CAS is and how to obtain it but contains nothing about pre-CAS, credibility, CAS Shield, Enroly or UKVI interviews. No Heriot-Watt-specific interview page or student report was found in two searches; results were generic UK guides (LJMU, Edwise, Leverage Edu, Meridean, NWC) that do not name Heriot-Watt and were not used."
+    }
+  ],
+  "searchesRun": [
+    "Heriot-Watt University credibility interview pre-CAS questions international students",
+    "\"Heriot-Watt\" \"pre-CAS interview\" OR \"CAS Shield\" OR \"credibility interview\" questions Nepal OR India student experience"
+  ]
+}

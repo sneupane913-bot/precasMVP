@@ -1,0 +1,65 @@
+{
+  "institutionId": "inst-edinburgh-napier-university",
+  "name": "Edinburgh Napier University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "facts": [
+    { "text": "Edinburgh Napier has three campuses in Edinburgh (Merchiston, Craiglockhart and Sighthill) offering facilities for learning, teaching and research.", "sourceUrl": "https://www.napier.ac.uk/about-us", "sourceTitle": "About us | Edinburgh Napier University" },
+    { "text": "Edinburgh Napier is ranked the #1 Modern University in Scotland in the THE World University Rankings 2025.", "sourceUrl": "https://www.napier.ac.uk/about-us", "sourceTitle": "About us | Edinburgh Napier University" },
+    { "text": "It has been the #1 university in Edinburgh for overall student satisfaction for seven consecutive years (NSS 2020-2026).", "sourceUrl": "https://www.napier.ac.uk/about-us", "sourceTitle": "About us | Edinburgh Napier University" },
+    { "text": "It is the top Scottish modern university for research power and research impact (REF 2021) and a top-5 UK modern university for career prospects (Guardian University Guide 2025).", "sourceUrl": "https://www.napier.ac.uk/about-us", "sourceTitle": "About us | Edinburgh Napier University" },
+    { "text": "The university comprises five schools with an international focus.", "sourceUrl": "https://www.napier.ac.uk/about-us", "sourceTitle": "About us | Edinburgh Napier University" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.napier.ac.uk/study-with-us/international-students/visas-and-immigration/new-students/credibility-interviews",
+      "title": "Credibility interviews | Edinburgh Napier University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Knowledge of intended course of study",
+        "Knowledge of Edinburgh Napier University",
+        "Your academic/employment background",
+        "Your future plans",
+        "Your finances"
+      ],
+      "quotes": [
+        "Why study in the UK?",
+        "Why choose Edinburgh Napier University?",
+        "Why this specific course?",
+        "What do you know about your course?",
+        "Can you explain any gaps in your years of study or work?",
+        "Who is financing your studies?"
+      ],
+      "questionIds": ["q-07", "q-09", "q-201", "q-45", "q-11", "q-05", "q-109", "q-15", "q-03", "q-19"],
+      "unmapped": [],
+      "notes": "'Before you are issued a CAS by the University you may be asked to carry out a credibility interview'. Page names 'CAS shield' as the platform. Preparation: 'During your interview, you should be in a room on your own with no or very limited background noise'; 'Be confident, positive and show your genuine intention to study in the UK'; 'If you do not understand a question, ask the interviewer to repeat it or rephrase the question'. Outcome: 'failing the interview does not necessarily mean the end of your application journey. You may be considered for a future intake'. Duration not stated. Note the first three 'Why...' items were reported by the fetch as preparation areas and may be paraphrased rather than verbatim."
+    },
+    {
+      "url": "https://www.scribd.com/document/753930899/ENU-PRE-CAS-Interview-PDF",
+      "title": "ENU PRE-CAS Interview PDF (Scribd) – 'Pre-CAS Interview Insights for ENU Applicants' (8 pages)",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetch returned only Scribd interface and metadata; document content not readable. A second Scribd document 'Edinburgh Napier University CAS Interview Tips' exists at https://www.scribd.com/document/960765091/Edinburgh-Napier-University-CAS-Shield-Interview (not fetched)."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=mblNg6S7mr8",
+      "title": "Credibility Interview of Edinburgh Napier University | Mock Pre-CAS Interview | GK ELT - YouTube",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Seen in search results only. Related videos: https://www.youtube.com/watch?v=wzNVN8b7ZEY ('Edinburgh Napier University Credibility Interview Questions | Mock Pre CAS interview'), https://www.youtube.com/watch?v=bawJIzKIi20 ('UK credibility interview | Real | Edinburgh Napier University Interview'), https://www.youtube.com/watch?v=QUieuWQJUvk ('Edinburgh Napier University CAS Process 2026 | Complete CAS Shield Documents, Interview & Funding'). None fetched."
+    }
+  ],
+  "searchesRun": ["Edinburgh Napier University credibility interview pre-CAS questions international students"]
+}

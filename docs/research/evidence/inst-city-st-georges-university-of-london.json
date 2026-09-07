@@ -1,0 +1,39 @@
+{
+  "institutionId": "inst-city-st-georges-university-of-london",
+  "name": "City St George’s, University of London",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    {
+      "text": "City, University of London merged with St George's, University of London on 1 August 2024 to become City St George's, University of London.",
+      "sourceUrl": "https://www.citystgeorges.ac.uk/about",
+      "sourceTitle": "About us • City St George's, University of London"
+    },
+    {
+      "text": "City St George's educates more than 27,000 students from over 170 countries across three campuses in Clerkenwell, Moorgate and Tooting.",
+      "sourceUrl": "https://www.citystgeorges.ac.uk/about",
+      "sourceTitle": "About us • City St George's, University of London"
+    },
+    {
+      "text": "The Lord Mayor of London is the university's Rector, and professional bodies help develop its courses and facilities.",
+      "sourceUrl": "https://www.citystgeorges.ac.uk/about",
+      "sourceTitle": "About us • City St George's, University of London"
+    },
+    {
+      "text": "The merger combines St George's specialism in health and medicine with City's strengths in business, law, communications, policy and global affairs, and science and technology, making it one of the most significant suppliers of the health workforce in London.",
+      "sourceUrl": "https://www.citystgeorges.ac.uk/about",
+      "sourceTitle": "About us • City St George's, University of London"
+    },
+    {
+      "text": "70% of its research is rated world-leading (4*) or internationally excellent (3*), it has six specialist Schools, and around half of its students come from outside the UK.",
+      "sourceUrl": "https://www.citystgeorges.ac.uk/about",
+      "sourceTitle": "About us • City St George's, University of London"
+    }
+  ],
+  "sources": [],
+  "searchesRun": [
+    "\"City St George's\" OR \"City, University of London\" credibility interview pre-CAS interview questions international students",
+    "\"City St George's\" \"pre-CAS\" OR \"CAS Shield\" OR \"credibility interview\" international applicants"
+  ],
+  "notes": "No City St George's-specific page about pre-CAS/credibility interviews and no student report naming it was found in two searches; results were generic guides for other universities and were not used. WebFetch of the about page returned 403; facts were read via the Browser pane."
+}

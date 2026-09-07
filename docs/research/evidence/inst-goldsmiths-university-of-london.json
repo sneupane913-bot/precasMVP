@@ -1,0 +1,27 @@
+{
+  "institutionId": "inst-goldsmiths-university-of-london",
+  "name": "Goldsmiths, University of London",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    { "text": "Goldsmiths delivers its research and teaching from the heart of South East London (New Cross).", "sourceUrl": "https://www.gold.ac.uk/about/", "sourceTitle": "About | Goldsmiths, University of London" },
+    { "text": "For more than 200 years, generations of students have received an education on the site of Goldsmiths.", "sourceUrl": "https://www.gold.ac.uk/about/", "sourceTitle": "About | Goldsmiths, University of London" },
+    { "text": "Goldsmiths offers study options across a range of disciplines from the arts and humanities to business and management.", "sourceUrl": "https://www.gold.ac.uk/about/", "sourceTitle": "About | Goldsmiths, University of London" },
+    { "text": "Goldsmiths runs a free public art gallery (Goldsmiths Centre for Contemporary Art) bringing world-class exhibitions to south London.", "sourceUrl": "https://www.gold.ac.uk/about/", "sourceTitle": "About | Goldsmiths, University of London" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.gold.ac.uk/ug/apply/advice/interviews/",
+      "title": "Attending an interview | Goldsmiths, University of London",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "This is the undergraduate ADMISSIONS (course-selection) interview advice page, not a credibility/pre-CAS interview page. Only relevant line: 'If you're an international student then you will most likely be interviewed via a video call.' No credibility-interview topics or questions. The international page https://www.gold.ac.uk/international/ was also fetched and contains nothing on credibility interviews, pre-CAS, CAS Shield or Enroly. No student report naming Goldsmiths was found."
+    }
+  ],
+  "searchesRun": ["Goldsmiths University of London credibility interview pre-CAS interview questions international students"]
+}

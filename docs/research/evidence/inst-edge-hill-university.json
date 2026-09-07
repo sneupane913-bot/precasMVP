@@ -1,0 +1,49 @@
+{
+  "institutionId": "inst-edge-hill-university",
+  "name": "Edge Hill University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "facts": [
+    { "text": "Edge Hill is in the North West of England, a 15-minute walk from the historic market town centre of Ormskirk, Lancashire.", "sourceUrl": "https://www.edgehill.ac.uk/about-us/", "sourceTitle": "About us | Edge Hill University" },
+    { "text": "Edge Hill is a UK top-45 university (Guardian University Guide 2025) and 3rd in the UK for employability (Uni Compare 2027), with 96.9% of students employed or in further study within 15 months of graduating.", "sourceUrl": "https://www.edgehill.ac.uk/about-us/", "sourceTitle": "About us | Edge Hill University" },
+    { "text": "Edge Hill was ranked 1st in the UK for accommodation (Uni Compare 2024-2027) and 3rd in the UK for university facilities (WhatUni Student Choice Awards 2023).", "sourceUrl": "https://www.edgehill.ac.uk/about-us/", "sourceTitle": "About us | Edge Hill University" },
+    { "text": "Campus facilities include The Catalyst (£26m library and student services building), a Technology Hub with the UK's first Computer Augmented Virtual Environment (CAVE), Creative Edge media production facilities and a £30m Sports Centre.", "sourceUrl": "https://www.edgehill.ac.uk/about-us/", "sourceTitle": "About us | Edge Hill University" },
+    { "text": "Edge Hill is an Ofsted 'outstanding' provider of initial teacher education.", "sourceUrl": "https://www.edgehill.ac.uk/about-us/", "sourceTitle": "About us | Edge Hill University" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.edgehill.ac.uk/wp-content/uploads/documents/Answer-preparation-Student-visa-credibility-interview.docx",
+      "title": "Answer preparation: Student visa credibility interview (Edge Hill University, Word document)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": ["why Edge Hill / why the UK", "why your course", "career plans and progression", "extra cost of UK study", "previous UK study", "study gap", "working in the UK", "funding"],
+      "quotes": [
+        "Why did you choose Edge Hill University?",
+        "Why did you choose your course?",
+        "How do your studies fit into your career plans?",
+        "If the costs of pursuing your course of study are higher in the UK than in your home country, why have you decided to incur the extra costs involved with studying in the UK?",
+        "You have previously studied in the UK – why have you chosen to return?",
+        "You have had a long break in your studies, why are you returning to study now?",
+        "Do you plan to work in the UK?",
+        "How will you fund your studies? (You should not be asked this unless you are called back for a second interview)."
+      ],
+      "questionIds": ["q-09", "q-07", "q-08", "q-201", "q-42", "q-38", "q-19", "q-20", "q-41", "q-13", "q-30", "q-111", "q-140", "q-54", "q-114", "q-14", "q-82", "q-106", "q-108"],
+      "unmapped": [],
+      "notes": "Document is framed as preparation for the UKVI 'Student visa credibility interview' (the funding question notes it should only be asked 'if you are called back for a second interview'), not explicitly a university-run pre-CAS interview. Each question has 'Answer preparation' guidance, e.g. for Why Edge Hill: 'Think about why you chose the UK rather than your home country, other English-speaking countries, or countries which other students of your nationality choose to study in'; for career plans: 'Does your course lead to any professional exemptions or qualifications and are these recognised in your country?... If the course you plan to study is at a similar academic level to previous studies, how does it represent progression'; for working: 'You also need to demonstrate an understanding of the hours you are allowed to work and typical rates of pay'; for funding: 'how you plan to pay for subsequent years fees if your course is more than a year in duration... If you have a loan, how will you afford to pay this back? How much will your accommodation cost'. Landing page: https://www.edgehill.ac.uk/document/answer-preparation-student-visa-credibility-interview/ (WebFetch showed only the title; the .docx was downloaded with curl and text extracted locally)."
+    },
+    {
+      "url": "https://www.edgehill.ac.uk/departments/support/international/applying/",
+      "title": "How to apply | International | Edge Hill University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Confirms CAS Shield (fetched via curl): 'Edge Hill University uses CAS Shield, an online self-service system...'; 'Postgraduate students – to accept your offer, please engage with the CAS Shield process'; applicants 'will automatically receive an invitation to CAS Shield' (email subject 'Welcome to CAS Shield'); 'Receiving an Unconditional offer for a place on a programme does not guarantee you will receive a CAS. The University has a limited number of CAS that can be issued'. No interview questions on this page. The Next Steps page (https://www.edgehill.ac.uk/departments/support/international/next-steps/) was fetched and only says applications go through 'our compliance team' for 'UKVI requirements relating to visa sponsorship'."
+    }
+  ],
+  "searchesRun": ["Edge Hill University credibility interview pre-CAS interview questions international students"]
+}

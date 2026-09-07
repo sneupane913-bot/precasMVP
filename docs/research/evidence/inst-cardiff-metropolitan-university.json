@@ -1,0 +1,43 @@
+{
+  "institutionId": "inst-cardiff-metropolitan-university",
+  "name": "Cardiff Metropolitan University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    { "text": "Cardiff Met's main address is Llandaff Campus, Western Avenue, Cardiff, CF5 2YB, and it also has a Cyncoed campus where halls such as Cyncoed Halls are located.", "sourceUrl": "http://www.cardiffmet.ac.uk/about/", "sourceTitle": "About | Cardiff Metropolitan University" },
+    { "text": "Cardiff Met has five academic schools: Art & Design; Education & Social Policy; Management; Sport & Health Sciences; and Technologies.", "sourceUrl": "http://www.cardiffmet.ac.uk/about/", "sourceTitle": "About | Cardiff Metropolitan University" },
+    { "text": "Cardiff Met describes itself as 'A leading modern university with a distinctive offer across a wide range of creative, sports, health, education, technology, social and life sciences, and business disciplines.'", "sourceUrl": "http://www.cardiffmet.ac.uk/about/", "sourceTitle": "About | Cardiff Metropolitan University" },
+    { "text": "The university draws on 'over 150 years of commitment to education as a force for good in the Cardiff Capital Region and beyond.'", "sourceUrl": "http://www.cardiffmet.ac.uk/about/", "sourceTitle": "About | Cardiff Metropolitan University" },
+    { "text": "Notable centres include the ZERO2FIVE Food Industry Centre and PDR, the International Centre for Design and Research.", "sourceUrl": "http://www.cardiffmet.ac.uk/about/", "sourceTitle": "About | Cardiff Metropolitan University" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.cardiffmet.ac.uk/international-students/visas-and-immigration/",
+      "title": "Visas and Immigration | Cardiff Metropolitan University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": ["an applicant's motivation for choosing to study in the UK"],
+      "quotes": [],
+      "questionIds": ["q-07"],
+      "unmapped": [],
+      "notes": "Page describes only the UKVI interview, not a university pre-CAS interview: 'UKVI may ask you to attend an interview as part of the visa application process. The purpose of these interviews is to understand an applicant's motivation for choosing to study in the UK and to prevent abuse of the visa system. These interviews are usually conducted via Microsoft TEAMS and will be conducted by Visa Officers.' No mention of credibility/pre-CAS interviews, CAS Shield or Enroly anywhere on the page."
+    },
+    {
+      "url": "https://www.facebook.com/groups/ukstudentvisa/posts/3876522752595710/",
+      "title": "I've completed my pre-CAS interview at Cardiff ... (Facebook group 'ukstudentvisa')",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title only seen in search results; truncated, so it is not certain it refers to Cardiff Met rather than Cardiff University. Not fetched."
+    }
+  ],
+  "searchesRun": [
+    "Cardiff Metropolitan University credibility interview pre-CAS questions international students",
+    "\"Cardiff Met\" OR \"Cardiff Metropolitan\" \"pre-CAS interview\" OR \"credibility interview\" questions asked experience"
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "institutionId": "inst-glasgow-caledonian-university",
+  "name": "Glasgow Caledonian University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    { "text": "Glasgow Caledonian is the largest modern university in Scotland, with campuses in the heart of Glasgow and in London.", "sourceUrl": "https://www.gcu.ac.uk/aboutgcu", "sourceTitle": "About Glasgow Caledonian | Glasgow Caledonian University" },
+    { "text": "GCU has around 1,500 staff and over 22,000 students from more than 100 countries, and transnational partnerships in China, Oman, Nepal, Singapore and Malaysia.", "sourceUrl": "https://www.gcu.ac.uk/aboutgcu", "sourceTitle": "About Glasgow Caledonian | Glasgow Caledonian University" },
+    { "text": "GCU offers a wide range of professionally accredited courses and has links with over 300 industry partners; over 90% of graduates are in employment and/or further study (HESA 2026), and it is Scotland's leading provider of Graduate Apprenticeships.", "sourceUrl": "https://www.gcu.ac.uk/aboutgcu", "sourceTitle": "About Glasgow Caledonian | Glasgow Caledonian University" },
+    { "text": "GCU was named UK University of the Year for Graduate Jobs in the Daily Mail University Guide and the top-ranked modern university in the UK in the Times and Sunday Times Guide 2026; it is the leading UK university for physiotherapy and subjects allied to medicine in that guide.", "sourceUrl": "https://www.gcu.ac.uk/aboutgcu", "sourceTitle": "About Glasgow Caledonian | Glasgow Caledonian University" },
+    { "text": "GCU has three Schools: the School of Science and Engineering, the Glasgow School for Business and Society, and the School of Health and Life Sciences, plus centres such as the Research Centre for Health (ReaCH) and the Yunus Centre for Social Business and Health; it is the only Scottish university with EcoCampus Platinum accreditation.", "sourceUrl": "https://www.gcu.ac.uk/aboutgcu", "sourceTitle": "About Glasgow Caledonian | Glasgow Caledonian University" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.gcu.ac.uk/currentstudents/support/international/credibilityinterviews",
+      "title": "Credibility interviews | Glasgow Caledonian University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Course and research: Your course; Glasgow Caledonian University; The UK; Plans after your studies",
+        "Finances and living in the UK: Dependants; Family in the UK; Travel and immigration history; Employment and education; Living costs and accommodation",
+        "English language"
+      ],
+      "quotes": [],
+      "questionIds": ["q-11", "q-102", "q-33", "q-100", "q-09", "q-101", "q-41", "q-37", "q-07", "q-99", "q-98", "q-19", "q-112", "q-94", "q-167", "q-20", "q-69", "q-88", "q-169", "q-115", "q-168", "q-187", "q-03", "q-06", "q-14", "q-104", "q-54", "q-114", "q-17", "q-108", "q-107"],
+      "unmapped": [],
+      "notes": "IMPORTANT: this page describes the UKVI credibility interview 'with an Entry Clearance Officer as part of your visa application', not a university-run pre-CAS interview; no CAS Shield/Enroly mention. Fetched via the Browser pane because WebFetch and curl both got Cloudflare 403. Key verbatim lines: 'The Credibility Interview usually takes between 45 minutes and an hour to complete. You will be asked questions about yourself and your study choices. The questions do not follow any set format'; 'You will likely be asked questions about specific course content, including the modules you will cover'; 'be prepared to explain your journey to choosing Glasgow Caledonian as the right university for you, including how you found out about us, what other institutions you considered, and what factors influenced your decision'; 'Consider any specialist facilities, accreditations, industry-standard equipment or industry links your course may offer'; 'You may be asked why you have opted to study in the UK instead of your home country'; 'The interviewer will be looking for clear academic and career-related motivations rather than personal preferences such as \"the weather.\"'; 'If you intend to return to your home country after your studies, be prepared to explain how your qualification will improve your career prospects there'; 'You may be asked whether you have family in the UK'; 'You may be asked about any previous visa applications, including both UK visas and visas for other countries... any prior visits to the UK... any previous visa refusals'; 'You may be asked about the source of your funds and whether you intend to work while studying'; 'You may also be asked about where you intend to live, how much it will cost, and how far it is from the University... how you will commute to University, how long it will take, and the approximate cost'; 'A report of interview including the answers you have given will be sent to the Entry Clearance Officer'. Contact: visa@gcu.ac.uk."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=JptFpwel11w",
+      "title": "Glasgow Caledonian University - Pre-Cas Interview (YouTube)",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetch returned only YouTube footer text (Nepali locale); no title/description/questions readable. A second video exists: https://www.youtube.com/watch?v=7kVUXgu0J8U ('GCU University Credibility Interview | Glasgow Caledonian University Pre CAS interview | GK ELT'), not fetched."
+    }
+  ],
+  "searchesRun": ["Glasgow Caledonian University GCU credibility interview pre-CAS questions international students"]
+}
