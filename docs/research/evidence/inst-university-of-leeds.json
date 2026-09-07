@@ -1,0 +1,68 @@
+{
+  "institutionId": "inst-university-of-leeds",
+  "name": "University of Leeds",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    {
+      "text": "Established in 1904, the University of Leeds is one of the largest universities in the UK, with more than 37,000 students.",
+      "sourceUrl": "https://www.leeds.ac.uk/about",
+      "sourceTitle": "About | University of Leeds"
+    },
+    {
+      "text": "The Leeds campus is a short walk from Leeds City Centre.",
+      "sourceUrl": "https://www.leeds.ac.uk/about",
+      "sourceTitle": "About | University of Leeds"
+    },
+    {
+      "text": "Leeds is part of the Russell Group of research-intensive universities and is ranked in the top 100 universities in the world (QS World University Rankings 2027).",
+      "sourceUrl": "https://www.leeds.ac.uk/about",
+      "sourceTitle": "About | University of Leeds"
+    },
+    {
+      "text": "Leeds has won the Queen's Anniversary Prize three times and its staff hold 33 National Teaching Fellowships.",
+      "sourceUrl": "https://www.leeds.ac.uk/about",
+      "sourceTitle": "About | University of Leeds"
+    },
+    {
+      "text": "The university contributed £1.9 billion to the Leeds City Region economy in 2021/22.",
+      "sourceUrl": "https://www.leeds.ac.uk/about",
+      "sourceTitle": "About | University of Leeds"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.leeds.ac.uk/international-visas-immigration/doc/applying-student-visa",
+      "title": "Applying for a Student visa: Application step-by-step guide | University of Leeds",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Application form information",
+        "Immigration history",
+        "Course details",
+        "Personal and financial circumstances",
+        "Reasons for studying in the UK and at Leeds",
+        "Education and employment history",
+        "Future plans"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-18",
+        "q-11",
+        "q-14",
+        "q-07",
+        "q-09",
+        "q-03",
+        "q-23",
+        "q-19"
+      ],
+      "unmapped": [],
+      "notes": "Describes the UKVI credibility interview only: 'Anyone applying for a Student visa from outside the UK can be interviewed as part of their visa application', conducted by a UKVI caseworker to check 'if you are a genuine student and that your English ability is at the correct level'. Advice: 'Be prepared to explain your thought process in detail and provide specific examples' and 'We recommend that you ask for a copy of the interview transcript at the end.' 'The issue of a CAS does not guarantee a successful application.' No university-run pre-CAS interview, CAS Shield or Enroly mentioned. Search snippet: CAS can be issued no earlier than six months before the course start date."
+    }
+  ],
+  "searchesRun": [
+    "credibility interview OR \"pre-CAS\" interview international students CAS questions (site: leeds.ac.uk)",
+    "\"University of Leeds\" pre-CAS OR credibility OR \"CAS Shield\" interview questions youtube OR scribd Nepal"
+  ]
+}

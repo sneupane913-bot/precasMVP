@@ -1,0 +1,64 @@
+{
+  "institutionId": "inst-university-of-leicester",
+  "name": "University of Leicester",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "facts": [
+    {
+      "text": "The University of Leicester's main campus is a mile south of the city centre, next to Victoria Park.",
+      "sourceUrl": "https://en.wikipedia.org/wiki/University_of_Leicester",
+      "sourceTitle": "University of Leicester - Wikipedia"
+    },
+    {
+      "text": "In 2024/25 Leicester had 18,990 students: 14,675 undergraduates and 4,315 postgraduates.",
+      "sourceUrl": "https://en.wikipedia.org/wiki/University_of_Leicester",
+      "sourceTitle": "University of Leicester - Wikipedia"
+    },
+    {
+      "text": "Leicester is known for inventing genetic (DNA) fingerprinting in 1984, for the discovery and identification of King Richard III's remains, and for a leading academic space research centre.",
+      "sourceUrl": "https://en.wikipedia.org/wiki/University_of_Leicester",
+      "sourceTitle": "University of Leicester - Wikipedia"
+    },
+    {
+      "text": "The David Wilson Library opened in 2008 after a £32 million redevelopment, and the 18-storey Attenborough Tower houses arts and humanities departments.",
+      "sourceUrl": "https://en.wikipedia.org/wiki/University_of_Leicester",
+      "sourceTitle": "University of Leicester - Wikipedia"
+    },
+    {
+      "text": "Leicester became a university by royal charter in 1957 and kept a UK top-30 place in The Times and Sunday Times Good University Guide 2026.",
+      "sourceUrl": "https://en.wikipedia.org/wiki/University_of_Leicester",
+      "sourceTitle": "University of Leicester - Wikipedia"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://le.ac.uk/study/international-students/applying-for-visa/cas-number",
+      "title": "CAS number | International | University of Leicester",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetch blocked: le.ac.uk returns HTTP 403 (Cloudflare) to both WebFetch and curl. Snippet: students requiring a Student visa 'will receive an email inviting them to complete a short form in order to request a CAS number'. No interview questions found."
+    },
+    {
+      "url": "https://le.ac.uk/study/welcome/your-arrival/identity-check-visa-checkpoint/visa-checkpoint",
+      "title": "Visa checkpoint | Your arrival | University of Leicester",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Snippet: 'New international students need to log in to CAS Shield and enter their visa details there.' Confirms Leicester uses CAS Shield, but only for arrival/visa-checkpoint data entry in this snippet; use of CAS Shield for a pre-CAS interview is not confirmed by anything seen."
+    }
+  ],
+  "searchesRun": [
+    "pre-CAS interview CAS Shield credibility interview international offer holders (site: le.ac.uk)",
+    "\"University of Leicester\" pre-CAS OR credibility OR \"CAS Shield\" interview questions youtube OR scribd Nepal",
+    "\"University of Leicester\" \"pre-CAS interview\" OR \"credibility interview\" Nepal consultancy questions"
+  ]
+}

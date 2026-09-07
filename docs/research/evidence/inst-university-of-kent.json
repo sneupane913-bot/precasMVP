@@ -1,0 +1,71 @@
+{
+  "institutionId": "inst-university-of-kent",
+  "name": "University of Kent",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "facts": [
+    {
+      "text": "The University of Kent has campuses in Canterbury and Medway and is organised into 10 academic schools, including Computing, Engineering, Mathematics and Physics, Law, Business, Psychology and Natural Sciences.",
+      "sourceUrl": "https://www.kent.ac.uk/about",
+      "sourceTitle": "About | University of Kent"
+    },
+    {
+      "text": "Kent is part of regional partnerships including Growing Kent and Medway, Creative Estuary, Eastern Arc and the Universities of Medway.",
+      "sourceUrl": "https://www.kent.ac.uk/about",
+      "sourceTitle": "About | University of Kent"
+    },
+    {
+      "text": "The Canterbury campus is built on 300 acres of parkland with views over the historic city of Canterbury, and London is just an hour away by train.",
+      "sourceUrl": "https://www.kent.ac.uk/locations/canterbury",
+      "sourceTitle": "Canterbury campus | University of Kent"
+    },
+    {
+      "text": "Canterbury campus life includes 250+ Kent Union societies, students from over 100 nationalities, the Venue nightclub, and free sports membership for campus residents.",
+      "sourceUrl": "https://www.kent.ac.uk/locations/canterbury",
+      "sourceTitle": "Canterbury campus | University of Kent"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.kent.ac.uk/international/credibility-interviews",
+      "title": "Credibility Interviews - International Student - University of Kent",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Why Kent?",
+        "Why the UK?",
+        "Why this specific course?",
+        "how your course fits with your career aspirations",
+        "why you've chosen the University of Kent instead of an alternative university or country"
+      ],
+      "quotes": [
+        "Why do you want to study in the UK?",
+        "Why do you want to study at University of Kent?",
+        "Why have you chosen your course of study?",
+        "What do you know about your course? Do you know how you'll be assessed and the modules you'll be studying?",
+        "Where do you plan to live while studying at University of Kent?",
+        "Do you know how you will you pay for your studies and living costs?"
+      ],
+      "questionIds": [
+        "q-07",
+        "q-09",
+        "q-201",
+        "q-45",
+        "q-12",
+        "q-11",
+        "q-17",
+        "q-14",
+        "q-20",
+        "q-38",
+        "q-99"
+      ],
+      "unmapped": [],
+      "notes": "Page distinguishes two interviews. The Pre-CAS Interview 'takes place before a CAS is issued and is conducted on CAS Shield as part of your CAS Assessment'; it is 'almost like a mock credibility interview', asks similar questions to UKVI and gives feedback on performance. The UKVI credibility interview is 'a short credibility interview with the Home Office' to 'confirm that you are a genuine applicant and to check that your English language skills meet the necessary requirements', held 'in person, by phone, or via online video-conferencing'. No length, booking or pass/fail rules stated for either."
+    }
+  ],
+  "searchesRun": [
+    "\"University of Kent\" pre-CAS OR credibility interview questions asked students Nepal",
+    "\"University of Kent\" \"pre-CAS\" OR \"CAS Shield\" interview questions youtube OR scribd OR tiktok"
+  ]
+}

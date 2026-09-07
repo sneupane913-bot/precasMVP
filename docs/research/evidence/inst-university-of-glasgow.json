@@ -1,0 +1,83 @@
+{
+  "institutionId": "inst-university-of-glasgow",
+  "name": "University of Glasgow",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    {
+      "text": "The University of Glasgow was founded in 1451 and is celebrating its 575th anniversary.",
+      "sourceUrl": "https://www.gla.ac.uk/explore/",
+      "sourceTitle": "Explore | University of Glasgow"
+    },
+    {
+      "text": "Glasgow is a world top 100 university and a member of the Russell Group of leading UK research universities.",
+      "sourceUrl": "https://www.gla.ac.uk/explore/",
+      "sourceTitle": "Explore | University of Glasgow"
+    },
+    {
+      "text": "Glasgow is ranked in the top 30 universities in the world for sustainability.",
+      "sourceUrl": "https://www.gla.ac.uk/explore/",
+      "sourceTitle": "Explore | University of Glasgow"
+    },
+    {
+      "text": "Campus landmarks include the Hunterian Museum, the University Library and the James McCune Smith Learning Hub.",
+      "sourceUrl": "https://www.gla.ac.uk/explore/",
+      "sourceTitle": "Explore | University of Glasgow"
+    },
+    {
+      "text": "Once you are unconditional and have accepted your offer, Glasgow says you should receive your CAS within 5-10 working days; a CAS must be issued no more than 6 months before your visa application.",
+      "sourceUrl": "https://www.gla.ac.uk/international/support/visasandimmigration/yourcas/",
+      "sourceTitle": "Your CAS | University of Glasgow"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.gla.ac.uk/international/support/visasandimmigration/applyingforastudentvisaoutsidetheuk/",
+      "title": "Applying for a Student Visa outside the UK | University of Glasgow",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Your educational background and previous studies",
+        "Why you have chosen the University of Glasgow",
+        "Why you have chosen your course",
+        "Your understanding of the course content",
+        "How the course relates to your future career plans",
+        "How you will fund your studies and living costs",
+        "Your immigration history and previous travel",
+        "Your plans after completing your studies"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-03",
+        "q-09",
+        "q-201",
+        "q-45",
+        "q-123",
+        "q-20",
+        "q-14",
+        "q-18",
+        "q-62",
+        "q-19"
+      ],
+      "unmapped": [],
+      "notes": "Describes the UKVI credibility interview only: conducted 'by a UKVI officer', 'By video call', 'By telephone' or 'In person at a Visa Application Centre'. 'Not all students will be asked to attend an interview, and UKVI does not publish details of how applicants are selected.' 'There are no correct answers.' 'Your visa application may be refused if UKVI is not satisfied that you are a genuine student.' Tips: answer honestly, speak clearly, ask for repetition, give detailed answers, avoid memorised answers. No university-run pre-CAS interview, CAS Shield or Enroly mentioned anywhere seen."
+    },
+    {
+      "url": "https://www.gla.ac.uk/international/support/visasandimmigration/yourcas/postgraduate/applicant-approval-guide/",
+      "title": "Your CAS - Postgraduate - Applicant approval guide | University of Glasgow",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched; describes checking the CAS record and requesting changes via 'Applicant Response' > 'Request Changes'. No interview, credibility check or CAS Shield step before CAS issue."
+    }
+  ],
+  "searchesRun": [
+    "credibility interview OR \"pre-CAS\" interview international students CAS questions (site: gla.ac.uk)",
+    "\"University of Glasgow\" pre-CAS OR credibility OR \"CAS Shield\" interview questions youtube OR scribd Nepal"
+  ]
+}

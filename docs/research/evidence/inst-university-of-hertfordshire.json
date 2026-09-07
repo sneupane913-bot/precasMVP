@@ -1,0 +1,137 @@
+{
+  "institutionId": "inst-university-of-hertfordshire",
+  "name": "University of Hertfordshire",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    {
+      "text": "The University of Hertfordshire is based in Hatfield, England.",
+      "sourceUrl": "https://mksprep.com/the-uk/university-of-hertfordshire/",
+      "sourceTitle": "University of Hertfordshire for Nepali Students | 2026 Guide"
+    },
+    {
+      "text": "Hertfordshire suits applicants interested in business, engineering, computing, health, life sciences and creative arts.",
+      "sourceUrl": "https://mksprep.com/the-uk/university-of-hertfordshire/",
+      "sourceTitle": "University of Hertfordshire for Nepali Students | 2026 Guide"
+    },
+    {
+      "text": "The university has a College Lane campus (home of the Ask Herts desk in the Hutton Hub) and a de Havilland campus (the 'DeHav Hub'), and its Student Immigration Team can be reached on 01707 284800.",
+      "sourceUrl": "https://ask.herts.ac.uk/interviews-as-part-of-the-student-visa-application-from-the-uk",
+      "sourceTitle": "Credibility interviews as part of your Student Visa application | Ask Herts"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.herts.ac.uk/international/apply/offer-holder-guidance/sponsorship-interview",
+      "title": "Sponsorship interview | International | Uni of Herts",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [
+        "Why the University attracted you more than other universities in the UK offering the same course, whether you looked at other options, and why you decided on that University",
+        "The facilities offered at the University including accommodation, the location of the University, and your travel arrangements to the University",
+        "Your future plans, whether you wish to continue studying in the UK at a higher level, return to your home country to find a job, or remain in the UK to work, and how your degree will help you gain employment",
+        "Your responsibilities as a Student Visa holder (UKCISA guidance on protecting your Student status)",
+        "English language ability sufficient to follow your chosen course and level of study"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-09",
+        "q-38",
+        "q-100",
+        "q-34",
+        "q-101",
+        "q-202",
+        "q-147",
+        "q-17",
+        "q-19",
+        "q-66",
+        "q-69",
+        "q-20",
+        "q-61",
+        "q-170"
+      ],
+      "unmapped": [],
+      "notes": "Direct fetch (WebFetch, curl and browser pane) returned HTTP 403 / Cloudflare JS challenge; topics recorded from the search snippet only. Snippet says a credibility interview is part of the Student visa application process to ascertain that intentions to study in the UK are genuine, and that interviewers look for fluency and signs a student has been 'coached'; advice is to speak naturally as if to a friend or family member. Snippet does not state format, length, or who conducts it."
+    },
+    {
+      "url": "https://ask.herts.ac.uk/interviews-as-part-of-the-student-visa-application-from-the-uk",
+      "title": "Credibility interviews as part of your Student Visa application | Ask Herts | University of Hertfordshire",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "your course",
+        "academic history",
+        "future plans",
+        "personal background",
+        "finances",
+        "confirm your personal details"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-02",
+        "q-03",
+        "q-19",
+        "q-01",
+        "q-14",
+        "q-129"
+      ],
+      "unmapped": [],
+      "notes": "Fetched via curl (200). Page dated 13 January 2026 and concerns Home Office credibility interviews for students applying for permission to remain in the UK, not the university's own pre-CAS interview: the Home Office invites you in writing, you must confirm attendance, and 'Your visa will be refused if you do not attend'. Topic list is verbatim. Links to a fuller guide (Credibility-Guide-Word.docx on herts.ac.uk) which returned 403."
+    },
+    {
+      "url": "https://www.herts.ac.uk/__data/assets/word_doc/0006/331269/Credibility-Guide-Word.docx",
+      "title": "Credibility-Guide-Word.docx",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Official credibility guide document surfaced by search; download returned 403 (Cloudflare). Not read. Also surfaced: Issuu 'Typical questions you may be asked' from the same guide (https://issuu.com/uniofherts/docs/credibility_guide_2023_v2/s/22819074), not fetched."
+    },
+    {
+      "url": "https://www.scribd.com/document/927717366/BEng-Hons-Aerospace-Engineering-With-Pilot-Studies-2025",
+      "title": "Pre-CAS Interview Guide for Hertfordshire | PDF",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Surfaced by search; title names Hertfordshire (BEng Aerospace Engineering with Pilot Studies 2025). No questions readable in the snippet; not fetched due to budget."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=fuViJDdZ2sE",
+      "title": "University of Hertfordshire Latest Credibility Interview | Pre CAS Interview 2025 #hertfordshire - YouTube",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title only; no questions readable in snippet; not fetched."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=HRbUxF1CFuw",
+      "title": "Updated CAS SHIELD Interview Q&A | University of Hertfordshire CAS SHIELD interview complete guide - YouTube",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title only. The title asserts Hertfordshire uses a CAS SHIELD interview; not confirmed on an official page, so usesCasShield left null."
+    }
+  ],
+  "searchesRun": [
+    "\"University of Hertfordshire\" pre-CAS interview questions asked Nepal",
+    "sponsorship interview offer holder questions (site: herts.ac.uk)",
+    "\"University of Hertfordshire\" credibility interview OR \"pre-CAS interview\" questions youtube OR scribd"
+  ]
+}

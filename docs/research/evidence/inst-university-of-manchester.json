@@ -1,0 +1,83 @@
+{
+  "institutionId": "inst-university-of-manchester",
+  "name": "University of Manchester",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    {
+      "text": "The University of Manchester was founded in 1824 and its campus is on Oxford Road, Manchester, M13 9PL.",
+      "sourceUrl": "https://www.manchester.ac.uk/about/",
+      "sourceTitle": "About | The University of Manchester"
+    },
+    {
+      "text": "Manchester is part of the Russell Group, with more than 44,000 students, 12,000 staff and 550,000 alumni from 190 countries.",
+      "sourceUrl": "https://www.manchester.ac.uk/about/",
+      "sourceTitle": "About | The University of Manchester"
+    },
+    {
+      "text": "Manchester is home to 26 Nobel Prize winners and is known for the world's first nuclear reaction, building the modern computer and isolating graphene.",
+      "sourceUrl": "https://www.manchester.ac.uk/about/",
+      "sourceTitle": "About | The University of Manchester"
+    },
+    {
+      "text": "Manchester is ranked 6th in the UK and 51st in the world in the Academic Ranking of World Universities (2026), and fifth for research power in REF 2021.",
+      "sourceUrl": "https://www.manchester.ac.uk/about/",
+      "sourceTitle": "About | The University of Manchester"
+    },
+    {
+      "text": "Manchester was the most popular UK university for undergraduate applications (UCAS 2023 cycle) and the second most targeted university by the UK's leading employers (The Graduate Market, 2024).",
+      "sourceUrl": "https://www.manchester.ac.uk/about/",
+      "sourceTitle": "About | The University of Manchester"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.studentsupport.manchester.ac.uk/immigration-and-visas/visas-and-applications/student-visa/applying-outside-uk/credibility-interviews/",
+      "title": "Contact from UKVI / Credibility interviews (applying outside the UK) | Student Support | The University of Manchester",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Why you decided to study in the UK",
+        "What made you choose the University of Manchester",
+        "The reasons for selecting your course",
+        "How you are funding your course",
+        "Where you expect to live while you are a student",
+        "How you chose your accommodation in Manchester",
+        "Your plans for when you have completed your course, e.g. your career aspirations"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-07",
+        "q-09",
+        "q-201",
+        "q-14",
+        "q-17",
+        "q-56",
+        "q-19"
+      ],
+      "unmapped": [],
+      "notes": "UKVI credibility interview only. 'Many overseas applicants who are interviewed are asked to attend a video interview as part of their Visa Application Centre appointment. However, UKVI may arrange interviews in other ways, including by telephone, depending on the circumstances.' 'For most applicants, the interview usually lasts 5-10 minutes.' No university-run pre-CAS interview, CAS Shield or Enroly mentioned."
+    },
+    {
+      "url": "https://www.studentsupport.manchester.ac.uk/immigration-and-visas/visas-and-applications/student-visa/applying-inside-uk/credibility-interviews-uk/",
+      "title": "Credibility Interviews (applying inside the UK) | Student Support | The University of Manchester",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [
+        "your plans for when you have completed your course, such as your career aspirations"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-19"
+      ],
+      "unmapped": [],
+      "notes": "Snippet: in-UK interviews are 'conducted through Skype with members of UKVI staff in Sheffield, and if you are asked to attend a credibility interview then you must do so, otherwise your application is likely to be refused.' Second search returned Manchester Metropolitan University CAS Shield pages, which are a different institution and not evidence for the University of Manchester."
+    }
+  ],
+  "searchesRun": [
+    "credibility interview OR \"pre-CAS\" interview international students CAS questions (site: manchester.ac.uk)",
+    "\"University of Manchester\" pre-CAS OR credibility OR \"CAS Shield\" interview questions youtube OR scribd Nepal"
+  ]
+}

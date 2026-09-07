@@ -1,0 +1,54 @@
+{
+  "institutionId": "inst-university-of-northampton",
+  "name": "University of Northampton",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    {
+      "text": "The University of Northampton's Waterside Campus opened in September 2018 and is at University Drive, Northampton, NN1 5PH.",
+      "sourceUrl": "https://www.northampton.ac.uk/about-us/",
+      "sourceTitle": "About Us | University of Northampton"
+    },
+    {
+      "text": "Northampton describes itself as one of the youngest universities in the UK and has won multiple awards for its social impact work.",
+      "sourceUrl": "https://www.northampton.ac.uk/about-us/",
+      "sourceTitle": "About Us | University of Northampton"
+    },
+    {
+      "text": "Northampton's UCAS code is N38, and the international deposit for undergraduate and postgraduate taught courses is currently £7,000; once the deposit is paid the university can issue the CAS.",
+      "sourceUrl": "https://www.northampton.ac.uk/international/how-to-apply/",
+      "sourceTitle": "How to Apply as an International Student | UON"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.northampton.ac.uk/international/how-to-apply/",
+      "title": "How to Apply as an International Student | UON",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched. Page does not mention any pre-CAS, credibility or readiness interview, nor CAS Shield/Enroly. Quotes: 'Once you pay the deposit, we can issue you with a Certificate of Acceptance for Studies (CAS).' and 'Currently, the deposit for Undergraduate and Postgraduate taught courses is £7,000.' No official interview page found on northampton.ac.uk or askus.northampton.ac.uk in three searches."
+    },
+    {
+      "url": "https://unimock.ai/university-of-northampton-pre-cas-process",
+      "title": "University of Northampton Pre-CAS process — Questions & AI Practice | UniMock",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Competitor practice page naming Northampton's pre-CAS process; title only, no questions readable in snippet."
+    }
+  ],
+  "searchesRun": [
+    "pre-CAS interview credibility interview international offer holders CAS (site: northampton.ac.uk)",
+    "\"University of Northampton\" pre-CAS OR credibility OR \"CAS Shield\" interview questions youtube OR scribd Nepal",
+    "credibility interview OR \"pre-CAS\" interview international CAS (site: askus.northampton.ac.uk)"
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "institutionId": "inst-university-of-liverpool",
+  "name": "University of Liverpool",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    {
+      "text": "The University of Liverpool has been 'advancing learning and transforming lives since 1881', is the original redbrick university and a founding member of the Russell Group.",
+      "sourceUrl": "https://www.liverpool.ac.uk/about/",
+      "sourceTitle": "About | University of Liverpool"
+    },
+    {
+      "text": "Liverpool's city-centre campus address is Foundation Building, Brownlow Hill, Liverpool L69 7ZX.",
+      "sourceUrl": "https://www.liverpool.ac.uk/about/",
+      "sourceTitle": "About | University of Liverpool"
+    },
+    {
+      "text": "Liverpool is in the top 140 in the QS World University Rankings 2027 and 18th in The Times and The Sunday Times Good University Guide 2026.",
+      "sourceUrl": "https://www.liverpool.ac.uk/about/",
+      "sourceTitle": "About | University of Liverpool"
+    },
+    {
+      "text": "Liverpool's teaching is rated Gold by the Teaching Excellence Framework, and 91% of its research is ranked world leading or internationally excellent (REF 2021).",
+      "sourceUrl": "https://www.liverpool.ac.uk/about/",
+      "sourceTitle": "About | University of Liverpool"
+    },
+    {
+      "text": "International students joining a master's course at Liverpool must pay a £2,000 deposit before the deadline; no deposit is required for undergraduate or postgraduate research degrees.",
+      "sourceUrl": "https://www.liverpool.ac.uk/international/applying/visas-and-immigration/applying-for-a-student-visa/",
+      "sourceTitle": "Applying for a Student visa from overseas | International students | University of Liverpool"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.liverpool.ac.uk/international/applying/visas-and-immigration/applying-for-a-student-visa/",
+      "title": "Applying for a Student visa from overseas | International students | University of Liverpool",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched. Only interview statement: 'You may be asked to attend an interview as part of the decision-making process.' No example questions, topics, format, university-run pre-CAS interview, CAS Shield or Enroly. Second search returned only Liverpool John Moores University and Kaplan (Liverpool International College) pages, which are not evidence for the University of Liverpool."
+    }
+  ],
+  "searchesRun": [
+    "credibility interview OR \"pre-CAS\" interview international students CAS questions (site: liverpool.ac.uk)",
+    "\"University of Liverpool\" pre-CAS OR credibility OR \"CAS Shield\" interview questions youtube OR scribd Nepal"
+  ]
+}

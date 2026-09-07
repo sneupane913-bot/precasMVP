@@ -1,0 +1,177 @@
+{
+  "institutionId": "inst-university-of-huddersfield",
+  "name": "University of Huddersfield",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    {
+      "text": "The University of Huddersfield's campus is at Queensgate, Huddersfield, HD1 3DH.",
+      "sourceUrl": "https://www.hud.ac.uk/about/",
+      "sourceTitle": "About | University of Huddersfield"
+    },
+    {
+      "text": "Huddersfield offers over 650 courses across five academic schools: Applied Sciences, Arts and Humanities, Business, Education and Law, Computing and Engineering, and Human and Health Sciences.",
+      "sourceUrl": "https://www.hud.ac.uk/about/",
+      "sourceTitle": "About | University of Huddersfield"
+    },
+    {
+      "text": "Notable facilities include the Barbara Hepworth Building and the National Health Innovation Campus, whose buildings are built to the WELL Building Standard.",
+      "sourceUrl": "https://www.hud.ac.uk/about/",
+      "sourceTitle": "About | University of Huddersfield"
+    },
+    {
+      "text": "Huddersfield was ranked 1st in the world for both Reduced Inequalities and No Poverty in the THE Sustainability Impact Ratings 2026, and three quarters of its research was rated world leading or internationally excellent in REF 2021.",
+      "sourceUrl": "https://www.hud.ac.uk/about/",
+      "sourceTitle": "About | University of Huddersfield"
+    },
+    {
+      "text": "The university contributes £300m a year to the local economy and is a major regional employer.",
+      "sourceUrl": "https://www.hud.ac.uk/about/",
+      "sourceTitle": "About | University of Huddersfield"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.hud.ac.uk/media/assets/document/international/immigration/Factsheet-Credibilityinterviews.pdf",
+      "title": "Credibility Interviews factsheet (PDF) - University of Huddersfield",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Your intention to study",
+        "Your academic history",
+        "About your finances",
+        "Your personal circumstances",
+        "your intended course, the reason for choosing to study at the university, your previous study, your finances and your future plans after completing your course in the UK"
+      ],
+      "quotes": [
+        "What is your name and date of birth?",
+        "What is your nationality?",
+        "Why did you choose the University of Huddersfield?",
+        "Did you look at any other universities? If not, why?",
+        "Which course will you study? Why did you choose this course?",
+        "What other courses (if any) did you consider studying?",
+        "Did you apply to study at any other university in the UK?",
+        "How long your course is; what modules you will be studying?",
+        "Why do you choose to study to the UK?",
+        "When will your course start?",
+        "What are your plans after you have completed your course?",
+        "How does this course fit in with any previous courses you have completed?",
+        "Do you have any family or relatives in the UK?",
+        "Have you visited the UK before?"
+      ],
+      "questionIds": [
+        "q-09",
+        "q-100",
+        "q-02",
+        "q-201",
+        "q-42",
+        "q-34",
+        "q-40",
+        "q-11",
+        "q-07",
+        "q-19",
+        "q-140",
+        "q-05",
+        "q-109",
+        "q-04",
+        "q-14",
+        "q-15",
+        "q-117",
+        "q-106",
+        "q-54",
+        "q-17",
+        "q-108",
+        "q-113",
+        "q-35",
+        "q-169",
+        "q-168"
+      ],
+      "unmapped": [
+        "What is your name and date of birth?",
+        "What is your nationality?"
+      ],
+      "notes": "One-page official factsheet, downloaded via curl and read with pypdf. Describes the Home Office credibility interview: 'conducted in English', assesses English ability, no interpreter; 'The interview will be conducted via Skype'. Also lists prompts (not phrased as questions): if returning after a long break explain why and what you did in the gap; who will fund your study and whether the money shown is genuinely available; how you will repay any loan; whether you plan to work in the UK; where you will live and how much it costs; future salary after the course. Advice: practise with family/friends, answers 'well researched and not vague'."
+    },
+    {
+      "url": "https://www.hud.ac.uk/international/immigration/before-you-arrive/credibility-interviews/",
+      "title": "Credibility interviews - University of Huddersfield",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "your education history at home and in the UK and overseas",
+        "your employment background",
+        "your immigration history in the UK and elsewhere",
+        "the course you are planning to study in the UK",
+        "your reasons for choosing to study at the University of Huddersfield",
+        "how you intend to fund your study and living costs in the UK",
+        "how your intended course fits into your career plans for the future",
+        "if you have previously studied a course at the same level as your new course, why you now want to study at the same level",
+        "why the UK appeals to you among other countries offering higher education",
+        "how you will pay for the course and why it's worth spending so much money on coming to study",
+        "the university's facilities and what you hope to gain from studying at Huddersfield"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-03",
+        "q-25",
+        "q-23",
+        "q-06",
+        "q-18",
+        "q-115",
+        "q-11",
+        "q-09",
+        "q-14",
+        "q-20",
+        "q-13",
+        "q-99",
+        "q-30",
+        "q-101",
+        "q-205"
+      ],
+      "unmapped": [],
+      "notes": "Home Office interview: 'Most students only have one interview. This will be very short over a video link.' The Home Office records the interview and sends a summary to the Entry Clearance Officer, who may require a second, more detailed interview at the Embassy; non-attendance 'may result in your visa application being refused'. Advice: make clear your main purpose is to study and you will not rely on earnings; avoid vague answers. The main hud.ac.uk page does not describe a university-run pre-CAS interview or any platform (CAS Shield not mentioned). Last three topics come from search snippets of this page."
+    },
+    {
+      "url": "https://london.hud.ac.uk/how-to-apply/visa-information",
+      "title": "Visa information | University of Huddersfield - London",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Snippet (Huddersfield London campus): the 'UK Visa and Compliance Team conduct Readiness Checks to help students prepare for UKVI credibility interviews and reduce visa refusal chances. If identified as requiring a Readiness Check, students must attend one before their CAS can be issued.' This is the university's own pre-CAS style check; platform not stated."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=k3XUe_uLhik",
+      "title": "Pre CAS Interview Questions 2026 - University of Huddersfield - YouTube",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Mock interview video dated June 2026 per snippet; questions not readable in snippet."
+    },
+    {
+      "url": "https://www.tiktok.com/discover/huddersfield-university-cas-interview-questions-answers",
+      "title": "Huddersfield University Cas Interview Questions Answers | TikTok",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title only."
+    }
+  ],
+  "searchesRun": [
+    "pre-CAS interview credibility interview international offer holders questions (site: hud.ac.uk)",
+    "\"University of Huddersfield\" pre-CAS OR credibility interview questions asked youtube OR scribd Nepal"
+  ]
+}

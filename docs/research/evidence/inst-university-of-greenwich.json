@@ -1,0 +1,150 @@
+{
+  "institutionId": "inst-university-of-greenwich",
+  "name": "University of Greenwich",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "facts": [
+    {
+      "text": "The University of Greenwich has two London-based campuses and one at Medway in Kent.",
+      "sourceUrl": "https://www.gre.ac.uk/about-us",
+      "sourceTitle": "About us | University of Greenwich"
+    },
+    {
+      "text": "Greenwich holds a Teaching Excellence Framework Gold Award and is a member of University Alliance.",
+      "sourceUrl": "https://www.gre.ac.uk/about-us",
+      "sourceTitle": "About us | University of Greenwich"
+    },
+    {
+      "text": "Greenwich has historic campuses and students from more than 150 countries, and is rated Top 5 in London by StudentCrowd.",
+      "sourceUrl": "https://www.gre.ac.uk/about-us",
+      "sourceTitle": "About us | University of Greenwich"
+    },
+    {
+      "text": "CAS Shield is Greenwich's online self-service system: once you accept your offer and pay any deposit, the university emails a CAS Shield invitation and you upload your information and documents there.",
+      "sourceUrl": "https://www.gre.ac.uk/visa/before-you-arrive/getting-your-cas",
+      "sourceTitle": "Getting your CAS | Visas and Immigration for study in the UK | University of Greenwich"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.gre.ac.uk/visa/before-you-arrive/prepare-for-your-visa-interview",
+      "title": "Prepare for your visa interview | Visas and Immigration for study in the UK | University of Greenwich",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "The university",
+        "Your programme",
+        "Why you want to come to University of Greenwich",
+        "Why you want to come to the UK",
+        "How you made your decision, and whether you applied to any other university",
+        "Where you plan to live",
+        "How you will finance your studies"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-36",
+        "q-11",
+        "q-45",
+        "q-09",
+        "q-07",
+        "q-144",
+        "q-34",
+        "q-17",
+        "q-14"
+      ],
+      "unmapped": [],
+      "notes": "Practice UKVI interview happens 'after you have an unconditional offer and paid any required deposit'; invitation 'via CAS Shield (or be sent an email)' and you 'choose a time and date'. Format is either 'A video interview recorded on CAS Shield' or 'A face-to-face interview (conducted on Microsoft Teams)'. Outcome: 'we will review your answers and come back to you with some feedback. If we have concerns about any of your answers, we may ask you to attend another interview.' 'We do not require all applicants to have a practice interview.' Page links to a 'Credibility Interview Guidance' document (not fetched). No length stated."
+    },
+    {
+      "url": "https://www.gre.ac.uk/visa/before-you-arrive/getting-your-cas",
+      "title": "Getting your CAS | Visas and Immigration for study in the UK | University of Greenwich",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Snippet: 'Some international offer holders may be required to complete a Practice UKVI interview with the CAS team prior to being issued their CAS. Offer holders are invited via CAS Shield to participate in these interviews and can choose a time and date.' Also: based on visa refusal risk some students may be asked to pay 100% of tuition fees upfront before a CAS is issued, and 'should not pay this until they have passed their credibility interview'. Nepal listed in Group A countries for CAS processing (snippet)."
+    },
+    {
+      "url": "https://www.scribd.com/document/501453396/Practice-UKVI-Interview-Guidance-1",
+      "title": "Practise UKVI Interview Guidance: About University of Greenwich? | PDF | Interview | Question",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Appears to be an upload of the university's own Practice UKVI Interview Guidance document; not fetched (budget). Title suggests a section 'About University of Greenwich?'."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=aG-2VKn9ERc",
+      "title": "Credibility Interview for Greenwich University | PASSED - YouTube",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title only; no questions readable in snippet."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=LQkJoktIH7Q",
+      "title": "Credibility Mock Interview for University of Greenwich | Mock Interview for University Interview - YouTube",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title only."
+    },
+    {
+      "url": "https://www.tiktok.com/discover/pre-cas-interview-questions-answers-university-of-greenwich",
+      "title": "Pre Cas Interview Questions Answers University of Greenwich | TikTok",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [
+        "reasons for choosing the UK and University of Greenwich",
+        "details about the student's course",
+        "plans for accommodation",
+        "travel",
+        "financing their studies",
+        "future career goals"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-07",
+        "q-09",
+        "q-11",
+        "q-17",
+        "q-14",
+        "q-19"
+      ],
+      "unmapped": [],
+      "notes": "Topic list taken from the search summary attributed to this cluster of results; discover page not fetched."
+    },
+    {
+      "url": "https://unimock.ai/university-of-greenwich-pre-cas-interview",
+      "title": "University of Greenwich Pre-CAS interview — Questions & AI Practice | UniMock",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Competitor practice page naming Greenwich; title only."
+    }
+  ],
+  "searchesRun": [
+    "pre-CAS interview credibility CAS Shield international offer holders (site: gre.ac.uk)",
+    "\"University of Greenwich\" pre-CAS OR \"CAS Shield\" OR credibility interview questions asked youtube OR scribd Nepal"
+  ]
+}

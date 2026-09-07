@@ -90,7 +90,7 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] D20 Full journey walked end to end in qa/journey-check.js, 26/26: land, gate, sign in, browse, start, consent, finish, report, personal offer, history, pay, no dead ends, delete. Every page a student passes through is asserted phone safe at 360px.
 
 - [x] D21 The paper is the university's paper (7 Sep 2026, first customer feedback). No question repeats across a student's sittings (Q-11); questions the university publishes itself come first (Q-12); city and UKVI living-cost figure resolve from a sourced fact pack and reach the marker (Q-13); every question carries a likelihood with reason and URL, shown in the room, the report, the university card and `/universities/<slug>/evidence` (Q-14). Bank grown 130 to 210 from the sourced harvest plus the counsellor's list. Proven by `qa/paper-check.mjs` (26 assertions); browser pass still to do
-- [ ] D22 Finish the evidence sweep: groups 1, 2, 5, 6 of the 7 Sep research (BPP, UEL, UWL, Ravensbourne, Coventry, Anglia Ruskin to Bournemouth; Brunel to Heriot-Watt; Birmingham to Exeter; Glasgow to Northampton) hit the session limit before writing. Run ONE agent per group, one at a time, with the brief in CONTINUE-HERE session 9. Then `node qa/build-evidence.mjs`
+- [x] D22 Evidence sweep complete (7 Sep 2026, session 9, one agent at a time): 93 institution files, 310 sources, 1,435 question mappings, 212 sourced facts; 91 of 93 universities have a source naming them (City St George's and Queen Mary have none yet). Compiled by `node qa/build-evidence.mjs`; `qa/paper-check.mjs` green
 
 ## E. Payment and approval
 

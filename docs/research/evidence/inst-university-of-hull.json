@@ -1,0 +1,137 @@
+{
+  "institutionId": "inst-university-of-hull",
+  "name": "University of Hull",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    {
+      "text": "The University of Hull's campus is at Cottingham Road, Hull, HU6 7RX, and the university has been teaching since 1927.",
+      "sourceUrl": "https://www.hull.ac.uk/choose-hull/university-and-region/about-us",
+      "sourceTitle": "About us | University of Hull"
+    },
+    {
+      "text": "Hull is rated Gold in the Teaching Excellence Framework (TEF) 2023, the highest rating for teaching quality and student success.",
+      "sourceUrl": "https://www.hull.ac.uk/choose-hull/university-and-region/about-us",
+      "sourceTitle": "About us | University of Hull"
+    },
+    {
+      "text": "Hull is a research leader in renewable energy, flood resilience, palliative and wound care, mental health and addiction, knife crime, and the fight against modern slavery.",
+      "sourceUrl": "https://www.hull.ac.uk/choose-hull/university-and-region/about-us",
+      "sourceTitle": "About us | University of Hull"
+    },
+    {
+      "text": "Hull's alumni range from Prime Ministers and Nobel Prize winners to Academy Award regulars.",
+      "sourceUrl": "https://www.hull.ac.uk/choose-hull/university-and-region/about-us",
+      "sourceTitle": "About us | University of Hull"
+    },
+    {
+      "text": "The university also has a London campus (University of Hull London), which publishes its own visa interview guide at london.hull.ac.uk.",
+      "sourceUrl": "https://london.hull.ac.uk/wp-content/uploads/2024/01/Visa-University-Guide-Hull-London.pdf",
+      "sourceTitle": "Visa Interview Guide - University of Hull London (PDF)"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://london.hull.ac.uk/wp-content/uploads/2024/01/Visa-University-Guide-Hull-London.pdf",
+      "title": "Visa Interview Guide - University of Hull London (PDF)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Intended Course(s)",
+        "General information",
+        "Financial Circumstances",
+        "Living in UK",
+        "applicant's reasons for choosing to study their programme in the UK, their knowledge of the chosen programme and whether they can afford their studies in the UK",
+        "intention; financial background; previous education/work history; other immigration-related questions"
+      ],
+      "quotes": [
+        "What is the course name and academic level? What qualification will you get after the course if you pass?",
+        "When does the course start and finish and how many terms/semesters is it?",
+        "What are the modules/subjects of the course? What will you study during the course? How are you going to be assessed on the course?",
+        "Did you do any research before choosing the school/course? What other schools/courses did you consider, and why did you decide on this one?",
+        "How is this course going to benefit you for your future career and/or academic plans?",
+        "What is the name of the university and study location?",
+        "Did you use an educational agent at any stage (even if you stopped using them)? Who is/was your agent and why did you choose them?",
+        "Why did you choose this university/college/school? Why did you choose this course and how does it relate to your previous study? Why do you wish to study in the UK? Why not stay in your own country to study, if similar courses are available there?",
+        "What is your plan after completing the course? Do you intend to stay in the UK (for additional studies) or are you returning home?",
+        "If you are changing course or study pathway, why are you are making such a change of direction in your studies?",
+        "How do you explain any gaps in your previous education/employment history?",
+        "Who is going to pay your tuition fees and living costs? Where did they get the money? What is their salary income?",
+        "Do you know how much it costs to live in the UK and also what you might spend on day- to- day items such as food, travel and accommodation?",
+        "Do you know the total cost of the course and have an idea on any future courses?",
+        "Where is the university? Which city is it located in and which part of the UK does it belong to?",
+        "Have you arranged accommodation? If not, why not? How will you/did you find it?",
+        "How much does accommodation cost in the city/town where you will be studying?",
+        "How will you commute between your accommodation and the university (bus, train, underground etc.)?"
+      ],
+      "questionIds": [
+        "q-02",
+        "q-103",
+        "q-40",
+        "q-39",
+        "q-11",
+        "q-102",
+        "q-12",
+        "q-100",
+        "q-42",
+        "q-38",
+        "q-20",
+        "q-78",
+        "q-65",
+        "q-09",
+        "q-201",
+        "q-07",
+        "q-98",
+        "q-19",
+        "q-66",
+        "q-69",
+        "q-124",
+        "q-109",
+        "q-142",
+        "q-14",
+        "q-15",
+        "q-104",
+        "q-85",
+        "q-16",
+        "q-47",
+        "q-174",
+        "q-147",
+        "q-163",
+        "q-108",
+        "q-107",
+        "q-185"
+      ],
+      "unmapped": [],
+      "notes": "6-page PDF from Hull's London campus, downloaded via curl and read with pypdf (dated Jan 2024 in URL). Describes the Home Office 'Visa Interview (Credibility Test)' for applicants aged 16+: 'via video link with the Home Office interviewing team in the UK, face-to-face with Entry Clearance Officers based in UK Embassies/High Commissions or via telephone'. 'Failure to attend the interview may result in your application being automatically refused.' Always answer in English, not via an interpreter. Also notes you may need extra bank statements / proof of sponsor income. No university-run pre-CAS interview or CAS Shield mentioned."
+    },
+    {
+      "url": "https://www.hull.ac.uk/study/international-students/visas-and-immigration",
+      "title": "UK Student Visa & Immigration Guidance | University of Hull",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched; contains no interview questions, format, pre-CAS interview or CAS Shield mention. Search snippet from hull.ac.uk: CAS is issued only once the offer is unconditional and the deposit received."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=fajnV7YJahM",
+      "title": "University of Hull Pre Cas Interview Questions | Credibility ...",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title only; questions not readable in snippet."
+    }
+  ],
+  "searchesRun": [
+    "pre-CAS interview credibility interview international offer holders CAS Shield (site: hull.ac.uk)",
+    "\"University of Hull\" pre-CAS OR credibility OR \"CAS Shield\" interview questions youtube OR scribd Nepal"
+  ]
+}
