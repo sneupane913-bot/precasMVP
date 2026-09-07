@@ -95,6 +95,8 @@ be blank, because it sits next to a real countdown and has to name a real reason
 
 Kept here because a wrong number that gets quietly fixed comes back.
 
+**Prep retail price, corrected 7 September 2026.** The 3 September coupon release set Prep to NPR 399. The client's actual retail price is NPR 499 (Serious 799); consultancies buy coupons at NPR 300 and NPR 700. Fixed in `lib/data/plans.ts`, from which every page and suite derives.
+
 **Seat value, corrected 12 August 2026.** An earlier version said a seat was 3
 mocks. That came from reading `costNpr: 241` as the Prep pack's cost when it is
 Pro's. Prep costs NPR 59 and Serious costs NPR 118 — and every bundle had always

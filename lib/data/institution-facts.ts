@@ -1,4 +1,5 @@
 import type { Institution } from '@/lib/types';
+import { GENERATED_FACTS } from '@/lib/data/university-evidence.generated';
 
 /**
  * WHAT WE ACTUALLY KNOW ABOUT EACH UNIVERSITY, AND WHERE IT CAME FROM.
@@ -354,6 +355,77 @@ export function publishedQuestionCount(institutionId: string): number {
 }
 
 // ---------------------------------------------------------------------------
+// 2b. What we can say about a university, with a source for each sentence.
+//
+// The client's point, 7 September 2026: the selling point is the question and
+// the ANSWER, and a model answer that says "[specific module]" for every
+// university is generic. So where we hold sourced facts, the model answers
+// and the marker use them; where we do not, the answer keeps the honest
+// bracket and says so. Ravensbourne first, because that is the university in
+// the complaint. Add the others ONE AT A TIME, each fact with a URL and date.
+// ---------------------------------------------------------------------------
+
+export interface InstitutionFact {
+  text: string;
+  sourceUrl: string;
+  sourceTitle: string;
+  checkedOn: string;
+}
+
+export const PROFILES: Record<string, InstitutionFact[]> = {
+  'inst-ravensbourne': [
+    {
+      text: 'its campus is at 6 Penrose Way on the Greenwich Peninsula in south-east London (SE10 0EW), next to the O2 and North Greenwich station',
+      sourceUrl: 'https://www.ravensbourne.ac.uk/',
+      sourceTitle: 'Ravensbourne University London (home page, address in the footer)',
+      checkedOn: '2026-09-07',
+    },
+    {
+      text: 'it describes itself as the place "where business, creativity and technology intersect", a specialist university for design, media, fashion, architecture, computing and business',
+      sourceUrl: 'https://www.ravensbourne.ac.uk/',
+      sourceTitle: 'Ravensbourne University London (home page)',
+      checkedOn: '2026-09-07',
+    },
+    {
+      text: 'its courses are linked to professional bodies including BCS, ACCA, CIM, CMI, RIBA and Ukie, and it teaches with industry partners such as Avid and Blackmagic',
+      sourceUrl: 'https://www.ravensbourne.ac.uk/',
+      sourceTitle: 'Ravensbourne University London (home page, partners and accreditations)',
+      checkedOn: '2026-09-07',
+    },
+    {
+      text: 'it calls its approach "learning with industry" and reported its strongest National Student Survey results to date in 2026',
+      sourceUrl: 'https://www.ravensbourne.ac.uk/',
+      sourceTitle: 'Ravensbourne University London (home page)',
+      checkedOn: '2026-09-07',
+    },
+    {
+      text: 'international applicants complete their CAS step through CAS Shield, which guides them through documents and questions before the university requests the CAS',
+      sourceUrl: 'https://www.ravensbourne.ac.uk/international-students/international-how-apply',
+      sourceTitle: 'International how to apply | Ravensbourne University London',
+      checkedOn: '2026-09-07',
+    },
+  ],
+};
+
+export function profileFor(institutionId: string): InstitutionFact[] {
+  const hand = PROFILES[institutionId] ?? [];
+  const swept = GENERATED_FACTS[institutionId] ?? [];
+  const seen = new Set(hand.map((f) => f.text.toLowerCase()));
+  return [...hand, ...swept.filter((f) => !seen.has(f.text.toLowerCase()))];
+}
+
+/**
+ * The sentence a model answer uses for "why this university". Two sourced
+ * facts joined, or null when we hold none (the answer then keeps its honest
+ * bracket prompt). Never a ranking on its own.
+ */
+export function aboutSentence(institutionId: string): string | null {
+  const facts = profileFor(institutionId);
+  if (facts.length === 0) return null;
+  return facts.slice(0, 2).map((f) => f.text).join(', and ');
+}
+
+// ---------------------------------------------------------------------------
 // 3. The fact block the evaluator reads.
 //
 // Short, verified, and never shown to the student. It lets the marker check a
@@ -375,6 +447,13 @@ export function institutionFactBlock(inst: Institution): string {
   const g = PUBLISHED_GUIDANCE[inst.id];
   if (g) {
     lines.push(`The university publishes its own interview guidance (${g.title}). It says it covers: ${g.topics.join('; ')}.`);
+  }
+  const facts = profileFor(inst.id);
+  if (facts.length > 0) {
+    lines.push('Verified facts about the university (a student who names these has done real research; a claim that contradicts them is a fix to name):');
+    for (const f of facts) lines.push(`- ${f.text}`);
+  } else {
+    lines.push('We hold no verified facts about this university beyond its city and band; do not mark a specific claim as false unless it contradicts the facts above.');
   }
   return lines.join('\n');
 }

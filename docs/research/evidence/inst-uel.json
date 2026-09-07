@@ -1,0 +1,67 @@
+{
+  "institutionId": "inst-uel",
+  "name": "University of East London",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    { "text": "UEL has three campuses: Docklands, Stratford and University Square Stratford (USS).", "sourceUrl": "https://www.uel.ac.uk/about/finding-us", "sourceTitle": "Finding us | University of East London (search snippet; page not fetched)" },
+    { "text": "The Docklands campus sits on the Royal Docks waterfront and is served by the DLR from Cyprus station, with trains every 5-10 minutes; you can also take the Elizabeth line and change at Custom House.", "sourceUrl": "https://www.uel.ac.uk/about/finding-us", "sourceTitle": "Finding us | University of East London (search snippet; page not fetched)" },
+    { "text": "The Stratford campus is next to the Olympic Park, a short walk from Stratford, Stratford International and Maryland stations, and is served by the Jubilee, Central and Elizabeth lines and the DLR.", "sourceUrl": "https://www.uel.ac.uk/about/location", "sourceTitle": "Location | University of East London (search snippet; page not fetched)" },
+    { "text": "A free university bus service runs between the UEL campuses.", "sourceUrl": "https://www.uel.ac.uk/about/finding-us", "sourceTitle": "Finding us | University of East London (search snippet; page not fetched)" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.uel.ac.uk/visa-immigration-advice/student-visa",
+      "title": "Student Visa | University of East London",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": ["Your previous studies", "Your reasons for choosing to study at the University of East London", "Your reasons for choosing to study your course", "Your reasons for wanting to study in the UK", "Your future and how your course will help you achieve your plans"],
+      "quotes": [],
+      "questionIds": ["q-03", "q-09", "q-201", "q-07", "q-19"],
+      "unmapped": [],
+      "notes": "Fetch returned HTTP 403; content taken from the search-result snippet. Snippet says: a pre-CAS interview is a supportive assessment that helps understand your reasons for studying in the UK and at UEL, and to help prepare you for the UKVI credibility interview; UKVI may invite you to a credibility interview via Skype, Microsoft Teams or at a visa application centre; if you do not pass the interview your visa application could be refused. The five topic areas above are listed as what to prepare. No mention of CAS Shield seen in the snippet."
+    },
+    {
+      "url": "https://gostudyvisa.com/2025/12/10/uel-pre-cas-interview-guide-2026-complete-sample-answers-preparation-framework/",
+      "title": "UEL Pre-CAS Interview Guide (2026) - Complete Sample Answers - Go Study Visa Consultancy",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": ["course choice", "career plans", "financial stability", "motivation for studying at UEL"],
+      "quotes": [],
+      "questionIds": ["q-201", "q-19", "q-14", "q-09"],
+      "unmapped": [],
+      "notes": "Fetch returned HTTP 403. Search snippet says the UEL pre-CAS interview may be by video call or in person, typically lasts around 20-30 minutes, verifies academic intention, financial readiness, English proficiency and genuine motivation, and is a step before the CAS is issued."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=KDQ47DC7Dek",
+      "title": "UEL Pre CAS Interview Questions 2026 - University Of East London Complete Mock (YouTube)",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title only from search results; not fetched. Two further UEL-named practice videos exist: https://www.youtube.com/watch?v=TP0QN1L_2-I and https://www.youtube.com/watch?v=Nn7SDN103tA (titles only)."
+    },
+    {
+      "url": "https://unimock.ai/university-of-east-london-cas-interview",
+      "title": "University of East London CAS interview - Questions & AI Practice | UniMock",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title only from search results; not fetched."
+    }
+  ],
+  "searchesRun": [
+    "University of East London credibility interview pre-CAS interview questions site:uel.ac.uk",
+    "\"University of East London\" pre-CAS interview questions asked international students",
+    "University of East London campuses Docklands Stratford University Square nearest station about UEL"
+  ]
+}

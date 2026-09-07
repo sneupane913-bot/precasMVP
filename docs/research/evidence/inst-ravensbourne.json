@@ -1,0 +1,45 @@
+{
+  "institutionId": "inst-ravensbourne",
+  "name": "Ravensbourne University London",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "sources": [
+    {
+      "url": "https://www.ravensbourne.ac.uk/international-students/international-how-apply",
+      "title": "International how to apply | Ravensbourne University London",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": ["the CAS platform (CAS Shield) guides applicants through the necessary documentation and questions", "CAS deposit"],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "The page itself returned 403 to our fetch; the search-result snippet of it says that an applicant who needs a CAS is invited to upload information to Ravensbourne's CAS platform and pay a CAS deposit, and that CAS Shield guides applicants through the documentation and questions before the CAS is requested from UKVI. CAS Shield (Enroly) runs a recorded video interview with questions drawn from themed banks, marked by the university."
+    },
+    {
+      "url": "https://www.ravensbourne.ac.uk/study/how-to-apply",
+      "title": "How to Apply | Ravensbourne University London",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": ["an interview for the majority of courses, in person or by telephone, Teams or Zoom"],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Snippet only. Ravensbourne interviews applicants for most courses (an admissions interview, separate from the CAS Shield credibility step)."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=3BLNwI93HBQ",
+      "title": "Ravensbourne University credibility interview questions | uk university interview questions (YouTube)",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": ["why Ravensbourne", "academic background"],
+      "quotes": ["Why did you choose Ravensbourne University?", "Tell us about your academic background"],
+      "questionIds": ["q-09", "q-03"],
+      "unmapped": [],
+      "notes": "A practice video named for Ravensbourne; the two questions above appeared in the search-result snippet. The video page body was not readable."
+    }
+  ],
+  "searchesRun": ["Ravensbourne University London pre-CAS interview questions credibility interview international students"]
+}

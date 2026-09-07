@@ -58,12 +58,13 @@ export const PLANS: Plan[] = [
     name: 'Prep',
     tagline: 'Get comfortable',
     /**
-     * NPR 399 from 3 September 2026 (was 449). Client decision, made together
-     * with the coupon model: a consultancy buys a Prep coupon at NPR 300 and
-     * a Serious coupon at NPR 700, and the NPR 99 gap on each is the
-     * consultancy's margin. See COUPON_WHOLESALE_NPR below.
+     * NPR 499 from 7 September 2026. The 3 September release set this to 399
+     * by mistake; the client corrected it: the retail Prep price is 499, the
+     * consultancy buys a Prep coupon at NPR 300 (Serious at NPR 700 against
+     * 799), and the gap is the consultancy's margin. See COUPON_WHOLESALE_NPR
+     * below. Every page and every suite derives from this line.
      */
-    priceNpr: 399,
+    priceNpr: 499,
     mockInterviews: 3,
     practiceSessions: 15,
     maxQuestionsPerMock: 17,
@@ -204,10 +205,10 @@ export const BUNDLES: Bundle[] = [
  * consultancy no longer buys twenty seats at once; it buys exactly as many
  * coupons as it wants, of whichever pack it wants, and pays in advance:
  *
- *     Prep coupon     NPR 300   (a student on their own pays NPR 399)
+ *     Prep coupon     NPR 300   (a student on their own pays NPR 499)
  *     Serious coupon  NPR 700   (a student on their own pays NPR 799)
  *
- * The NPR 99 on each is the consultancy's to charge their student, and it is
+ * The gap on each (NPR 199 on Prep, NPR 99 on Serious) is the consultancy's to charge their student, and it is
  * DERIVED on every page that mentions it (retail minus wholesale), never
  * typed. A pack with no entry here cannot be bought as a coupon.
  *

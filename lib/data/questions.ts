@@ -52,6 +52,7 @@ import { answerSecondsFor, readSecondsFor } from '@/lib/data/timing';
 import type { Draft } from '@/lib/data/question-draft';
 import { BATCH3 } from '@/lib/data/questions-batch3';
 import {
+  aboutSentence,
   maintenanceFor,
   pounds,
   publishedBy as publishedByFacts,
@@ -195,7 +196,7 @@ const RAW: Draft[] = [
       'If you know a module, a facility or a lecturer, name it.',
     ],
     modelAnswer:
-      'I looked at the course content at {{university}} and it covers [specific module], which is exactly the area I want to work in. The campus is in {{city}}, and living costs there are manageable for my budget. They also offer [specific support, placement or facility], which other universities I looked at did not.',
+      'I chose {{university}} because {{aboutUniversity}}. The course itself covers [specific module], which is exactly the area I want to work in. The campus is in {{city}}, and living costs there fit my budget. They also offer [specific support, placement or facility], which other universities I looked at did not.',
     rubricNotes:
       'Weak university knowledge is a major risk flag. Reward named modules, campus facts, city facts, support services. Penalise rankings-only and "good reputation".',
   },
@@ -2059,7 +2060,14 @@ export function publishedBy(questionId: string): string[] {
  */
 export function fill(text: string, inst: Institution): string {
   const m = maintenanceFor(inst);
+  // {{aboutUniversity}}: two sourced facts about this university, or the
+  // honest bracket when we hold none. Resolved first because it may itself
+  // name the university.
+  const about =
+    aboutSentence(inst.id) ??
+    '[one specific thing you found about {{university}}: a named module, facility, accreditation or industry link]';
   return text
+    .replaceAll('{{aboutUniversity}}', about)
     .replaceAll('{{university}}', inst.name)
     .replaceAll('{{city}}', inst.city)
     .replaceAll('{{ukviBand}}', m.band === 'London' ? 'in London' : 'outside London')

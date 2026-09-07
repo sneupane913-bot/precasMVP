@@ -42,6 +42,8 @@ const institutions = new Map(
 
 const TIERS = new Set(['official', 'student_report', 'consultancy']);
 const result = {};
+const factsOut = {};
+let facts = 0;
 let sources = 0;
 let mapped = 0;
 let unmapped = 0;
@@ -93,6 +95,23 @@ for (const f of files) {
     mapped += ids.length;
     unmapped += (s.unmapped ?? []).length;
   }
+  const cleanFacts = [];
+  for (const f of j.facts ?? []) {
+    if (!f?.text || !f?.sourceUrl || !/^https?:\/\//.test(f.sourceUrl)) {
+      warnings.push(`${id}: fact without text or a valid URL, dropped`);
+      continue;
+    }
+    cleanFacts.push({
+      text: String(f.text).slice(0, 300),
+      sourceUrl: f.sourceUrl,
+      sourceTitle: String(f.sourceTitle ?? f.sourceUrl).slice(0, 200),
+      checkedOn: String(j.checkedOn ?? '2026-09-07'),
+    });
+  }
+  if (cleanFacts.length) {
+    factsOut[id] = cleanFacts;
+    facts += cleanFacts.length;
+  }
   result[id] = {
     institutionId: id,
     checkedOn: String(j.checkedOn ?? '2026-09-07'),
@@ -106,15 +125,19 @@ const header = `/**
  * Do not edit by hand; edit the JSON and re-run the script.
  *
  * ${files.length} institution files, ${sources} sources, ${mapped} question mappings,
- * ${unmapped} verbatim questions not yet in the bank. Built ${new Date().toISOString().slice(0, 10)}.
+ * ${unmapped} verbatim questions not yet in the bank, ${facts} sourced facts. Built ${new Date().toISOString().slice(0, 10)}.
  */
 import type { InstitutionEvidence } from '@/lib/data/university-evidence';
+import type { InstitutionFact } from '@/lib/data/institution-facts';
 
 export const GENERATED_EVIDENCE: Record<string, InstitutionEvidence> = ${JSON.stringify(result, null, 2)};
+
+/** Sourced facts the sweep captured, merged by profileFor() in institution-facts.ts. */
+export const GENERATED_FACTS: Record<string, InstitutionFact[]> = ${JSON.stringify(factsOut, null, 2)};
 `;
 writeFileSync(out, header);
 
 for (const w of warnings) console.warn('  WARN', w);
 console.log(
-  `evidence: ${files.length} files, ${Object.keys(result).length} institutions, ${sources} sources, ${mapped} mappings, ${unmapped} unmapped, ${warnings.length} warnings`
+  `evidence: ${files.length} files, ${Object.keys(result).length} institutions, ${sources} sources, ${mapped} mappings, ${unmapped} unmapped, ${facts} facts, ${warnings.length} warnings`
 );

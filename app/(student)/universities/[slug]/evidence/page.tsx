@@ -6,7 +6,7 @@ import { headerSession } from '@/lib/auth/header-session';
 import { Page, Card, Chip, ButtonLink, Eyebrow } from '@/components/ui';
 import { getInstitution } from '@/lib/data/institutions';
 import { eligiblePool, eligiblePoolFor, publicQuestion, primeExtraQuestions } from '@/lib/data/questions';
-import { maintenanceFor, pounds, UKVI_MAINTENANCE } from '@/lib/data/institution-facts';
+import { maintenanceFor, pounds, profileFor, UKVI_MAINTENANCE } from '@/lib/data/institution-facts';
 import {
   evidenceFor,
   evidenceSummary,
@@ -44,6 +44,7 @@ export default async function EvidencePage({ params }: { params: Promise<{ slug:
   const summary = evidenceSummary(inst);
   const band = maintenanceFor(inst);
   const shield = usesCasShield(inst.id);
+  const profile = profileFor(inst.id);
 
   const inPaper = new Set(eligiblePoolFor(inst.id).map((q) => q.id));
   const rows = eligiblePool()
@@ -85,6 +86,21 @@ export default async function EvidencePage({ params }: { params: Promise<{ slug:
                 </a>
                 , checked {UKVI_MAINTENANCE.checkedOn}.
               </li>
+              {profile.map((f) => (
+                <li key={f.text}>
+                  {f.text[0]!.toUpperCase() + f.text.slice(1)}.{' '}
+                  <a href={f.sourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">
+                    source
+                  </a>
+                  , checked {f.checkedOn}.
+                </li>
+              ))}
+              {profile.length === 0 && (
+                <li>
+                  We hold no verified facts about {inst.shortName || inst.name} beyond its city and band yet, so its
+                  model answers keep an honest prompt where a fact would go.
+                </li>
+              )}
               {shield === true && (
                 <li>
                   {inst.shortName || inst.name} runs its interview through Enroly CAS Shield: a recorded video

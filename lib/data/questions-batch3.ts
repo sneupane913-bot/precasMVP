@@ -354,7 +354,7 @@ export const BATCH3: Draft[] = [
       'If your fact is a ranking, add a second fact. Rankings alone are weak.',
     ],
     modelAnswer:
-      'The thing that stood out was [specific: a named lab, a professional accreditation, a placement scheme, a module]. I checked and the other universities I applied to, [names], did not offer it. It matters for me because [reason tied to your plan]. The campus is in {{city}}, which also fits my budget.',
+      'The thing that stood out was that {{aboutUniversity}}. I checked and the other universities I applied to, [names], did not offer that. It matters for me because [reason tied to your plan]. The campus is in {{city}}, which also fits my budget.',
     rubricNotes:
       'The distinctiveness test. Reward a checkable fact and an explicit comparison. Rankings-only and "good reputation" score low on genuine intent (Oxford Brookes: it is not enough to rely on rankings). A fact that belongs to a different university is a serious flag; check against the university facts you are given.',
   },
@@ -1385,7 +1385,7 @@ export const BATCH3: Draft[] = [
       'Enthusiasm with a fact behind it is the answer.',
     ],
     modelAnswer:
-      'The thing I am most excited about is [specific: the [module], the [facility], the placement with [industry], living in {{city}}]. I have wanted to [do what] since [when], and this is the first time I will actually get to. That is why I chose {{university}} over [other option].',
+      'The thing I am most excited about is that {{aboutUniversity}}. For my course that means [the module / the facility / the placement] I have wanted since [when], and this is the first time I will actually get to do it. That is why I chose {{university}} over [other option].',
     rubricNotes:
       'Genuine interest test. Reward a specific, checkable thing tied to a personal reason. Generic excitement about "the UK" or "a world-class university" scores low.',
   },
@@ -1400,7 +1400,7 @@ export const BATCH3: Draft[] = [
       'A ranking on its own is a weak reason. A ranking plus a feature is research.',
     ],
     modelAnswer:
-      '{{university}} was [ranking or award, for example: rated [level] in the Teaching Excellence Framework / ranked [n] for [subject] in [guide] in [year]]. More important for me, it has [feature: an accreditation from [body] / a partnership with [industry] / a research centre in [area]], which is directly linked to my course.',
+      '{{university}} was [ranking or award, for example: rated [level] in the Teaching Excellence Framework / ranked [n] for [subject] in [guide] in [year]]. More important for me, {{aboutUniversity}}, which is directly linked to my course.',
     rubricNotes:
       'Rankings are the classic generic answer (Oxford Brookes: "it is not enough to rely on university rankings"), so reward the second, non-ranking fact more than the first. A wrong or invented ranking is worse than none. Do not verify exact positions; look for plausibility and a non-ranking feature.',
   },
