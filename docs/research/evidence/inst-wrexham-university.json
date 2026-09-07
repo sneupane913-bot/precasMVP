@@ -1,0 +1,77 @@
+{
+  "institutionId": "inst-wrexham-university",
+  "name": "Wrexham University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://wrexham.ac.uk/international-students/how-to-apply/",
+      "title": "How to apply - Wrexham University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Verbatim: 'Once you've successfully fulfilled the conditions of your offer, Wrexham University's Immigration Compliance team will be in contact with you to arrange a compliance interview.' 'If your compliance interview is successful and the course fees have been paid, the Immigration Compliance team will then issue you with a Confirmation of Acceptance for Studies (CAS) letter.' No example questions. A search-result summary (source page not identified; Shiksha Q&A returned 403) said the interview 'will take place at a regional interview centre and will be conducted by video call over the internet, estimated to take less than 30 minutes' — unverified. Contact: immigration@wrexham.ac.uk (from search summary)."
+    },
+    {
+      "url": "https://wrexham.ac.uk/international-students/visas/",
+      "title": "Visas - Wrexham University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched; no mention of compliance/credibility/pre-CAS interviews."
+    },
+    {
+      "url": "https://www.scribd.com/document/680627356/FAQS-FOR-WREXHAM-GLYNDWR-UNIVERSITY",
+      "title": "Faqs For Wrexham Glyndwr University | PDF (Scribd, 6 pages)",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "educational qualifications and experience",
+        "work history, roles and responsibilities",
+        "fitness, the environment, email use, and other topics"
+      ],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Scribd document body not readable via fetch; only the description was visible: 'The document contains questions that may be asked during an interview for academic or work purposes. It includes questions about educational qualifications and experience, work history, roles and responsibilities, as well as more general questions related to fitness, the environment, email use, and other topics.' Search snippet also showed 'Are you fit and well to be interviewed today?' and 'Why did you choose UK for your studies?' in the same results set but not attributable with certainty to this document."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=lQLTRJlF2fw",
+      "title": "Wrexham Glyndwr University Interview | #ukstudyvisa (Spectrum Overseas)",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Video page returned 403; title and channel confirmed via YouTube oEmbed. Description/questions not readable."
+    },
+    {
+      "url": "https://wrexham.cas-shield.com/",
+      "title": "CAS Shield",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Subdomain resolved and served a page titled only 'CAS Shield' (no university name shown). Weak evidence of an Enroly CAS Shield tenant; not confirmed by any official page."
+    }
+  ],
+  "searchesRun": [
+    "Wrexham University credibility interview questions",
+    "\"Wrexham University\" pre-CAS interview questions",
+    "\"Wrexham University\" OR \"Wrexham Glyndwr\" pre-CAS interview questions Nepal OR India experience (not executed: session search budget exhausted)"
+  ]
+}

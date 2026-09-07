@@ -1,0 +1,128 @@
+{
+  "institutionId": "inst-university-of-roehampton",
+  "name": "University of Roehampton",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.roehampton.ac.uk/globalassets/documents/visas-and-immigration/credibility-interviews-0318.pdf/",
+      "title": "Tier 4 Credibility Interview Guidance (University of Roehampton PDF, 03/2018)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "your background and immigration history",
+        "your previous education",
+        "the studies you are planning to undertake in the UK",
+        "your financial circumstances"
+      ],
+      "quotes": [
+        "Why did you choose Roehampton University?",
+        "Why did you choose your course?",
+        "How do your studies fit into your career plans?",
+        "If the costs of pursuing your course of study are higher in the UK than in your home country, why have you decided to incur the extra costs involved with studying in the UK?",
+        "You have previously studied in the UK - why have you chosen to return?",
+        "You have had a long break in your studies, why are you returning to study now?",
+        "Do you plan to work whilst you study in the UK?",
+        "How will you fund your studies?"
+      ],
+      "questionIds": [
+        "q-09",
+        "q-10",
+        "q-07",
+        "q-201",
+        "q-11",
+        "q-39",
+        "q-76",
+        "q-112",
+        "q-35",
+        "q-20",
+        "q-19",
+        "q-13",
+        "q-46",
+        "q-30",
+        "q-111",
+        "q-140",
+        "q-109",
+        "q-54",
+        "q-114",
+        "q-14",
+        "q-82",
+        "q-81",
+        "q-106",
+        "q-108",
+        "q-16"
+      ],
+      "unmapped": [],
+      "notes": "PDF extracted locally with pypdf (WebFetch could not read it). Home Office staff interview; guidance under each question says interviewer may ask about 'the name and content of modules, course structure (i.e. when modules are studied, how many credits each module is worth etc.) the total number of credits, academic calendar, likely career opportunities and progression'; whether UK family influenced choice; campus vs city lifestyle and knowledge of London; 'maximum of 20 hours per week' work; subsequent years' fees; loan repayment; accommodation cost and cost of living. Interviewer also checks English."
+    },
+    {
+      "url": "https://www.roehampton.ac.uk/student-support/international-students/visas-and-immigration/student-visas/",
+      "title": "International students | Visas and immigration | Student visa(s) | University of Roehampton, London",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "your course, university and intentions of study",
+        "your background and immigration history",
+        "your previous education",
+        "your financial circumstances"
+      ],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "'The 5 – 10 minute interview will be conducted in English and provide assurance that the English language requirements of the Student visa rules are met.' No example questions; links to the PDF above."
+    },
+    {
+      "url": "https://www.scribd.com/document/889854278/Pre-CAS-Interviews-University-of-Roehampton-London",
+      "title": "Roehampton Pre-CAS Interview Guide (Scribd: Pre-CAS Interviews _ University of Roehampton, London)",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Only Scribd metadata readable: 3-page doc 'outlines the process for Pre-CAS interviews as part of the application and CAS request at Roehampton University', deposit may be required, interviews mandatory, assess 'course knowledge, motivation, and financial arrangements'. Indicates Roehampton runs its own Pre-CAS interview. No questions readable."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=inQiJZ73c4s",
+      "title": "University of Roehampton credibility interview questions ❓🇬🇧 credibility interview questions",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title via oEmbed (author RRD_london); description not readable."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=1sSEkPMIfe0",
+      "title": "REAL UK CAS Interview Mock | Roehampton London Pre-CAS Questions & Answers 🇬🇧 Role Play Actors",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title via oEmbed (author 'Beyond Education & Immigration Services'); not fetched."
+    },
+    {
+      "url": "https://www.tiktok.com/@faisalqadeerr/video/7571869029556686098",
+      "title": "Full Credibility Interview at University of Roehampton",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Seen in search results only; not fetched."
+    }
+  ],
+  "searchesRun": [
+    "University of Roehampton credibility interview questions"
+  ]
+}

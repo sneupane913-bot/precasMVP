@@ -1,0 +1,14 @@
+{
+  "institutionId": "inst-queen-mary-university-of-london",
+  "name": "Queen Mary University of London",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [],
+  "searchesRun": [
+    "Queen Mary University of London credibility interview pre-CAS questions",
+    "site:qmul.ac.uk credibility interview OR \"pre-CAS\" interview",
+    "Bing: Queen Mary University of London pre-CAS credibility interview questions (Bing HTML results page fetched via WebFetch after the WebSearch budget was exhausted; it returned unrelated results (recorded for completeness, no evidence taken).)",
+    "curl probe: qmul.cas-shield.com (did not resolve)"
+  ],
+  "notes": "No official QMUL page about credibility or pre-CAS interviews was found; search results were only medicine admissions interviews, careers-service interview practice and job-interview sites (Glassdoor/Indeed). No student reports naming QMUL pre-CAS questions were found. Nothing recorded."
+}

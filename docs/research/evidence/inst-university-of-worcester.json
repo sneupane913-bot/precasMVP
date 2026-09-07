@@ -1,0 +1,63 @@
+{
+  "institutionId": "inst-university-of-worcester",
+  "name": "University of Worcester",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.worcester.ac.uk/study/International/international-applicants/visas-and-immigration.aspx",
+      "title": "Visas and immigration - University Of Worcester",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Only sentence on the topic: 'You may need to attend a credibility interview before a CAS is issued, which satisfies that you are a genuine student and that your English Language ability is at the correct level.' Search snippet for this page adds: 'This process is undertaken by the Admissions and International Experience Teams.' No example questions anywhere on worcester.ac.uk found."
+    },
+    {
+      "url": "https://www.worcester.ac.uk/study/find-a-course/how-to-apply/international-applications.aspx",
+      "title": "International applications - University Of Worcester",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched; contains no mention of credibility or pre-CAS interviews."
+    },
+    {
+      "url": "https://www.realdreamsedu.com/university-of-worcester/",
+      "title": "University of Worcester - Best International University (Real Dreams Education, Nepal)",
+      "tier": "consultancy",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "English waiver interview in English"
+      ],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Nepali consultancy page. Verbatim: 'Nepalese students can now apply to non-nursing courses at Worcester University based on (65%) 2.6 in English for the Year 12 HSC to waive the English test requirement. As part of the application process, students must attend an interview in English.' 'The interview link will be sent to the Student. After Passing the interview, they will receive an offer letter.' Search snippet: interview 'scheduled after the offer is issued and before a deposit is made'. No questions listed."
+    },
+    {
+      "url": "https://worcester.cas-shield.com/",
+      "title": "CAS Shield",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Subdomain resolved and served a page titled only 'CAS Shield' (no university name shown). Weak evidence of an Enroly CAS Shield tenant; not confirmed by any official page."
+    }
+  ],
+  "searchesRun": [
+    "University of Worcester credibility interview pre-CAS questions",
+    "University of Worcester pre-CAS interview international students",
+    "\"University of Worcester\" credibility interview questions international CAS (not executed: session search budget exhausted)"
+  ]
+}

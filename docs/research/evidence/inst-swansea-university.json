@@ -1,0 +1,113 @@
+{
+  "institutionId": "inst-swansea-university",
+  "name": "Swansea University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "sources": [
+    {
+      "url": "https://www.swansea.ac.uk/media/Credibility-interview-information.pdf",
+      "title": "Credibility and time limits (Swansea University credibility interview information PDF)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Your Immigration history",
+        "Your previous study, study and career plans",
+        "Financing your studies and your life in the UK"
+      ],
+      "quotes": [
+        "You will be asked questions about any previous visits you have made to the UK and to other countries. They will ask you why you went there, how long you stayed, whether you left before your visa ended.",
+        "They may also ask what connections you have in other countries, such as family members or friends.",
+        "They will ask you about your educational history up to date, and ask you how your course in the UK fits in with your plans for your career in the future.",
+        "You need to be ready to answer questions about the content of the course, so use the university prospectus and web site to research about your course.",
+        "You will be asked why you have to study with us rather than at another university or college, so you should use our web site to get information about us and about the city of Swansea.",
+        "If you are returning to study after a long break, you will be asked to explain why.",
+        "There will be questions about how you are going to fund your studies and your living costs. They may ask you where the money has come from.",
+        "Be clear about the amounts you have to show in the bank to meet the visa requirements. You must not assume that you can work part-time in the UK to support your studies.",
+        "They may ask why you are going to the UK when it would be cheaper to study in your country or in another country."
+      ],
+      "questionIds": [
+        "q-62",
+        "q-168",
+        "q-90",
+        "q-169",
+        "q-35",
+        "q-03",
+        "q-19",
+        "q-20",
+        "q-11",
+        "q-123",
+        "q-09",
+        "q-38",
+        "q-10",
+        "q-109",
+        "q-140",
+        "q-14",
+        "q-104",
+        "q-50",
+        "q-157",
+        "q-54",
+        "q-30",
+        "q-98"
+      ],
+      "unmapped": [],
+      "notes": "PDF extracted locally with pypdf. Describes the UKVI interview, not a university pre-CAS interview: 'The interview will be done by video-conference in English and you must answer in English, without the help of an interpreter'; 'The person carrying out the interview will write down your answers and send them to the Visa Officer'; 'The interview will normally be done at the same time as you attend for biometrics'; 'If you are from one of the low-risk countries, you will likely not be interviewed'; non-attendance can lead to refusal; a face-to-face follow-up at the VAC is possible. Quotes are the document's verbatim topic statements, not literal questions."
+    },
+    {
+      "url": "https://www.swansea.ac.uk/admissions/confirmation-of-acceptance-for-studies-cas/",
+      "title": "Confirmation of Acceptance for Studies (CAS) - Swansea University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "No interview questions. Page describes CAS Shield as the online self-service system where applicants upload documents and complete questionnaires for the CAS."
+    },
+    {
+      "url": "https://www.swansea.ac.uk/media/CAS-Information-document.pdf",
+      "title": "Confirmation of Acceptance for Studies (CAS) from Swansea University (PDF)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [
+        "The UKVI undertake credibility interviews carried out as part of the Student visa application process. It is essential that you are well-prepared in advance of these interviews, as questions can cover a wide variety of subjects. In order to help you prepare, see our Credibility Interview Guide."
+      ],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched with curl and extracted with pypdf. Only points to the Credibility Interview Guide; no questions."
+    },
+    {
+      "url": "https://swansea.cas-shield.com/",
+      "title": "CAS Shield",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "swansea.cas-shield.com resolves (HTTP 200) and serves Enroly's CAS Shield login page (page text contains 'Enroly' and 'CAS Shield'), so Swansea University uses Enroly CAS Shield for its CAS process. Enroly pre-CAS interviews draw randomised questions from themed banks; no question list is published on the site."
+    },
+    {
+      "url": "https://www.facebook.com/groups/164167452272529/posts/1323935259629070/",
+      "title": "Swansea University er CAS interview ki keo diyechhen? Is ...",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Search-result title only (Bengali: asking whether anyone has done the Swansea CAS interview). Not fetched; no questions recorded."
+    }
+  ],
+  "searchesRun": [
+    "Swansea University credibility interview pre-CAS interview questions",
+    "Swansea University pre-CAS interview questions asked YouTube OR scribd OR reddit (WebSearch budget exhausted - not performed)",
+    "Bing: Swansea University pre-CAS interview questions (Bing HTML results page fetched via WebFetch after the WebSearch budget was exhausted; it returned unrelated results (recorded for completeness, no evidence taken).)",
+    "curl probe: swansea.cas-shield.com"
+  ]
+}

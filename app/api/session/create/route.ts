@@ -304,9 +304,22 @@ export async function POST(req: Request) {
   const questionLimit = isPractice
     ? 1
     : Math.min(ent.questionsAllowed, institution.questionCount);
+  /**
+   * Q-11. Everything this student has already been asked, from the sittings
+   * listed above (no second read of the store). A sitting counts once it has
+   * an answer or is complete; a paper that was opened and never started was
+   * never heard, so it is not "seen".
+   */
+  const seen = new Set<string>();
+  for (const x of await store.listByStudent(student.id)) {
+    if ((x.answers?.length ?? 0) > 0 || x.status === 'completed') {
+      for (const qid of x.questionIds) seen.add(qid);
+    }
+  }
+  const planOpts = { seen, institutionId: institution.id };
   const questionIds = isPractice
-    ? buildPracticePlan(parsed.category ?? (await weakestCategoryFor(student.id)) ?? undefined)
-    : buildQuestionPlan(questionLimit);
+    ? buildPracticePlan(parsed.category ?? (await weakestCategoryFor(student.id)) ?? undefined, planOpts)
+    : buildQuestionPlan(questionLimit, planOpts);
 
   // Bind the session to this browser so nobody else can read the transcript.
   const ownerId = await ensureOwnerId();

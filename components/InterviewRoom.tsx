@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Institution, PublicQuestion } from '@/lib/types';
+import { LIKELIHOOD_LABEL } from '@/lib/data/university-evidence';
 import { FLAG_META } from '@/lib/types';
 import { useMonitor } from '@/lib/useMonitor';
 import { MonitorPanel } from '@/components/MonitorPanel';
@@ -846,9 +847,33 @@ export function InterviewRoom({
             </div>
           )}
 
-          <h1 className="mb-5 font-serif text-title font-bold leading-snug text-ink">
+          <h1 className="mb-2 font-serif text-title font-bold leading-snug text-ink">
             {question.text}
           </h1>
+
+          {/* Q-14. Why this question is on THIS university's paper. One line,
+              with the level and the reason; the URL lives on the evidence
+              page, not in the room, where a link is a way to leave. */}
+          {question.likelihood ? (
+            <p className="mb-5 text-sm text-ink-quiet">
+              <span
+                className={`mr-2 rounded-md px-2 py-0.5 text-micro font-bold uppercase tracking-wide ${
+                  question.likelihood.level === 'very_likely'
+                    ? 'bg-go-tint text-go-dark'
+                    : question.likelihood.level === 'likely'
+                      ? 'bg-info-tint text-info'
+                      : 'bg-surface-sunk text-ink-soft'
+                }`}
+              >
+                {question.likelihood.level === 'general'
+                  ? LIKELIHOOD_LABEL.general
+                  : `${LIKELIHOOD_LABEL[question.likelihood.level]} at ${institution.shortName || institution.name}`}
+              </span>
+              {question.likelihood.reason}
+            </p>
+          ) : (
+            <div className="mb-5" />
+          )}
 
           {/* ---- Live flag, placed where the eye already is ---- */}
           {latestFlag && phase === 'recording' && (

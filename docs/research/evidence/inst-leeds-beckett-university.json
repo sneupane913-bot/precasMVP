@@ -1,0 +1,112 @@
+{
+  "institutionId": "inst-leeds-beckett-university",
+  "name": "Leeds Beckett University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.leedsbeckett.ac.uk/-/media/files/international/credibility-interviews.pdf",
+      "title": "Credibility interviews – points to consider (Leeds Beckett University PDF)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Reasons for choosing course",
+        "Reasons for choosing Leeds Beckett University",
+        "Reasons for choosing the UK",
+        "Funding your study in the UK",
+        "Other things to think about (gap in study, career path)"
+      ],
+      "quotes": [
+        "Why did you choose Leeds Beckett University over other universities?",
+        "What research did you do into Leeds Beckett University? For example, did you research our facilities, campuses, accommodation etc?",
+        "How will your choice of Leeds Beckett University benefit you in your chosen subject?",
+        "Why did you choose study in the UK rather than in your home country?",
+        "Why did you choose study in the UK over study in another English-speaking country?",
+        "Benefits of this course for your chosen career path",
+        "Your prior interest in this subject – are you a member of a professional body associated with this area for example?",
+        "Any previous study you have already undertaken in this subject area",
+        "How you plan to use what you will learn on your chosen course when you return to your home country.",
+        "Think about how you will intend to fund yourself during your studies in the UK. How will you get your funds? If your parents are funding you then think about where their funds are coming from, and how they will afford this.",
+        "If you will be staying off campus think about how you intend to travel in to the University – can you afford to pay for frequent bus travel for example? Research into how far your intended accommodation is from campus and how much this may cost you.",
+        "Think about any other costs that might be involved in studying in the UK (books, travel, food, hobbies etc)",
+        "If you have a gap in study be prepared to explain what you have been doing during the time since you were last in education (e.g. working). Think about how this gap will benefit you in your intended study.",
+        "Think about your intended career path and how your chosen subject will benefit it in the future."
+      ],
+      "questionIds": [
+        "q-04",
+        "q-05",
+        "q-07",
+        "q-08",
+        "q-09",
+        "q-14",
+        "q-15",
+        "q-16",
+        "q-17",
+        "q-19",
+        "q-20",
+        "q-27",
+        "q-38",
+        "q-98",
+        "q-99",
+        "q-100",
+        "q-101",
+        "q-104",
+        "q-107",
+        "q-108",
+        "q-109",
+        "q-146",
+        "q-152",
+        "q-159",
+        "q-185",
+        "q-202"
+      ],
+      "unmapped": [],
+      "notes": "PDF downloaded by WebFetch and text extracted locally (pypdf). Written as 'points to consider' for the UKVI credibility interview; items are phrased partly as questions and partly as prompts. Also notes International Foundation / Pre-sessional applicants should think about the course they progress to."
+    },
+    {
+      "url": "https://isc.leedsbeckett.ac.uk/how-to-apply/visa-information",
+      "title": "Visa information | Leeds Beckett University ISC",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "the International Study Centre",
+        "accommodation options, costs, and the local area",
+        "your chosen course content",
+        "employment / work placement"
+      ],
+      "quotes": [
+        "Why did you choose the the International Study Centre?",
+        "Did you consider other courses?",
+        "Why do you want to study in the UK?"
+      ],
+      "questionIds": [
+        "q-07",
+        "q-09",
+        "q-42"
+      ],
+      "unmapped": [],
+      "notes": "Fetched. Study Group pathway college page (Leeds Beckett International Study Centre). UKVI interview 'normally take place in your local Visa Application Centre, via a video link. You will be interviewed by an ECO based in the UK.' Employment guidance: 'Make clear that your main purpose for being in the UK is to study, and that any employment or work placement would be to gain practical work experience in your field of study.'"
+    },
+    {
+      "url": "https://isc.leedsbeckett.ac.uk/how-to-apply/before-you-arrive",
+      "title": "Before you arrive | Leeds Beckett University ISC",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched. Only mentions a 'Readiness Check (if required)' step in the CAS process; no questions. A search snippet (source page not identified, so not recorded as its own URL) said: 'The UK Visa and Compliance Team conduct Readiness Checks to help prepare for a UKVI credibility interview and reduce chances of visa refusal. If you have been identified as requiring a Readiness Check, you must attend one before your CAS can be issued.'"
+    }
+  ],
+  "searchesRun": [
+    "Leeds Beckett University credibility interview questions",
+    "Leeds Beckett University pre-CAS interview",
+    "site:leedsbeckett.ac.uk credibility interview",
+    "(budget exhausted, not run) Leeds Beckett University CAS Shield OR Enroly pre-CAS interview readiness check"
+  ],
+  "researcherNotes": "Leeds Beckett's own pre-CAS step is called a 'Readiness Check'; no CAS Shield/Enroly mention found. No student-report pages naming Leeds Beckett with readable questions were found."
+}

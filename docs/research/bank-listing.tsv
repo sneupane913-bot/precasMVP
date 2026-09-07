@@ -1,0 +1,211 @@
+id	category	kind	text
+q-01	identity	root	Please introduce yourself briefly.
+q-02	identity	root	Can you confirm the course and the university you have applied to, and when it starts?
+q-03	education	root	Tell me about your previous qualification and why you chose that subject.
+q-04	education	root	How does your previous study connect with the course you want to study now?
+q-05	study_gap	root	What have you been doing since you finished your last qualification?
+q-06	study_gap	root	How will your work experience help you in this course?
+q-07	why_uk	root	Why do you want to study in the UK rather than in Nepal?
+q-08	why_uk	root	Did you consider Australia, Canada or the USA? Why did you choose the UK instead?
+q-09	why_university	root	Why did you choose {{university}}?
+q-10	why_university	root	What do you know about {{city}}, where you will be living?
+q-11	why_course	root	Which modules will you study on this course, and which one interests you most?
+q-12	why_course	root	How is this course assessed? Exams, coursework or both?
+q-13	progression	root	This course is at the same level as your previous qualification. Why do you need it?
+q-14	finance	root	How will you pay your tuition fees and your living costs?
+q-15	finance	root	Who is your sponsor, what do they do, and roughly what do they earn?
+q-16	finance	root	What do you think your monthly living costs in the UK will be?
+q-17	accommodation	root	Where do you plan to live, and how will you travel to campus?
+q-18	immigration	root	Have you applied for a visa to any country before? Have you ever been refused?
+q-19	future_plans	root	What do you plan to do after you complete this course?
+q-20	future_plans	root	How will this qualification help you specifically, back in Nepal?
+q-21	conversational	root	Tell me about a challenge you faced recently and how you handled it.
+q-22	conversational	root	Is there anything else you would like to add before we finish?
+q-23	identity	root	What do you do at the moment — are you working or studying?
+q-24	education	root	What grades did you get in your last qualification, and which subjects did you do best in?
+q-25	education	root	Where did you complete your schooling and your last qualification, and under which board or university?
+q-26	education	root	Have you studied outside your home country before?
+q-27	study_gap	root	What did you learn in your time away from study that will help you on this course?
+q-28	study_gap	root	Why did you not continue your studies immediately after your last qualification?
+q-29	why_uk	root	What do you know about studying and living in the UK?
+q-30	why_uk	root	Studying in the UK costs much more than studying at home. Why is it worth it for you?
+q-31	why_uk	root	Why are you applying for this intake rather than an earlier or a later one?
+q-32	why_uk	root	What challenges do you expect as an international student, and how will you deal with them?
+q-33	why_university	root	How did you first find out about {{university}}?
+q-34	why_university	root	Which other universities did you apply to, and what offers did you receive?
+q-35	why_university	root	Do you know anyone who has studied at {{university}} or who lives in the UK?
+q-36	why_university	root	How big is {{university}}, and what kind of university is it?
+q-37	why_university	root	What support does {{university}} offer international students?
+q-38	why_university	root	Why {{university}}, when other universities offer the same course?
+q-39	why_course	root	How is your course structured — what happens in each semester or term?
+q-40	why_course	root	How long is your course, and what exact qualification will you hold when you finish?
+q-41	why_course	root	Does your course carry any professional recognition, accreditation or placement?
+q-42	why_course	root	Which other courses did you consider before choosing this one?
+q-43	why_course	root	What were the entry requirements for your course, and how did you meet them?
+q-44	why_course	root	What will you do if the course turns out to be harder than you expected?
+q-45	why_course	root	What do you already know about the subject you are about to study?
+q-46	progression	root	How is this course a clear step up from what you have already studied?
+q-47	finance	root	How much are your tuition fees, and how much have you already paid?
+q-48	finance	root	Can you pay your tuition fees in full, and when is the rest of the money due?
+q-49	finance	root	Besides your main sponsor, do you have any other funding — savings, scholarships, or family support?
+q-50	finance	root	Do you know how much money you must show for living costs, and is it ready?
+q-51	finance	root	Will you have access to this money for your whole time in the UK? Whose name is the account in?
+q-52	finance	root	How will your family manage their own living costs while also paying for your studies?
+q-53	finance	root	Have you checked the refund policy — what happens to your money if your visa is refused?
+q-54	finance	root	Do you plan to work part-time in the UK, and does your budget depend on it?
+q-55	finance	root	Who decided the budget for your studies, and how was the decision made at home?
+q-56	accommodation	root	What research have you done on accommodation — what did you compare, and what will it cost?
+q-57	accommodation	root	Will you live on campus or off campus, and why?
+q-58	accommodation	root	What do you know about the cost of living in {{city}} compared with other UK cities?
+q-59	accommodation	root	Who will you live with in the UK, and do you have relatives there?
+q-60	accommodation	root	This will be your first time living alone. How will you manage daily life — cooking, laundry, budgeting?
+q-61	immigration	root	What are the conditions of a UK Student visa — what are you allowed and not allowed to do?
+q-62	immigration	root	Have you ever travelled abroad before — for study, work or a visit?
+q-63	immigration	root	Do you know what happens to your visa if you stop attending or fail your course?
+q-64	immigration	root	Are you planning to transfer to a different university after you arrive in the UK?
+q-65	immigration	root	Did you use an education consultancy or agent, and what did they help you with?
+q-66	future_plans	root	Are you planning to stay in the UK after your course finishes?
+q-67	future_plans	root	What will you do if your visa application is refused?
+q-68	future_plans	root	Where do you see yourself five years from now?
+q-69	future_plans	root	Are you planning further study after this course, or is this the final qualification you need?
+q-70	future_plans	root	What will you do if you cannot find a job in your field straight after graduating?
+q-71	conversational	root	Tell me about your home town and what you like about it.
+q-72	conversational	root	What do you enjoy doing outside your studies and work?
+q-73	education	root	Did you have any failed subjects, backlogs or repeated years in your previous studies?
+q-74	why_uk	root	Why should you be granted a student visa? What makes you a genuine student?
+q-75	why_course	root	Who is your course leader or programme director, and have you looked at who teaches your course?
+q-76	why_course	root	How many credits does your course carry, and roughly how are they spread across modules?
+q-77	why_course	root	Does your course offer optional modules? Which ones do you plan to choose, and why?
+q-78	why_university	root	Which campus will your course be taught on, and what do you know about it?
+q-79	why_university	root	How is teaching at a UK university different from how you studied in Nepal, and how will you adjust?
+q-80	finance	root	Do you have any personal savings of your own, separate from your sponsor?
+q-81	finance	root	If you have a scholarship or discount, what exactly does it cover — and what do you still pay yourselves?
+q-82	finance	root	You have planned for the first year. How will you cover the second year, or the rest of your course?
+q-83	finance	root	What happens to your studies if your sponsor’s circumstances change — a bad year in the business, or a job loss?
+q-84	finance	root	How will you manage unexpected costs — an emergency trip home, a medical need, a laptop that dies?
+q-85	finance	root	What documents will you show to prove your funding — and have you read them yourself?
+q-86	accommodation	root	What is the weather like in {{city}} for most of the year, and what does an ordinary meal cost there?
+q-87	accommodation	root	What is your weekly budget in the UK, and how did you arrive at that number?
+q-88	immigration	root	Will any dependants — a spouse or children — travel with you or join you in the UK later?
+q-89	immigration	root	Tell me about your family’s immigration history. Has anyone applied to live, work or study abroad?
+q-90	immigration	root	Have you ever overstayed a visa, or broken the conditions of one, in any country?
+q-91	immigration	root	Do you or your immediate family have any pending immigration or residency applications in another country?
+q-92	future_plans	root	What ties do you have at home in Nepal — family, property, work — that will bring you back?
+q-93	future_plans	root	Salaries in the UK are much higher than in Nepal. Why would you actually come back?
+q-94	future_plans	root	What research have you done into the job market this course leads to?
+q-95	conversational	root	What was the most interesting topic in the subject you studied most recently?
+q-96	conversational	root	Tell me about a recent book, news story or topic that interested you.
+q-97	conversational	root	Tell me about a typical day in your life at the moment.
+q-98	why_uk	probe	Why not study this course in your home country?
+q-99	why_uk	probe	Which other countries did you consider, and what made you decide on the UK?
+q-100	why_university	probe	Which other universities did you consider?
+q-101	why_university	probe	What facilities are you expecting at {{university}} for your subject?
+q-102	why_course	probe	What will you actually learn in the modules you just named?
+q-103	why_course	probe	Do you know what level your course is at?
+q-104	finance	probe	Where did the money in that bank account come from?
+q-105	finance	probe	What does your sponsor do, and how many people depend on that income?
+q-106	finance	probe	Have you taken a loan? How will you pay it back?
+q-107	accommodation	probe	How far is that from campus, and how will you get to class?
+q-108	accommodation	probe	How much will your accommodation cost each week?
+q-109	study_gap	probe	Why is there such a long gap between your last course and this one?
+q-110	study_gap	probe	What was your monthly salary in that job?
+q-111	education	probe	Have you studied in the UK before? Why are you studying here again?
+q-112	future_plans	probe	What jobs could you actually do after this course?
+q-113	future_plans	probe	What salary do you expect when you go home?
+q-114	immigration	probe	Do you know how many hours you are allowed to work during term time?
+q-115	immigration	probe	Have you made any previous visa applications? Were they successful?
+q-116	finance	probe	How long have those funds been in the account?
+q-117	finance	probe	Are those funds still in the account today?
+q-118	finance	probe	Your statement shows a large deposit shortly before the application. Where did that come from?
+q-119	finance	probe	You said your sponsor is not your parent. When did you last meet them, and why are they funding you?
+q-120	accommodation	probe	How does that rent fit inside the monthly budget you described?
+q-121	accommodation	probe	Where did that accommodation figure come from — which website, page or person?
+q-122	why_university	probe	You had offers from other universities. Why did you turn those down?
+q-123	why_course	probe	Leave the module names aside — explain to me in your own words what your course is actually about.
+q-124	education	probe	Your new course is quite different from what you studied before. Why the change of field?
+q-125	immigration	probe	What will your spouse do while you are studying in the UK?
+q-126	immigration	probe	You mentioned a previous visa. Did you comply fully with its conditions?
+q-127	future_plans	probe	You said you will return to Nepal to work. Which companies or organisations would you actually apply to?
+q-128	study_gap	probe	During that gap, was it work, exam preparation, or family responsibility — walk me through it.
+q-129	identity	root	Tell me about yourself: where you are from, what you have studied, and what you are doing now.
+q-130	identity	root	What is your current occupation, and how long have you been doing it?
+q-131	identity	root	What was the last course you completed, and when did you finish it?
+q-132	identity	root	Tell me about your family. Who do you live with, and what do they do?
+q-133	identity	root	Which English test did you take, what score did you get, and which part was hardest for you?
+q-134	identity	root	Do you know why this interview is taking place, and what we are trying to find out?
+q-135	identity	root	How did you prepare for this interview?
+q-136	education	root	What was your final percentage or GPA, and how does it compare with what {{university}} asked for?
+q-137	education	root	If you have studied in the UK before, did you complete that course, and how much of your Student visa time limit have you used?
+q-138	education	root	Does anyone in your family have a degree, or has anyone studied overseas before you?
+q-139	education	root	Describe one project or assignment from your previous studies that prepared you for this course.
+q-140	study_gap	root	Why are you returning to study now, rather than two years ago or two years from now?
+q-141	study_gap	root	After a break from study, what makes you confident you can cope with full-time academic work again?
+q-142	study_gap	root	Between finishing your last course and today, which months were you not working and not studying, and what were you doing then?
+q-143	why_uk	root	What is different about how a UK university teaches, and why does that suit you?
+q-144	why_uk	root	Walk me through how you decided on the UK. What did you compare, and who did you talk to?
+q-145	why_uk	root	Could you have studied this subject in Nepal? What would you miss by studying at home?
+q-146	why_university	root	What did you find out about {{university}} that you could not have said about any other university?
+q-147	why_university	root	Where exactly is {{university}}, and how would you get there from the airport on your first day?
+q-148	why_university	root	Have you spoken to any current students or graduates of {{university}}? What did they tell you?
+q-149	why_university	root	Who first suggested {{university}} to you, and what did you check for yourself before accepting the offer?
+q-150	why_university	root	Which service or facility at {{university}} will you actually use in your first term, and why?
+q-151	why_course	root	Name three core modules of your course, and explain what one of them actually covers.
+q-152	why_course	root	What first made you interested in this subject, and when did you decide to study it at this level?
+q-153	why_course	root	You could study this subject at many universities. What is different about the version of the course at {{university}}?
+q-154	why_course	root	What can you do today, and what will you be able to do after this course that you cannot do now?
+q-155	progression	root	You already hold a qualification at this level. What does a second one add that your first did not?
+q-156	progression	root	Why are you not continuing in the field you studied before?
+q-157	finance	root	For a student at {{university}}, how much does UKVI say you must show for living costs, and for how many months?
+q-158	finance	root	Have you paid a tuition deposit? How much, when, and from which account did it go?
+q-159	finance	root	How did your sponsor build up the money for your studies, and over how long?
+q-160	finance	root	If you have an education loan, which bank is it from, how much is sanctioned, and has it been paid out yet?
+q-161	finance	root	Does anyone other than your family contribute: a scholarship, an employer, a government scheme? What exactly does it cover?
+q-162	finance	root	If you work part-time in the UK, what would you realistically earn, and does your plan depend on it?
+q-163	accommodation	root	Have you already arranged your accommodation, or when and how will you do it?
+q-164	accommodation	root	Apart from the university, why {{city}}? What do you know about living there as a student?
+q-165	accommodation	root	What happens in your first week in the UK? Where will you sleep on night one, and what will you sort out first?
+q-166	accommodation	root	What will you find hardest about daily life in {{city}} compared with home, and what have you done to prepare for it?
+q-167	immigration	root	Do you know what the Graduate visa is, and are you planning to use it?
+q-168	immigration	root	Have you ever been to the UK before, even as a visitor? When, and for what purpose?
+q-169	immigration	root	Do you have close relatives living outside Nepal, in the UK or anywhere else? Where, and what is their status?
+q-170	immigration	root	What are three things you are required to do, or not allowed to do, while on a Student visa?
+q-171	future_plans	root	What job title will you apply for when you go back to Nepal, and what is a realistic starting salary for it?
+q-172	future_plans	root	Is there a specific job, business or responsibility waiting for you in Nepal when you finish?
+q-173	future_plans	root	If you were offered a good job in the UK after graduating, what would you do?
+q-174	future_plans	root	After this course, is your next step a job or more study? If more study, where, and who would pay?
+q-175	future_plans	root	Name two employers in Nepal who hire people with this qualification, and what they would hire you to do.
+q-176	conversational	root	How will you spend your semester breaks and your free time in the UK?
+q-177	conversational	root	Describe a time you had to manage on your own without your family. What did you learn from it?
+q-178	conversational	root	Some people would say you should be settling into a career at your age, not starting a course. What would you say to them?
+q-179	finance	probe	You mentioned a land sale. When was it registered, and where is the sale document?
+q-180	finance	probe	What is your sponsor's income after their own household costs, and is that enough for your second year?
+q-181	finance	probe	If we rang your sponsor's bank today, would they confirm the balance on the statement you submitted?
+q-182	finance	probe	Your loan repayment starts after the course. How much is it a month, and how does that fit the salary you expect?
+q-183	why_course	probe	You named a module. What is one assignment or exam you will have to pass in it?
+q-184	why_course	probe	Who teaches that module, or what research is the department known for?
+q-185	accommodation	probe	You said you will live off campus. Which bus or train would you take, and how much would that cost a month?
+q-186	accommodation	probe	If that hall is full when you apply, what is your second option and what does it cost?
+q-187	immigration	probe	You mentioned a refusal. What reason did the refusal letter give, and what has changed since then?
+q-188	immigration	probe	You mentioned family who might join you. Do you know who is allowed to bring dependants on a Student visa now?
+q-189	education	probe	You mentioned a backlog. How many attempts did it take, and what did you do differently the last time?
+q-190	education	probe	Which specific part of your old degree will you actually use on this course?
+q-191	study_gap	probe	What documents could you show for that time, such as an employment letter, a pay slip or an exam registration?
+q-192	study_gap	probe	At that salary, how much of your own savings did you manage to put towards this course?
+q-193	why_uk	probe	What was the total cost of the option you rejected, compared with this one?
+q-194	why_uk	probe	You mentioned the UK education system. What is one rule or feature of it you only learned during your research?
+q-195	why_university	probe	What did the university you rejected offer that {{university}} does not?
+q-196	why_university	probe	How far is the campus from the city centre of {{city}}, and what is around it?
+q-197	future_plans	probe	You named an employer. What would they need to see from you, beyond the degree, to hire you?
+q-198	future_plans	probe	What is the exact month your visa ends, and what will you be doing in the month after that?
+q-199	future_plans	probe	Who in Nepal is counting on you to come back, and what happens to them if you do not?
+q-200	conversational	probe	Explain that same answer again in different words, as if I had not understood you.
+q-201	why_course	root	Why did you choose this course, and how does it relate to what you studied before?
+q-202	why_university	root	What facilities does {{university}} have for your course?
+q-203	why_course	root	Which modules will you study in your first semester, and which ones come later?
+q-204	conversational	root	How will you handle the cultural differences you will meet in the UK?
+q-205	why_university	root	What excites you most about studying at {{university}}?
+q-206	why_university	root	Can you name any rankings, achievements or special features of {{university}}?
+q-207	future_plans	root	What is your biggest dream in life, and how does this course fit into it?
+q-208	conversational	root	How will you balance your studies, your social life and any part-time work in the UK?
+q-209	conversational	root	Imagine it is your first week at {{university}}. What is the first thing you will do after your classes finish?
+q-210	conversational	root	How will you deal with loneliness, homesickness or stress during your time in the UK?

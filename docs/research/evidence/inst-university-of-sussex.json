@@ -1,0 +1,118 @@
+{
+  "institutionId": "inst-university-of-sussex",
+  "name": "University of Sussex",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "sources": [
+    {
+      "url": "https://student.sussex.ac.uk/international/visas/applying/interviews",
+      "title": "Credibility interviews : University of Sussex",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Example University of Sussex Questions",
+        "Example Accommodation Questions",
+        "Example Travel Questions",
+        "Example Finance Questions",
+        "Example Course Questions",
+        "Example Research Questions",
+        "Example Future Plans Questions"
+      ],
+      "quotes": [
+        "What do you know about the University of Sussex?",
+        "Where did you find information about Sussex, and how did this influence your decision?",
+        "Who helped you make your decision to study at Sussex?",
+        "Can you find the University of Sussex on a map?",
+        "Sussex is a campus university – what attracts you to the student lifestyle on a campus rather than in a city location?",
+        "Have you planned your living arrangements in Sussex?",
+        "What type of accommodation will you choose (halls of residence, with family, shared rented, privately rented etc)?",
+        "What are the advantages and disadvantages of this type of accommodation?",
+        "How much will your accommodation cost?",
+        "How do people travel around Sussex?",
+        "How long will it take to get to the University of Sussex campus?",
+        "Do you know how much you are likely to spend travelling to university?",
+        "Do you know about student travel discounts?",
+        "How much money will you need to live in Sussex?",
+        "How are you funding your studies and living costs?",
+        "Are you planning to work part-time while you are studying?",
+        "What do you know about the course you will study at Sussex?",
+        "Why did you choose to study in the UK?",
+        "Are their similar courses available in your home country?",
+        "What other UK universities could you have chosen? Why didn't you?",
+        "What factual information do you know about Sussex?",
+        "Do you know the position of the University of Sussex in university league tables?",
+        "What are your future plans after you graduate?",
+        "How will your time at Sussex help you in achieving your goals?",
+        "How do your studies fit into your career plans?"
+      ],
+      "questionIds": [
+        "q-36",
+        "q-206",
+        "q-33",
+        "q-149",
+        "q-65",
+        "q-147",
+        "q-163",
+        "q-57",
+        "q-108",
+        "q-17",
+        "q-107",
+        "q-185",
+        "q-16",
+        "q-14",
+        "q-54",
+        "q-123",
+        "q-11",
+        "q-07",
+        "q-98",
+        "q-145",
+        "q-100",
+        "q-122",
+        "q-19",
+        "q-20"
+      ],
+      "unmapped": [
+        "Sussex is a campus university – what attracts you to the student lifestyle on a campus rather than in a city location?",
+        "What are the advantages and disadvantages of this type of accommodation?",
+        "Do you know about student travel discounts?"
+      ],
+      "notes": "Official example-question list, grouped by theme. Page gives no format/duration details. Mapping notes: 'How do people travel around Sussex?' mapped to q-17 (travel to campus); 'What factual information do you know about Sussex?' and the league-table question mapped to q-206."
+    },
+    {
+      "url": "https://student.sussex.ac.uk/international/visas/applying/cas",
+      "title": "Confirmation of Acceptance for Studies : University of Sussex",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "your reasons for studying in the UK and at the University of Sussex",
+        "your plans during your studies and after you complete your course"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-07",
+        "q-09",
+        "q-19"
+      ],
+      "unmapped": [],
+      "notes": "Verbatim: 'You may be asked to complete a pre-CAS interview on CAS Shield. This is a video interview where you film yourself answering set questions.' 'Before we can issue you a CAS, you will be expected to meet certain UK Visas and Immigration (UKVI) guidelines. These checks are completed through CAS Shield.' 'We recommend that you prepare original and personal answers using the resources on our website. Avoid giving generic answers that could apply to any other university or country of study.' Search snippet for this page: a short questionnaire precedes the video interview, 'answering questions around your reasons for studying in the UK and at the University of Sussex' and 'about your plans during your studies and after you complete your course'. questionIds here are mapped from those topic areas, not verbatim questions. Confirms CAS Shield."
+    },
+    {
+      "url": "https://sussex.cas-shield.com/",
+      "title": "CAS Shield",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Subdomain resolved and served a page titled 'CAS Shield'. Consistent with the official CAS page naming CAS Shield. Questions are randomised from themed banks; no list available."
+    }
+  ],
+  "searchesRun": [
+    "University of Sussex credibility interview pre-CAS questions",
+    "\"University of Sussex\" pre-CAS interview questions YouTube"
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "institutionId": "inst-york-st-john-university",
+  "name": "York St John University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "sources": [
+    {
+      "url": "https://www.yorksj.ac.uk/international/international-offer-holders/preparing-for-cas/",
+      "title": "Preparing for CAS | York St John University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": true,
+      "topics": [
+        "your background, study plans, career and finances",
+        "why you want to study in the UK and particularly at York St John",
+        "what attracted you to study your chosen course at York St John University as opposed to other institutions offering the same course in the UK and abroad",
+        "how this course relates to your previous and current studies or work experience, and how this course will shape and develop your career",
+        "how you plan to finance the course fees, living costs and accommodation payments",
+        "you may be asked to outline the total costs involved in studying there"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-07",
+        "q-09",
+        "q-153",
+        "q-38",
+        "q-201",
+        "q-04",
+        "q-06",
+        "q-20",
+        "q-14",
+        "q-47",
+        "q-16"
+      ],
+      "unmapped": [],
+      "notes": "Fetch returned only navigation (page body is script-rendered), so topics are taken from search-result snippets of this page. Snippet text: 'You may be asked to complete a Pre-CAS interview or questionnaire through Enroly CAS Shield.' 'York St John will ask you questions about your background, study plans, career and finances.' 'The interview will always be carried out in English'. 'If you are chosen for a Pre-CAS interview, it is not a test'. Snippet also says the page has dropdown menus with example questions; these could not be read. questionIds mapped from topic areas, not verbatim questions. Confirms Enroly CAS Shield."
+    },
+    {
+      "url": "https://www.yorksj.ac.uk/international/international-offer-holders/enroly-cas-shield/",
+      "title": "Enroly CAS Shield | York St John University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Linked from Preparing for CAS. Fetch returned navigation only; body not readable. Page existence confirms an Enroly CAS Shield process."
+    },
+    {
+      "url": "https://yorksj.cas-shield.com/",
+      "title": "CAS Shield",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Subdomain resolved and served a page titled 'CAS Shield'. Consistent with official page naming Enroly CAS Shield. Questions randomised from themed banks; no list."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=1XLgY3ixeTI",
+      "title": "York St John University Pre CAS Interview Questions 2026 - Mock Interview (Study in UK)",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Video page not readable; title and channel ('Study in UK') confirmed via YouTube oEmbed. Description/questions not readable."
+    },
+    {
+      "url": "https://www.scribd.com/document/939643144/Pre-cas-Interview-Preparation-Guide",
+      "title": "Pre-CAS Interview Guide for York St John | PDF (Scribd)",
+      "tier": "consultancy",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "communication skills",
+        "understanding of the program",
+        "reasons for studying in the UK and at York St John",
+        "career goals",
+        "overall clarity of intent"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-07",
+        "q-09",
+        "q-123",
+        "q-19"
+      ],
+      "unmapped": [],
+      "notes": "Document body not readable; only Scribd description visible: guide covers 'communication skills, understanding of the program, reasons for studying in the UK and at York St John, career goals, and overall clarity of intent'. questionIds mapped from those topics only."
+    },
+    {
+      "url": "https://www.scribd.com/document/805676144/YORK-ST-JOHN-Pre-Cas-Interview-Guide-A5-London-22April-PRINT-2",
+      "title": "Pre-CAS Interview Guide for YSJ London | PDF (Scribd, uploaded by GOLD OVERSEAS, 12 pages)",
+      "tier": "consultancy",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Document body not readable via fetch. Appears to be an agent-distributed guide for the YSJ London campus. No questions readable."
+    },
+    {
+      "url": "https://www.tiktok.com/@callmejade.a/video/7491963721581907222",
+      "title": "Replying to @INCONSISTENT USER Pre-CAS interview? Here's how mine went at York St John watch this before yours!",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Student TikTok about a York St John pre-CAS interview (title from search result). Page fetch returned no content; no questions readable."
+    }
+  ],
+  "searchesRun": [
+    "York St John University credibility interview CAS Shield questions",
+    "\"York St John\" pre-CAS interview questions",
+    "University of York credibility interview pre-CAS questions (also surfaced York St John results)",
+    "\"York St John\" pre-CAS interview questions Nepal OR India experience blog (not executed: session search budget exhausted)"
+  ]
+}

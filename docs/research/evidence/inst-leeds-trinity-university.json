@@ -1,0 +1,72 @@
+{
+  "institutionId": "inst-leeds-trinity-university",
+  "name": "Leeds Trinity University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.leedstrinity.ac.uk/international/visas-and-immigration/",
+      "title": "Visas and immigration - International - Leeds Trinity University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "your Leeds Trinity programme",
+        "your knowledge of Leeds",
+        "your motivations for study",
+        "your intentions after studying with us"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-09",
+        "q-10",
+        "q-11",
+        "q-19",
+        "q-201"
+      ],
+      "unmapped": [],
+      "notes": "Fetched. Verbatim: 'Please note: you may have to undertake a Home Office Credibility Interview as part of the visa application process. The Credibility Interview may ask questions relating to your Leeds Trinity programme, your knowledge of Leeds, your motivations for study and your intentions after studying with us.' No example questions, format or platform details."
+    },
+    {
+      "url": "https://www.leedstrinity.ac.uk/study/international-students/visa-information/",
+      "title": "Visas and immigration - International - Leeds Trinity University (alternate URL)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "your Leeds Trinity programme",
+        "your knowledge of Leeds",
+        "your motivations for study",
+        "your intentions after studying with us"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-09",
+        "q-10",
+        "q-11",
+        "q-19",
+        "q-201"
+      ],
+      "unmapped": [],
+      "notes": "Fetched; identical paragraph to the /international/visas-and-immigration/ page."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=UiFmmttVyr8",
+      "title": "Pre-CAS interview - Suitable for Leeds Trinity University - Arifur Rahman Shamim",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'Arifur Rahman Shamim' (via YouTube oEmbed). Video description not returned by WebFetch; no questions readable. Title only."
+    }
+  ],
+  "searchesRun": [
+    "Leeds Trinity University credibility interview questions",
+    "Leeds Trinity University pre-CAS interview",
+    "site:leedstrinity.ac.uk credibility interview"
+  ],
+  "researcherNotes": "A search snippet (studies-overseas.com, consultancy) stated 'Before issuing the Confirmation of Acceptance for Studies (CAS), applicants are required to complete a Pre-CAS Interview as part of the University's compliance checks' and a £2,000 deposit; page not fetched so not recorded as a source. Most results were PGCE/journalism admissions interviews."
+}

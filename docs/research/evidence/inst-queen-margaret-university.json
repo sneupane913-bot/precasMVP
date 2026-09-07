@@ -1,0 +1,72 @@
+{
+  "institutionId": "inst-queen-margaret-university",
+  "name": "Queen Margaret University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.qmu.ac.uk/study-here/international-students/visas-and-immigration/credibility-interviews",
+      "title": "Credibility Interviews | International Students | Queen Margaret University, Edinburgh",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Questions About Your Course",
+        "Educational and Work Background",
+        "Future Career Plans",
+        "Immigration History",
+        "Finances",
+        "English Language Ability"
+      ],
+      "quotes": [
+        "You should demonstrate a strong understanding of your chosen course and a genuine interest in studying it.",
+        "Be ready to discuss specific modules and explain why you selected this course at QMU.",
+        "Check the rankings of your chosen course and compare them with similar courses elsewhere. Be prepared to explain why you selected Queen Margaret University over other universities in the UK or abroad.",
+        "The interviewer may ask about your previous studies and how they relate to your chosen course.",
+        "You should be able to explain how the course will support your long-term career goals.",
+        "Your immigration history, both in the UK and other countries, may be reviewed.",
+        "You may be asked how you will fund your studies (e.g., personal savings, parental support, bank loans).",
+        "Your English proficiency will be assessed throughout the interview."
+      ],
+      "questionIds": [
+        "q-45",
+        "q-11",
+        "q-201",
+        "q-153",
+        "q-206",
+        "q-38",
+        "q-09",
+        "q-04",
+        "q-19",
+        "q-20",
+        "q-18",
+        "q-115",
+        "q-14",
+        "q-49",
+        "q-160"
+      ],
+      "unmapped": [],
+      "notes": "Page gives topic guidance rather than a literal question list (quotes above are the page's verbatim topic statements). Format: 'Interviews are usually conducted by video call or telephone and will be carried out entirely in English.' Outcomes: 'Failure to attend a scheduled interview without a valid reason will likely result in your application being refused.'; 'Failure to pass the interview will result in a visa refusal, and the University is unlikely to be able to issue a new CAS for a further application.' Tip from snippet: provide full, detailed answers - interviewers may not prompt you to expand. No mention of Enroly or CAS Shield."
+    },
+    {
+      "url": "https://www.qmu.ac.uk/study-here/how-to-apply/admissions-faqs",
+      "title": "Admissions FAQs | Queen Margaret University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [
+        "Under certain circumstances, such as if you require a CAS for a visa to study in the UK, we will also have to ask you to complete an interview over the phone."
+      ],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Confirms QMU itself runs a phone interview before CAS; no questions listed."
+    }
+  ],
+  "searchesRun": [
+    "Queen Margaret University credibility interview pre-CAS interview questions",
+    "Queen Margaret University pre-CAS interview questions asked YouTube OR scribd",
+    "Bing: Queen Margaret University pre-CAS interview questions (Bing HTML results page fetched via WebFetch after the WebSearch budget was exhausted; it returned unrelated results (recorded for completeness, no evidence taken).)",
+    "curl probe: qmu.cas-shield.com (did not resolve)"
+  ]
+}

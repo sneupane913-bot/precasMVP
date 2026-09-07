@@ -48,20 +48,29 @@
  */
 
 import type { Institution, Question, PublicQuestion } from '@/lib/types';
-import { type AnswerKind, answerSecondsFor, readSecondsFor } from '@/lib/data/timing';
+import { answerSecondsFor, readSecondsFor } from '@/lib/data/timing';
+import type { Draft } from '@/lib/data/question-draft';
+import { BATCH3 } from '@/lib/data/questions-batch3';
+import {
+  maintenanceFor,
+  pounds,
+  publishedBy as publishedByFacts,
+} from '@/lib/data/institution-facts';
+import { likelihoodFor, LIKELIHOOD_RANK } from '@/lib/data/university-evidence';
+import { getInstitution } from '@/lib/data/institutions';
 
-// The question bank. {{university}} and {{city}} are resolved per session, so
-// one bank serves every institution and adding institution 7 through 104 needs
-// no new question writing.
+// The question bank. {{university}}, {{city}} and the UKVI living-cost
+// placeholders are resolved per session from lib/data/institution-facts.ts, so
+// one bank serves every institution and the CORRECT ANSWER, not the question,
+// is what changes from university to university (see that file for why).
 //
 // Model answers are STRUCTURES, written in the simple spoken English a Nepali
 // student can actually produce. They are never presented as scripts.
 // Rubric notes are private and never leave the server.
-
-type Draft = Omit<
-  Question,
-  'id' | 'vertical' | 'institutionId' | 'timeLimitSeconds' | 'readSeconds'
-> & { answerKind: AnswerKind };
+//
+// THE BANK IS APPEND ONLY. Ids are positional and are stored on every session
+// and in institution-facts.ts. Never reorder RAW; add at the end, or in a new
+// batch file appended after it (questions-batch3.ts).
 
 const RAW: Draft[] = [
   {
@@ -1999,19 +2008,63 @@ const RAW: Draft[] = [
  * two facts and a conclusion in 45 seconds, so the product was training
  * students to under-answer the real interview.
  */
-export const QUESTIONS: Question[] = RAW.map((q, i) => ({
-  ...q,
-  id: `q-${String(i + 1).padStart(2, '0')}`,
-  vertical: 'uk-precas',
-  institutionId: null,
-  timeLimitSeconds: answerSecondsFor(q.answerKind),
-  readSeconds: readSecondsFor(q.answerKind),
-}));
+export const QUESTIONS: Question[] = [...RAW, ...BATCH3].map((q, i) => {
+  const { publishedBy: _own, ...rest } = q;
+  return {
+    ...rest,
+    id: `q-${String(i + 1).padStart(2, '0')}`,
+    vertical: 'uk-precas',
+    institutionId: null,
+    timeLimitSeconds: answerSecondsFor(q.answerKind),
+    readSeconds: readSecondsFor(q.answerKind),
+  };
+});
 
-function fill(text: string, inst: Institution): string {
+/**
+ * Which universities' OWN published guidance asks a given question (Q-12).
+ *
+ * Two sources merged: the per-institution mapping in institution-facts.ts for
+ * the original bank, and the `publishedBy` field carried by later batches.
+ * Built once; the plan reads it for every candidate.
+ */
+const PUBLISHED_BY: Map<string, string[]> = (() => {
+  const m = new Map<string, string[]>();
+  const drafts = [...RAW, ...BATCH3];
+  for (let i = 0; i < drafts.length; i++) {
+    const id = `q-${String(i + 1).padStart(2, '0')}`;
+    const set = new Set<string>([...publishedByFacts(id), ...(drafts[i]!.publishedBy ?? [])]);
+    if (set.size) m.set(id, [...set]);
+  }
+  return m;
+})();
+
+/** Institution ids whose own interview guidance asks this question. */
+export function publishedBy(questionId: string): string[] {
+  return PUBLISHED_BY.get(questionId) ?? [];
+}
+
+/**
+ * Q-13. Every placeholder resolves from the institution and its fact pack.
+ *
+ *   {{university}}    the full name
+ *   {{city}}          the campus city
+ *   {{ukviBand}}      "in London" / "outside London" for UKVI maintenance
+ *   {{ukviMonthly}}   the monthly figure for that band, e.g. £1,529
+ *   {{ukviTotal}}     nine months of it
+ *
+ * The money figures live in ONE place (institution-facts.ts, with the GOV.UK
+ * source and date). A question or rubric that typed the number in would go
+ * stale the day the rule changed, and a stale figure marked as correct coaches
+ * a student into a wrong answer at the real interview.
+ */
+export function fill(text: string, inst: Institution): string {
+  const m = maintenanceFor(inst);
   return text
     .replaceAll('{{university}}', inst.name)
-    .replaceAll('{{city}}', inst.city);
+    .replaceAll('{{city}}', inst.city)
+    .replaceAll('{{ukviBand}}', m.band === 'London' ? 'in London' : 'outside London')
+    .replaceAll('{{ukviMonthly}}', pounds(m.monthly))
+    .replaceAll('{{ukviTotal}}', pounds(m.total));
 }
 
 /** Resolve placeholders for one institution and strip the private rubric. */
@@ -2022,16 +2075,19 @@ export function publicQuestion(q: Question, inst: Institution): PublicQuestion {
     text: fill(q.text, inst),
     modelAnswer: fill(q.modelAnswer, inst),
     tips: q.tips.map((t) => fill(t, inst)),
+    // Q-14. The student sees how likely this is at THEIR university and why.
+    likelihood: likelihoodFor(q, inst),
   };
 }
 
-/** Server-side only. Keeps the rubric attached. */
+/** Server-side only. Keeps the rubric attached, resolved for this campus. */
 export function resolvedQuestion(q: Question, inst: Institution): Question {
   return {
     ...q,
     text: fill(q.text, inst),
     modelAnswer: fill(q.modelAnswer, inst),
     tips: q.tips.map((t) => fill(t, inst)),
+    rubricNotes: fill(q.rubricNotes, inst),
   };
 }
 
@@ -2054,6 +2110,7 @@ export function resolvedQuestion(q: Question, inst: Institution): Question {
 let EXTRA: Question[] = [];
 
 export async function primeExtraQuestions(): Promise<void> {
+  FAMILY = null;
   try {
     const { platform } = await import('@/lib/platform');
     const s = await platform.getSettings();
@@ -2152,45 +2209,215 @@ function rootPool(): Question[] {
   return pool().filter((q) => !q.isProbe);
 }
 
-/** Probes for one category, shuffled. */
-function probesFor(category: string): Question[] {
-  return shuffled(pool().filter((q) => q.isProbe && q.category === category));
+/**
+ * WHAT A STUDENT HAS ALREADY BEEN ASKED (Q-11).
+ *
+ * 7 September 2026. The client's second requirement after the first customer
+ * feedback: a student who buys ten mocks must never hear the same question
+ * twice, and never a near-copy of one either. The plan was random within one
+ * sitting and blind across sittings, so with twelve roots drawn from ninety-
+ * five, the second mock repeated several of the first almost every time.
+ *
+ * `seen` is every question id from the student's previous sittings (built by
+ * the caller from the session store). Two tiers of avoidance:
+ *
+ *   1. an id in `seen` is never chosen while an unseen id in the same
+ *      category exists;
+ *   2. a question whose FAMILY (paraphrase group, see familyOf) contains a
+ *      seen id is avoided while an unseen family exists.
+ *
+ * The bank is finite, so this is a preference with a floor, never a refusal:
+ * a paper is always `limit` long (Q-3). When a student has genuinely heard
+ * everything in a category, the least-recently-asked question comes back.
+ * qa/paper-check.mjs proves ten full sittings with zero repeats.
+ */
+export interface PlanOptions {
+  /** Ids from earlier sittings, most recent first if the caller knows the order. */
+  seen?: Iterable<string>;
+  /** The university, so questions it publishes itself are preferred (Q-12). */
+  institutionId?: string;
 }
 
-export function buildQuestionPlan(limit: number): string[] {
-  const QUESTIONS = rootPool();
-  if (limit >= QUESTIONS.length) return withProbes(QUESTIONS.map((q) => q.id), limit);
+const STOP = new Set(
+  'the a an to of in at for and or you your do did have has is are will would can could what why how which where when please me about this that it be with on i my we our if any there than so as by from'.split(
+    ' '
+  )
+);
+
+function tokens(text: string): Set<string> {
+  return new Set(
+    text
+      .toLowerCase()
+      .replace(/\{\{[a-z]+\}\}/g, ' ')
+      .replace(/[^a-z ]/g, ' ')
+      .split(/\s+/)
+      .filter((w) => w.length > 2 && !STOP.has(w))
+  );
+}
+
+/**
+ * Paraphrase groups. "How is this course assessed?" and "How will your studies
+ * be assessed?" are one question to a student, so they are one family here.
+ * Computed once from word overlap (Jaccard >= 0.6 after stopwords and
+ * placeholders are stripped), within a category, with union-find so chains
+ * merge. Deterministic, and needs no field on any question.
+ */
+let FAMILY: Map<string, string> | null = null;
+function familyOf(id: string): string {
+  if (!FAMILY) {
+    const all = pool();
+    const parent = new Map<string, string>(all.map((q) => [q.id, q.id]));
+    const find = (x: string): string => {
+      let r = x;
+      while (parent.get(r) !== r) r = parent.get(r)!;
+      parent.set(x, r);
+      return r;
+    };
+    const toks = new Map(all.map((q) => [q.id, tokens(q.text)]));
+    for (let i = 0; i < all.length; i++) {
+      for (let j = i + 1; j < all.length; j++) {
+        const a = all[i]!;
+        const b = all[j]!;
+        if (a.category !== b.category || Boolean(a.isProbe) !== Boolean(b.isProbe)) continue;
+        const ta = toks.get(a.id)!;
+        const tb = toks.get(b.id)!;
+        let inter = 0;
+        for (const w of ta) if (tb.has(w)) inter++;
+        const union = ta.size + tb.size - inter;
+        if (union > 0 && inter / union >= 0.6) parent.set(find(a.id), find(b.id));
+      }
+    }
+    FAMILY = new Map(all.map((q) => [q.id, find(q.id)]));
+  }
+  return FAMILY.get(id) ?? id;
+}
+
+/** Exposed for the QA suite, which asserts the grouping is sane. */
+export function questionFamily(id: string): string {
+  return familyOf(id);
+}
+
+/**
+ * Order candidates for one slot. Lower is better. Unseen ids first, then
+ * unseen families, then questions the chosen university publishes itself,
+ * then the corroboration of the source, with random jitter so two students
+ * with the same history still get different papers (N-26).
+ */
+function rank(q: Question, seen: Set<string>, seenFamilies: Set<string>, institutionId?: string): number {
+  let score = Math.random();
+  if (seen.has(q.id)) score += 100;
+  else if (seenFamilies.has(familyOf(q.id))) score += 10;
+  if (institutionId) {
+    const inst = getInstitution(institutionId);
+    if (inst) {
+      const level = likelihoodFor(q, inst).level;
+      // General-evidence questions sit behind every evidenced one, ahead of
+      // any repeat; the stronger the evidence, the earlier the question.
+      if (level === 'general') score += 50;
+      else score -= LIKELIHOOD_RANK[level];
+    }
+  }
+  return score;
+}
+
+function orderFor(list: Question[], seen: Set<string>, seenFamilies: Set<string>, institutionId?: string): Question[] {
+  return list
+    .map((q) => ({ q, r: rank(q, seen, seenFamilies, institutionId) }))
+    .sort((a, b) => a.r - b.r)
+    .map((x) => x.q);
+}
+
+/**
+ * Q-14. Questions with evidence for THIS university come first.
+ *
+ * likelihoodFor() grades every question for a university: very_likely
+ * (its own page lists it), likely (its students report it), possible (it
+ * names the theme), or general (only the guidance other UK universities
+ * publish for the same interview). The plan takes the evidenced levels
+ * before any general one, and a general one before any repeat. The student
+ * sees the label either way; nothing is ever claimed that the research does
+ * not hold.
+ */
+function poolFor(_institutionId?: string): Question[] {
+  return pool();
+}
+
+/** The questions with evidence naming this university (not merely general). */
+export function eligiblePoolFor(institutionId: string): Question[] {
+  const inst = getInstitution(institutionId);
+  if (!inst) return pool();
+  return pool().filter((q) => likelihoodFor(q, inst).level !== 'general');
+}
+
+export function buildQuestionPlan(limit: number, opts: PlanOptions = {}): string[] {
+  const seen = new Set(opts.seen ?? []);
+  const seenFamilies = new Set([...seen].map((id) => familyOf(id)));
+  const inst = opts.institutionId;
+
+  const QUESTIONS = poolFor(inst).filter((q) => !q.isProbe);
+  if (limit >= QUESTIONS.length) return withProbes(QUESTIONS.map((q) => q.id), limit, seen, seenFamilies, inst);
 
   // Openers first. A real interview starts by asking who you are, so the
   // 'identity' category always fills slot one.
-  const openers = QUESTIONS.filter((q) => q.category === 'identity');
+  const openers = orderFor(
+    QUESTIONS.filter((q) => q.category === 'identity'),
+    seen,
+    seenFamilies,
+    inst
+  );
   const picked: string[] = [];
-  if (openers.length > 0) picked.push(shuffled(openers)[0]!.id);
+  if (openers.length > 0) picked.push(openers[0]!.id);
 
-  // One bucket per category, each internally shuffled.
+  // One bucket per category, each ordered by preference (unseen, unseen
+  // family, published by this university, then random). Identity is the
+  // opener and only the opener: a real interview asks who you are once, and
+  // drawing identity twice a sitting would exhaust the ten openers in five
+  // sittings and force a repeat.
   const buckets = new Map<string, string[]>();
-  for (const q of shuffled(QUESTIONS)) {
-    if (picked.includes(q.id)) continue;
+  for (const q of QUESTIONS) {
+    if (picked.includes(q.id) || q.category === 'identity') continue;
     const list = buckets.get(q.category) ?? [];
     list.push(q.id);
     buckets.set(q.category, list);
   }
+  for (const [cat, ids] of buckets) {
+    buckets.set(
+      cat,
+      orderFor(
+        ids.map((id) => getQuestion(id)!),
+        seen,
+        seenFamilies,
+        inst
+      ).map((q) => q.id)
+    );
+  }
 
   // Round-robin across categories so coverage stays even however many we need.
-  const order = shuffled([...buckets.keys()]);
+  // Categories with unseen questions go first, so a student who has exhausted
+  // one theme is not handed a repeat while another theme still has new ones.
+  const order = shuffled([...buckets.keys()]).sort((a, b) => {
+    const ua = buckets.get(a)!.some((id) => !seen.has(id)) ? 0 : 1;
+    const ub = buckets.get(b)!.some((id) => !seen.has(id)) ? 0 : 1;
+    return ua - ub;
+  });
+  // Buckets are ordered unseen-first, so a bucket whose head is seen has no
+  // unseen question left. Such a bucket is skipped while any other bucket
+  // still has an unseen head; only when every theme is exhausted does a
+  // repeat come back (Q-11's floor).
+  const anyUnseenHead = () => [...buckets.values()].some((l) => l.length > 0 && !seen.has(l[0]!));
   let progress = true;
   while (picked.length < limit && progress) {
     progress = false;
     for (const cat of order) {
       if (picked.length >= limit) break;
       const list = buckets.get(cat);
-      if (list && list.length > 0) {
-        picked.push(list.shift()!);
-        progress = true;
-      }
+      if (!list || list.length === 0) continue;
+      if (seen.has(list[0]!) && anyUnseenHead()) continue;
+      picked.push(list.shift()!);
+      progress = true;
     }
   }
-  return withProbes(picked, limit);
+  return withProbes(picked, limit, seen, seenFamilies, inst);
 }
 
 /**
@@ -2208,8 +2435,16 @@ export function buildQuestionPlan(limit: number): string[] {
  * The count is bounded at about a third of the sitting. A mock that is half
  * probes stops being an interview and becomes an interrogation, and the
  * published banks are mostly first-level questions.
+ *
+ * Probes obey the same no-repeat preference as roots (Q-11).
  */
-function withProbes(rootIds: string[], limit: number): string[] {
+function withProbes(
+  rootIds: string[],
+  limit: number,
+  seen: Set<string> = new Set(),
+  seenFamilies: Set<string> = new Set(),
+  institutionId?: string
+): string[] {
   const maxProbes = Math.floor(limit / 3);
   if (maxProbes < 1) return rootIds.slice(0, limit);
 
@@ -2227,8 +2462,17 @@ function withProbes(rootIds: string[], limit: number): string[] {
     // The closing question ends the interview. Nothing follows it.
     if (!root || root.answerKind === 'closing' || root.category === 'identity') continue;
 
-    const probe = probesFor(root.category).find((x) => !used.has(x.id));
-    if (probe) {
+    const probe = orderFor(
+      poolFor(institutionId).filter((q) => q.isProbe && q.category === root.category && !used.has(q.id)),
+      seen,
+      seenFamilies,
+      institutionId
+    )[0];
+    // A probe the student has already been asked is not placed. The slot goes
+    // to the next unseen root instead (the root list is `limit` long, so the
+    // paper stays full); a sitting with four probes and no repeats beats one
+    // with five and a repeat.
+    if (probe && !seen.has(probe.id)) {
       used.add(probe.id);
       out.push(probe.id);
     }
@@ -2243,16 +2487,20 @@ function withProbes(rootIds: string[], limit: number): string[] {
  * a single question, optionally from the category the student is weakest in.
  * The results page then tells them about that one answer, which is the fastest
  * useful loop in the product.
+ *
+ * Draws an unseen question first (Q-11), like a mock.
  */
-export function buildPracticePlan(category?: string): string[] {
+export function buildPracticePlan(category?: string, opts: PlanOptions = {}): string[] {
   // D-24. Practice draws from the merged pool too, or a question the admin
   // added is asked in a mock and never in a drill.
-  const all = pool();
+  const all = poolFor(opts.institutionId);
   // A probe only makes sense after an answer, so practice draws from roots.
   const roots = all.filter((q) => !q.isProbe);
   const bucket = category ? roots.filter((q) => q.category === category) : roots;
   const from = bucket.length > 0 ? bucket : all;
-  const pick = from[Math.floor(Math.random() * from.length)]!;
+  const seen = new Set(opts.seen ?? []);
+  const seenFamilies = new Set([...seen].map((id) => familyOf(id)));
+  const pick = orderFor(from, seen, seenFamilies, opts.institutionId)[0]!;
   return [pick.id];
 }
 

@@ -1,0 +1,36 @@
+{
+  "institutionId": "inst-university-of-southampton",
+  "name": "University of Southampton",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.southampton.ac.uk/studentservices/visa-and-immigration/applying-for-your-visa/getting-your-cas.page",
+      "title": "Getting your CAS | The Student Hub | University of Southampton",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched. No pre-CAS/credibility interview content or example questions; mentions a 'CAS request form' and 'CAS questionnaire' only."
+    },
+    {
+      "url": "https://www.karangupta.com/universities/university-of-southampton/interview",
+      "title": "University of Southampton Interview Questions & Preparation Guide 2026",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetch returned HTTP 403. Search snippet mentioned 'Why have you chosen Southampton?' but in the context of general university/admissions interviews, not the credibility interview, so no quotes recorded."
+    }
+  ],
+  "searchesRun": [
+    "University of Southampton credibility interview questions",
+    "University of Southampton pre-CAS interview questions Nepal"
+  ]
+}

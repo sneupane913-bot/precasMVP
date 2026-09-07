@@ -1,0 +1,153 @@
+{
+  "institutionId": "inst-university-of-sunderland",
+  "name": "University of Sunderland",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "sources": [
+    {
+      "url": "https://www.sunderland.ac.uk/help/international/immigration-compliance/credibility-interview/",
+      "title": "Confirmation of Acceptance for Studies (CAS) | University of Sunderland",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Your course",
+        "Educational background",
+        "Career goals",
+        "The city",
+        "Accommodation",
+        "Immigration history",
+        "Finances",
+        "English communication",
+        "Post-graduation plans",
+        "Why the UK"
+      ],
+      "quotes": [
+        "Why did you choose your specific course",
+        "What makes it better than similar courses",
+        "Your past studies",
+        "How they connect to your chosen course",
+        "What job do you want after graduating?",
+        "What do you know about Sunderland",
+        "Types of accommodation available",
+        "Approximate rent prices",
+        "Any previous travel to the UK or other countries",
+        "How will you pay for your studies and living costs",
+        "You will leave the UK when your visa expires",
+        "Why did you choose the UK instead of other countries"
+      ],
+      "questionIds": [
+        "q-201",
+        "q-153",
+        "q-03",
+        "q-04",
+        "q-19",
+        "q-171",
+        "q-10",
+        "q-56",
+        "q-108",
+        "q-62",
+        "q-168",
+        "q-14",
+        "q-66",
+        "q-08",
+        "q-07"
+      ],
+      "unmapped": [],
+      "notes": "University-run Pre-CAS process: a four-part pre-CAS questionnaire (course selection, UK research, post-study plans, accommodation) plus a Pre-CAS interview. 'If you do not pass the Pre-CAS interview, we cannot continue with your application.' Snippet: 'research courses, accommodation, and the city of Sunderland'. Page itself does not name CAS Shield/Enroly; CAS Shield use is evidenced only by the Student Room thread title below."
+    },
+    {
+      "url": "https://www.thestudentroom.co.uk/showthread.php?t=7557364",
+      "title": "CAS SHIELD for University of Sunderland - The Student Room",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetch returned HTTP 403. Title (seen in search results) is the basis for usesCasShield=true; no questions readable."
+    },
+    {
+      "url": "https://es.scribd.com/document/868852851/SUNDERLAND-CAS-QUESTIONS",
+      "title": "CAS Interview Preparation for Sunderland (Scribd: SUNDERLAND-CAS-QUESTIONS)",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "academic motivations",
+        "course selection",
+        "university comparisons",
+        "career plans",
+        "living arrangements in the UK"
+      ],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Only Scribd metadata readable: 'CAS Shield Interview' questionnaire prep doc using the PEE technique; 'lists common interview questions' but they were not readable, so none recorded."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=H-KCh53cWCU",
+      "title": "University of Sunderland Pre CAS Interview Questions 2026 - Mock Interview",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title via oEmbed (author 'Study in UK'); description not readable."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=SBTWh3Q8G6k",
+      "title": "UK 🇬🇧 University interview | Pre-CAS interview questions | University of Sunderland#interview",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title via oEmbed (author 'The Ediot'); not fetched."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=R9Q2Dp9xFfA",
+      "title": "UK🇬🇧 PRE-CAS interview for university of Sunderland | Credibility Interview | Pre-Cas",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title via oEmbed (author 'The Ediot'); not fetched."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=ZuY9ZayFhSE",
+      "title": "Credibility Interview of University of Sunderland | Mock test University of Sunderland London campus",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title via oEmbed (author GK ELT); not fetched. London campus."
+    },
+    {
+      "url": "https://www.tiktok.com/discover/pre-cas-interview-questions-of-sunderland",
+      "title": "Pre Cas Interview Questions of Sunderland | TikTok",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Seen in search results only; not fetched."
+    }
+  ],
+  "searchesRun": [
+    "University of Sunderland credibility interview questions CAS Shield"
+  ]
+}

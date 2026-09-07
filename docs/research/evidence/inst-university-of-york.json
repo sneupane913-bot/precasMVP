@@ -1,0 +1,37 @@
+{
+  "institutionId": "inst-university-of-york",
+  "name": "University of York",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": false,
+  "sources": [
+    {
+      "url": "https://www.york.ac.uk/students/studying/student-visa/cas/",
+      "title": "Confirmation of Acceptance for Studies (CAS) - Student Visa holders, University of York",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "your reasons for studying in the UK",
+        "your background",
+        "your study plans",
+        "careers plans",
+        "finances",
+        "your plans after completing your studies"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-07",
+        "q-129",
+        "q-19",
+        "q-14"
+      ],
+      "unmapped": [],
+      "notes": "No verbatim questions; questionIds mapped from topic areas only. Verbatim: 'University of York questions will also focus on your reasons for studying in the UK, your background, your study plans, careers plans and finances.' 'UKVI credibility questions will focus on your reasons for studying in the UK, your background, study and career plans, finances and your plans after completing your studies.' 'the credibility assessment will be conducted via Zoom (or an alternative) in English.' 'Students will need to show their passport during the credibility call.' Outcome: 'If the credibility interviewer was unable to find evidence that you will meet UKVI credibility thresholds for entry to the UK to study we will not be able to proceed with issuing you with a CAS and your application will be withdrawn.' Search snippet: assessment is occasional ('Occasionally you may be required to undergo a credibility assessment as part of your CAS request'); invitation by email with date/time options. york.cas-shield.com did not resolve (DNS ENOTFOUND) and the official page names Zoom, so usesCasShield set false. No student reports naming University of York found."
+    }
+  ],
+  "searchesRun": [
+    "University of York credibility interview pre-CAS questions",
+    "\"University of York\" pre-CAS interview credibility assessment questions Nepal",
+    "\"University of York\" credibility interview experience reddit OR youtube (not executed: session search budget exhausted)"
+  ]
+}

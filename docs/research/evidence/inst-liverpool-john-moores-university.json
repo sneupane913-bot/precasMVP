@@ -1,0 +1,106 @@
+{
+  "institutionId": "inst-liverpool-john-moores-university",
+  "name": "Liverpool John Moores University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "sources": [
+    {
+      "url": "https://www.ljmu.ac.uk/discover/student-support/international-student-support/study-visas/pre-cas-interviews",
+      "title": "Pre-CAS interviews | Student support | Liverpool John Moores University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "why you have chosen to study in the UK and at LJMU",
+        "why you selected your specific course",
+        "your post study plans and how the course supports them",
+        "your financial circumstances and funding plans",
+        "your accommodation arrangements",
+        "your understanding of Student visa regulations"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-07",
+        "q-09",
+        "q-14",
+        "q-15",
+        "q-17",
+        "q-19",
+        "q-20",
+        "q-61",
+        "q-163",
+        "q-170",
+        "q-201"
+      ],
+      "unmapped": [],
+      "notes": "Fetched. Verbatim: 'The questions are randomised but will typically cover:' followed by the six topics. Pre-CAS Interview (PCI) is 'a short, self-recorded video interview completed online through CAS Shield'; passport shown to camera; 'The interview takes around 20 to 25 minutes to complete depending on the length of your responses.' Required for students from 'Algeria, Angola, Bangladesh, Democratic Republic of the Congo, Ghana, Kenya, India, Malawi, Nepal, Nigeria, Sri-Lanka, Syria, Uganda, Zimbabwe'. 'A minimum payment of £1,000 is required in advance', remaining £4,000 after passing. Outcomes verbatim: 'Pass: You have demonstrated a genuine intention to study at LJMU and we believe you can meet the Student visa requirements.' 'Resit: Your interview is borderline, and you have been offered one chance to resit.' 'Fail: We have concerns about your intention to study at LJMU or your ability to make a successful visa application.' 'We will review your recording and aim to give you an outcome within three to four working days.' No notes/scripts allowed; pre-prepared answers may result in failing."
+    },
+    {
+      "url": "https://www.ljmu.ac.uk/international/holding-offer-of-study/how-to-accept-your-offer",
+      "title": "How to Accept Your Offer | International | Liverpool John Moores University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched. 'A Pre-CAS Interview (PCI) is mandatory, recorded credibility check for some international students', 'completed within CAS Shield', 'must be passed before we can issue your CAS'. No questions."
+    },
+    {
+      "url": "https://www.ljmu.ac.uk/-/media/files/ljmu/international/agent-zone/agent-handbook-202526.pdf",
+      "title": "LJMU Agent Handbook 2025/26 (Updated December 2025)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "PDF downloaded and text extracted locally. Verbatim: 'Pre-CAS interviews apply to students from Bangladesh, India, Iran, Nigeria, Pakistan and Sri-Lanka. They can pay £1,000 to book the interview and upon successfully passing the interview pay the £4,000 to receive the CAS.' (older country list than the current PCI web page, which includes Nepal). No questions."
+    },
+    {
+      "url": "https://www.ljmuisc.com/how-to-apply/visa-information",
+      "title": "Visa information | LJMU International Study Centre",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "the Liverpool John Moores University International Study Centre",
+        "accommodation options, costs, and the local area",
+        "your chosen course content",
+        "employment / work placement"
+      ],
+      "quotes": [
+        "Why did you choose the Liverpool John Moores University International Study Centre?",
+        "Did you consider other courses?",
+        "Why do you want to study in the UK?"
+      ],
+      "questionIds": [
+        "q-07",
+        "q-09",
+        "q-42"
+      ],
+      "unmapped": [],
+      "notes": "Fetched. Study Group pathway college page. Describes the UKVI credibility interview (video link at Visa Application Centre with a UK-based ECO)."
+    },
+    {
+      "url": "https://unimock.ai/ljmu-pre-cas-interview-india",
+      "title": "LJMU Pre-CAS Interview India (PCI) | UniMock",
+      "tier": "consultancy",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched but page body was not returned (title only). No questions recorded."
+    }
+  ],
+  "searchesRun": [
+    "Liverpool John Moores University credibility interview questions",
+    "LJMU pre-CAS interview",
+    "site:ljmu.ac.uk credibility interview"
+  ],
+  "researcherNotes": "LJMU's official PCI page is the strongest official source in this group: names Nepal explicitly, confirms CAS Shield, randomised questions from six themes, and pass/resit/fail rules."
+}

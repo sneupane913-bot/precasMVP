@@ -1,0 +1,134 @@
+{
+  "institutionId": "inst-ulster-university",
+  "name": "Ulster University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "sources": [
+    {
+      "url": "https://www.ulster.ac.uk/global/apply/visas-and-immigration/i-need-a-tier-4-visa",
+      "title": "Applying for your Student visa - Ulster University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "your plans for study",
+        "your reason for choosing to study at Ulster University",
+        "the course",
+        "your finances"
+      ],
+      "quotes": [
+        "As part of the CAS assessment process, you may be invited to a Pre-cas interview via CAS shield",
+        "The questions in the interview will ask you about your plans for study, your reason for choosing to study at Ulster University, the course, and your finances.",
+        "Please ensure that you do not have any notes or websites in front of you during the interview.",
+        "A CAS will only be issued if the Pre-CAS interview is complete and successful."
+      ],
+      "questionIds": [
+        "q-19",
+        "q-09",
+        "q-201",
+        "q-11",
+        "q-14"
+      ],
+      "unmapped": [],
+      "notes": "Direct WebFetch returned 403 (Cloudflare); read via a text-reader proxy. Confirms a university-run Pre-CAS interview on CAS Shield, invitations from 'ulster@cas-shield.com'. questionIds are topic-level."
+    },
+    {
+      "url": "https://www.ulster.ac.uk/global/apply/visas-and-immigration/i-need-a-tier-4-visa/applying-for-tier-4-visa-from-outside-the-uk",
+      "title": "Applying for your Student visa from outside the UK - Ulster University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "why you have chosen to study in the UK",
+        "any previous study in the UK",
+        "any gap in your studies",
+        "Ulster University and why you have chosen to study there",
+        "your course and why you have chosen to study it",
+        "how you will fund your studies",
+        "what you plan to do when your studies are over"
+      ],
+      "quotes": [
+        "The interview will be conducted by a member of Home Office staff, who will assess whether you are a 'genuine student' and have the required level of English language proficiency.",
+        "It is important that you answer all questions in as much details and as clearly as possible. If your answers are too vague or too brief, the interviewer may not believe that you are a 'genuine student'. You may then be given a second interview or your visa may be refused."
+      ],
+      "questionIds": [
+        "q-07",
+        "q-111",
+        "q-137",
+        "q-109",
+        "q-05",
+        "q-09",
+        "q-201",
+        "q-14",
+        "q-19"
+      ],
+      "unmapped": [],
+      "notes": "Direct WebFetch 403; read via text-reader proxy. This section is about the Home Office credibility interview at the visa application centre (separate from the CAS Shield pre-CAS interview). Search snippet also: 'you may be asked detailed questions about your new course of study, your previous UK study and immigration history, how you will fund your studies and the reasons you have chosen to study your course in the UK and at Ulster University.'"
+    },
+    {
+      "url": "https://ulster.cas-shield.com/",
+      "title": "CAS Shield",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "ulster.cas-shield.com resolves (HTTP 200) and serves Enroly's CAS Shield login page (page text contains 'Enroly' and 'CAS Shield'), so Ulster University uses Enroly CAS Shield for its CAS process. Enroly pre-CAS interviews draw randomised questions from themed banks; no question list is published on the site."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=JHCk1GtyUes",
+      "title": "Ulster University Pre-CAS Interview Questions 2025 | UK Credibility Interview",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'Study in UK'. Description is a generic mock-interview pitch ('mock Ulster University Pre Cas Interview'); no questions listed; video not viewable."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=Xzr5GA8DQ0k",
+      "title": "UK Student visa Interview | Pre-CAS Interview | Credibility Interview | Ulster University London",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'JK civil engineer' (title via YouTube oEmbed). Page not readable (401); no questions recorded. Relates to the Ulster University London branch campus."
+    },
+    {
+      "url": "https://www.facebook.com/groups/ulsteruniversitystudents/posts/1437535373986070/",
+      "title": "Pre-CAS interview questions for Ulster University",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Search-result title only; not fetched; no questions recorded."
+    },
+    {
+      "url": "https://www.facebook.com/groups/825257028768788/posts/1498189838142167/",
+      "title": "Will the Ulster University pre-cas interview questionnaire ...",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Search-result title only; indicates a pre-CAS questionnaire step. Not fetched; no questions recorded."
+    }
+  ],
+  "searchesRun": [
+    "Ulster University credibility interview pre-CAS interview questions",
+    "Bing: Ulster University pre-CAS interview questions (Bing HTML results page fetched via WebFetch after the WebSearch budget was exhausted; it returned unrelated results (recorded for completeness, no evidence taken).)",
+    "curl probe: ulster.cas-shield.com"
+  ]
+}

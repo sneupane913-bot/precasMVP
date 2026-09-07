@@ -1,0 +1,39 @@
+{
+  "institutionId": "inst-robert-gordon-university",
+  "name": "Robert Gordon University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.rgu.ac.uk/study/apply/selection-visits-interviews",
+      "title": "Selection Visits & Interviews | Apply | RGU",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched page covers course-selection interviews (Gray's School of Art, Health, Pharmacy, Applied Sciences) and contains nothing about credibility or pre-CAS interviews. Search snippet attributed to rgu.ac.uk described a recorded course-selection video interview: 'You will be asked 6 questions with a time allocation of 4 minutes for each ... read aloud by the interviewer and will also be presented as a transcript on screen'; '7 days to submit your interview ... must complete the interview in one sitting'; 'approximately 60 minutes'. This is an academic selection interview, not a credibility interview - recorded here only so it is not mistaken for one."
+    },
+    {
+      "url": "https://www.rgu.ac.uk/study/international-students/visa-information",
+      "title": "Visa Information | International Students | RGU",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "No mention of credibility interviews, pre-CAS interviews, CAS questionnaires, Enroly or CAS Shield."
+    }
+  ],
+  "searchesRun": [
+    "Robert Gordon University credibility interview pre-CAS questions",
+    "Robert Gordon University \"6 questions\" video interview international students CAS",
+    "site:rgu.ac.uk \"6 questions\" \"4 minutes\" interview",
+    "Bing: Robert Gordon University pre-CAS interview questions (Bing HTML results page fetched via WebFetch after the WebSearch budget was exhausted; it returned unrelated results (recorded for completeness, no evidence taken).)",
+    "curl probe: rgu.cas-shield.com (did not resolve)"
+  ]
+}

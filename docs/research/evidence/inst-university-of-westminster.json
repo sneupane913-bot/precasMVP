@@ -1,0 +1,74 @@
+{
+  "institutionId": "inst-university-of-westminster",
+  "name": "University of Westminster",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.westminster.ac.uk/international/visas-and-advice/visas/student-visa/credibility-interviews",
+      "title": "Credibility interviews | University of Westminster, London",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "your previous studies, both in the UK and elsewhere",
+        "your course at the University of Westminster",
+        "your reasons for wanting to study in the UK",
+        "why you chose your course at the University of Westminster instead of similar courses offered by other institutions",
+        "how you are going to finance the course, who is providing the money",
+        "the cost of living in the UK"
+      ],
+      "quotes": [
+        "What degree will you study at the UOW and why did you choose this course?",
+        "What are some of the modules you will study and why are you interested in these?",
+        "How will your course be taught and assessed?",
+        "Did you consider any other universities and what made you decide on this university?",
+        "How will you finance your studies (fees and living costs in the UK)?",
+        "How much money will you need per month for living expenses?",
+        "Will you have access to this money for the whole of your studies in the UK?",
+        "What are your reasons for studying in the UK?",
+        "Did you consider any other countries and what made you decide on the UK?",
+        "What are your plans after you graduate?",
+        "Where will you live in London, how far is it from the campus you will study on, and why do you want to live there?",
+        "Can you describe the facilities at the University?"
+      ],
+      "questionIds": [
+        "q-02",
+        "q-201",
+        "q-11",
+        "q-12",
+        "q-100",
+        "q-38",
+        "q-14",
+        "q-16",
+        "q-51",
+        "q-07",
+        "q-08",
+        "q-99",
+        "q-19",
+        "q-17",
+        "q-107",
+        "q-202"
+      ],
+      "unmapped": [],
+      "notes": "Describes the UKVI credibility interview: 'The initial interview is conducted by video call with a member of staff from the Home Office based in the UK and is likely to last between 10 and 20 minutes.' For in-UK extensions 'the interview should last about 20 or 30 minutes'. Second interview 'will be more in-depth and is likely to be longer in duration.' 'If you fail to undertake the interview when requested, without providing a reasonable explanation for why you are unable to do so, the visa caseworker may refuse your Student visa application.' Topic list partly from the search snippet for this page. No separate pre-CAS interview page found; no student reports naming Westminster found."
+    },
+    {
+      "url": "https://westminster.cas-shield.com/",
+      "title": "CAS Shield",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Subdomain resolved and served a page titled only 'CAS Shield' (no university name shown). Weak evidence of an Enroly CAS Shield tenant; not confirmed by any official page."
+    }
+  ],
+  "searchesRun": [
+    "University of Westminster credibility interview questions",
+    "\"University of Westminster\" pre-CAS interview questions YouTube",
+    "\"University of Westminster\" pre-CAS interview Nepal consultancy questions (not executed: session search budget exhausted)"
+  ]
+}

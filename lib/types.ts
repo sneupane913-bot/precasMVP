@@ -4,6 +4,7 @@
 export type VerticalSlug = 'uk-precas';
 
 import type { AnswerKind } from '@/lib/data/timing';
+import type { QuestionLikelihood } from '@/lib/data/university-evidence';
 
 export type QuestionCategory =
   | 'identity'
@@ -118,7 +119,15 @@ export interface Question {
 }
 
 /** A question with the private rubric stripped, safe to send to the client. */
-export type PublicQuestion = Omit<Question, 'rubricNotes'>;
+export type PublicQuestion = Omit<Question, 'rubricNotes'> & {
+  /**
+   * Q-14. How likely this question is at the student's university, with the
+   * reason and the URL it rests on. Null only when the question was placed by
+   * the floor in buildQuestionPlan (the bank for that university ran short).
+   * See lib/data/university-evidence.ts.
+   */
+  likelihood?: QuestionLikelihood | null;
+};
 
 export type TranscriptStatus = 'ok' | 'too_short' | 'silent' | 'failed';
 

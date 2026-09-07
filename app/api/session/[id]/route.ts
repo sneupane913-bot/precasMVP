@@ -73,7 +73,15 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       const ent = await entitlementFor(student);
       const fullLength = Math.min(ent.questionsAllowed, institution.questionCount);
       if (ent.hasPaid && fullLength > session.questionIds.length) {
-        const extra = buildQuestionPlan(fullLength).filter(
+        // Q-11 applies to the seven unlocked questions too: nothing from this
+        // sitting, and nothing from any earlier one.
+        const seen = new Set<string>(session.questionIds);
+        for (const x of await store.listByStudent(student.id)) {
+          if (x.id !== session.id && ((x.answers?.length ?? 0) > 0 || x.status === 'completed')) {
+            for (const qid of x.questionIds) seen.add(qid);
+          }
+        }
+        const extra = buildQuestionPlan(fullLength, { seen, institutionId: institution.id }).filter(
           (qid) => !session.questionIds.includes(qid)
         );
         const extended = [

@@ -1,0 +1,82 @@
+{
+  "institutionId": "inst-university-of-stirling",
+  "name": "University of Stirling",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "sources": [
+    {
+      "url": "https://www.stir.ac.uk/international/international-students/visa/confirmation-of-acceptance-for-studies/",
+      "title": "Confirmation of Acceptance for Studies | International | University of Stirling",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "your course and university",
+        "your background",
+        "reasons for studying in the UK",
+        "Module preferences",
+        "Educational background and connection to current plans",
+        "Subject changes and rationale",
+        "Post-graduation career goals and degree relevance",
+        "Living arrangements and reasoning"
+      ],
+      "quotes": [
+        "Why you chose this specific course",
+        "What you like about the module choices",
+        "Why the city of Stirling is a good place for you to live",
+        "Your past studies and how it connects to your chosen plan",
+        "Any gaps in your CV",
+        "Cost of living and how you'll afford to pay for food, bills etc"
+      ],
+      "questionIds": [
+        "q-201",
+        "q-153",
+        "q-145",
+        "q-11",
+        "q-77",
+        "q-10",
+        "q-164",
+        "q-04",
+        "q-124",
+        "q-109",
+        "q-05",
+        "q-19",
+        "q-20",
+        "q-17",
+        "q-57",
+        "q-16",
+        "q-87"
+      ],
+      "unmapped": [],
+      "notes": "'A Pre-CAS interview is conducted on CAS Shield and is a means to ensure that you have seriously considered your study choices. The interview will be a series of randomised questions about your course and university as well as your background and reasons for studying in the UK.' Approx 20 minutes, reviewed by admissions staff; staff recommendation determines whether a CAS is issued. Don'ts: 'Use AI. AI use is easier to detect than you think', 'Read from scripts'. Quotes are topic prompts, not literal questions; CAS Shield randomises from themed banks so no fixed list exists."
+    },
+    {
+      "url": "https://www.scribd.com/document/788527248/Stirling-University-Credibility-Interview",
+      "title": "Credibility Interview Insights for Stirling Uni (Scribd: Stirling University - Credibility Interview)",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Only Scribd interface/metadata readable; no questions readable."
+    },
+    {
+      "url": "https://uk.indeed.com/cmp/University-of-Stirling/faq/interviews",
+      "title": "Interviews at University of Stirling | Indeed.com",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Search snippet: a question 'University of Stirling credibility interview questions' was posted May 2024 and is unanswered. No content."
+    }
+  ],
+  "searchesRun": [
+    "University of Stirling credibility interview questions",
+    "University of Stirling pre-CAS interview questions"
+  ]
+}

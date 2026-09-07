@@ -1,0 +1,165 @@
+{
+  "institutionId": "inst-teesside-university",
+  "name": "Teesside University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "sources": [
+    {
+      "url": "https://www.tees.ac.uk/sections/international/credibility.cfm",
+      "title": "Credibility interview | International | Teesside University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "How you have carefully planned and considered your reasons for UK study",
+        "What research you have undertaken about your course and chosen university",
+        "Why you have chosen your course and university",
+        "What are your career aspirations and how UK study will benefit you",
+        "What you plan to do when you return home after you graduate"
+      ],
+      "quotes": [
+        "You will be asked to talk in English about your reasons for coming to the UK and about your study plans."
+      ],
+      "questionIds": [
+        "q-144",
+        "q-07",
+        "q-146",
+        "q-45",
+        "q-09",
+        "q-201",
+        "q-19",
+        "q-20",
+        "q-171"
+      ],
+      "unmapped": [],
+      "notes": "Describes the UKVI interview: 'The purpose of the interview is for UKVI (UK Visas and Immigration) to ensure that you are a genuine student'; 'You will be interviewed in person, on the phone, or via video link by a visa officer from UKVI'; 'If you fail to attend the interview, or if you do not answer the visa officer's questions in sufficient detail, or in a satisfactory level of English, you may be refused a visa.' Also: 'when you apply to Teesside, we will send you a mandatory questionnaire to complete.' questionIds are topic-level mappings."
+    },
+    {
+      "url": "https://www.tees.ac.uk/sections/international/immigration.cfm",
+      "title": "Obtaining a CAS for a Student Visa | International | Teesside University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [
+        "Credibility checks: If you have not done so already, you must complete the mandatory questionnaire on your applicant portal.",
+        "You will receive an invitation to log into Enroly CAS Shield when you reach the stage of the course admission process where you are required to apply for a CAS"
+      ],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Confirms Enroly CAS Shield and a mandatory pre-CAS questionnaire reviewed by the 'UKVI International Compliance Team' ('to allow the UKVI International Compliance Team to confirm they are happy with your intentions for coming to Teesside University to study'). 'Following successful completion of all University checks your CAS will be issued within 5 working days'. No separate interview question list."
+    },
+    {
+      "url": "https://tees.cas-shield.com/",
+      "title": "CAS Shield",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "tees.cas-shield.com resolves (HTTP 200) and serves Enroly's CAS Shield login page (page text contains 'Enroly' and 'CAS Shield'), so Teesside University uses Enroly CAS Shield for its CAS process. Enroly pre-CAS interviews draw randomised questions from themed banks; no question list is published on the site."
+    },
+    {
+      "url": "https://www.scribd.com/document/911392325/Teesside-Credibility-Interview-Q-A",
+      "title": "Teesside Credibility Interview Q&A | PDF | Cost Of Living | 3 D Computer Graphics",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Why the UK?",
+        "Why Teesside University?",
+        "Why This Course (MA 3D Games Art)?",
+        "Background/Post-Graduation Activities",
+        "Accommodation",
+        "Funding",
+        "Work Plans",
+        "Post-Study Career Plans"
+      ],
+      "quotes": [
+        "Why Teesside University?",
+        "Why this course?",
+        "What have you done after your graduation?",
+        "What about accommodation?",
+        "How are you funding your studies?",
+        "Do you plan to work whilst in the UK?",
+        "What are your post-study career plans?",
+        "Tell us about your research into alternative universities?"
+      ],
+      "questionIds": [
+        "q-07",
+        "q-09",
+        "q-201",
+        "q-05",
+        "q-17",
+        "q-163",
+        "q-14",
+        "q-54",
+        "q-19",
+        "q-34",
+        "q-100"
+      ],
+      "unmapped": [],
+      "notes": "Uploaded by 'SAI PRAVEEN' (Indian applicant, MA 3D Games Art). Read via a text-reader proxy. A prepared Q&A script, so the questions are the student's expected questions rather than a transcript. Answers cover Parkside Hall (10-minute walk to campus), family income and rental income, 20 hrs/week term-time work rule, and returning to India to work for named studios."
+    },
+    {
+      "url": "https://unimock.ai/teesside-university-pre-cas-interview",
+      "title": "Teesside University Pre-CAS interview — Questions & AI Practice | UniMock",
+      "tier": "consultancy",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Course knowledge",
+        "Finance",
+        "Study intent & immigration history",
+        "English communication",
+        "Post-study plans & ties",
+        "Immigration & compliance"
+      ],
+      "quotes": [
+        "Why did you choose this university?",
+        "What modules are you most looking forward to?",
+        "How is this course assessed?",
+        "How will you pay tuition and living costs?"
+      ],
+      "questionIds": [
+        "q-09",
+        "q-11",
+        "q-12",
+        "q-14"
+      ],
+      "unmapped": [],
+      "notes": "AI-practice vendor page. Heading 'Real Teesside questions students are asked', but the page states the themes come from UKCISA guidance - generic, low weight. Format claims: '30-90 minutes', answers 'one to three minutes each', recorded portals 'may not let you re-record'."
+    },
+    {
+      "url": "https://isc.tees.ac.uk/readiness-check",
+      "title": "Readiness Check | Teesside University ISC",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Page now only says 'The Teesside University International Study Centre closed on 31 August 2026'. Search snippet had said a Readiness Check interview was required before CAS for ISC (pathway) applicants; no questions were readable."
+    },
+    {
+      "url": "https://www.tiktok.com/discover/teesside-university-credibility-interview-questions",
+      "title": "Teesside University Credibility Interview Questions | TikTok",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Search-result title only; not fetched; no questions recorded."
+    }
+  ],
+  "searchesRun": [
+    "Teesside University credibility interview pre-CAS interview questions",
+    "Bing: Teesside University pre-CAS interview questions (Bing HTML results page fetched via WebFetch after the WebSearch budget was exhausted; it returned unrelated results (recorded for completeness, no evidence taken).)",
+    "curl probe: tees.cas-shield.com / teesside.cas-shield.com"
+  ]
+}

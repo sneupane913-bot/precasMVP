@@ -1,0 +1,128 @@
+{
+  "institutionId": "inst-middlesex-university",
+  "name": "Middlesex University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.mdx.ac.uk/international/student-visas/your-interview/",
+      "title": "Your Interview / Preparing for your credibility interview | Middlesex University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Your Institution",
+        "Your Course and Career Plans",
+        "Living in the UK"
+      ],
+      "quotes": [
+        "Why do you want to study in the UK?",
+        "Why did you choose your institution?",
+        "Where is your institution?",
+        "How big is your institution?",
+        "What other institutions did you consider?",
+        "Why did you choose this course?",
+        "What other courses did you consider?",
+        "How will you be assessed?",
+        "What modules will you study?",
+        "What do you want to do after graduation?",
+        "How will this qualification help you?",
+        "How much are the tuition fees?",
+        "How long is your course?",
+        "What qualification will you receive when you graduate?",
+        "Where will you live?",
+        "How will you pay for your studies/living costs?",
+        "How much will your accommodation cost?",
+        "Are you planning to work while you are in the UK?"
+      ],
+      "questionIds": [
+        "q-07",
+        "q-09",
+        "q-11",
+        "q-12",
+        "q-14",
+        "q-17",
+        "q-19",
+        "q-20",
+        "q-34",
+        "q-36",
+        "q-40",
+        "q-42",
+        "q-47",
+        "q-54",
+        "q-100",
+        "q-108",
+        "q-147",
+        "q-201"
+      ],
+      "unmapped": [],
+      "notes": "Fetched. Describes the UKVI credibility interview: 'The interview should last around 10 to 20 minutes. It can be done by video conference with an interviewer in the UK, by telephone or face-to-face at a visa application centre, a High Commission or an Embassy.' 'The interview is not recorded, but your answers are written down.' Checks 'You have carefully thought about your study and why you want to come here' and 'Your English is good enough for you to study in the UK so you will be expected to answer the questions without an interpreter.' No CAS Shield/Enroly mention."
+    },
+    {
+      "url": "https://www.mdx.ac.uk/international/student-visas/your-application/",
+      "title": "Student Visa Application | Middlesex University London",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched. Only offers a 'Visa Credibility Preparation Webinar' video: 'This video will help you prepare for your visa credibility interview by reviewing some of the most common questions.' No questions in page text."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=Kon7V4RtU0o",
+      "title": "Middlesex University UK Pre CAS Interview Questions & Answers | Study In UK 2026",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'Study in UK with Wayup' (oEmbed). Description not returned; no questions readable."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=CAcltZs3aSY",
+      "title": "Pre-Cas interview Middlesex University (MDX)Part-1 |I CAS interviewUK-2023 #CAS #interview #SA",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'SLT-_-' (oEmbed). Description not returned; no questions readable."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=GE-GNlrlUps",
+      "title": "UKVI Credibility Interview for Middlesex University 2025|Real Experience+Questions| UK Students Visa",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'Bibi Colab' (oEmbed). Description not returned; no questions readable."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=1B_HgjefuDY",
+      "title": "Preparation Before Pre-CAS interview ||Middlesex University interview|| CAS interview uk 2025",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'SLT-_-' (oEmbed). Description not returned; no questions readable."
+    }
+  ],
+  "searchesRun": [
+    "Middlesex University pre-CAS interview questions",
+    "Middlesex University credibility interview questions",
+    "site:mdx.ac.uk credibility interview"
+  ],
+  "researcherNotes": "Official page lists 18 verbatim questions in three groups. Student Room thread (t=5883070) returned 403. Multiple YouTube student reports exist but descriptions were not readable."
+}

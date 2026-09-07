@@ -1,0 +1,74 @@
+{
+  "institutionId": "inst-university-of-strathclyde",
+  "name": "University of Strathclyde",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": false,
+  "sources": [
+    {
+      "url": "https://www.strath.ac.uk/professionalservices/studentexperience/admissions/confirmationofacceptanceforstudiescas/pre-casreadinesscheck/",
+      "title": "Pre-CAS readiness check | University of Strathclyde",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "your chosen programme",
+        "your reasons for studying in the UK",
+        "your future plans",
+        "your preparation for study",
+        "Your course (what you'll study, key modules, skills gained)",
+        "Your decision-making (why this programme/university)",
+        "Your future plans (career goals, course alignment)"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-201",
+        "q-11",
+        "q-154",
+        "q-07",
+        "q-19",
+        "q-20",
+        "q-09",
+        "q-141"
+      ],
+      "unmapped": [],
+      "notes": "Not CAS Shield: 'completed online (via Qualtrics) and includes a combination of video and written responses'; 'Approximately 15 minutes'; 'Your responses will be reviewed by the academic faculty'. Outcomes: Pass (CAS may be issued), Borderline (guidance, may progress), Unsuccessful (second opportunity may be given; failure ends progression). Search snippet: 'reflects the type of questions asked in a UKVI credibility interview, and may be asked of some applicants before visa sponsorship'. No literal questions listed, only topics."
+    },
+    {
+      "url": "https://isc.strath.ac.uk/how-to-apply/visa-information",
+      "title": "Student visa information | University of Strathclyde ISC",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [
+        "Why did you choose the University of Strathclyde International Study Centre?",
+        "Did you consider other courses?",
+        "Why do you want to study in the UK?",
+        "Do you plan to work in the UK?"
+      ],
+      "questionIds": [
+        "q-09",
+        "q-42",
+        "q-07",
+        "q-54"
+      ],
+      "unmapped": [],
+      "notes": "International Study Centre (pathway college, Study Group) page about UKVI credibility interviews, not the main university. 'Credibility interviews normally take place in your local Visa Application Centre, via a video link ... interviewed by an ECO'. Advises research on accommodation options, costs, local area, course content."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=zxNhVOMO_9U",
+      "title": "University of Strathclyde | No Credibility Interview | Low Initial Deposit | Sep 2023 intake UK",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title via oEmbed (author Farooq Azam Official). Agent video claiming no credibility interview for Sep 2023 intake; superseded by the university's Pre-CAS readiness check page. No questions."
+    }
+  ],
+  "searchesRun": [
+    "University of Strathclyde credibility interview questions"
+  ]
+}

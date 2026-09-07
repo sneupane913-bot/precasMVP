@@ -1,0 +1,125 @@
+{
+  "institutionId": "inst-london-south-bank-university",
+  "name": "London South Bank University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.lsbu.ac.uk/__data/assets/pdf_file/0017/116522/making-tier-4-application-credibility-interviews.pdf",
+      "title": "Making a Tier 4 application: Credibility interviews (LSBU PDF)",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [
+        "why you chose LSBU / the UK rather than home country or another English-speaking country",
+        "English language ability",
+        "genuine student"
+      ],
+      "quotes": [
+        "Why did you choose to study at London South Bank University?"
+      ],
+      "questionIds": [
+        "q-07",
+        "q-08",
+        "q-09"
+      ],
+      "unmapped": [],
+      "notes": "WebFetch returned HTTP 403 (both this URL and the older /_resources/pdf/guidelines/ URL). Snippet text: 'Why did you choose to study at London South Bank University?' with guidance to 'think about why you chose to study in the UK rather than in your home country, another English-speaking country or country which other students of your nationality chose to study in.' Snippet also: 'The Home Office intends to interview most students who make a Student visa application to assess whether your English language ability meets the required level and whether you are a \"genuine student\"'; 'You will be interviewed when you attend the visa application centre to submit your application and biometric information.'"
+    },
+    {
+      "url": "https://www.lsbu.ac.uk/_old/international/visas-and-immigration/confirmation-of-acceptance-for-studies-cas",
+      "title": "Confirmation of Acceptance for Studies (CAS) | London South Bank University",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [
+        "genuine international student",
+        "English language speaking and listening",
+        "Tier 4 financial requirements"
+      ],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "WebFetch returned HTTP 403. Snippet text: 'Take part in a pre-CAS Credibility and English Interview'; 'The interview will last approximately 15 to 20 minutes and you will be asked a set of questions. The interview is to check you are a genuine international student seeking to study in the UK and may also check your English language speaking and listening ability.' Older (Tier 4-era) page. No questions in snippet."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=7u3mVQrJNUA",
+      "title": "Credibility Interview For London South Bank University | LSBU Credibility Mock Test for Preparation",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'GK ELT' (oEmbed). Description not returned; no questions readable."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=oHs-Pl_j-V4",
+      "title": "My Pre CAS Interview | London South Bank University | LSBU.",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'IELTS With Mashtorshav' (oEmbed). Description not returned; no questions readable."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=ia4BK2uNMCg",
+      "title": "LSBU 2023/2024 Pre-Cas Interview: Exclusive Insights and First-Hand Experience",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'Hassan Raza' (oEmbed). Description not returned; no questions readable."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=Im2N5-xwvrw",
+      "title": "Pre-Cas interview LSBU Part-1 || CAS interview UK-2024 - #CAS #interview #lsbu",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'Tanvir Bhai ll' (oEmbed). Description not returned; no questions readable."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=Y441iQD9dhI",
+      "title": "Pre - CAS interview at London south bank university. University admission interview for UK.",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'All In One' (oEmbed). Description not returned; no questions readable."
+    },
+    {
+      "url": "https://www.scribd.com/document/547124287/Mamoon-s-Credibility-Interview-Doc",
+      "title": "Mamoon's Credibility Interview | PDF (Scribd) - LSBU Interview Insights for Prospective Students",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched; Scribd exposed only the summary ('LSBU Interview Insights for Prospective Students'), names London South Bank University, no verbatim questions visible."
+    }
+  ],
+  "searchesRun": [
+    "London South Bank University credibility interview questions",
+    "LSBU pre-CAS interview",
+    "site:lsbu.ac.uk credibility interview",
+    "(budget exhausted, not run) London South Bank University pre-CAS interview questions Nepal students"
+  ],
+  "researcherNotes": "All lsbu.ac.uk URLs returned 403 to WebFetch. Many student YouTube videos exist for LSBU pre-CAS interviews but descriptions could not be read. Also seen: https://www.lsbu.ac.uk/international/international-student-journey (403)."
+}

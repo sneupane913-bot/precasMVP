@@ -1,0 +1,37 @@
+{
+  "institutionId": "inst-bpp",
+  "name": "BPP University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.scribd.com/document/808872755/INTERVIEW-QA-BPP",
+      "title": "BPP University CAS Interview Guide | PDF | United Kingdom",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [
+        "academic background and motivation",
+        "gaps in academic history and how applicants spent that time",
+        "where students will stay in the UK and commute arrangements"
+      ],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "A student-shared BPP CAS interview guide; the search-result snippet listed the three topics above. Not fetched. A second document of the same kind exists on Studocu (\"Updated Pre-CAS Questions for BPP University Application\")."
+    },
+    {
+      "url": "https://www.studocu.com/en-gb/document/bpp-university/llb-hons-law/updated-pre-cas-questions-for-bpp-university-application/133221829",
+      "title": "Updated Pre-CAS Questions for BPP University Application - Studocu",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title only, from the search result. Not fetched."
+    }
+  ],
+  "searchesRun": ["BPP University pre-CAS interview questions international students credibility"]
+}

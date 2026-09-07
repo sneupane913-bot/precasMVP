@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { publicInstitutions } from '@/lib/data/institutions';
+import { evidenceSummary } from '@/lib/data/university-evidence';
 import type { Institution } from '@/lib/types';
 import { SiteHeader } from '@/components/SiteHeader';
 import { Page, Card, Banner, Button, ButtonLink, Chip, Monogram, EmptyState, SectionTitle } from '@/components/ui';
@@ -205,8 +206,9 @@ function UniversityBrowser() {
             Choose your university
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-lg text-ink-soft">
-            Questions are built from the credibility themes universities publish, not from any
-            leaked question list.
+            Every paper is built for the university you pick: its city, its UKVI living-cost band,
+            and, where the university publishes its own interview guidance, the questions it says
+            it asks. Nothing comes from a leaked list.
           </p>
         </div>
 
@@ -443,7 +445,7 @@ function UniCard({
         </Chip>
       </div>
 
-      <div className="mb-5 grid grid-cols-2 gap-3">
+      <div className="mb-3 grid grid-cols-2 gap-3">
         <div className="rounded-control border border-line bg-surface-sunk px-3 py-3 text-center">
           <p className="text-micro uppercase tracking-wide text-ink-quiet">Duration</p>
           <p className="mt-0.5 font-bold text-ink">{i.durationMinutes} mins</p>
@@ -453,6 +455,16 @@ function UniCard({
           <p className="mt-0.5 font-bold text-ink">{i.questionCount} Qs</p>
         </div>
       </div>
+
+      {/* Q-14. What the paper for this university rests on, in one honest
+          line, and a way to see every source. A university we found nothing
+          for says so; it does not borrow another university's evidence. */}
+      <p className="mb-5 text-sm leading-snug text-ink-soft">
+        {evidenceSummary(i).line}{' '}
+        <Link href={`/universities/${i.slug}/evidence`} className="font-semibold text-ink underline-offset-2 hover:underline">
+          See the evidence
+        </Link>
+      </p>
 
       {/* U-3: ONE action per card, and its label never promises something the
           server will refuse. */}

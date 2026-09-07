@@ -1,0 +1,36 @@
+{
+  "institutionId": "inst-university-of-nottingham",
+  "name": "University of Nottingham",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "http://nottingham.ac.uk/go/obtaining-your-cas",
+      "title": "Confirmation of Acceptance for Studies (CAS) - The University of Nottingham",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched. Page has no pre-CAS/credibility interview content and lists no questions. Only says students with 5+ years of UK degree-level study 'may ask you to complete a questionnaire about your previous studies before we can issue your CAS'. Search snippet: 'automatically prepares a CAS for new international students once they have met certain requirements, including paying any necessary deposits.'"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=8ALe6gAuaQU",
+      "title": "University of Nottingham Pre Cas Interview Questions | Credibility Interview UK 2025",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Video page fetch returned only YouTube footer; title confirmed via oEmbed (author 'Study in UK'). Description/questions not readable, so no quotes recorded."
+    }
+  ],
+  "searchesRun": [
+    "University of Nottingham credibility interview questions",
+    "University of Nottingham pre-CAS interview international students genuine student"
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "institutionId": "inst-university-of-south-wales",
+  "name": "University of South Wales",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.southwales.ac.uk/international/visas-and-pre-arrival/credibility-interviews/",
+      "title": "Credibility Interviews - University of South Wales",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [
+        "Your Course",
+        "Career Aspirations",
+        "Finances"
+      ],
+      "quotes": [
+        "Why did you choose this course?",
+        "How will your course be assessed?",
+        "Why did you choose to study in the UK?",
+        "Why did you choose to study at the University of South Wales?",
+        "What facilities at the University of South Wales particularly attracted you?"
+      ],
+      "questionIds": [
+        "q-201",
+        "q-12",
+        "q-07",
+        "q-09",
+        "q-202",
+        "q-101",
+        "q-20",
+        "q-46",
+        "q-14",
+        "q-179"
+      ],
+      "unmapped": [],
+      "notes": "Fetch returned HTTP 403; quotes are from the search-result snippet of this page. Snippet also says: think about 'the relevance of your course to your future career path ... why you are progressing to this course and how it relates to your previous study'; 'how you are funding your studies. If the funds have come from a large transaction such as a sale of land, you should be prepared to talk about that'."
+    },
+    {
+      "url": "https://uswfoxtail.blob.core.windows.net/foxtail-prod-uploads/documents/Credibility_Interview_Questions_05.06.14.pdf",
+      "title": "Potential credibility interview questions (University of South Wales PDF, 05/06/14)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Your course",
+        "Your finances and personal situation",
+        "Your future plans"
+      ],
+      "quotes": [
+        "Why did you choose this course?",
+        "How will your course be assessed?",
+        "Why did you choose to study in the UK?",
+        "Why did you choose to study at the University of South Wales?",
+        "What facilities at the University of South Wales particularly attracted you?",
+        "How are you funding your studies?",
+        "If you have taken out a bank loan to finance your studies, how do you intend to repay it?",
+        "If you have dependants travelling with you, what will they be doing while you are studying?",
+        "Where do you intend to live while you are in the UK? Have you already arranged accommodation?",
+        "How are you planning on travelling to the University?",
+        "What do you plan to do after you finish your course?",
+        "If you intend to return home to seek employment, which companies do you hope to apply to?",
+        "How is your course relevant to your future plans?",
+        "If you intend to stay in the UK for further study, what do you plan to do?"
+      ],
+      "questionIds": [
+        "q-201",
+        "q-12",
+        "q-07",
+        "q-09",
+        "q-202",
+        "q-101",
+        "q-14",
+        "q-106",
+        "q-125",
+        "q-88",
+        "q-17",
+        "q-163",
+        "q-107",
+        "q-19",
+        "q-127",
+        "q-175",
+        "q-20",
+        "q-69",
+        "q-174"
+      ],
+      "unmapped": [],
+      "notes": "USW-hosted PDF (2014) extracted locally with pypdf. 'not an exhaustive list'. Also: 'if you are expected to undertake a pre-sessional English course prior to your main course please mention this in your interview.'"
+    },
+    {
+      "url": "https://www.facebook.com/groups/1209838390859493/posts/1324219559421375/",
+      "title": "University of South Wales interview questions for CAS ...",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Facebook group post seen in search results only; not fetched."
+    }
+  ],
+  "searchesRun": [
+    "University of South Wales credibility interview questions"
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "institutionId": "inst-university-of-surrey",
+  "name": "University of Surrey",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://my.surrey.ac.uk/visas/credibility-interviews",
+      "title": "Credibility interviews | MySurrey student website | University of Surrey",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Why you chose the University of Surrey",
+        "Why you chose this course",
+        "How your studies complement your career plans",
+        "Long break in studies / returning to study",
+        "How you will fund your studies",
+        "questions related to current events and your course",
+        "practical questions about your course such as, when will it start? How many hours of a week will you be studying?"
+      ],
+      "quotes": [
+        "Why did you choose the University of Surrey?",
+        "Why did you choose this course?",
+        "How do your studies compliment your career plans?",
+        "You have had a long break in your studies, why are you returning to study now?",
+        "How will you fund your studies?",
+        "when will it start?",
+        "How many hours of a week will you be studying?"
+      ],
+      "questionIds": [
+        "q-09",
+        "q-201",
+        "q-19",
+        "q-140",
+        "q-109",
+        "q-14",
+        "q-02",
+        "q-96"
+      ],
+      "unmapped": [
+        "How many hours of a week will you be studying?"
+      ],
+      "notes": "This page describes the UKVI credibility interview: 'up to 30 minutes', 'conducted via video link with a member of the UKVI based in the UK', 'The interview will be conducted in English and therefore your ability to communicate in English will be tested.', 'You can request a copy of your interview transcript', 'If you fail to attend a credibility interview after being invited then your application will be refused.' q-96 mapped from the 'current events ... linked to your course' topic, not a verbatim question. Search snippet for this page also listed topics: background, immigration history, planned studies, why Surrey and the course, career aspirations, funding; and 'Why you chose the UK rather than your home country, what the University of Surrey offers that other universities don't, and which other universities you considered' (snippet text, maps loosely to q-07, q-38, q-100)."
+    },
+    {
+      "url": "https://www.surrey.ac.uk/international/visas-and-immigration/confirmation-of-acceptance-for-studies",
+      "title": "Confirmation of Acceptance for Studies (CAS) | University of Surrey",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "chosen course, learning outcomes and the university"
+      ],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Verbatim: 'As part of the CAS process, you may be asked to complete a Pre-CAS interview.' 'We advise that applicants complete in-depth research and are well equipped with the information about the chosen course, learning outcomes and the university.' 'Failure to complete the interview may affect the outcome of you CAS application.' Links to https://visas.surrey.ac.uk/credibility-interviews which 302-redirects to the MySurrey page above. No example questions."
+    },
+    {
+      "url": "https://blog.kiratalent.com/university-of-surrey-credibility-interviews/",
+      "title": "Surrey saves 350+ hours conducting credibility interviews - Kira Talent Admissions Resources",
+      "tier": "consultancy",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Vendor case study. States Surrey uses 'Asynchronous Assessment in Kira Talent to conduct credibility interviews' and reviewers assess 'an applicant's intention to study'. No questions listed. Indicates Surrey's pre-CAS interview is a recorded asynchronous video assessment (Kira Talent), not a live call and not CAS Shield."
+    },
+    {
+      "url": "https://surrey.cas-shield.com/",
+      "title": "CAS Shield",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Subdomain resolved and served a page titled only 'CAS Shield' (no university name shown). Weak evidence of an Enroly CAS Shield tenant; not confirmed by any official page. Conflicts with the Kira Talent case study; usesCasShield left null."
+    }
+  ],
+  "searchesRun": [
+    "University of Surrey credibility interview questions",
+    "\"University of Surrey\" pre-CAS interview questions Nepal students",
+    "\"University of Surrey\" pre-CAS interview Kira Talent questions experience (not executed: session search budget exhausted)"
+  ]
+}

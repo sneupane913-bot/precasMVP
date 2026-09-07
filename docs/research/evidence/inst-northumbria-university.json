@@ -1,0 +1,126 @@
+{
+  "institutionId": "inst-northumbria-university",
+  "name": "Northumbria University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "sources": [
+    {
+      "url": "https://www.northumbria.ac.uk/study-at-northumbria/immigration/credibility-interviews/",
+      "title": "Credibility interviews | Northumbria University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "why the UK (other countries considered)",
+        "why Northumbria (other UK universities considered)",
+        "course motivation (and why further study if already a graduate)",
+        "career goals",
+        "financing",
+        "accommodation"
+      ],
+      "quotes": [
+        "Why have you chosen to study in the UK?",
+        "Why did you decide to study at Northumbria University?",
+        "What motivated you to choose your course of study?",
+        "What are your future career goals, and how will this course help you achieve them?",
+        "How are you financing your studies?",
+        "Where do you plan to live during your studies at Northumbria University?"
+      ],
+      "questionIds": [
+        "q-07",
+        "q-08",
+        "q-09",
+        "q-14",
+        "q-17",
+        "q-19",
+        "q-20",
+        "q-38",
+        "q-99",
+        "q-100",
+        "q-155",
+        "q-163",
+        "q-201"
+      ],
+      "unmapped": [],
+      "notes": "Fetched. Guidance under each question verbatim: 'You should consider what other countries you looked at and why you chose the UK over them?'; 'Be prepared to discuss the other UK universities you considered and explain in detail why Northumbria University was a better fit for you.'; 'If you've previously completed university studies, be prepared to explain why you're pursuing additional academic work.'; 'You will need to explain how you plan to cover your tuition fees and living expenses while studying in the UK.'; 'they will expect you to have considered your options' (accommodation). UKVI interview: 'Typically, you will be interviewed during your biometrics appointment'; 'conducted by a UKVI staff member in the UK, either via video conference (e.g., Skype), telephone, or face-to-face.' Pre-CAS: 'a Pre-CAS Interview as part of their admissions process to Northumbria University. This interview, conducted within CAS shield, aims to verify that you are a genuine student.' 'If you are unable to answer the questions satisfactorily during this interview, you will not be issued a CAS.' 'If you fail to attend your interview, your visa application will be refused.'"
+    },
+    {
+      "url": "https://www.northumbria.ac.uk/study-at-northumbria/immigration/cas-process/",
+      "title": "Student Route CAS Process | Northumbria University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched. 'Some applicants may need to complete a Pre-CAS Interview as part of their admissions process to Northumbria University.' Conducted through CAS Shield; 'a mock credibility interview, where you will likely be asked questions similar to those in the UKVI credibility interview'; 'You must pass the Pre-CAS Interview to receive a Confirmation of Acceptance for Studies from Northumbria University.' No example questions."
+    },
+    {
+      "url": "https://es.scribd.com/document/811774587/Northumbria-University-Cas-Interview-question-blank-sheet-Questions-sheet-new-1",
+      "title": "Northumbria University Cas Interview Question Blank Sheet - Questions Sheet New (Scribd) / 'Northumbria University MSc Interview Insights'",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched; Scribd exposed only metadata, no question text readable. Search-result tags mention 'Cost Of Living' and 'Marketing Strategy'."
+    },
+    {
+      "url": "https://unimock.ai/northumbria-university-pre-cas-interview",
+      "title": "Northumbria University Pre-CAS interview — Questions & AI Practice | UniMock",
+      "tier": "consultancy",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched but page body not returned (title only). No questions recorded."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=6F08cg2IV4A",
+      "title": "Part-1| How to clear the Pre CAS Interview UK? Q&A Northumbria | University Credibility Interview",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'Naa Mano Prayanam' (oEmbed). Description not returned; no questions readable."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=_7rvjrVW_Yc",
+      "title": "Northumbria University CAS Interview Questions & Answers | Cyber Security Mock Interview 2026",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'Study in UK with Wayup' (oEmbed). Description not returned; no questions readable."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=9c_8nvtuyGE",
+      "title": "Pre CAS Interview - Northumbria University - YouTube",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Seen in search results; oEmbed returned 404 (video may be removed/private). Title only."
+    }
+  ],
+  "searchesRun": [
+    "Northumbria University pre-CAS interview questions",
+    "Northumbria University credibility interview questions",
+    "site:northumbria.ac.uk pre-CAS interview"
+  ],
+  "researcherNotes": "Official page gives six verbatim questions with guidance; Pre-CAS interview confirmed inside CAS Shield with a must-pass rule. pathway.northumbria.ac.uk/faq/ was fetched and had no interview content."
+}

@@ -12,6 +12,7 @@ import { buildSummary } from '@/lib/summary';
 import { isDemoTranscript } from '@/lib/ai/stt';
 import { getInstitution } from '@/lib/data/institutions';
 import { getQuestion, resolvedQuestion , primeExtraQuestions} from '@/lib/data/questions';
+import { likelihoodFor, LIKELIHOOD_LABEL } from '@/lib/data/university-evidence';
 import { BAND_LABEL, CATEGORY_LABEL, FLAG_META, PEE_STEPS, type FlagType } from '@/lib/types';
 import { BAND, Card, Chip, ButtonLink, Eyebrow, type Band } from '@/components/ui';
 
@@ -369,6 +370,24 @@ export default async function ResultsPage({ params }: { params: Promise<{ sessio
                     <span className="rounded-md bg-surface-sunk px-2.5 py-1 text-micro font-semibold text-ink-quiet">
                       {CATEGORY_LABEL[q.category]}
                     </span>
+                    {/* Q-14. The evidence this question rests on, per
+                        university, with its URL. */}
+                    {(() => {
+                      const lk = likelihoodFor(base, institution);
+                      return lk ? (
+                        <a
+                          href={lk.sourceUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          title={lk.reason}
+                          className="rounded-md bg-surface-sunk px-2.5 py-1 text-micro font-semibold text-ink-quiet underline-offset-2 hover:underline"
+                        >
+                          {lk.level === 'general'
+                            ? LIKELIHOOD_LABEL.general
+                            : `${LIKELIHOOD_LABEL[lk.level]} at ${institution.shortName || institution.name}`}
+                        </a>
+                      ) : null;
+                    })()}
                     {/* D-27. A per-question "Almost ready · 75%" badge is the same
                         claim as the headline, made twelve more times. Withheld
                         for sample answers. */}

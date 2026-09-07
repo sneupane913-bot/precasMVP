@@ -1,0 +1,173 @@
+{
+  "institutionId": "inst-london-metropolitan-university",
+  "name": "London Metropolitan University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.londonmet.ac.uk/international/applying/compliance-interview-guide/",
+      "title": "Compliance Interview Guide - London Metropolitan University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Intention to Study in the UK",
+        "Course Choice and Academic Progression",
+        "Career plans",
+        "Visa and work",
+        "Finances"
+      ],
+      "quotes": [
+        "Why do you want to study in the UK?",
+        "Benefits of studying in the UK compared to your home country or other countries",
+        "Why London Met?",
+        "What motivated your choice of course at London Met?",
+        "Which modules are you most interested in and why?",
+        "Why do you prefer your London Met course compared to similar courses at other universities?",
+        "How does your course fit into your long-term career plans?",
+        "What roles or types of organisations do graduates from your course typically enter?",
+        "Do you understand your responsibilities as a UK Student Visa holder?",
+        "Who is financing your tuition fees and living costs?"
+      ],
+      "questionIds": [
+        "q-07",
+        "q-08",
+        "q-09",
+        "q-11",
+        "q-14",
+        "q-15",
+        "q-19",
+        "q-38",
+        "q-61",
+        "q-98",
+        "q-112",
+        "q-153",
+        "q-170",
+        "q-175",
+        "q-201"
+      ],
+      "unmapped": [],
+      "notes": "Fetched. This is London Met's own compliance (pre-CAS) interview guide; page says interviews are 'a standard part of the process' for applicants from specific countries after meeting offer conditions. No platform, length or outcome details on the page."
+    },
+    {
+      "url": "https://www.londonmet.ac.uk/international/advice/visas/student-visa-previously-tier-4/applying/after-youve-applied/credibility-interviews/",
+      "title": "Credibility interviews - London Metropolitan University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "immigration history: previous UK visas held, whether visa conditions were ever breached, visas obtained for other countries",
+        "study plans: gap between previous study and new course, reasons for choosing London Met and your course, plans after the course",
+        "financial matters: where your money has come from, family circumstances and financial support",
+        "English language"
+      ],
+      "quotes": [
+        "If there is a long gap between previous study and your new course you may be asked to explain why there has been a break",
+        "You may be asked about your plans after the course, eg where do you want to work",
+        "UKVI may ask where your money has come from"
+      ],
+      "questionIds": [
+        "q-05",
+        "q-09",
+        "q-14",
+        "q-15",
+        "q-18",
+        "q-19",
+        "q-28",
+        "q-52",
+        "q-90",
+        "q-104",
+        "q-109",
+        "q-115",
+        "q-123",
+        "q-126",
+        "q-201"
+      ],
+      "unmapped": [],
+      "notes": "Fetched. Describes the UKVI (Home Office) credibility interview 'via a video link with a member of staff from the Home Office'. Advice: 'be able to talk about the course content and not just list the modules'."
+    },
+    {
+      "url": "https://isc.londonmet.ac.uk/visa-information/",
+      "title": "Visa Information | London Metropolitan University Study Centre",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Eligibility assessment",
+        "Financial requirements",
+        "Academic qualifications",
+        "English Language proficiency"
+      ],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched. Pathway centre page: 'You must complete a Pre-CAS interview to allow us to assess whether your chosen course meets the vis requirements and whether you fulfil the criteria to study in the UK.' Minimum £4,000 deposit before CAS request. No questions."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=v_Bcmy07R5g",
+      "title": "London Metropolitan University (LMU) Pre Cas Interview Question | Credibility Interview UK",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'Study in UK' (oEmbed). Description not returned; no questions readable."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=ZfX53ppJ40o",
+      "title": "Pre CAS Interview For London Metropolitan University LMU London UK in MSC Public Health Program",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'Dr Saud Javed' (oEmbed). Description not returned; no questions readable."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=nwUENV2Qw7w",
+      "title": "Pre- CAS interview all question and answer ( london met uni. and others )",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'verma ji in UK' (oEmbed). Only title seen; no questions readable."
+    },
+    {
+      "url": "https://www.scribd.com/document/801532723/LMU-updated-interview-file",
+      "title": "London Met University Interview Insights (Scribd, 13 pages)",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched; Scribd only exposed metadata, document text not readable. Names London Metropolitan University. No questions recorded."
+    },
+    {
+      "url": "https://www.facebook.com/uniladderconsultancy0/videos/no-credibility-interview-apply-to-london-metropolitan-university-without-needing/497421469370628/",
+      "title": "No Credibility Interview !!! Apply to London Metropolitan ... (Uniladder Consultancy video)",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Seen in search results only; consultancy marketing claim that London Met can be applied to without a credibility interview. Not fetched, no questions."
+    }
+  ],
+  "searchesRun": [
+    "London Metropolitan University credibility interview questions",
+    "London Metropolitan University pre-CAS interview",
+    "site:londonmet.ac.uk credibility interview"
+  ],
+  "researcherNotes": "Two distinct official pages: the university's own Compliance Interview Guide (its pre-CAS interview) and its UKVI credibility interview advice page. No CAS Shield/Enroly mention found."
+}

@@ -89,6 +89,9 @@ Last updated: 2026-08-12 (session 3). Verified items now say how they were prove
 - [x] D19 Student history at /account: mocks and practice left, every session with a link back to the report or to carry on, referral link
 - [x] D20 Full journey walked end to end in qa/journey-check.js, 26/26: land, gate, sign in, browse, start, consent, finish, report, personal offer, history, pay, no dead ends, delete. Every page a student passes through is asserted phone safe at 360px.
 
+- [x] D21 The paper is the university's paper (7 Sep 2026, first customer feedback). No question repeats across a student's sittings (Q-11); questions the university publishes itself come first (Q-12); city and UKVI living-cost figure resolve from a sourced fact pack and reach the marker (Q-13); every question carries a likelihood with reason and URL, shown in the room, the report, the university card and `/universities/<slug>/evidence` (Q-14). Bank grown 130 to 210 from the sourced harvest plus the counsellor's list. Proven by `qa/paper-check.mjs` (26 assertions); browser pass still to do
+- [ ] D22 Finish the evidence sweep: groups 1, 2, 5, 6 of the 7 Sep research (BPP, UEL, UWL, Ravensbourne, Coventry, Anglia Ruskin to Bournemouth; Brunel to Heriot-Watt; Birmingham to Exeter; Glasgow to Northampton) hit the session limit before writing. Run ONE agent per group, one at a time, with the brief in CONTINUE-HERE session 9. Then `node qa/build-evidence.mjs`
+
 ## E. Payment and approval
 
 - [x] E1 Payment order model (`PaymentOrder`) with states

@@ -1,0 +1,114 @@
+{
+  "institutionId": "inst-university-of-salford",
+  "name": "University of Salford",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.salford.ac.uk/sites/default/files/2020-09/Tier-4-credibility-interviews.pdf",
+      "title": "WHAT IS A CREDIBILITY INTERVIEW? (University of Salford Tier 4 credibility interview leaflet PDF)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Your career aspirations, including your post-study plans and reasons for these plans",
+        "Information about your course of study, including modules and course content",
+        "Information about the funding of your studies in the UK",
+        "Your understanding of the rules and regulations for your Tier 4 visa",
+        "Your living arrangements, including how close this will be to the University",
+        "Details about the University’s location in the UK",
+        "Your personal life and your family history"
+      ],
+      "quotes": [
+        "HOW DO YOUR STUDIES FIT INTO YOUR CAREER PLANS?",
+        "What do I want to do after studying my course?",
+        "How does this course fit with my career objectives?",
+        "Will the course I want to study enable me to compete within the working environment?",
+        "WHY DID YOU CHOOSE THE UNIVERSITY OF SALFORD?",
+        "HOW WILL YOU FUND YOUR STUDIES?",
+        "WHAT TIES DO YOU HAVE TO YOUR HOME COUNTRY?",
+        "WHERE DO YOU PLAN TO LIVE?",
+        "YOU HAVE PREVIOUSLY OVERSTAYED. WHY WAS THIS THE CASE?"
+      ],
+      "questionIds": [
+        "q-20",
+        "q-19",
+        "q-154",
+        "q-09",
+        "q-33",
+        "q-38",
+        "q-149",
+        "q-14",
+        "q-104",
+        "q-82",
+        "q-92",
+        "q-88",
+        "q-17",
+        "q-163",
+        "q-107",
+        "q-90",
+        "q-187",
+        "q-11",
+        "q-61",
+        "q-147",
+        "q-132",
+        "q-89",
+        "q-109"
+      ],
+      "unmapped": [],
+      "notes": "PDF extracted locally with pypdf. UKVI interviews 'All interviews are conducted in English and normally via video link.' Guidance also says you 'may be asked to provide information about any gaps in your employment or study history', to explain source and sustainability of funds, hours/rules of Tier 4, proximity of accommodation to campus, and previous refusals. If refused on credibility, email Salford-CAS@salford.ac.uk for transcript request."
+    },
+    {
+      "url": "https://www.salford.ac.uk/international/faqs-for-prospective-international-students",
+      "title": "FAQs for Prospective International Students | University of Salford",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched; nothing about pre-CAS / credibility interview, CAS Shield or Enroly."
+    },
+    {
+      "url": "https://www.scribd.com/document/844347439/Md-Murshed-Khan-Interview-Sheet-pdf",
+      "title": "Salford University Pre-CAS Interview Guide",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Only Scribd metadata readable: covers educational background, reasons for choosing UK and Salford, course specifics, career plans, financial sponsorship, student responsibilities. No verbatim questions readable."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=qlq73A6MhP0",
+      "title": "University of Salford CAS Interview Questions 🇬🇧 | UK Student Visa Mock Interview 2026",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title via oEmbed (author 'Study in UK with Wayup'); description not readable."
+    },
+    {
+      "url": "https://www.facebook.com/groups/809707179596954/posts/2118014218766237/",
+      "title": "University of Salford, Menchester ar pre-cas interview ...",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Facebook group post seen in search results only; not fetched."
+    }
+  ],
+  "searchesRun": [
+    "University of Salford credibility interview questions",
+    "University of Salford pre-CAS interview questions Nepal"
+  ]
+}

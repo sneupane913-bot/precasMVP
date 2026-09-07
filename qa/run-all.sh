@@ -99,6 +99,18 @@ else
   FAILED=$((FAILED + 1))
 fi
 
+# The paper suite drives the real plan builder for every university, so it
+# imports the TypeScript directly like contract-check does.
+printf '  %-24s ' "paper-check"
+if OUT=$(node --experimental-strip-types --no-warnings --import ./qa/_alias-register.mjs qa/paper-check.mjs 2>&1); then
+  echo "$OUT" | grep -E 'passed' | tail -1
+  PASSED_SUITES=$((PASSED_SUITES + 1))
+else
+  echo "FAILED"
+  echo "$OUT" | grep -E 'FAIL' | head -6
+  FAILED=$((FAILED + 1))
+fi
+
 for suite in "${STATIC[@]}"; do
   printf '  %-24s ' "$suite"
   if OUT=$(node "qa/$suite.js" 2>&1); then

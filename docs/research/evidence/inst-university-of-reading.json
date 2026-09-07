@@ -1,0 +1,44 @@
+{
+  "institutionId": "inst-university-of-reading",
+  "name": "University of Reading",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.reading.ac.uk/essentials/International/Visa-and-immigration/credibility-interviews",
+      "title": "UKVI interview information for prospective students | University of Reading",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Ability to speak English",
+        "Why you want to study in the UK",
+        "Why you chose University of Reading",
+        "Why you chose your course",
+        "Your financial situation",
+        "Immigration history"
+      ],
+      "quotes": [
+        "Why do you want to study in the UK?",
+        "Why have you chosen to study at University of Reading?",
+        "Why have you chosen your course to study?",
+        "How will you finance your studies (fees and living costs in the UK)?",
+        "Why did you decide to come to the UK rather than, for example, Australia or the USA?",
+        "What are the benefits of studying in the UK compared to your home country or other countries that mean it is worth the cost to you?"
+      ],
+      "questionIds": [
+        "q-07",
+        "q-09",
+        "q-201",
+        "q-14",
+        "q-08",
+        "q-30"
+      ],
+      "unmapped": [],
+      "notes": "Conducted by 'a UKVI member of staff' in person, telephone or video. Non-attendance without reasonable explanation = automatic refusal; 'the caseworker has the authority to refuse entry if you fail the interview'; 'if you are unable to communicate in English, your application will be refused immediately'. Last two quotes and the snippet text 'questions about where you live and what your financial support arrangements are, how much your fees are and general questions about your life in the UK and your future plans' were read in the search snippet for this same URL."
+    }
+  ],
+  "searchesRun": [
+    "University of Reading credibility interview questions"
+  ]
+}

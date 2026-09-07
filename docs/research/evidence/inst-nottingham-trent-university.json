@@ -1,0 +1,94 @@
+{
+  "institutionId": "inst-nottingham-trent-university",
+  "name": "Nottingham Trent University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "sources": [
+    {
+      "url": "https://www.ntu.ac.uk/international/your-application/received-an-offer/applying-for-your-visa",
+      "title": "Applying for your visa | Nottingham Trent University",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [
+        "your NTU course",
+        "why you have chosen to study at NTU",
+        "English language ability"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-09",
+        "q-201"
+      ],
+      "unmapped": [],
+      "notes": "WebFetch returned HTTP 403. Snippet text: 'You should be well prepared for this and be able to talk about your NTU course and why you have chosen to study at NTU.' and 'Credibility interviews are used to assess the student's English language ability, and this type of interview will be conducted in English.' No verbatim questions."
+    },
+    {
+      "url": "https://www.ntu.ac.uk/about-us/governance/information-governance/admissions-privacy-notice",
+      "title": "Admissions privacy notice | Nottingham Trent University",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "WebFetch returned HTTP 403. Snippet text (site:ntu.ac.uk search): 'Credibility interviews are completed through Enroly and conducted using an artificial intelligence (AI) tool, which generates a score based on responses and forms part of the University's assessment of credibility. The score is reviewed by the Admissions team alongside other relevant information, and it is not used in isolation, with no decisions made solely based on automated processing.' Enroly is the CAS Shield vendor, hence usesCasShield=true. Attribution of this snippet to this exact page is inferred from the result list, not confirmed."
+    },
+    {
+      "url": "https://www.ntu.ac.uk/international/frequently-asked-questions",
+      "title": "International and European applicants FAQs | Nottingham Trent University",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "WebFetch returned HTTP 403. A snippet in the same result set (page attribution not confirmed; could be this page or /international/countries/asia/india) said: 'pre-CAS interviews that take place on MS Teams with a member of staff from the NTU International Team and last approximately 30 minutes' and 'final limited interview slots are available for those who may need them'. No questions."
+    },
+    {
+      "url": "https://yesoverseascareers.com/2026/01/nottingham-trent-university-study-in-uk-with-moi-and-no-cas-interviewstudy-in-uk-nottingham-trent-university-without-ielts/",
+      "title": "Nottingham Trent University – Study in UK with MOI and No CAS Interview (Yes Overseas Careers)",
+      "tier": "consultancy",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched. Verbatim: 'One of the biggest fears for UK students is the CAS credibility interview. Nottingham Trent University does not require a CAS interview for most eligible students.' Consultancy marketing; no questions."
+    },
+    {
+      "url": "https://www.tiktok.com/@studyabroad_shafraz/video/7608098947885829393",
+      "title": "Did you know that Nottingham Trent University is issuing CAS letters for September 2026 without a Pre-CAS interview for most students? (TikTok)",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Seen in search results only; not fetched. Consultancy claim that NTU issues CAS for Sept 2026 'without a Pre-CAS interview for most students'."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=WN-GXgENjHY",
+      "title": "Nottingham Trent University Pre Cas Interview Questions | Mock Interview",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'Study in UK' (oEmbed). Description not returned; no questions readable."
+    }
+  ],
+  "searchesRun": [
+    "Nottingham Trent University credibility interview questions",
+    "Nottingham Trent University pre-CAS interview",
+    "site:ntu.ac.uk credibility interview",
+    "(budget exhausted, not run) Nottingham Trent University Enroly credibility interview questions"
+  ],
+  "researcherNotes": "All ntu.ac.uk pages (visa page, FAQ, India page, privacy notice, student-hub PDF) returned 403 to WebFetch; recorded from snippets. Two consultancy sources claim NTU currently waives the pre-CAS interview for most students; the privacy notice snippet says interviews, when used, run through Enroly with an AI scoring tool."
+}

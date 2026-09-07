@@ -1,0 +1,98 @@
+{
+  "institutionId": "inst-university-of-the-west-of-england",
+  "name": "University of the West of England",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.uwe.ac.uk/courses/international-study/visas/applying/student-visa-outside-of-the-uk/guide-to-credibility-interview",
+      "title": "Guide to credibility interview - Applying for a student visa outside of the UK | UWE Bristol",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Your education and career plans",
+        "Your visa application",
+        "Personal and financial circumstances",
+        "English language skills",
+        "Make sure you know about your course: How long it is, What qualification you will receive, What is the structure of the course like, What modules you are interested in studying"
+      ],
+      "quotes": [
+        "Why did you choose UWE Bristol?",
+        "Did you consider studying at any other university?",
+        "Why do you want to study in the UK?",
+        "Why did you choose your course? What modules will you be studying?",
+        "What are your future career plans?",
+        "Are you planning on further study in the UK after you complete this course?",
+        "Do you have any travel plans?",
+        "Do you have family in the UK?",
+        "Have you made any previous visa applications and were they successful?",
+        "Have you travelled to the UK previously and, if so, for what purpose?",
+        "How did you obtain the funds you are using to support yourself during your studies?",
+        "Where will you be living during your studies and how will you travel to University?",
+        "Do you plan on working in the UK?",
+        "Will you be bringing dependants with you?",
+        "What impact would health promotion have in your region?",
+        "Can you explain epidemiology?"
+      ],
+      "questionIds": [
+        "q-09",
+        "q-100",
+        "q-07",
+        "q-201",
+        "q-11",
+        "q-19",
+        "q-69",
+        "q-174",
+        "q-169",
+        "q-35",
+        "q-115",
+        "q-18",
+        "q-168",
+        "q-159",
+        "q-104",
+        "q-17",
+        "q-54",
+        "q-88",
+        "q-45",
+        "q-40",
+        "q-39"
+      ],
+      "unmapped": [
+        "Do you have any travel plans?",
+        "What impact would health promotion have in your region?",
+        "Can you explain epidemiology?"
+      ],
+      "notes": "The question-form quotes are the page's section headings under 'Your education and career plans', 'Your visa application' and 'Personal and financial circumstances'. The two Public Health questions are given as an example of subject-specific questions ('an MSc Public Health applicant was asked'); mapped loosely to q-45 and also listed unmapped. q-40/q-39 mapped from the course-knowledge checklist. Pre-CAS: 'you may be asked to participate in a UWE Bristol Pre CAS interview with a member of staff, which will happen before you pay a deposit'; described as 'a short, structured conversation'. Advice: 'you must prepare well and above all be honest and natural with your answers'; 'We do not advise you to prepare or read off a script'. 'Following your interview a report of the interview including the answers you have given will be sent to the Entry Clearance Officer who makes the decision on your Student Visa application.' Second interviews: email immigrationadvice@uwe.ac.uk. Work: max 20 hours/week term time and 'cannot rely on funds from work in support of your living costs'."
+    },
+    {
+      "url": "https://www.instagram.com/p/DMhUPEQocr0/",
+      "title": "No Pre-CAS Interview Required at UWE Bristol! Start your postgraduate journey with confidence",
+      "tier": "consultancy",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Caption verbatim: 'No Pre-CAS Interview Required at UWE Bristol! Start your postgraduate journey with confidence at the University of the West of England (Bristol)'. Agent marketing post; contradicts the official page which says applicants 'may be asked' to do a pre-CAS interview. Poster identity not visible in fetch."
+    },
+    {
+      "url": "https://uwe.cas-shield.com/",
+      "title": "CAS Shield",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Subdomain resolved and served a page titled only 'CAS Shield' (no university name shown). Weak evidence of an Enroly CAS Shield tenant; not confirmed by any official page."
+    }
+  ],
+  "searchesRun": [
+    "UWE Bristol credibility interview questions pre-CAS",
+    "\"UWE Bristol\" pre-CAS interview questions YouTube",
+    "\"UWE Bristol\" pre-CAS interview questions Nepal OR India experience (not executed: session search budget exhausted)"
+  ]
+}

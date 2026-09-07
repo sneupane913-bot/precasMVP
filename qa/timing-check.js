@@ -193,7 +193,9 @@ check(
 
 check(
   'T-17 a probe follows its own topic',
-  /probesFor\(root\.category\)/.test(qSrc),
+  // 7 Sep 2026: the helper became an inline filter when probes learned to
+  // avoid repeats (Q-11); the rule is the same, the category must match.
+  /probesFor\(root\.category\)|q\.isProbe && q\.category === root\.category/.test(qSrc),
   'the planner places a probe without matching the category of the question before it, so a ' +
     'finance probe can follow an accommodation answer'
 );

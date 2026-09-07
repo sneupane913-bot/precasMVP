@@ -1,0 +1,80 @@
+{
+  "institutionId": "inst-university-of-sheffield",
+  "name": "University of Sheffield",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://sheffield.ac.uk/media/27076/download?attachment",
+      "title": "Typical Credibility Interview Questions (University of Sheffield International Student Support PDF)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [
+        "Why did you choose The University of Sheffield?",
+        "Why did you choose your course?",
+        "What do you prefer about your course at Sheffield compared to other courses?",
+        "If you applied for other courses - why did you choose Sheffield over them?",
+        "If you have previously studied in the UK, why have you chosen to return?",
+        "If you have had a long break in your studies, why are you returning to study now?",
+        "How do your studies fit into your career plans?",
+        "Does your course lead to any professional exemptions or qualifications, and are these recognised in your country?",
+        "Do you know what other students graduating from your course went on to do (e.g. the types of roles and organisations they work for)?",
+        "If the course you plan to study is at a similar academic level to previous studies, how does it represent progression and does it have a vocational focus?",
+        "If the costs of pursuing your course of study are higher in the UK than in your home country, why have you decided to incur the extra costs involved with studying in the UK?",
+        "Have you made a realistic assessment of all the costs involved and how you plan to pay for them?",
+        "Do you plan to work in the UK?",
+        "How will you fund your studies?",
+        "Where you have a loan, how will you afford to pay this back?",
+        "How much will your accommodation cost and are you clear about the cost of living in the UK?"
+      ],
+      "questionIds": [
+        "q-09",
+        "q-07",
+        "q-201",
+        "q-153",
+        "q-122",
+        "q-42",
+        "q-111",
+        "q-140",
+        "q-20",
+        "q-19",
+        "q-41",
+        "q-112",
+        "q-94",
+        "q-13",
+        "q-46",
+        "q-30",
+        "q-16",
+        "q-14",
+        "q-54",
+        "q-114",
+        "q-106",
+        "q-108"
+      ],
+      "unmapped": [],
+      "notes": "PDF linked from the credibility-interviews page (href /media/27076/download?attachment); extracted locally with pypdf. Note: 'How will you fund your studies? (You should not be asked this unless you are called back for a second interview)'. Interviewer also checks listening/speaking in English."
+    },
+    {
+      "url": "https://sheffield.ac.uk/student-visas-immigration/visa-application/outside-uk/credibility-interviews",
+      "title": "Credibility interviews | immigration | The University of Sheffield",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Your finances",
+        "Your academic history",
+        "Your intention to study",
+        "Your personal background"
+      ],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "'Interviews are conducted in English by a Home Office staff member usually via video link', usually at the visa application centre at biometrics. 'You may be asked to attend a second interview.' Same content at https://sheffield.ac.uk/new-students/immigration/student-visa-application/outside-uk/credibility-interviews (also fetched)."
+    }
+  ],
+  "searchesRun": [
+    "University of Sheffield credibility interview questions"
+  ]
+}

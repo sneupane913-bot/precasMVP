@@ -255,7 +255,7 @@ export default async function HomePage() {
               },
               {
                 q: 'Are these the exact questions my university will ask?',
-                a: 'No, and anyone who promises that is not being honest with you. Our questions are built from the credibility themes universities publish, so you practise the right subjects in the right way.',
+                a: 'Nobody can promise the exact list, and anyone who does is not being honest with you. What we do is show our evidence: where your university publishes its own interview guidance or its students report what they were asked, those questions go in your paper and each one is labelled with how likely it is and where we found it.',
               },
               {
                 q: 'Who can see my answers?',

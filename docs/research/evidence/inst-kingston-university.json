@@ -1,0 +1,91 @@
+{
+  "institutionId": "inst-kingston-university",
+  "name": "Kingston University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "sources": [
+    {
+      "url": "https://www.kingston.ac.uk/study/international-students/visas-immigration-and-cas/confirmation-of-acceptance-for-studies",
+      "title": "Confirmation of Acceptance for Studies (CAS) | Kingston University London",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [
+        "pre-CAS interview (CAS Shield, recorded online)"
+      ],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "WebFetch returned HTTP 403. From search snippet only: 'Some applicants are required to complete a pre-CAS interview based on their country of application. Applicants from Bangladesh, India, Nepal, Pakistan, and Sri Lanka are strongly encouraged to complete the Pre-CAS interview by the deadline dates.' and 'Your pre-CAS interview will appear in your CAS Shield account once you have activated it. You will complete this online by recording your answers directly in the system.' Snippet also says Kingston provides a 'pre-CAS interview training guide' (not located). No question list in snippet."
+    },
+    {
+      "url": "https://www.kingston.ac.uk/study/international-students/visas-immigration-and-cas/visa-requirements",
+      "title": "Visa requirements | Kingston University London",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [
+        "your chosen course",
+        "your university",
+        "how studying in the UK aligns with your academic and career aspirations",
+        "your financial arrangements and the documentation supporting your application"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-07",
+        "q-09",
+        "q-14",
+        "q-19",
+        "q-85",
+        "q-201"
+      ],
+      "unmapped": [],
+      "notes": "WebFetch returned HTTP 403. Snippet text: 'You should be ready to discuss your chosen course, your university, and how studying in the UK aligns with your academic and career aspirations. Familiarity with your financial arrangements and the documentation supporting your application is also essential.' Describes the UKVI credibility interview ('usually be conducted by video link with a UK Visas and Immigration (UKVI) officer'). Topics only, no verbatim questions."
+    },
+    {
+      "url": "https://www.kingstonisc.com/how-to-apply/visa-information",
+      "title": "Visa information | Kingston University International Study Centre",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "the International Study Centre",
+        "accommodation options, costs, and the local area",
+        "your chosen course content",
+        "employment / work placement"
+      ],
+      "quotes": [
+        "Why did you choose the Kingston University London International Study Centre?",
+        "Did you consider other courses?",
+        "Why do you want to study in the UK?"
+      ],
+      "questionIds": [
+        "q-07",
+        "q-09",
+        "q-42"
+      ],
+      "unmapped": [],
+      "notes": "Fetched. This is the Study Group pathway college (Kingston University London International Study Centre), not the main university admissions team. Describes UKVI credibility interview: 'normally take place in your local Visa Application Centre, via a video link. You will be interviewed by an ECO based in the UK.'"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=8sNlg8Deezk",
+      "title": "Pre Cas Interview for Kingston University London | Pre Cas Interview Questions Answers UK",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'Study in UK' (via YouTube oEmbed). Video page body/description not returned by WebFetch; no questions readable. Title only."
+    }
+  ],
+  "searchesRun": [
+    "Kingston University credibility interview questions",
+    "Kingston University pre-CAS interview",
+    "site:kingston.ac.uk credibility interview",
+    "(budget exhausted, not run) Kingston University pre-CAS interview questions youtube CAS Shield",
+    "(budget exhausted, not run) Kingston University \"pre-CAS interview training guide\""
+  ],
+  "researcherNotes": "All kingston.ac.uk pages (CAS page, visa-requirements, admissions-timeline, interviews page) returned 403 to WebFetch; recorded from snippets. Facebook group posts about Kingston pre-CAS interviews appeared in results but were not fetchable."
+}

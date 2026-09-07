@@ -1,0 +1,40 @@
+{
+  "institutionId": "inst-keele-university",
+  "name": "Keele University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://kuic.keele.ac.uk/new-students/visa/",
+      "title": "Visa Process - Keele University International College",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched. Page only says: 'For information about the credibility interview process, visit this page on the Navitas website' (links to study.navitas.com/credibility-interviews/, which redirects to navitas.com/study/destinations/united-kingdom/credibility-interview/). The Navitas page was fetched and does NOT name Keele, so it is not recorded as Keele evidence. No example questions on the KUIC page."
+    },
+    {
+      "url": "https://www.keele.ac.uk/study/postgraduatestudy/apply/",
+      "title": "Apply - Keele University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched. Mentions a 'pre-CAS checklist' returned to the Immigration Compliance team; no interview, no questions, no CAS Shield/Enroly mention."
+    }
+  ],
+  "searchesRun": [
+    "Keele University credibility interview questions",
+    "Keele University pre-CAS interview",
+    "site:keele.ac.uk credibility interview",
+    "(budget exhausted, not run) \"Keele University\" \"CAS Shield\" OR \"pre-CAS interview\"",
+    "(budget exhausted, not run) Keele University CAS interview questions youtube Nepal"
+  ],
+  "researcherNotes": "No Keele-specific interview question evidence found. Search results were dominated by Medicine/Midwifery admissions interviews (not credibility interviews) and Glassdoor job interviews. Guessed URLs keele.ac.uk/study/internationalstudents/visasandimmigration/ and the immigration student-services page returned 404."
+}

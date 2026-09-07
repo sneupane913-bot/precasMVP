@@ -1,0 +1,57 @@
+{
+  "institutionId": "inst-newcastle-university",
+  "name": "Newcastle University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.ncl.ac.uk/student-progress/visa/interview/",
+      "title": "Student Visa Sponsorship Interview | Newcastle University (Visa Support)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Your reasons for choosing your programme at Newcastle University",
+        "Your knowledge of your programme",
+        "Your immigration history",
+        "Your funding arrangements for your programme"
+      ],
+      "quotes": [],
+      "questionIds": [
+        "q-09",
+        "q-11",
+        "q-12",
+        "q-14",
+        "q-15",
+        "q-18",
+        "q-62",
+        "q-115",
+        "q-123",
+        "q-201"
+      ],
+      "unmapped": [],
+      "notes": "Fetched (found via the 'Interview' link on https://www.ncl.ac.uk/student-progress/visa/). Verbatim: 'As part of Newcastle University's obligations to UK immigration compliance, the University reserves the right to carry out additional checks on applicants' eligibility for student visa sponsorship.' Applicants may be asked to take 'a brief interview' covering the four listed topics. Process: 'Sign and return the Consent form' to compliance@ncl.ac.uk, then 'Use this booking form' (Microsoft Bookings page named 'Credibilityinterview'). Live booked interview with the compliance team; no CAS Shield/Enroly mention; no example questions."
+    },
+    {
+      "url": "https://www.ncl.ac.uk/student-progress/visa/",
+      "title": "Visa Support | Newcastle University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched. No interview content itself; navigation contains the 'Interview' link to /student-progress/visa/interview/."
+    }
+  ],
+  "searchesRun": [
+    "Newcastle University credibility interview questions",
+    "Newcastle University pre-CAS interview",
+    "site:ncl.ac.uk credibility interview",
+    "(budget exhausted, not run) \"Newcastle University\" \"pre-CAS interview\" OR \"credibility interview\" CAS Shield",
+    "(budget exhausted, not run) INTO Newcastle University credibility interview questions",
+    "(budget exhausted, not run) Newcastle University CAS interview questions youtube"
+  ],
+  "researcherNotes": "Searches returned mostly Northumbria or Medicine admissions results; the official page was located by fetching ncl.ac.uk/student-progress/visa/ directly. No student reports naming Newcastle University (as opposed to Northumbria) were found."
+}

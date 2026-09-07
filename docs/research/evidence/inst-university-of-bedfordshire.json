@@ -1,0 +1,52 @@
+{
+  "institutionId": "inst-university-of-bedfordshire",
+  "name": "University of Bedfordshire",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "sources": [
+    {
+      "url": "https://issuu.com/uniofbeds/docs/credibility_guide",
+      "title": "University of Bedfordshire Credibility Guide - Credibility Interviews: Information and Advice",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Issuu flipbook published by the University of Bedfordshire on 9 May 2016. Only the landing page (title, subtitle 'Credibility Interviews: Information and Advice', publisher) was readable; the guide body could not be extracted via WebFetch or a text-reader proxy (cookie wall). No questions recorded. Worth opening manually in a browser."
+    },
+    {
+      "url": "https://beds.cas-shield.com/",
+      "title": "CAS Shield",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "beds.cas-shield.com resolves (HTTP 200) and serves Enroly's CAS Shield login page (page text contains 'Enroly' and 'CAS Shield'), so University of Bedfordshire uses Enroly CAS Shield for its CAS process. Enroly pre-CAS interviews draw randomised questions from themed banks; no question list is published on the site."
+    },
+    {
+      "url": "https://www.beds.ac.uk/howtoapply/admissions/interviews/preparing-for-interview/",
+      "title": "Doing well in an interview | University of Bedfordshire",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [
+        "The people interviewing you are assessing your suitability for the course and university; your interest in the subject; your commitment and readiness to study; and your ability to communicate clearly."
+      ],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "From search snippet only. General admissions-interview advice page, not specifically a credibility/pre-CAS interview page; no questions."
+    }
+  ],
+  "searchesRun": [
+    "University of Bedfordshire credibility interview pre-CAS interview questions",
+    "site:beds.ac.uk credibility interview questions",
+    "Bing: University of Bedfordshire credibility interview questions (Bing HTML results page fetched via WebFetch after the WebSearch budget was exhausted; it returned unrelated results (recorded for completeness, no evidence taken).)",
+    "curl probe: beds.cas-shield.com / bedfordshire.cas-shield.com"
+  ]
+}

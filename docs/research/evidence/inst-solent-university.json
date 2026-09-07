@@ -1,0 +1,62 @@
+{
+  "institutionId": "inst-solent-university",
+  "name": "Solent University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "sources": [
+    {
+      "url": "https://solent.cas-shield.com/",
+      "title": "CAS Shield",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "solent.cas-shield.com resolves (HTTP 200) and serves Enroly's CAS Shield login page (page text contains 'Enroly' and 'CAS Shield'), so Solent University uses Enroly CAS Shield for its CAS process. Enroly pre-CAS interviews draw randomised questions from themed banks; no question list is published on the site."
+    },
+    {
+      "url": "https://www.solent.ac.uk/international/visas-and-immigration",
+      "title": "Visas and immigration guide for international students",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "From search snippet only: 'The University provides a CAS ... once you hold an unconditional offer and meet their pre-CAS checks' and 'Solent University will sponsor you for your visa once you have met all the conditions of your offer and meet our visa checks by issuing you a CAS.' No credibility-interview page or question list found on solent.ac.uk."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=0psiGkxFESo",
+      "title": "pre Cas interview of solent university. Real mock Test #interview University interview",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Channel 'Mock Academy'. Description: 'Dm to book your mock Test #interview.' No questions readable; video not viewable."
+    },
+    {
+      "url": "https://www.quora.com/After-accepting-the-unconditional-offer-and-paying-the-initial-deposit-to-Solent-University-what-is-the-acceptance-rate-of-the-university-for-pre-CAS-interview-Does-the-university-rejects-you-in-the-pre-CAS-Is-there",
+      "title": "After accepting the unconditional offer and paying the initial deposit to Solent University, what is the acceptance rate of the university for pre-CAS interview? ... - Quora",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Search-result title only; confirms students sit a Solent pre-CAS interview after deposit. Page not fetched; no questions recorded."
+    }
+  ],
+  "searchesRun": [
+    "Solent University credibility interview pre-CAS interview questions",
+    "site:solent.ac.uk credibility interview OR \"pre-CAS\" OR \"CAS interview\"",
+    "Bing: Solent University pre-CAS interview questions (Bing HTML results page fetched via WebFetch after the WebSearch budget was exhausted; it returned unrelated results (recorded for completeness, no evidence taken).)",
+    "curl probe: solent.cas-shield.com"
+  ]
+}

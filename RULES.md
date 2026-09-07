@@ -140,6 +140,16 @@ process, the reason is stated on the line.
 
 ---
 
+### 1f. The paper, and its link to the university (added 7 September 2026, from the first customer feedback)
+
+| # | Rule | Status | Evidence |
+|---|---|---|---|
+| Q-11 | A student is never asked the same question twice across any number of sittings, and never a paraphrase of one while an unseen question exists. Only when a theme is genuinely exhausted does a question come back | **BUILT + SOURCE-CHECKED** | paper Q-11, Q-11a to Q-11d, S-53b drive the real plan builder for ten sittings at every catalogue university (930 papers, zero repeats). Not yet driven through the HTTP API with a paid second sitting |
+| Q-12 | Where a university publishes its own interview guidance, its paper carries the questions it publishes ahead of the rest | **BUILT + SOURCE-CHECKED** | paper Q-12 (Aberdeen: about 16 published questions per paper against 2.5 without the preference) |
+| Q-13 | Every fact in a question, tip, model answer or rubric that depends on the campus (city, UKVI band, the living-cost figure) resolves from one sourced, dated fact pack, and the marker is told those facts | **BUILT + SOURCE-CHECKED** | paper Q-13 to Q-13f; `lib/data/institution-facts.ts` (GOV.UK, checked 2026-09-07: £1,529 London / £1,171 outside, 9 months) |
+| Q-14 | Every question a student hears carries a likelihood for THEIR university (very likely: on its own page; likely: its students report it; possible: it names the theme; general: only other UK universities' guidance), with a one-line reason and the URL it rests on. Evidenced questions are drawn before general ones, general ones before any repeat. The card, the room, the report and `/universities/<slug>/evidence` all show it | **BUILT + SOURCE-CHECKED** | paper Q-14 to Q-14j. Evidence: 21 hand-checked official pages in `institution-facts.ts` plus the 7 September sweep in `docs/research/evidence/` (47 institutions, 176 sources, 860 mappings). **Browser pass not done.** |
+| Q-3b | The bank holds at least 120 root questions and 50 follow-ups, ten identity openers, and is append-only (ids are positional and stored on sessions) | **BUILT + SOURCE-CHECKED** | paper Q-3b, Q-11a, Q-11b (157 roots, 53 follow-ups, 10 openers as of 7 September 2026) |
+
 ## Part 2. The consultancy admin
 
 | # | Rule | Status | Evidence |

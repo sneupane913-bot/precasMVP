@@ -1,0 +1,66 @@
+{
+  "institutionId": "inst-university-of-plymouth",
+  "name": "University of Plymouth",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.plymouth.ac.uk/services/international-student-advice/ukvi-credibility-interviews",
+      "title": "UKVI credibility interviews - University of Plymouth",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "What motivated you to choose the UK as your study destination?",
+        "Why University of Plymouth?",
+        "Why did you choose this course?",
+        "How well do you understand your course?",
+        "How are you funding your studies?",
+        "What are your future plans?",
+        "Additional considerations"
+      ],
+      "quotes": [
+        "What differences did you consider between studying in the UK and studying in your home country or another country?",
+        "What made University of Plymouth stand out compared to other UK universities?",
+        "What are your personal reasons for choosing this specific course?",
+        "What do you know about the structure of your course?",
+        "How do you plan to pay for your tuition fees and living expenses?",
+        "What do you plan to do after completing your course?",
+        "In what ways do you think this course will help you achieve your long-term ambitions?",
+        "How did you decide that this course at University of Plymouth was the right fit for you?"
+      ],
+      "questionIds": [
+        "q-07",
+        "q-08",
+        "q-99",
+        "q-09",
+        "q-38",
+        "q-201",
+        "q-152",
+        "q-39",
+        "q-14",
+        "q-19",
+        "q-20",
+        "q-207",
+        "q-153"
+      ],
+      "unmapped": [],
+      "notes": "Conducted by a UK Entry Clearance Officer (UKVI), in person / telephone / video call. Attendance mandatory; non-attendance = automatic refusal. 'the ECO can refuse your application if they are not convinced that you are a genuine student'. Last two quotes were read in the search-result snippet for this same URL (fetch summary omitted them)."
+    },
+    {
+      "url": "https://www.yumpu.com/en/document/view/27841275/credibility-interviews-for-tier-4-students-plymouth-university",
+      "title": "Credibility Interviews for Tier 4 Students - Plymouth University",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Older university-authored Tier 4 guidance mirrored on yumpu. Page 1 says 'The interview will focus on your reasons for coming to the UK; this is known as a credibility interview.' Page 2 'Possible Credibility Interview Ques[tions]' and page 3 (starts 'Would anything about your personal[...]') were not readable in the fetch, so no questions recorded."
+    }
+  ],
+  "searchesRun": [
+    "University of Plymouth credibility interview questions"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "institutionId": "inst-wolverhampton",
+  "name": "University of Wolverhampton",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://www.trymerra.ai/cas-interview/university-of-wolverhampton",
+      "title": "University of Wolverhampton Pre-CAS Interview Questions 2026 | Merra",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [
+        "how they'll settle in and integrate",
+        "their accommodation and living-cost plans",
+        "their post-graduation intentions",
+        "the personal influences and challenges behind their decision to study in the UK",
+        "the standard finance checks"
+      ],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Search-result snippet only (page not fetched). States that Wolverhampton requires many international applicants to complete its own Pre-CAS interview after the initial deposit and before the CAS is released, that it is typically recorded, and lists the topics above as what applicants report being asked."
+    },
+    {
+      "url": "https://www.scribd.com/document/885580107/University-of-Wolverhampton-PRE-CAS-QUESTIONS",
+      "title": "Wolverhampton Pre-CAS Interview Questions | PDF | Cost Of Living | University",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": ["cost of living", "the university"],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "A student-shared question list named after the university; only the title and its tags (cost of living, university) were readable in the search result. Not fetched."
+    }
+  ],
+  "searchesRun": ["University of Wolverhampton pre-CAS interview credibility questions international"]
+}

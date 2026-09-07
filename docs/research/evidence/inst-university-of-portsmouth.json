@@ -1,0 +1,100 @@
+{
+  "institutionId": "inst-university-of-portsmouth",
+  "name": "University of Portsmouth",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "sources": [
+    {
+      "url": "https://myport.port.ac.uk/study/international-students/visa-advice/credibility-interviews",
+      "title": "Credibility interviews | Student Services - University of Portsmouth",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "your course details",
+        "the reasons you want to study with us",
+        "your previous immigration history",
+        "your finances"
+      ],
+      "quotes": [
+        "Have you had any previous UK visas?",
+        "Have you have ever breached the conditions of your visa, for example, overstaying?",
+        "Have you had any visas for other countries?",
+        "How do your studies fit in with your career plans?",
+        "Why did you choose to study at the University of Portsmouth instead of another university?",
+        "What do you plan to do once you have finished your studies? Do you plan to do further study, or go into work? If so, how and where?",
+        "Where did you receive your money from?",
+        "How will you fund your studies?",
+        "What is your family's financial situation?",
+        "If you are a sponsored student, what does your sponsorship cover?",
+        "Why have you chosen to study in the UK?",
+        "What other countries have you considered and what universities did you look at?",
+        "What other universities have you considered in the UK?"
+      ],
+      "questionIds": [
+        "q-18",
+        "q-115",
+        "q-90",
+        "q-20",
+        "q-19",
+        "q-09",
+        "q-38",
+        "q-174",
+        "q-69",
+        "q-104",
+        "q-159",
+        "q-14",
+        "q-15",
+        "q-105",
+        "q-81",
+        "q-161",
+        "q-07",
+        "q-08",
+        "q-99",
+        "q-34",
+        "q-100"
+      ],
+      "unmapped": [],
+      "notes": "UKVI conducts; 'normally conducted online, but can take place face-to-face or on the phone'. PhD students may get more in-depth research questions. 'Do not try and memorise a script - be yourself!'. Same page also indexed at https://myport.port.ac.uk/life-at-uni/international-students/visa-advice/credibility-interviews and linked from https://www.port.ac.uk/credibility-interviews (seen in search results, not fetched)."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=LhCxIPXgOzU",
+      "title": "CREDIBILITY INTERVIEW QUESTIONS AT THE UNIVERSITY OF PORTSMOUTH | UK | RAJESHWARI MACHENDER",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title confirmed via oEmbed (author Rajeshwari Machender); description not readable, no quotes recorded."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=-w4PSKNN-gs",
+      "title": "University of Portsmouth Pre Cas Interview Question | Credibility Interview UK 2025",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title confirmed via oEmbed (author 'Study in UK'); page fetch returned only footer, no quotes recorded."
+    },
+    {
+      "url": "https://www.facebook.com/groups/818670073571488/posts/1265234435581714/",
+      "title": "University of Portsmouth credibility interview questions?",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Facebook group post seen in search results only; not fetched (login wall). No questions readable."
+    }
+  ],
+  "searchesRun": [
+    "University of Portsmouth credibility interview questions"
+  ]
+}

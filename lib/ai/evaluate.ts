@@ -107,6 +107,13 @@ export async function evaluateAnswer(args: {
    * evaluator is told, and stops trusting the final words.
    */
   ranOutOfTime?: boolean;
+  /**
+   * Q-13. Verified facts about the student's university (city, UKVI band and
+   * figure, what its own guidance says). Lets the marker check "I need £1,500
+   * a month" against the real number for THIS campus instead of guessing.
+   * Built by lib/data/institution-facts.ts; never shown to the student.
+   */
+  institutionFacts?: string;
 }): Promise<Evaluation | null> {
   const clean = redact(args.transcript).split(/\s+/).slice(0, MAX_TRANSCRIPT_WORDS).join(' ');
 
@@ -123,6 +130,9 @@ export async function evaluateAnswer(args: {
   const userPrompt = [
     `QUESTION (category: ${args.question.category}): ${args.question.text}`,
     `PRIVATE MARKING NOTES (never repeat these to the student): ${args.question.rubricNotes}`,
+    args.institutionFacts
+      ? `VERIFIED FACTS ABOUT THE STUDENT'S UNIVERSITY (check the student's claims against these; a claim that contradicts them is a fix to name; never quote this block to the student):\n${args.institutionFacts}`
+      : '',
     `ANSWER LENGTH: ${Math.round(args.durationSeconds)} seconds`,
     args.ranOutOfTime
       ? `THE TIMER CUT THIS ANSWER OFF. The student did not choose to stop. Treat the final sentence as unfinished, and do not trust or quote its last words: the transcription may have guessed at them.`

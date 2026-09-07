@@ -1,0 +1,89 @@
+{
+  "institutionId": "inst-university-of-winchester",
+  "name": "University of Winchester",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "sources": [
+    {
+      "url": "https://www.winchester.ac.uk/international/visa-information/",
+      "title": "Visa information - University of Winchester",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Why Winchester",
+        "Your Course",
+        "Accommodation",
+        "Travel",
+        "Finance",
+        "Future Plans",
+        "Other Areas to Consider"
+      ],
+      "quotes": [
+        "Think about why you chose the UK rather than your home country.",
+        "Think about what attracted you to study at the university you have chosen and how you found out about them.",
+        "Think about what specifically there is about this course that made you choose it.",
+        "If the course you plan to study is at a similar academic level to previous studies, be prepared to explain how it represents progression and whether it has a vocational focus?",
+        "Think about what campus your course will be taught at and where it is located.",
+        "Think about the different types of accommodation that is available to you and where you will be staying. Take into consideration the locality of the accommodation in relation to your chosen university.",
+        "Think about the modes of transport available. Think about how you would get to and from the campus and how much this would cost.",
+        "This question is to check how you would be funding your studies and that your funds are genuinely available to you for your studies. You will need to submit proof of your finances as part of your application, so you need to ensure you are clear about the source and availability of these funds.",
+        "Also think about how you would plan to fund the subsequent years if your chosen course is longer than 1 year.",
+        "Think about the origin of the money and how much your parent(s) earn if they are financially supporting you.",
+        "Think about how the knowledge and skills you will gain will help you with the type of work you hope to do.",
+        "Think about the type of job you expect to be doing and what the salary would be.",
+        "If you have previously studied in the UK, think about how the new programme relates to previous studies and how it might build on your previous learning.",
+        "If you have had a long break, think about how you would explain your decision in the context of your long-term career plans.",
+        "If you are bringing dependants, think about how you would support them."
+      ],
+      "questionIds": [
+        "q-07",
+        "q-98",
+        "q-09",
+        "q-33",
+        "q-201",
+        "q-153",
+        "q-13",
+        "q-46",
+        "q-78",
+        "q-56",
+        "q-57",
+        "q-17",
+        "q-185",
+        "q-14",
+        "q-51",
+        "q-104",
+        "q-82",
+        "q-15",
+        "q-159",
+        "q-20",
+        "q-171",
+        "q-113",
+        "q-111",
+        "q-137",
+        "q-140",
+        "q-109",
+        "q-88"
+      ],
+      "unmapped": [],
+      "notes": "Quotes are the university's verbatim preparation prompts (phrased 'Think about...') under each Pre-CAS Interview topic heading, not literal questions. Format: 'The interview will be conducted online in English, using CAS Shield; so broadband access and a computer/tablet with camera and microphone (not a smartphone) will be required.' 'up to 30 minutes without interruptions'; 'The interview will be recorded.'; passport to hand 'opened at the photo/ID page'. 'It is not a test of academic or creative skill but to ensure that they are committed and ready to study at the University in the UK.' Outcome: 'If we feel you will not be able to prove to the UKVI that you are a genuine student with an intention to study, we reserve the right to refuse to issue you with a CAS to apply for a student visa.' Search snippet adds: compulsory for those invited; chance to ask questions at the end; outcome is 'a recommendation to issue a CAS, or a decision not to proceed with issuing a CAS'."
+    },
+    {
+      "url": "https://winchester.cas-shield.com/",
+      "title": "CAS Shield",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Subdomain resolved and served a page titled 'CAS Shield'. Consistent with official page stating the interview uses CAS Shield. Questions randomised from themed banks; no list."
+    }
+  ],
+  "searchesRun": [
+    "University of Winchester credibility interview pre-CAS questions",
+    "\"University of Winchester\" pre-CAS interview questions",
+    "\"Winchester\" pre-CAS interview questions Nepal OR India experience CAS Shield (not executed: session search budget exhausted)"
+  ]
+}

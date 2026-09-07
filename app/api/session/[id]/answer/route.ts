@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { store } from '@/lib/store';
 import { getInstitution } from '@/lib/data/institutions';
+import { institutionFactBlock } from '@/lib/data/institution-facts';
 import { getQuestion, resolvedQuestion , primeExtraQuestions} from '@/lib/data/questions';
 import { transcribe, redact } from '@/lib/ai/stt';
 import { evaluateAnswer } from '@/lib/ai/evaluate';
@@ -239,6 +240,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     question,
     transcript,
     durationSeconds,
+    // Q-13. The marker knows which campus this is: the UKVI band, the real
+    // living-cost figure, and what the university itself says it asks.
+    institutionFacts: institutionFactBlock(institution),
     /**
      * Labelled with the question each answer belonged to, because the
      * evaluator now runs a consistency cross-check ("earlier you said your
