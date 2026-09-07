@@ -69,9 +69,59 @@ class BlobStore implements SessionStore {
     return getStore({ name: 'precas-sessions', consistency: 'strong' });
   }
 
+  /**
+   * THE PER-STUDENT INDEX (7 September 2026).
+   *
+   * Blobs has no query. `listByStudent` used to list EVERY session in the
+   * store and read each one to find a student's own, and it is called on
+   * every mock start (entitlement, the resume check, the seen set), on the
+   * dashboard and in the advice picker. That is fine for a pilot and it is
+   * the wrong shape for scale: the cost of one student starting a mock grew
+   * with the number of students who had ever used the product, in time and
+   * in the Netlify reads that are already most of the monthly credit.
+   *
+   * So a second store holds one small document per student: the ids of that
+   * student's sessions. A create appends to it; a read fetches the index and
+   * then only that student's sessions. A student created before the index
+   * existed has no document, so the first read for them does the old full
+   * scan once and writes the index (lazy backfill). Two simultaneous creates
+   * for one student could race on the append and lose an id; a student has
+   * one browser and the create route already hands back an open sitting
+   * instead of making a second, so this is accepted and the full-scan path
+   * remains as the repair (see `repairIndex`).
+   */
+  private async index() {
+    const { getStore } = await import('@netlify/blobs');
+    return getStore({ name: 'precas-session-index', consistency: 'strong' });
+  }
+
+  private async readIndex(studentId: string): Promise<string[] | null> {
+    try {
+      const ix = await this.index();
+      const ids = (await ix.get(studentId, { type: 'json' })) as string[] | null;
+      return Array.isArray(ids) ? ids : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private async writeIndex(studentId: string, ids: string[]): Promise<void> {
+    try {
+      const ix = await this.index();
+      await ix.setJSON(studentId, [...new Set(ids)]);
+    } catch {
+      // The index is a cache of the truth, never the truth. A failed write
+      // costs one slow read later, not a lost session.
+    }
+  }
+
   async create(session: InterviewSession): Promise<void> {
     const s = await this.blobs();
     await s.setJSON(session.id, session);
+    if (session.studentId) {
+      const ids = (await this.readIndex(session.studentId)) ?? (await this.repairIndex(session.studentId));
+      if (!ids.includes(session.id)) await this.writeIndex(session.studentId, [...ids, session.id]);
+    }
   }
 
   async get(id: string): Promise<InterviewSession | null> {
@@ -93,8 +143,8 @@ class BlobStore implements SessionStore {
   }
 
   /**
-   * Blobs has no query, so we list keys and read them. Fine at pilot scale and
-   * one of the reasons Postgres is the destination for this data.
+   * The full scan. Kept for the lazy backfill and the back office; never on
+   * the student's own path once their index exists.
    */
   private async all(): Promise<InterviewSession[]> {
     try {
@@ -109,14 +159,34 @@ class BlobStore implements SessionStore {
     }
   }
 
+  /** One full scan for one student, and the index is written from it. */
+  private async repairIndex(studentId: string): Promise<string[]> {
+    const ids = (await this.all()).filter((x) => x.studentId === studentId).map((x) => x.id);
+    await this.writeIndex(studentId, ids);
+    return ids;
+  }
+
   async listByStudent(studentId: string) {
-    return (await this.all()).filter((s) => s.studentId === studentId).sort(newestFirst);
+    const ids = (await this.readIndex(studentId)) ?? (await this.repairIndex(studentId));
+    if (ids.length === 0) return [];
+    const rows = await Promise.all(ids.map((id) => this.get(id)));
+    const found = rows.filter((r): r is InterviewSession => Boolean(r) && r!.studentId === studentId);
+    // A session deleted elsewhere leaves a dangling id; drop it from the
+    // index so the next read does not pay for it.
+    if (found.length !== ids.length) await this.writeIndex(studentId, found.map((r) => r.id));
+    return found.sort(newestFirst);
   }
 
   async deleteByStudent(studentId: string) {
     const s = await this.blobs();
     const mine = await this.listByStudent(studentId);
     for (const row of mine) await s.delete(row.id);
+    try {
+      const ix = await this.index();
+      await ix.delete(studentId);
+    } catch {
+      // Nothing to do; a stale index is repaired on the next read.
+    }
     return mine.length;
   }
 }

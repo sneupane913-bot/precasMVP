@@ -96,6 +96,7 @@ process, the reason is stated on the line.
 | S-28 | Leaving mid-interview warns first, and the warning covers the in-app Back button | **BUILT, NOT PROVEN** | Built this session. `beforeunload` and `popstate` cannot be driven from a test process. **Browser pass required.** |
 | S-29 | Three attempts per question, read from the stored attempt number | **BUILT + SOURCE-CHECKED** | rules S-27 |
 | S-30 | A dropped connection preserves the recording | **BUILT + SOURCE-CHECKED** | rules S-28 |
+| S-31 | Starting a mock costs the same whether one student or ten thousand have used the product: a student's own sittings are found through a per-student index, never by scanning every session (added 7 September 2026) | **BUILT, NOT PROVEN** | `lib/store.ts` BlobStore index; only exists on Netlify Blobs, so no local suite drives it. Verify on the live site: the first mock after deploy is the one-time backfill, the second is fast |
 
 ### 1d. Paying
 

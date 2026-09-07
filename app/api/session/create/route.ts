@@ -248,9 +248,9 @@ export async function POST(req: Request) {
    * A DIFFERENT university still gets a fresh sitting, because they changed
    * their mind and it has cost them nothing.
    */
+  const mine = await store.listByStudent(student.id);
   {
-    const mineOpen = await store.listByStudent(student.id);
-    const untouched = mineOpen.find(
+    const untouched = mine.find(
       (x) =>
         x.institutionId === institution.id &&
         x.mode === parsed.mode &&
@@ -311,7 +311,7 @@ export async function POST(req: Request) {
    * never heard, so it is not "seen".
    */
   const seen = new Set<string>();
-  for (const x of await store.listByStudent(student.id)) {
+  for (const x of mine) {
     if ((x.answers?.length ?? 0) > 0 || x.status === 'completed') {
       for (const qid of x.questionIds) seen.add(qid);
     }
