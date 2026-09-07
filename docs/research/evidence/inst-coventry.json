@@ -1,0 +1,106 @@
+{
+  "institutionId": "inst-coventry",
+  "name": "Coventry University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "facts": [
+    { "text": "Coventry University's main campus is on Priory Street (CV1 5FB), covering about 14.5 hectares in the heart of Coventry city centre.", "sourceUrl": "https://www.coventry.ac.uk/the-university/about-coventry-university/our-buildings/", "sourceTitle": "Our Buildings | Coventry University (search snippet; page not fetched)" },
+    { "text": "The Sir Frank Whittle Building, formerly the Engineering and Computing Building, is a GBP 55 million facility used by students since September 2012 and formally opened by the Princess Royal on 8 February 2013.", "sourceUrl": "https://www.coventry.ac.uk/primary-news/royal-opening-universitys-know-how-the-focus-at-new-building-launch/", "sourceTitle": "Royal opening: University's know-how the focus at new building launch | Coventry University (search snippet; page not fetched)" },
+    { "text": "The Sir Frank Whittle Building houses engineering facilities including a Harrier jump jet, a Cruden full-motion vehicle simulator, a Mercedes Petronas AMG scale wind tunnel and a flight simulation suite, and is linked to the Beatrice Shilling Building.", "sourceUrl": "https://www.coventry.ac.uk/the-university/about-coventry-university/our-buildings/sir-frank-whittle/", "sourceTitle": "Sir Frank Whittle Building | Coventry University (search snippet; page not fetched)" },
+    { "text": "Coventry University asks CAS applicants to meet their CAS conditions through CAS Shield (Enroly), and can be contacted via CAS Shield or casissued.io@coventry.ac.uk.", "sourceUrl": "https://www.coventry.ac.uk/student-central/coventry/before-you-start/get-your-confirmation-of-acceptance-for-studies/", "sourceTitle": "Get your Confirmation of Acceptance for Studies (CAS) | Student Central (search snippet; page not fetched)" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.coventry.ac.uk/international-students-hub/coming-to-the-uk/your-visa/credibility-interviews/",
+      "title": "Credibility interviews | Coventry University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Country decision: Why you chose to study in the UK rather than in your home country or another destination",
+        "University decision: Why Coventry University is the right choice for you, including the research you did and what stood out",
+        "Course decision: Your understanding of the course, its modules, and why it is the best fit for your interests and goals",
+        "Career plans: How this course will support your future ambitions, and how your studies will help you progress after graduation",
+        "Finances: How you will fund your tuition fees, living costs, and accommodation, and your understanding of your financial requirements"
+      ],
+      "quotes": [],
+      "questionIds": ["q-07", "q-98", "q-09", "q-146", "q-11", "q-201", "q-19", "q-20", "q-14", "q-56"],
+      "unmapped": [],
+      "notes": "Fetched. Page frames the interview as a UKVI credibility interview: 'a Home Office member of staff will assess whether you meet the English language requirements, and if you are a genuine student'. 'Interviews are normally carried out online, although some are via telephone or face-to-face at Home Office centres.' 'If you are asked to attend such an interview you must do so (unless you have a good reason as to why you cannot), otherwise your application is likely to be refused.' The search snippet for the same page family adds: be prepared to give details of previous study and qualifications and know the names of the modules in your course; all interviews are conducted in English; failure to attend without a reasonable explanation results in automatic refusal. No CAS Shield mention on this page."
+    },
+    {
+      "url": "https://www.coventry.ac.uk/student-central/coventry/before-you-start/get-your-confirmation-of-acceptance-for-studies/",
+      "title": "Get your Confirmation of Acceptance for Studies (CAS) | Student Central",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Snippet: 'You will receive an email to the address provided during your application asking you to use CAS shield to meet your CAS conditions.' Evidence that Coventry uses Enroly CAS Shield for the pre-CAS stage. A Word file 'credibility-interviews-in-country-text.docx' is also hosted at https://www.coventry.ac.uk/globalassets/media/global/international-office/credibility-interviews-in-country-text.docx (not fetched)."
+    },
+    {
+      "url": "https://admissiontimes.com/coventry-university-credibility-interview-questions-and-answers/",
+      "title": "Coventry University Credibility Interview Questions and Answers (Admission Times)",
+      "tier": "consultancy",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [
+        "Why did you choose Coventry University?",
+        "Why do you want to study in the UK instead of your home country?",
+        "Why did you choose this specific course?",
+        "How do you plan to fund your studies?",
+        "What are your career plans after completing your studies?",
+        "Have you researched accommodation and living expenses in the UK?",
+        "Do you have any relatives or friends in the UK?",
+        "Why should Coventry University believe that you are a genuine student?"
+      ],
+      "questionIds": ["q-09", "q-07", "q-201", "q-14", "q-19", "q-56", "q-35", "q-74"],
+      "unmapped": [],
+      "notes": "Fetched. Says the interview usually takes place online through video calls, lasts 15 to 30 minutes, and the interviewer may be a Coventry University representative or a member of UKVI."
+    },
+    {
+      "url": "https://www.trymerra.ai/cas-interview/coventry-university",
+      "title": "Coventry University Pre-CAS Interview Questions 2026 | Merra",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Snippet: 'One recorded interview decides whether Coventry University issues your CAS'; rehearsed answers and vague funding figures are the top stated refusal reasons; Coventry's guidance breaks the interview into five decision areas - country, university, course, career plans, and finances."
+    },
+    {
+      "url": "https://www.scribd.com/document/844700021/CAS-Interview-Answers-Coventry",
+      "title": "Coventry University CAS Interview Guide | PDF | Expense | Travel Visa (Scribd)",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": ["academic intentions", "financial proof", "future career plans", "UK visa rules", "English language proficiency", "travel arrangements"],
+      "quotes": [],
+      "questionIds": ["q-201", "q-85", "q-19", "q-61", "q-133"],
+      "unmapped": [],
+      "notes": "Fetched, but only the listing rendered; the 2-page PDF body was not readable. Ids mapped from the description's topic list only."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=uaIZPsAPuHE",
+      "title": "Coventry University UK: Pre CAS Interview Questions & Answers | Study In UK 2026 (YouTube)",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title only; not fetched."
+    }
+  ],
+  "searchesRun": [
+    "Coventry University pre-CAS interview credibility interview CAS Shield site:coventry.ac.uk",
+    "\"Coventry University\" pre-CAS interview questions asked international students",
+    "Coventry University campus Priory Street city centre Coventry station facilities Engineering and Computing building facts about"
+  ]
+}

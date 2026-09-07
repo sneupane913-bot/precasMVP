@@ -312,6 +312,18 @@ export const PUBLISHED_GUIDANCE: Record<string, PublishedGuidance> = {
     ],
     questionIds: ['q-03', 'q-04', 'q-07', 'q-09', 'q-11', 'q-19', 'q-20'],
   },
+  'inst-brunel-university-london': {
+    url: 'https://www.brunel.ac.uk/international/visas-and-immigration/apply-for-your-cas',
+    title: 'Brunel University London: Apply for your CAS (the video recorded pre-CAS interview)',
+    checkedOn: '2026-09-07',
+    topics: [
+      'why you wish to study in the UK and at Brunel University, how your chosen course supports your career plans',
+      'your past studies and their relevance to your current course choice',
+      'what you intend to do after you have completed your degree and how this supports your career plans',
+      'how you are funding your studies in the UK, including tuition and accommodation fees and living costs',
+    ],
+    questionIds: ['q-04', 'q-07', 'q-09', 'q-14', 'q-19', 'q-20'],
+  },
   [UWL]: {
     url: 'https://www.uwl.ac.uk/international/after-you-apply',
     title: 'University of West London: After you apply',

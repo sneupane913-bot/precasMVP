@@ -1,0 +1,68 @@
+{
+  "institutionId": "inst-uwl",
+  "name": "University of West London",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    { "text": "UWL has campuses in Ealing and Brentford in west London, and in Reading in Berkshire.", "sourceUrl": "https://www.uwl.ac.uk/student-life/our-campus-and-sites", "sourceTitle": "Our campus and sites | University of West London (search snippet; page not fetched)" },
+    { "text": "The Ealing site's main address is St Mary's Road, Ealing, W5 5RF; its teaching buildings are about a 10-minute walk from Ealing Broadway station (Central and District lines, Elizabeth line and National Rail).", "sourceUrl": "https://www.uwl.ac.uk/student-life/our-campus-and-sites/studying-ealing", "sourceTitle": "Studying at UWL Ealing site | University of West London (search snippet; page not fetched)" },
+    { "text": "The Ealing site has had a GBP 50 million transformation including a refurbished Students' Union, music studios, an auditorium and the Paul Hamlyn library.", "sourceUrl": "https://www.uwl.ac.uk/student-life/our-campus-and-sites/studying-ealing", "sourceTitle": "Studying at UWL Ealing site | University of West London (search snippet; page not fetched)" },
+    { "text": "The Brentford site, called Paragon (Boston Manor Road, TW8 9GA), is 1.5 miles south of the Ealing site and linked to it by a free 10-minute shuttle bus.", "sourceUrl": "https://www.uwl.ac.uk/student-life/our-campus-and-sites", "sourceTitle": "Our campus and sites | University of West London (search snippet; page not fetched)" },
+    { "text": "The Reading site at Fountain House in Reading town centre hosts nursing and midwifery courses delivered in partnership with the NHS.", "sourceUrl": "https://www.uwl.ac.uk/student-life/our-campus-and-sites", "sourceTitle": "Our campus and sites | University of West London (search snippet; page not fetched)" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.uwl.ac.uk/international/after-you-apply",
+      "title": "After you apply | University of West London",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetch returned HTTP 403. Search snippet: after submitting a CAS request form applicants should monitor their inbox and applicant portal as they may be asked to provide additional documentation or attend a pre-CAS interview. No example questions or topics given in the snippet."
+    },
+    {
+      "url": "https://www.uwl.ac.uk/about-us/policies-and-regulations/recruitment-and-admissions-policy",
+      "title": "Recruitment and admissions policy | University of West London",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Not fetched. Search snippet: international applicants requiring Student route sponsorship may be required to undergo financial checks and a credibility interview prior to a CAS being issued."
+    },
+    {
+      "url": "https://www.scribd.com/document/697952913/Pre-CAS-Discussion-Questions-Interview",
+      "title": "Pre-CAS Interview Preparation Guide | PDF | Master Of Business Administration | Digital Marketing (Scribd)",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": ["the applicant's course details", "reasons for choosing the program and university", "future plans"],
+      "quotes": [],
+      "questionIds": ["q-02", "q-201", "q-09", "q-19"],
+      "unmapped": [],
+      "notes": "Fetched. The page names UWL: it says the course is a 15-month MBA at the University of West London costing GBP 17,500, and that the document includes 14 questions about the applicant's course details, reasons for choosing the program and university, future plans, and more. The question wording itself was not readable in the fetched page (PDF body not rendered). Question ids mapped from the topic description only."
+    },
+    {
+      "url": "https://www.facebook.com/groups/741858843536117/posts/pre-cas-interview-questions-of-university-of-west-londonanyoneand-can-you-please/1343706290018033/",
+      "title": "pre cas interview questions of university of west london... (Facebook group post)",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title only from search results; a student asking others for UWL pre-CAS questions. Not fetched, no questions readable."
+    }
+  ],
+  "searchesRun": [
+    "University of West London pre-CAS credibility interview questions international students site:uwl.ac.uk",
+    "\"University of West London\" pre-CAS interview questions asked Ealing",
+    "University of West London Ealing campus St Mary's Road Ealing Broadway station Brentford Paragon Reading campus facts"
+  ]
+}

@@ -3,37 +3,90 @@
   "name": "University of Wolverhampton",
   "checkedOn": "2026-09-07",
   "usesCasShield": null,
+  "facts": [
+    { "text": "The university has four campuses: City and Springfield in Wolverhampton, plus Walsall and Telford.", "sourceUrl": "https://www.wlv.ac.uk/news-and-events/open-day/which-campus/", "sourceTitle": "Which campus - University of Wolverhampton (search snippet; page not fetched)" },
+    { "text": "City Campus is in Wolverhampton city centre and is split into two sites, City Campus Molineux and City Campus Wulfruna.", "sourceUrl": "https://www.wlv.ac.uk/about-us/contacts-and-maps/all-maps-and-directions/map-and-directions-for-city-campus-wolverhampton/", "sourceTitle": "Map and directions for City Campus (Wolverhampton) (search snippet; page not fetched)" },
+    { "text": "Wolverhampton train station is about a 7-minute walk from City Campus and is on the main Birmingham, London, Manchester, Liverpool and Edinburgh lines; the Wolverhampton St George's Metro stop (tram to Birmingham) is also 7 minutes away.", "sourceUrl": "https://www.wlv.ac.uk/about-us/contacts-and-maps/all-maps-and-directions/map-and-directions-for-city-campus-wolverhampton/", "sourceTitle": "Map and directions for City Campus (Wolverhampton) (search snippet; page not fetched)" },
+    { "text": "Walsall Campus is home to sport, teaching and many health-based courses, about half an hour's walk from Walsall train station.", "sourceUrl": "https://www.wlv.ac.uk/about-us/contacts-and-maps/all-maps-and-directions/map-and-directions-for-walsall-campus/", "sourceTitle": "Map and directions for Walsall Campus (search snippet; page not fetched)" },
+    { "text": "Telford Campus is an 18-minute walk from Telford Central station.", "sourceUrl": "https://www.wlv.ac.uk/university-life/our-campus/", "sourceTitle": "Our campus - University of Wolverhampton (search snippet; page not fetched)" }
+  ],
   "sources": [
+    {
+      "url": "https://www.wlv.ac.uk/about-us/corporate-information/wlv-policies/admissions-policy-and-process/",
+      "title": "Admissions Policy and Process 2024-25 - University of Wolverhampton",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": ["the applicant's understanding of their chosen course and institution"],
+      "quotes": [],
+      "questionIds": ["q-201", "q-09"],
+      "unmapped": [],
+      "notes": "Not fetched (snippet). Snippet: the purpose of the Pre-CAS Interview is to assess the credibility and genuine study intentions of the applicant and to ensure the University continues to meet its compliance obligations under UKVI sponsor guidance; it may evaluate the applicant's understanding of their chosen course and institution; it may be requested where immigration or credibility risk indicators are identified; it may be required at all levels (UG, PGT, MRes, doctoral); applicants may be asked to attend if requested by Admissions or the Student Visa Compliance & Advice team; missing the interview without a valid reason may result in visa refusal."
+    },
+    {
+      "url": "https://www.wlv.ac.uk/international/international-faqs/",
+      "title": "International FAQ's - University of Wolverhampton",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetch returned an empty body; nothing readable. Listed in search results for both the official-site query and the questions query."
+    },
+    {
+      "url": "https://www.scribd.com/document/885580107/University-of-Wolverhampton-PRE-CAS-QUESTIONS",
+      "title": "Wolverhampton Pre-CAS Interview Questions | PDF | Cost Of Living | University (Scribd)",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": ["cultural integration", "course and accommodation plans", "living costs", "post-graduation intentions"],
+      "quotes": [],
+      "questionIds": ["q-204", "q-201", "q-17", "q-16", "q-19"],
+      "unmapped": [],
+      "notes": "Fetched, but only the Scribd listing (title, description, metadata) rendered; the PDF body with the question wording was not readable. Ids mapped from the description's topic list only."
+    },
     {
       "url": "https://www.trymerra.ai/cas-interview/university-of-wolverhampton",
       "title": "University of Wolverhampton Pre-CAS Interview Questions 2026 | Merra",
       "tier": "consultancy",
       "fetched": false,
       "fromSnippet": true,
-      "topics": [
-        "how they'll settle in and integrate",
-        "their accommodation and living-cost plans",
-        "their post-graduation intentions",
-        "the personal influences and challenges behind their decision to study in the UK",
-        "the standard finance checks"
-      ],
+      "topics": ["how they'll settle in and integrate", "their accommodation and living-cost plans", "their post-graduation intentions", "the personal influences and challenges behind their decision to study in the UK", "standard finance checks"],
       "quotes": [],
-      "questionIds": [],
+      "questionIds": ["q-204", "q-17", "q-16", "q-19", "q-144", "q-14"],
       "unmapped": [],
-      "notes": "Search-result snippet only (page not fetched). States that Wolverhampton requires many international applicants to complete its own Pre-CAS interview after the initial deposit and before the CAS is released, that it is typically recorded, and lists the topics above as what applicants report being asked."
+      "notes": "Snippet only. Says Wolverhampton requires many international applicants to complete its own Pre-CAS interview after paying an initial deposit and before the CAS is released, and that it is typically a recorded interview; applicants should be ready to show sufficient funds held, where required, for 28 days."
     },
     {
-      "url": "https://www.scribd.com/document/885580107/University-of-Wolverhampton-PRE-CAS-QUESTIONS",
-      "title": "Wolverhampton Pre-CAS Interview Questions | PDF | Cost Of Living | University",
+      "url": "https://www.thestudentroom.co.uk/showthread.php?t=7576160",
+      "title": "I gave my Pre-CAS interview on February 26, 2025, for the University of Wolverhampton - The Student Room",
       "tier": "student_report",
       "fetched": false,
       "fromSnippet": true,
-      "topics": ["cost of living", "the university"],
+      "topics": [],
       "quotes": [],
       "questionIds": [],
       "unmapped": [],
-      "notes": "A student-shared question list named after the university; only the title and its tags (cost of living, university) were readable in the search result. Not fetched."
+      "notes": "Fetch returned HTTP 403; title only. A second thread, 'University of Wolverhampton pre cas recorded interview' (https://www.thestudentroom.co.uk/showthread.php?t=7550691), confirms by its title that the interview is recorded. The search-engine summary also said 'the pre-CAS interview includes 24 questions across various topics such as why the UK was chosen, choice of university and course, future plans, finances, and previous visas', but did not attribute this to a specific page, so it is not mapped."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=lgynnephov4",
+      "title": "University of Wolverhampton Credibility Interview Part 01 (YouTube)",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title only from search results; not fetched."
     }
   ],
-  "searchesRun": ["University of Wolverhampton pre-CAS interview credibility questions international"]
+  "searchesRun": [
+    "University of Wolverhampton pre-CAS interview credibility interview site:wlv.ac.uk",
+    "\"University of Wolverhampton\" pre-CAS interview questions asked students",
+    "University of Wolverhampton City Campus Wulfruna Street Walsall Telford campuses facts nearest station"
+  ]
 }

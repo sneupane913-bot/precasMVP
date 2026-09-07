@@ -3,22 +3,73 @@
   "name": "BPP University",
   "checkedOn": "2026-09-07",
   "usesCasShield": null,
+  "facts": [
+    { "text": "BPP University has over 33,000 students and is organised into four schools: the School of Law, the Business School, the School of Technology and the School of Healthcare and Nursing.", "sourceUrl": "https://www.bpp.com/about-bpp/bpp-university", "sourceTitle": "About BPP University - BPP" },
+    { "text": "BPP University Law School teaches from two London centres, Holborn and Waterloo, and from centres in Birmingham, Bristol, Cambridge, Leeds and Manchester.", "sourceUrl": "https://www.bpp.com/about-bpp/bpp-university", "sourceTitle": "About BPP University - BPP" },
+    { "text": "BPP reports that 96% of its UK-domiciled graduates are in highly skilled employment 15 months after graduating, and 90% satisfaction in teaching and learning in the Postgraduate Taught Experience Survey 2025.", "sourceUrl": "https://www.bpp.com/about-bpp/bpp-university", "sourceTitle": "About BPP University - BPP" },
+    { "text": "BPP University is registered with the Office for Students, holds its own degree-awarding powers, and designs its curriculum with law firms, banks and businesses.", "sourceUrl": "https://www.bpp.com/about-bpp/bpp-university", "sourceTitle": "About BPP University - BPP" },
+    { "text": "BPP's London West study centre at Shepherd's Bush is the home of its Business School programmes; it also has London centres at Holborn, Waterloo and King's Cross.", "sourceUrl": "https://www.bpp.com/about-bpp/locations", "sourceTitle": "Study locations - London - BPP (search snippet; page not fetched)" }
+  ],
   "sources": [
     {
-      "url": "https://www.scribd.com/document/808872755/INTERVIEW-QA-BPP",
-      "title": "BPP University CAS Interview Guide | PDF | United Kingdom",
-      "tier": "student_report",
+      "url": "https://www.bpp.com/study/international-students/applying-for-a-visa",
+      "title": "Applying for a Visa - BPP",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": ["Why you chose BPP University", "Your academic and career aspirations", "Your readiness to study in the UK (if you are applying from abroad)"],
+      "quotes": [],
+      "questionIds": ["q-09", "q-19", "q-32"],
+      "unmapped": [],
+      "notes": "Fetched. BPP calls it the Admissions Credibility Interview. Verbatim: 'This will take place with a BPP staff member and helps us understand why you want to study your chosen programme, and to confirm you are a genuine student.' 'This call will take place via Microsoft Teams. Please note, you will be required to have your camera on for this call. The call will be recorded for training and monitoring purposes.' 'Attending your interview at the scheduled time is essential to ensure your application can be reviewed for your intended cohort start date.' Applicants need their passport accessible during the call, a stable internet connection and a quiet space. No mention of CAS Shield or Enroly on the page."
+    },
+    {
+      "url": "https://www.bpp.com/study/international-students",
+      "title": "International students - BPP",
+      "tier": "official",
       "fetched": false,
       "fromSnippet": true,
-      "topics": [
-        "academic background and motivation",
-        "gaps in academic history and how applicants spent that time",
-        "where students will stay in the UK and commute arrangements"
-      ],
+      "topics": [],
       "quotes": [],
       "questionIds": [],
       "unmapped": [],
-      "notes": "A student-shared BPP CAS interview guide; the search-result snippet listed the three topics above. Not fetched. A second document of the same kind exists on Studocu (\"Updated Pre-CAS Questions for BPP University Application\")."
+      "notes": "Snippet: the personal statement is used to evaluate whether the programme is right for the applicant and to confirm they are a genuine and credible student, alongside the Admissions Credibility Interview."
+    },
+    {
+      "url": "https://www.scribd.com/document/808872755/INTERVIEW-QA-BPP",
+      "title": "BPP University CAS Interview Guide | PDF | United Kingdom (Scribd)",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": ["gap in study and what the applicant was doing during it", "where the applicant will stay in the UK and how they will commute to university"],
+      "quotes": ["What were you doing during your gap (if any)?", "Where will you stay in the UK and how will you commute to university?"],
+      "questionIds": ["q-05", "q-17"],
+      "unmapped": [],
+      "notes": "Not fetched. The two questions appeared in the search-engine summary of the BPP question-guide results (Scribd/Studocu); attributed to this Scribd guide, the top-listed BPP guide. The summary also said BPP preparation material highlights BPP's academic rankings, state-of-the-art facilities, diverse learning environment and strong employability rates, and reasons for choosing the UK such as academic excellence, shorter course durations and cultural diversity."
+    },
+    {
+      "url": "https://www.scribd.com/document/821006116/Bpp-University-PCI-Guideline-2024-1-1",
+      "title": "BPP University PCI - Guideline.2024-1 | PDF | Cost Of Living | Academic Degree (Scribd)",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Snippet: a Pre-CAS Interview (PCI) guideline that gives structured tips for answering using the PEE technique (Point, Evidence, Explanation) and stresses personalised responses focused on academic modules. No questions readable."
+    },
+    {
+      "url": "https://www.scribd.com/document/604779044/Final-Interview-questions-for-BPP-university",
+      "title": "Final Interview Questions For BPP University | PDF | Academic Degree | Master's Degree (Scribd)",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched, but only the listing rendered (page 1 of 7; questions not visible). Caution: the document description describes an applicant to a Master's in Project Management at the University of Law, not BPP, so despite its title it is not reliable BPP evidence."
     },
     {
       "url": "https://www.studocu.com/en-gb/document/bpp-university/llb-hons-law/updated-pre-cas-questions-for-bpp-university-application/133221829",
@@ -30,8 +81,24 @@
       "quotes": [],
       "questionIds": [],
       "unmapped": [],
-      "notes": "Title only, from the search result. Not fetched."
+      "notes": "Title only; not fetched."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=8f4FQkxLVNo",
+      "title": "Credibility Interview of BPP University | Pre CAS Interview of ... (YouTube)",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title only; not fetched. Other BPP-named videos in results: https://www.youtube.com/watch?v=cc0-JdnQ-8c, https://www.youtube.com/watch?v=JPloTRBJFx8, https://www.youtube.com/watch?v=cw4N3_gZwEs."
     }
   ],
-  "searchesRun": ["BPP University pre-CAS interview questions international students credibility"]
+  "searchesRun": [
+    "BPP University CAS interview credibility interview international students site:bpp.com",
+    "\"BPP University\" pre-CAS interview questions asked",
+    "BPP University campuses London Waterloo Shepherd's Bush Manchester Birmingham law accounting professional body accreditation facts"
+  ]
 }

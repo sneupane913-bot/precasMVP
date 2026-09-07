@@ -1,0 +1,56 @@
+{
+  "institutionId": "inst-bournemouth-university",
+  "name": "Bournemouth University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "facts": [
+    { "text": "Bournemouth University's main Talbot Campus is at Fern Barrow, Poole (BH12 5BB), in neighbouring Poole rather than Bournemouth itself.", "sourceUrl": "https://www.bournemouth.ac.uk/about/contact-us/directions-maps/directions-our-talbot-campus", "sourceTitle": "Directions to our Talbot Campus | Bournemouth University (search snippet; page not fetched)" },
+    { "text": "Talbot Campus is a compact campus housing most facilities, including the BU Business School, the Faculty of Media & Communication, the Faculty of Science & Technology, the Doctoral College and SportBU.", "sourceUrl": "https://www.bournemouth.ac.uk/why-bu/facilities-campuses/talbot-campus", "sourceTitle": "Talbot Campus | Bournemouth University (search snippet; fetch returned 403)" },
+    { "text": "Lansdowne Campus, just outside Bournemouth town centre and close to Bournemouth station, hosts most Faculty of Health & Social Sciences teaching and the Business School's postgraduate programmes, with the Bournemouth Gateway Building's healthcare simulation suites and the Weston Library.", "sourceUrl": "https://www.bournemouth.ac.uk/why-bu/facilities-campuses", "sourceTitle": "Facilities and campuses | Bournemouth University (search snippet; page not fetched)" },
+    { "text": "Travelling between Talbot Campus and Lansdowne Campus takes about 10-15 minutes by car or regular bus.", "sourceUrl": "https://www.bournemouth.ac.uk/why-bu/facilities-campuses", "sourceTitle": "Facilities and campuses | Bournemouth University (search snippet; page not fetched)" },
+    { "text": "Bournemouth University uses CAS Shield for international offer holders; some may be asked to complete a pre-CAS recorded interview about their decision to study at BU, with instructions given on CAS Shield.", "sourceUrl": "https://www.bournemouth.ac.uk/study/postgraduate/how-apply/cas-shield-step-step-guide-international-offer-holders", "sourceTitle": "CAS Shield - a step-by-step guide for international offer holders | Bournemouth University (search snippet; fetch returned 403)" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.bournemouth.ac.uk/study/postgraduate/how-apply/cas-shield-step-step-guide-international-offer-holders",
+      "title": "CAS Shield - a step-by-step guide for international offer holders | Bournemouth University",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": ["their decision to study at Bournemouth University"],
+      "quotes": [],
+      "questionIds": ["q-09"],
+      "unmapped": [],
+      "notes": "Fetch returned HTTP 403. Snippet: some international offer holders may be required to complete a pre-CAS recorded interview where they will be asked about their decision to study at Bournemouth University; detailed instructions are on CAS Shield if the step applies; applicants may also be asked to complete the Pre-CAS Questionnaire, which is not required for everyone."
+    },
+    {
+      "url": "https://www.bournemouth.ac.uk/students/help-advice/international-students/immigration-visas/student-visa/credibility-interviews-information-international-applicants",
+      "title": "Credibility interviews - information for international applicants | Bournemouth University",
+      "tier": "official",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetch returned HTTP 403. Snippet: the Home Office may invite applicants to a credibility interview to confirm their intention to study in the UK is genuine and credible; being invited does not mean there is a problem; it is conducted by a UK Entry Clearance Officer (ECO); applicants should answer in their own words without pre-prepared answers or scripts. No example questions readable."
+    },
+    {
+      "url": "https://www.kaplanpathways.com/where-to-study/bournemouth-university-international-college/student-services/pre-arrival/",
+      "title": "Pre-arrival information | Bournemouth University International College (Kaplan)",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title only; pathway-college page, not fetched. No student-report pages naming Bournemouth University with readable questions were found in the searches run."
+    }
+  ],
+  "searchesRun": [
+    "Bournemouth University credibility interview pre-CAS interview international site:bournemouth.ac.uk",
+    "\"Bournemouth University\" pre-CAS interview questions asked students",
+    "Bournemouth University Talbot Campus Lansdowne Campus Poole location nearest station facts about"
+  ]
+}

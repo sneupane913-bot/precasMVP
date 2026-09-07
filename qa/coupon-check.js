@@ -20,6 +20,14 @@
  * Run:  QA_PORT=3050 node qa/coupon-check.js   (needs `next dev`, never `next start`)
  */
 const http = require('http');
+// 7 Sep 2026: Prep moved to NPR 499 and this suite went red for restating
+// 399. Every price is read from lib/data/plans.ts, never typed here.
+const PREP_RETAIL = Number(
+  /code:\s*'prep'[\s\S]*?priceNpr:\s*(\d+)/.exec(
+    require('fs').readFileSync(require('path').join(__dirname, '..', 'lib/data/plans.ts'), 'utf8')
+  )[1]
+);
+const PREP_RE = new RegExp(`NPR ${PREP_RETAIL}`);
 
 const QA_SUPER_KEY = process.env.SUPER_ADMIN_PASSCODE || 'super-dev';
 const P = Number(process.env.QA_PORT || 3050);
@@ -373,12 +381,12 @@ const strip = (html) => html.replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>]+>/g,
   const partner = await req('GET', '/consultancy', null, { ip: nextIp() });
   const partnerText = strip(partner.body).replace(/\s+/g, ' ');
   t('C-26', '/consultancy sells coupons at the wholesale prices, and shows the retail price beside them',
-    partner.code === 200 && /NPR 300/.test(partnerText) && /NPR 700/.test(partnerText) && /NPR 399/.test(partnerText) && /NPR 799/.test(partnerText) && !/per mock/i.test(partnerText),
+    partner.code === 200 && /NPR 300/.test(partnerText) && /NPR 700/.test(partnerText) && PREP_RE.test(partnerText) && /NPR 799/.test(partnerText) && !/per mock/i.test(partnerText),
     `${partner.code}`);
   const pricing = await req('GET', '/pricing', null, { ip: nextIp() });
   const pricingText = strip(pricing.body).replace(/\s+/g, ' ');
   t('C-26b', '/pricing offers the coupon as the second way to pay, and never the wholesale price',
-    pricing.code === 200 && /coupon/i.test(pricingText) && /NPR 399/.test(pricingText) && !/NPR 300/.test(pricingText) && !/NPR 700/.test(pricingText),
+    pricing.code === 200 && /coupon/i.test(pricingText) && PREP_RE.test(pricingText) && !/NPR 300/.test(pricingText) && !/NPR 700/.test(pricingText),
     `${pricing.code}`);
   t('C-27', 'The footer names the company', /WI Education/.test(pricingText), '');
 

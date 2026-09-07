@@ -1,0 +1,77 @@
+{
+  "institutionId": "inst-aston-university",
+  "name": "Aston University",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "facts": [
+    { "text": "All of Aston's teaching and recreational facilities are on one self-contained, green 60-acre site at Aston Triangle in Birmingham city centre, with student accommodation on campus run by UNITE.", "sourceUrl": "https://www.aston.ac.uk/about/visit", "sourceTitle": "Visit Us | Aston University (search snippet; page not fetched)" },
+    { "text": "Birmingham New Street is the nearest railway station to Aston; the nearest tram stops (Bull Street, Corporation Street and Grand Central New Street) are 6-10 minutes away.", "sourceUrl": "https://www.aston.ac.uk/student-life/commuting-to-university", "sourceTitle": "Commuting to university | Aston University (search snippet; page not fetched)" },
+    { "text": "Aston Triangle sits at the heart of Birmingham's Knowledge Quarter and Innovation Precinct.", "sourceUrl": "https://www.aston.ac.uk/about/history/heritage-trail/aston-triangle", "sourceTitle": "Aston Triangle | Aston University (search snippet; page not fetched)" },
+    { "text": "Aston Business School is triple accredited by AACSB, AMBA and EQUIS, a status held by fewer than 1% of business schools worldwide; it gained EQUIS in 1999, AACSB in 2003 and AMBA in 2006.", "sourceUrl": "https://online.aston.ac.uk/blog/triple-crown-accreditation-awarded-to-aston-business-school", "sourceTitle": "Triple Crown accreditation awarded to Aston Business School - Aston University Online (search snippet; page not fetched)" },
+    { "text": "Aston runs its own pre-CAS interview on Enroly CAS Shield for applicants from listed countries including Nepal; it is a recorded video interview with a 75% pass mark, and applicants who score below that are invited to a 30-minute face-to-face Teams interview with the Visa Compliance Credibility Officers.", "sourceUrl": "https://www.aston.ac.uk/sites/default/files/2025-07/aston-pre-CAS-interview-policy-v2.pdf", "sourceTitle": "PRE CAS INTERVIEW POLICY (Aston University, v1.8, effective 14 January 2025)" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.aston.ac.uk/sites/default/files/2023-12/pre-cas-interview-guide.pdf",
+      "title": "Visa Compliance Pre-CAS Interviews - Why we do Pre-CAS Interviews (Aston University guide PDF)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "Studying in the UK: Why did you choose the UK; Did you consider other countries; UK rankings",
+        "Studying at Aston: Why did you choose Aston; did you consider any other universties; Aston rankings",
+        "Course Details: Core Modules; Optional Modules; Course duration; Placements",
+        "Future Career: Short term career goals; Long term career goals; Graduate roles; Salary expectations",
+        "Living in the UK: Living on campus or off campus; Research into local accommodation; Birmingham; Travel options; Cost of renting",
+        "Student Life: Expectations of student life; Things to do in and around Birmingham; Clubs and Societies; Travelling around the UK",
+        "Financing the course: How will your course be financed; Who is supporting you financially; Familiarity of tution costs",
+        "Student visa knowledge: Working rights; Part time work options; Obligations as a student visa holder"
+      ],
+      "quotes": ["Why did you choose the UK", "Did you consider other countries", "Why did you choose Aston", "did you consider any other universties", "How will your course be financed", "Who is supporting you financially"],
+      "questionIds": ["q-07", "q-08", "q-99", "q-206", "q-09", "q-100", "q-34", "q-11", "q-151", "q-77", "q-40", "q-41", "q-19", "q-68", "q-112", "q-113", "q-57", "q-56", "q-10", "q-17", "q-107", "q-108", "q-164", "q-150", "q-176", "q-14", "q-15", "q-47", "q-114", "q-54", "q-61", "q-170"],
+      "unmapped": ["UK rankings", "Expectations of student life", "Travelling around the UK"],
+      "notes": "Fetched (PDF text extracted). Verbatim: 'To ensure all students are genuine and credible - coming to the UK to complete their studies'; 'Preparation for students for a UKVI Credibility Interview'; 'We want to know why you are keen to come to the UK and to Aston University'. Recorded interview: 'First step of the process', 'Complete on CAS Shield', 'You will be asked 12 questions plus some administrative checks and questions', 'You do not need your passport', 'Should not take longer than 20-30 minutes', 'Should only be recorded once', 'You will have 7 days from when you are invited to complete the interview'. 'If your recorded interview does not meet the 75% pass you will be invited to a Face-to-Face Interview' - 'a friendly 30-minute interview with the Credibility Team on Microsoft Teams'. Outcome emailed; 48 hours to appeal; no 3rd attempt. Tips: don't take notes or read from a script; use headphones; do your research; it is not a formal interview."
+    },
+    {
+      "url": "https://www.aston.ac.uk/sites/default/files/2025-07/aston-pre-CAS-interview-policy-v2.pdf",
+      "title": "PRE CAS INTERVIEW POLICY (Aston University, version 1.8, effective 14 January 2025)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": ["10 standardised questions, 1 from each of 10 categories", "2 administrative questions", "2 random wildcard questions (e.g. about family) used to assess English"],
+      "quotes": ["Do you have any brothers or sisters", "how will your course be assessed"],
+      "questionIds": ["q-132", "q-12"],
+      "unmapped": [],
+      "notes": "Fetched (PDF text extracted). Key verbatim points: 'The Pre CAS-Questionnaire (CAS Shield) asks certain applicants to answer credibility style questions. If answers are not deemed satisfactory, VCT will request a face-to-face interview.' 'Students from high-risk areas will be picked up automatically by the CAS shield system'; 'The student is given 7 days to complete the interview' plus a 7-day reminder; 'The CAS Shield MyInterview Programme is a video interview platform'; must be completed in a single session; 'All students invited to interview will be asked 14 questions in total ... This includes 10 questions randomly selected from the pre-determined list (1 from each category), 2 administrative questions and 2 random wildcard questions generated from a pre-approved list, none of which are made available to students prior to interview.' 'The questions asked will simulate the same that would be asked during a Home Office Pre-CAS interview.' 'Enroly CAS Shield will select questions at random'. Scored by Enroly or VCT staff within 3-5 working days; pass above 75%, else face-to-face on Teams with the Visa Compliance Credibility Officer, recorded, scored 0-3 per question out of 30: 22+ pass and CAS issued, 21 or below rejected with no CAS. Not attending within 15 minutes = automatic failure. Wildcard example: Q 'Do you have any brothers or sisters', A 'I will be studying in Birmingham' would be marked as a fail with concern over English. Red flags: poor English, looking elsewhere/reading notes, poor research, not providing ID, someone else sitting the interview, lip-syncing, deepfake. Rejected students cannot apply again until the next academic cycle. Appendix A: 'Applications from Nepal' are always invited to a Pre-CAS interview, as are applicants with significant or inconsistent study gaps, previous visa refusals, and non-low-risk applicants studying Business & Management, HRM and International/Global Business."
+    },
+    {
+      "url": "https://www.aston.ac.uk/current-students/support-services/international/visa-compliance/pre-cas-interview",
+      "title": "Pre-CAS Interview | Aston University",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetched. 'As part of the CAS request process, you may be asked to undertake a pre-CAS video interview'. 'If you don't successfully pass the pre-CAS interview, we will invite you to a Face to Face Interview which will be conducted by the Visa Compliance Credibility Officers.' After that 'you will be able to appeal but you will not be given a third attempt to complete an interview.' Links to the guide and policy PDFs above. Related official pages not fetched: https://www.aston.ac.uk/current-students/support-services/international/visa-compliance/pre-cas (Pre CAS Questionnaire) and https://www.aston.ac.uk/sites/default/files/2023-09/credibility-interview-leaflet.pdf."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=kAGSHrubwCU",
+      "title": "Aston University Pre Cas Interview Questions 2025 (YouTube)",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title only; not fetched. A copy of the Aston policy is also on Scribd: https://www.scribd.com/document/904138516/Aston-Pre-CAS-Interview-Policy-v2."
+    }
+  ],
+  "searchesRun": [
+    "Aston University pre-CAS interview credibility interview CAS Shield site:aston.ac.uk",
+    "\"Aston University\" pre-CAS interview questions asked students",
+    "Aston University campus Birmingham city centre Aston Triangle nearest station triple accredited business school facts about"
+  ]
+}

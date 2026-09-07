@@ -1,0 +1,62 @@
+{
+  "institutionId": "inst-coventry-university-london",
+  "name": "Coventry University London",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    { "text": "Coventry University London's campus is University House on Middlesex Street, next to Liverpool Street station in the City of London.", "sourceUrl": "https://www.coventry.ac.uk/london/student-life/london-life/campus-and-facilities/", "sourceTitle": "Campus and facilities | Coventry University London (search snippet; page not fetched)" },
+    { "text": "The campus has four teaching floors, a library with around 100 study spaces including silent study areas, a Mac suite with industry software and a dedicated Student Lounge.", "sourceUrl": "https://www.coventry.ac.uk/london/student-life/london-life/campus-and-facilities/", "sourceTitle": "Campus and facilities | Coventry University London (search snippet; page not fetched)" },
+    { "text": "Coventry University London is a business school specialising in business and management programmes such as MSc Global Finance and Business Management, and describes itself as TEF Gold.", "sourceUrl": "https://www.coventry.ac.uk/london/", "sourceTitle": "Coventry University London (search snippet; page not fetched)" },
+    { "text": "Each year over 11,000 international students from more than 80 countries study at Coventry University London.", "sourceUrl": "https://www.coventry.ac.uk/london/", "sourceTitle": "Coventry University London (search snippet; page not fetched)" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.coventry.ac.uk/london/international/immigration-and-visa-/credibility-interviews-/",
+      "title": "Credibility Interviews | Coventry University London",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": ["Your ability to speak English (regardless of IELTS score)", "Knowledge of intended course of study", "Knowledge of Coventry University", "Your academic/employment background", "Your future plans", "Your finances"],
+      "quotes": [
+        "Why do you want to study in the UK?",
+        "Why have you chosen to study at Coventry University?",
+        "Why have you chosen your course to study?",
+        "How is your course assessed?",
+        "Do you know what level your course is?",
+        "Can you explain any gaps in your years of study or work?",
+        "Who is financing your studies?"
+      ],
+      "questionIds": ["q-07", "q-09", "q-201", "q-12", "q-103", "q-05", "q-109", "q-15", "q-133", "q-45", "q-36", "q-03", "q-130", "q-19", "q-14"],
+      "unmapped": [],
+      "notes": "Fetched. Verbatim rules: 'All interviews are conducted in English to assure that you have the required level of English language to undertake your course successfully.' 'Attendance is mandatory.' 'If you fail to attend an interview without providing a reasonable explanation, this will result in an automatic refusal.' 'The caseworker has the authority to refuse entry if you fail the interview.' Framed as the UKVI credibility interview (caseworker), not a university-run pre-CAS interview. No mention of CAS Shield or Enroly. The search-engine summary for this query also quoted 'If there have been periods of time in which you have been working, why are you now looking to come back to study? Would this study benefit your current profession or enhance your future prospects?' without a clear page attribution, so it is not mapped."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=-Y9uc4rZlx0",
+      "title": "UK Pre-CAS Interview Questions & Answers 2025 | Coventry University Student | Learn With Isha (YouTube)",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Title only; not fetched. Names Coventry University generally, not the London campus specifically."
+    },
+    {
+      "url": "https://www.trymerra.ai/cas-interview/coventry-university",
+      "title": "Coventry University Pre-CAS Interview Questions 2026 | Merra",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": ["which campus you applied to - Coventry main campus, Coventry University London, or a CU sub-brand - where it is, how you'll get there, and why you chose it", "source and availability of your money, how you'll pay subsequent years' fees, exact sponsorship amounts and what they cover, loan repayment plans, accommodation and living costs"],
+      "quotes": [],
+      "questionIds": ["q-78", "q-147", "q-09", "q-104", "q-82", "q-15", "q-106", "q-17", "q-16"],
+      "unmapped": [],
+      "notes": "Snippet only. Explicitly tells applicants to be able to say where the Coventry University London campus is, how they will get there and why they chose it; interviews are normally online, some by phone or face-to-face including at the biometric appointment; rehearsed answers and vague funding figures are the top stated refusal reasons."
+    }
+  ],
+  "searchesRun": [
+    "\"Coventry University London\" pre-CAS interview questions asked students",
+    "Coventry University London campus University House Spitalfields Liverpool Street station about business school facts"
+  ]
+}

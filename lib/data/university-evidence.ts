@@ -48,6 +48,8 @@ import { GENERATED_EVIDENCE } from '@/lib/data/university-evidence.generated';
 export type EvidenceTier = 'official' | 'student_report' | 'consultancy';
 
 export interface EvidenceSource {
+  /** True for the shared CAS Shield theme list, so the reason can say so. */
+  viaCasShield?: boolean;
   url: string;
   title: string;
   tier: EvidenceTier;
@@ -98,9 +100,44 @@ export interface QuestionLikelihood {
   sourceTitle: string;
 }
 
+/**
+ * THE CAS SHIELD THEMES. Enroly's CAS Shield runs the recorded pre-CAS
+ * interview for a large share of UK universities, and Brunel publishes the
+ * policy: 15 to 20 minutes, questions randomised from these themes, an ID
+ * check on camera, assessed by the university's own compliance staff, with
+ * pass / resit / reject outcomes. Any university we have evidence uses CAS
+ * Shield inherits this theme list as an official source, worded as such.
+ * Verbatim from the PDF, read 7 September 2026.
+ */
+export const CAS_SHIELD_SOURCE: EvidenceSource = {
+  viaCasShield: true,
+  url: 'https://www.brunel.ac.uk/study/admissions/documents/pdf/CAS-Shield-Interview-Policy-2024-5.pdf',
+  title: 'Brunel University London: CAS Shield Interview Policy 2024-5 (the themes every CAS Shield interview draws from)',
+  tier: 'official',
+  checkedOn: '2026-09-07',
+  fetched: true,
+  topics: [
+    'The reason why the applicant has chosen to study in the UK, and at the university',
+    'The reason why the applicant has chosen their particular course',
+    "The applicant's post-study plans and how their course may support them in this",
+    "The applicant's financial circumstances and how they expect to fund their studies in the UK",
+    "The applicant's arrangements for UK accommodation",
+    "The applicant's awareness of the Student visa regulations",
+    "'Random' questions on unrelated topics may be included to prevent the use of scripted answers",
+  ],
+  questionIds: [],
+  notes:
+    'Recorded video interview in the CAS Shield software, approximately 15-20 minutes, questions randomised from the themes above, passport shown on camera for an ID check, assessed by the university\'s own compliance or admissions staff. Outcomes: pass, resit (borderline, in whole or for specific subject areas), or reject.',
+};
+
+const BRUNEL = 'inst-brunel-university-london';
+
 /** Every source we hold for one university: hand-checked guidance first, then the sweep. */
 export function evidenceFor(institutionId: string): EvidenceSource[] {
   const out: EvidenceSource[] = [];
+  if (institutionId === BRUNEL || GENERATED_EVIDENCE[institutionId]?.usesCasShield === true) {
+    out.push(CAS_SHIELD_SOURCE);
+  }
   const g = PUBLISHED_GUIDANCE[institutionId];
   if (g) {
     out.push({
@@ -150,6 +187,7 @@ const TOPIC_KEYWORDS: [RegExp, QuestionCategory[]][] = [
   [/career|future|plan|after|graduat|ambition|goal|return|employ/i, ['future_plans']],
   [/gap|break|since you|history|background|previous|prior|past stud/i, ['study_gap', 'education']],
   [/genuine|intention|yourself|introduc|personal|english/i, ['identity', 'conversational']],
+  [/random|unrelated|scripted/i, ['conversational', 'identity']],
 ];
 
 function categoriesCoveredBy(topics: string[]): Set<QuestionCategory> {
@@ -235,8 +273,9 @@ export function likelihoodFor(q: Question, inst: Institution): QuestionLikelihoo
     if (categoriesCoveredBy(s.topics).has(q.category)) {
       return {
         level: 'possible',
-        reason:
-          s.tier === 'official'
+        reason: s.viaCasShield
+          ? `${name} runs its interview through CAS Shield, whose published themes cover this.`
+          : s.tier === 'official'
             ? `${name} says its interview covers this theme.`
             : `Students who sat ${name}'s interview report this theme.`,
         sourceUrl: s.url,
@@ -296,6 +335,8 @@ export function evidenceSummary(inst: Institution): {
   let line: string;
   if (official > 0 && ids.size > 0) {
     line = `${ids.size} questions from ${name}'s own interview guidance${reports > 0 ? `, plus ${reportIds.size} reported by its students` : ''}.`;
+  } else if (sources.some((s) => s.viaCasShield) && official === 1) {
+    line = `${name} runs its interview through CAS Shield, whose themes are published${reports > 0 ? `; ${reportIds.size} questions reported by its students` : ''}.`;
   } else if (official > 0) {
     line = `${name} publishes the themes of its interview${reports > 0 ? `; ${reportIds.size} questions reported by its students` : ''}.`;
   } else if (reports > 0) {
