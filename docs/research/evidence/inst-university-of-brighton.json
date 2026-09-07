@@ -1,0 +1,42 @@
+{
+  "institutionId": "inst-university-of-brighton",
+  "name": "University of Brighton",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "facts": [
+    { "text": "The University of Brighton has been part of the city of Brighton & Hove since 1859, when it started as a school of art in the kitchens of the Royal Pavilion.", "sourceUrl": "https://www.brighton.ac.uk/about-us/index.aspx", "sourceTitle": "About us | University of Brighton" },
+    { "text": "The university's head office is Mithras House, Lewes Road, Brighton, BN2 4AT, and its sites include Moulsecoomb and Grand Parade.", "sourceUrl": "https://www.brighton.ac.uk/about-us/index.aspx", "sourceTitle": "About us | University of Brighton" },
+    { "text": "Brighton holds a TEF 2023 Silver award and is placed in the top 4.3% of institutions globally by the Center for World University Rankings 2025.", "sourceUrl": "https://www.brighton.ac.uk/about-us/index.aspx", "sourceTitle": "About us | University of Brighton" },
+    { "text": "The university holds Race Equality Charter Silver, Athena Swan Silver and EcoCampus Platinum accreditations and is a Disability Confident Employer.", "sourceUrl": "https://www.brighton.ac.uk/about-us/index.aspx", "sourceTitle": "About us | University of Brighton" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.brighton.ac.uk/international/applying-here/visas-and-immigration/confirmation-of-acceptance-for-studies/index.aspx",
+      "title": "Confirmation of acceptance for studies | University of Brighton",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Quote: 'Some applicants will require a pre-CAS interview as part of our assessment of their suitability for sponsorship under the Student visa route.' Invitation is sent through Enroly CAS Shield; format is recorded video: onscreen questions with preparation time, then verbal answers within time limits; allow about 30 minutes, private location, passport for ID verification. Quote: 'Applicants who do not respond to the interview invitation, fail to attend, or do not pass the interview will be refused a CAS/Student visa sponsorship and their offer of a place at the university will be withdrawn.' Quote: 'If you do not pass the pre-CAS interview, you will not be offered a chance to re-sit' (technical failures may be retaken at the Visa Compliance team's discretion). 'You may also be required to attend a follow-up online interview with a member of the Visa Compliance team.' Result is communicated via the CAS Shield chat function. No example questions on the page."
+    },
+    {
+      "url": "https://www.brighton.ac.uk/international/applying-here/visas-and-immigration/student-visa-outside-uk/index.aspx",
+      "title": "Student visa: outside the UK | University of Brighton",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": ["why you want to study your course", "the reasons why you chose to study at the university"],
+      "quotes": [],
+      "questionIds": ["q-201", "q-09"],
+      "unmapped": [],
+      "notes": "About the UKVI interview: 'In a small number of cases UKVI will request an applicant attends a substantive interview, sometimes referred to as a \"credibility\" interview.' 'At the interview you will be asked about why you want to study your course and the reasons why you chose to study at the university.' Applicants 'must attend as otherwise your application will be rejected'; the university suggests asking for a transcript of the conversation. questionIds are mapped from the two topics named, not verbatim questions."
+    }
+  ],
+  "searchesRun": [
+    "\"University of Brighton\" credibility interview pre-CAS questions international",
+    "site:brighton.ac.uk credibility interview OR \"pre-CAS\" international students visa"
+  ]
+}

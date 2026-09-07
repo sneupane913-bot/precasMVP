@@ -1,0 +1,38 @@
+{
+  "institutionId": "inst-university-of-bristol",
+  "name": "University of Bristol",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    { "text": "The University of Bristol is ranked 8th in the UK and 57th in the world in the QS World University Rankings 2027.", "sourceUrl": "https://www.bristol.ac.uk/university/", "sourceTitle": "About the University | University of Bristol" },
+    { "text": "Bristol was the first higher education institution in the UK to admit men and women on an equal basis.", "sourceUrl": "https://www.bristol.ac.uk/university/", "sourceTitle": "About the University | University of Bristol" },
+    { "text": "The university's main address is Beacon House, Queens Road, Bristol, BS8 1QU.", "sourceUrl": "https://www.bristol.ac.uk/university/", "sourceTitle": "About the University | University of Bristol" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.bristol.ac.uk/directory/visas/student-visa/apply/credibility/",
+      "title": "Credibility interviews, document verification and refusals | Directory of Professional Services | University of Bristol",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": ["Motivation for UK study", "Course selection", "Career goals", "Funding", "Geographic/cost comparison", "Country benefits", "Employment gaps", "Accommodation and logistics"],
+      "quotes": [
+        "Why do you want to study in the UK? Have you considered other countries for study, which ones and how did you research these options?",
+        "Why did you choose this specific course? What about is appeals to you, and which modules specifically will you find useful or interesting?",
+        "What are your future plans after completing your studies and how does this course help with your career goals?",
+        "How will you fund your studies in the UK? How much are your course fees?",
+        "If the course is available for less cost in your home country, what is the reason that you would choose to pay extra to study in the UK?",
+        "What are some of the benefits of studying in the UK compared to your home country?",
+        "How do you explain any gaps in your study/professional history?",
+        "Where will you live while you are studying in the UK? How far will that be from where your classes will be held and how do you plan to travel to class?"
+      ],
+      "questionIds": ["q-07", "q-99", "q-144", "q-201", "q-11", "q-19", "q-20", "q-14", "q-47", "q-30", "q-145", "q-29", "q-109", "q-128", "q-17", "q-107"],
+      "unmapped": [],
+      "notes": "Describes UKVI credibility interviews: 'interviews normally take place online via video link' and are conducted by 'UKVI staff members', to verify 'that you are a genuine and credible student and that you meet the English language requirements'. The separate CAS page (https://www.bristol.ac.uk/directory/visas/student-visa/cas/) was fetched and contains no pre-CAS interview, CAS Shield or Enroly content. Search snippet for the visa pages mentioned 'you may be asked to participate in a pre-CAS interview with a member of university staff' but that sentence was not on either fetched page and may belong to UWE Bristol, so it is not recorded as Bristol evidence."
+    }
+  ],
+  "searchesRun": [
+    "\"University of Bristol\" credibility interview pre-CAS questions international students",
+    "\"University of Bristol\" facts and figures founded 1909 Russell Group Clifton campus Temple Meads"
+  ]
+}

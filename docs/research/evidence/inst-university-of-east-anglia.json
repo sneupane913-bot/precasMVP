@@ -1,0 +1,55 @@
+{
+  "institutionId": "inst-university-of-east-anglia",
+  "name": "University of East Anglia",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    { "text": "UEA was founded in 1963 with room for about 1,200 students and now has over 17,000 students.", "sourceUrl": "https://www.uea.ac.uk/about/university-information", "sourceTitle": "University Information | UEA" },
+    { "text": "UEA's campus is on the Norwich Research Park, near the centre of Norwich (address Norwich Research Park, Norwich, Norfolk NR4 7TJ).", "sourceUrl": "https://www.uea.ac.uk/about/university-information", "sourceTitle": "University Information | UEA" },
+    { "text": "The Norwich Research Park is described as a world-leading centre for environment, health and plant science research and is home to the Norfolk and Norwich University Hospital.", "sourceUrl": "https://www.uea.ac.uk/about/university-information", "sourceTitle": "University Information | UEA" },
+    { "text": "UEA is consistently ranked in the top 25 universities in the UK and in the UK top 20 for research quality (Times Higher Education, 2021 REF); the campus includes the Sainsbury Centre art museum and the Sportspark.", "sourceUrl": "https://www.uea.ac.uk/about/university-information", "sourceTitle": "University Information | UEA" },
+    { "text": "Norwich is England's first UNESCO City of Literature.", "sourceUrl": "https://www.uea.ac.uk/about/university-information", "sourceTitle": "University Information | UEA" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.uea.ac.uk/study/international-students/cas-and-visa-process",
+      "title": "The CAS process at UEA",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Quote: 'You may be required to carry out a pre-CAS interview. These interviews are designed to ensure that you are well prepared for your studies in the UK and that UEA sponsors only genuine students.' UEA may also ask for visa documentation and evidence of cost-of-living funds at this stage. No example questions, format, platform or outcome rules on the page."
+    },
+    {
+      "url": "https://www.facebook.com/groups/ukstudentvisa/posts/4418468655067781/",
+      "title": "I passed the Pre-cas interview at University of East Anglia ...",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Search result only (not fetched); confirms UEA runs pre-CAS interviews. No questions readable from the snippet."
+    },
+    {
+      "url": "https://www.trencher.ai/university-of-east-anglia-january-2026-intake/",
+      "title": "University of East Anglia January 2026 Intake - www.trencher.ai",
+      "tier": "consultancy",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Search snippet claims the January 2026 intake had 'no pre-CAS interview requirement'; unverified consultancy claim, not fetched."
+    }
+  ],
+  "searchesRun": [
+    "\"University of East Anglia\" OR UEA credibility interview pre-CAS questions international students",
+    "site:uea.ac.uk campus Norwich founded 1963 Sainsbury Centre Norwich Research Park facts"
+  ]
+}

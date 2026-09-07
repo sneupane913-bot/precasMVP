@@ -1,0 +1,55 @@
+{
+  "institutionId": "inst-university-of-exeter",
+  "name": "University of Exeter",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": true,
+  "facts": [
+    { "text": "The University of Exeter traces its history to 1855 and received its full University Charter in 1955; it is a Russell Group university.", "sourceUrl": "https://www.exeter.ac.uk/about/", "sourceTitle": "About the University of Exeter" },
+    { "text": "Exeter has three main campuses: Streatham and St Luke's in Exeter and Penryn in Cornwall, plus a Truro site.", "sourceUrl": "https://www.exeter.ac.uk/about/", "sourceTitle": "About the University of Exeter" },
+    { "text": "Exeter has 29,700 students from 150 countries, 7,360 staff and 195,000 alumni from 183 countries.", "sourceUrl": "https://www.exeter.ac.uk/about/", "sourceTitle": "About the University of Exeter" },
+    { "text": "Exeter is ranked 136th in the 2027 QS World University Rankings and is one of only four Russell Group universities to hold Triple Gold in the 2023 TEF.", "sourceUrl": "https://www.exeter.ac.uk/about/", "sourceTitle": "About the University of Exeter" },
+    { "text": "Exeter was ranked 4th in the 2024/25 BUCS Sport Rankings and describes its campuses as carbon-neutral.", "sourceUrl": "https://www.exeter.ac.uk/about/", "sourceTitle": "About the University of Exeter" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.exeter.ac.uk/international-students/visas/student/cas/",
+      "title": "Confirmation for Acceptance for Studies (CAS) | International Students | University of Exeter",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Quote: 'If you are required to undertake a Pre-CAS interview, you will also be able to complete this at your convenience through CAS Shield.' Quote: 'You will usually receive your CAS Statement within 3 working days of completing all the requirements of your CAS Shield application (including passing a Pre-CAS interview, if you are required to complete one).' Pre-CAS interview applies only to some students; no example questions, topics, format or retake rules given. usesCasShield = true."
+    },
+    {
+      "url": "https://unimock.ai/blog/pre-cas-mock-interview-university-of-exeter-complete-guide-and-tips-2026",
+      "title": "Pre-CAS mock interview University of Exeter - Complete Guide and Tips 2026 | UniMock.ai",
+      "tier": "consultancy",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetch returned only the page title/header; no body content or questions were readable."
+    },
+    {
+      "url": "https://www.facebook.com/groups/165239440652720/posts/2509102719599702/",
+      "title": "Does University of Exeter hold any Pre-Cas interview?",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Search result only (not fetched); no questions readable from the snippet."
+    }
+  ],
+  "searchesRun": [
+    "\"University of Exeter\" credibility interview pre-CAS questions international students",
+    "\"University of Exeter\" \"pre-CAS\" interview questions asked experience"
+  ]
+}

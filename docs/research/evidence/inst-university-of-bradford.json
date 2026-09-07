@@ -1,0 +1,87 @@
+{
+  "institutionId": "inst-university-of-bradford",
+  "name": "University of Bradford",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    { "text": "The University of Bradford was established in 1966 as the UK's fortieth university, and its campus is at Richmond Road, Bradford, West Yorkshire, BD7 1DP.", "sourceUrl": "https://www.bradford.ac.uk/about/", "sourceTitle": "About - University of Bradford" },
+    { "text": "In 2024/25 Bradford had 10,887 students, of whom 2,908 were international students from the EU and overseas.", "sourceUrl": "https://www.bradford.ac.uk/about/", "sourceTitle": "About - University of Bradford" },
+    { "text": "Bradford created the first Peace Studies department at a British university in 1973 and became the first British 'University of Sanctuary' in 2018.", "sourceUrl": "https://www.bradford.ac.uk/about/", "sourceTitle": "About - University of Bradford" },
+    { "text": "Bradford is ranked 2nd in the UK for Optometry, 3rd for Paramedic Science and 5th for Chemical Engineering, and 1st in England for social mobility (2021-2024).", "sourceUrl": "https://www.bradford.ac.uk/about/", "sourceTitle": "About - University of Bradford" },
+    { "text": "The university's partners include Bradford 2025 (UK City of Culture), Bradford City AFC, the Bradford Literature Festival and the National Science and Media Museum.", "sourceUrl": "https://www.bradford.ac.uk/about/", "sourceTitle": "About - University of Bradford" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.bradford.ac.uk/international/support/visa-support/student-visas/credibility-checks/",
+      "title": "Credibility checks - Student visas - University of Bradford",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": ["Intent and ability to study course", "English language ability", "Financial credibility", "Previous study in the UK", "Immigration history (such as visa refusals for the UK or other countries, previous curtailments or overstaying)", "Intention to Study", "Academic History", "Personal Background", "Financial Questions"],
+      "quotes": [
+        "Why do you want to study in the UK?",
+        "What made you choose the University of Bradford?",
+        "Which other Universities did you consider?",
+        "What facilities are unique to your course/needs at the University of Bradford?",
+        "What do you know about the city of Bradford?",
+        "Why did you choose your course?",
+        "What modules will you be studying and what qualification will you leave the University with?",
+        "How is your course assessed?",
+        "What other courses (if any) did you consider studying?",
+        "What are your plans after you complete your course?",
+        "Where have you studied previously and why did you choose this course of study?",
+        "Why have you decided to return to study?",
+        "Have you ever visited the UK before?",
+        "Will you have any family travelling with you?",
+        "Do you have family in the UK?",
+        "Do you have family in your home country?",
+        "Have you ever had a visa refusal for the UK or any other country?",
+        "How will you fund your studies for the full duration of your course?",
+        "What are the source of your funds and will you have access throughout your studies?",
+        "Have you carried out research on accommodation costs, location, availability?",
+        "Do you plan on working while in the UK?",
+        "If you have a loan how do you plan on paying this back?"
+      ],
+      "questionIds": ["q-07", "q-09", "q-100", "q-101", "q-202", "q-10", "q-201", "q-11", "q-40", "q-12", "q-42", "q-19", "q-25", "q-03", "q-140", "q-168", "q-88", "q-169", "q-92", "q-18", "q-14", "q-82", "q-51", "q-104", "q-56", "q-54", "q-106"],
+      "unmapped": [],
+      "notes": "University conducts 'mandatory pre-CAS applicant support interviews' (separate from any UKVI credibility interview). Quote: 'This interview will be conducted via Teams or Google Meet and will last for approximately 1 hour.' Conducted in English; English ability is checked. Quote: 'If the interview suggests that you are not a genuine student or your risk of visa refusal is high, we do reserve the right to refuse your CAS.' No mention of CAS Shield or Enroly on the page."
+    },
+    {
+      "url": "https://www.scribd.com/document/881358635/University-of-Bradford",
+      "title": "University of Bradford Interview Guide | PDF | Travel Visa",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": ["Intention to study in the UK", "Academic history", "Personal background", "Financial plans"],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Fetch returned only the Scribd description, not the document body, so no questions were readable. Description states the interview is one hour via Teams or Google Meet, only one interview attempt is allowed, and it must be completed before a CAS is issued."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=fvAKjS6zODA",
+      "title": "University of Bradford Pre Cas Interview Questions 2025 | UK Credibility Interview - YouTube",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Seen only as a search result title; not fetched (budget). No questions readable from the snippet."
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=Kjj2UoP-YsM",
+      "title": "Preparing for your Credibility Interview | Likely Questions for Pre-CAS,Visa| University of Bradford - YouTube",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Seen only as a search result title; not fetched (budget). No questions readable from the snippet."
+    }
+  ],
+  "searchesRun": ["\"University of Bradford\" credibility interview questions asked students"]
+}

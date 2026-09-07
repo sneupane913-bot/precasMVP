@@ -1,0 +1,43 @@
+{
+  "institutionId": "inst-university-of-central-lancashire",
+  "name": "University of Central Lancashire",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    { "text": "The University of Central Lancashire now brands itself the University of Lancashire; it describes itself as 'the international, multi-campus university tracing its roots back to 1828'.", "sourceUrl": "https://www.uclan.ac.uk/about-us", "sourceTitle": "Find out all about the University of Lancashire" },
+    { "text": "The university has a community of over 42,000 students and staff from more than 100 countries.", "sourceUrl": "https://www.uclan.ac.uk/about-us", "sourceTitle": "Find out all about the University of Lancashire" },
+    { "text": "It was named Edufuturists University of the Year 2023 and describes itself as the most affordable university in the UK (The Times, 2023) with the lowest cost of living for students.", "sourceUrl": "https://www.uclan.ac.uk/about-us", "sourceTitle": "Find out all about the University of Lancashire" },
+    { "text": "The university's Clearing and enquiry phone number is 01772 830777, a Preston (01772) area code, and it offers campus tours and Preston venue hire.", "sourceUrl": "https://www.uclan.ac.uk/about-us", "sourceTitle": "Find out all about the University of Lancashire" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.lancashire.ac.uk/international-students/visa-advice",
+      "title": "Visa advice for international students",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "WebFetch returned 403; page retrieved with curl instead. Quote: 'You will be notified by email after paying your deposit as to whether you have been selected for a UCLan credibility interview and you must engage with this process otherwise we may withdraw your offer. Please note, the UCLan credibility interviews are different to the UKVI credibility interview process.' Interview is selective (only some applicants). No example questions, format, length or platform given. Page also states CAS is issued up to 6 months before the course and lists the UKVI maintenance figures. No CAS Shield or Enroly mention found."
+    },
+    {
+      "url": "https://www.scribd.com/document/588775615/Cas",
+      "title": "UCLan CAS Confirmation for International Student | PDF",
+      "tier": "student_report",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "A student's CAS letter upload, not an interview report; body inaccessible and no interview content in the description."
+    }
+  ],
+  "searchesRun": [
+    "\"University of Central Lancashire\" OR UCLan pre-CAS credibility interview questions",
+    "site:uclan.ac.uk credibility interview CAS international students",
+    "UCLan \"pre-CAS\" OR \"credibility\" interview questions Nepal OR India students youtube"
+  ]
+}

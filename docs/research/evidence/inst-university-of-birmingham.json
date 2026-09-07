@@ -1,0 +1,44 @@
+{
+  "institutionId": "inst-university-of-birmingham",
+  "name": "University of Birmingham",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    { "text": "The University of Birmingham was founded in 1900, is the original 'redbrick' university and is a member of the Russell Group; its campus is at Edgbaston, Birmingham, B15 2TT.", "sourceUrl": "https://www.birmingham.ac.uk/about", "sourceTitle": "About us - University of Birmingham" },
+    { "text": "Birmingham counts 10 Nobel Laureates among its staff and alumni and contributed to the discovery of the Higgs Boson and gravitational waves.", "sourceUrl": "https://www.birmingham.ac.uk/about", "sourceTitle": "About us - University of Birmingham" },
+    { "text": "In the QS World Rankings 2027 Birmingham is 68th globally and 10th among UK universities, and the Complete University Guide ranks 20 of its subjects in the top 10.", "sourceUrl": "https://www.birmingham.ac.uk/about", "sourceTitle": "About us - University of Birmingham" },
+    { "text": "The Edgbaston campus is three miles south-west of Birmingham city centre and has its own railway station, University station, about ten minutes from Birmingham New Street on the cross-city line and a five-minute walk from the campus centre.", "sourceUrl": "https://www.birmingham.ac.uk/contact/directions", "sourceTitle": "Getting to campus - University of Birmingham" },
+    { "text": "Buses 61, 63, X20, X21 and X22 run from Birmingham city centre to campus, and Birmingham Airport connects to the rail network by the free two-minute Air-Rail Link.", "sourceUrl": "https://www.birmingham.ac.uk/contact/directions", "sourceTitle": "Getting to campus - University of Birmingham" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.birmingham.ac.uk/study/international/visas",
+      "title": "Visas for international students - University of Birmingham",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [
+        "Why do you want to study in the UK instead of your home country?",
+        "Why have you chosen the University of Birmingham?",
+        "Which other universities did you consider?",
+        "What do you know about Birmingham?",
+        "Where will live in the UK? How much will your accommodation cost?",
+        "What is the name and level of your course?",
+        "Why did you choose your course/research area?",
+        "How long does your course last?",
+        "How will your course be assessed?",
+        "What is your academic/employment background?",
+        "How will you fund your course e.g. self-funded, parents, scholarship or sponsorship?",
+        "What do you hope to achieve after your course? What are your career aspirations?"
+      ],
+      "questionIds": ["q-07", "q-98", "q-09", "q-100", "q-10", "q-17", "q-108", "q-02", "q-103", "q-201", "q-40", "q-12", "q-03", "q-129", "q-14", "q-49", "q-19"],
+      "unmapped": [],
+      "notes": "Page describes the UKVI credibility interview, which may be 'via a video link by UKVI staff in the UK'. Quote: 'During the interview the interviewer will write down what you say and will send this record to the person who will make a decision on your visa application who is called an Entry Clearance Officer (ECO).' No mention of a university-run pre-CAS interview, CAS Shield or Enroly."
+    }
+  ],
+  "searchesRun": [
+    "\"University of Birmingham\" credibility interview pre-CAS questions international students",
+    "\"University of Birmingham\" pre-CAS interview questions experience student"
+  ]
+}

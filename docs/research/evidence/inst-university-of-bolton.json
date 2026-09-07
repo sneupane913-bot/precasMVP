@@ -1,0 +1,60 @@
+{
+  "institutionId": "inst-university-of-bolton",
+  "name": "University of Bolton",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    { "text": "The University of Bolton was known by that name until 2024, when it became the University of Greater Manchester.", "sourceUrl": "https://en.wikipedia.org/wiki/University_of_Greater_Manchester", "sourceTitle": "University of Greater Manchester - Wikipedia" },
+    { "text": "The University of Greater Manchester's address is Deane Road, Bolton, BL3 5AB (tel +44 (0)1204 900 600).", "sourceUrl": "https://greatermanchester.ac.uk/about", "sourceTitle": "about | University of Greater Manchester" },
+    { "text": "The university's preferred teaching approach is the 'Greater Manchester Way', which uses a block-teaching model on many (not all) courses.", "sourceUrl": "https://greatermanchester.ac.uk/about", "sourceTitle": "about | University of Greater Manchester" }
+  ],
+  "sources": [
+    {
+      "url": "https://knowledge.greatermanchester.ac.uk/knowledge/what-is-a-credibility-interview-and-what-can-i-expect",
+      "title": "What is a credibility interview and what can I expect? - Help Centre - University of Greater Manchester",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": ["your study intentions", "future study and career plans", "your financial stability or ability to fund your studies and living costs", "your ability to demonstrate your English language skills"],
+      "quotes": [
+        "Why have you chosen to study in the UK?",
+        "Why have you chosen to study at the University of Greater Manchester?",
+        "Why have you chosen to study this course?",
+        "How will this course prepare you for your future career plans and aspirations?",
+        "Are you planning to work in the UK?",
+        "How will you fund your studies and living costs during your studies?"
+      ],
+      "questionIds": ["q-07", "q-09", "q-201", "q-20", "q-54", "q-66", "q-14"],
+      "unmapped": [],
+      "notes": "Reached via 301 redirect from knowledge.bolton.ac.uk. Describes the UKVI credibility interview: conducted by 'a UKVI member of staff', 'usually last 30 minutes', in English. Invitation triggers: 'if more information is needed for your application if there are documents or information that needs clarifying, if you are processing to another course or postgraduate study, or if there are discrepancies with your visa or immigration history.' 'If you do not attend your credibility interview then your visa may be refused'. No mention of a university-run pre-CAS interview, CAS Shield or Enroly."
+    },
+    {
+      "url": "https://www.tiktok.com/@lisaunfiltered365/video/7476977155910438166",
+      "title": "Storytime: My Pre-CAS Interview Experience during University of Bolton Admission process | TikTok",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Search result only (not fetched). Title confirms the University of Bolton ran a pre-CAS interview during admission; no questions readable from the snippet."
+    },
+    {
+      "url": "https://www.facebook.com/groups/146148223938200/posts/my-pre-cas-interview-for-bolton-university-is-tomorrow-ill-pay-the-fee-after-tha/776382884248061/",
+      "title": "My pre-CAS interview for Bolton University is tomorrow. I'll ...",
+      "tier": "student_report",
+      "fetched": false,
+      "fromSnippet": true,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Search result only (not fetched). Confirms existence of a Bolton pre-CAS interview; no questions readable."
+    }
+  ],
+  "searchesRun": [
+    "\"University of Bolton\" OR \"University of Greater Manchester\" credibility interview pre-CAS questions",
+    "\"University of Bolton\" pre-CAS interview questions asked"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "institutionId": "inst-university-of-dundee",
+  "name": "University of Dundee",
+  "checkedOn": "2026-09-07",
+  "usesCasShield": null,
+  "facts": [
+    { "text": "The University of Dundee came into formal existence by Royal Charter on 1 August 1967; its address is Nethergate, Dundee, DD1 4HN, Scotland.", "sourceUrl": "https://www.dundee.ac.uk/about", "sourceTitle": "About the University of Dundee | University of Dundee, UK" },
+    { "text": "The City Campus is in the heart of Dundee, a short walk from the train and bus stations and a few minutes' walk from the city centre.", "sourceUrl": "https://www.dundee.ac.uk/student-life/campus/city-campus", "sourceTitle": "City Campus | University of Dundee, UK" },
+    { "text": "The City Campus has the Main Library (open until 2:30am in semester and 24 hours during exams), DUSA the Students' Union, a campus shop, bars, cafes and the Institute of Sport and Exercise with a gym and 25-metre swimming pool.", "sourceUrl": "https://www.dundee.ac.uk/student-life/campus/city-campus", "sourceTitle": "City Campus | University of Dundee, UK" },
+    { "text": "Most university accommodation is on campus, with two off-campus sites (Seabraes and West Park) within a 5- to 30-minute walk, and there are over 240 student societies.", "sourceUrl": "https://www.dundee.ac.uk/student-life/campus/city-campus", "sourceTitle": "City Campus | University of Dundee, UK" }
+  ],
+  "sources": [
+    {
+      "url": "https://www.dundee.ac.uk/guides/pre-cas-credibility-assessments",
+      "title": "Pre-Confirmation of Acceptance for Studies (CAS) credibility assessments | University of Dundee, UK",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": ["your reasons for coming to the UK", "your background", "your study plans", "careers plans", "finances", "the programme you have applied for and the University of Dundee", "your previous immigration history"],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Quote: 'The University will conduct mandatory pre-CAS credibility interviews.' 'Your interview will be conducted over the phone or via video conference.' Conducted in English; English ability checked. Purpose: 'assess your intent to study by asking you questions about the programme you have applied for and the University of Dundee, clarify questions about your previous immigration history, and discuss with you any other concerns about the success of your Student Visa application.' Quote: 'If your interview suggests that you are not a genuine student or your risk of visa refusal is exceptionally high, we reserve the right to refuse your CAS.' Also advises to 'request your Home Office interview transcript at the beginning of the interview'. No verbatim example questions, no length, no CAS Shield/Enroly mention."
+    }
+  ],
+  "searchesRun": [
+    "\"University of Dundee\" credibility interview pre-CAS questions international students",
+    "site:dundee.ac.uk about campus city centre Nethergate life sciences facts figures students"
+  ]
+}
