@@ -15,6 +15,12 @@ import { BRAND_NAME } from '@/lib/branding';
  */
 
 export const metadata: Metadata = {
+  // 8 Sep 2026. Without a base, Next resolves the relative image paths below
+  // against http://localhost:3000, and that is what the LIVE site was sending
+  // WhatsApp and Facebook, so every shared link still had no picture. Netlify
+  // sets URL to the site's primary address at build time; the fallback is for
+  // any other host.
+  metadataBase: new URL(process.env.URL || 'https://examtestai.com'),
   title: `${BRAND_NAME} | Practise your UK interview`,
   description:
     'Sit a real mock Pre-CAS credibility interview for your university and find out exactly what to fix before the real one.',
