@@ -28,6 +28,13 @@ const PREP_RETAIL = Number(
   )[1]
 );
 const PREP_RE = new RegExp(`NPR ${PREP_RETAIL}`);
+// 8 Sep 2026: the Prep coupon moved to NPR 400. Wholesale is read the same way.
+const PLANS_SRC = require('fs').readFileSync(require('path').join(__dirname, '..', 'lib/data/plans.ts'), 'utf8');
+const PREP_WHOLESALE = Number(/COUPON_WHOLESALE_NPR[\s\S]*?prep:\s*(\d+)/.exec(PLANS_SRC)[1]);
+const SERIOUS_WHOLESALE = Number(/COUPON_WHOLESALE_NPR[\s\S]*?serious:\s*(\d+)/.exec(PLANS_SRC)[1]);
+// Hub A buys 5 Prep and 2 Serious at creation, then tops up 1 Serious.
+const A_TOTAL = 5 * PREP_WHOLESALE + 2 * SERIOUS_WHOLESALE;
+const A_PAID = A_TOTAL + SERIOUS_WHOLESALE;
 
 const QA_SUPER_KEY = process.env.SUPER_ADMIN_PASSCODE || 'super-dev';
 const P = Number(process.env.QA_PORT || 3050);
@@ -113,10 +120,10 @@ const strip = (html) => html.replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>]+>/g,
 
   const low = await platformCall({ action: 'createConsultancy', name: A.name, slug: A.slug, coupons: { prep: 5, serious: 2 }, paidNpr: 1500 });
   t('C-1', 'Fewer rupees than the coupons cost is REFUSED, with the working shown',
-    low.code === 400 && low.json?.error?.code === 'PRICE_MISMATCH' && /2,900/.test(low.json?.error?.userMessage ?? '') && /1,500/.test(low.json?.error?.userMessage ?? ''),
+    low.code === 400 && low.json?.error?.code === 'PRICE_MISMATCH' && new RegExp(A_TOTAL.toLocaleString('en-US')).test(low.json?.error?.userMessage ?? '') && /1,500/.test(low.json?.error?.userMessage ?? ''),
     `${low.code} ${low.json?.error?.code}: ${(low.json?.error?.userMessage ?? '').slice(0, 110)}`);
 
-  const high = await platformCall({ action: 'createConsultancy', name: A.name, slug: A.slug, coupons: { prep: 5, serious: 2 }, paidNpr: 3000 });
+  const high = await platformCall({ action: 'createConsultancy', name: A.name, slug: A.slug, coupons: { prep: 5, serious: 2 }, paidNpr: A_TOTAL + 100 });
   t('C-1b', 'More rupees than the coupons cost is refused too (the sum must be exact)',
     high.code === 400 && high.json?.error?.code === 'PRICE_MISMATCH', `${high.code}`);
 
@@ -128,14 +135,14 @@ const strip = (html) => html.replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>]+>/g,
   t('C-3', 'A hidden pack (Starter) cannot be sold as a coupon',
     hidden.code === 400 && /do not exist/.test(hidden.json?.error?.userMessage ?? ''), `${hidden.code}`);
 
-  const badSlug = await platformCall({ action: 'createConsultancy', name: A.name, slug: 'Hub A', coupons: { prep: 1 }, paidNpr: 300 });
+  const badSlug = await platformCall({ action: 'createConsultancy', name: A.name, slug: 'Hub A', coupons: { prep: 1 }, paidNpr: PREP_WHOLESALE });
   t('C-5', 'A short name with a capital or a space is refused WITH the rule spelled out',
     badSlug.code === 400 && /lower case/.test(badSlug.json?.error?.userMessage ?? ''),
     `${badSlug.code}: ${(badSlug.json?.error?.userMessage ?? '').slice(0, 90)}`);
 
   console.log('\n=== CREATION: PAID, APPROVED, HANDED OVER ===\n');
 
-  const made = await platformCall({ action: 'createConsultancy', name: A.name, slug: A.slug, contactName: 'Sita', contactPhone: '9841000000', coupons: { prep: 5, serious: 2 }, paidNpr: 2900 });
+  const made = await platformCall({ action: 'createConsultancy', name: A.name, slug: A.slug, contactName: 'Sita', contactPhone: '9841000000', coupons: { prep: 5, serious: 2 }, paidNpr: A_TOTAL });
   A.id = made.json?.data?.id;
   A.handover = made.json?.data?.handoverPasscode;
   const couponsA = made.json?.data?.coupons ?? [];
@@ -143,7 +150,7 @@ const strip = (html) => html.replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>]+>/g,
     made.code === 200 && couponsA.length === 7 && couponsA.filter((c) => c.packCode === 'prep').length === 5 && couponsA.filter((c) => c.packCode === 'serious').length === 2,
     `${made.code}, ${couponsA.length} coupons (${couponsA.filter((c) => c.packCode === 'prep').length} prep, ${couponsA.filter((c) => c.packCode === 'serious').length} serious)`);
   t('C-4b', 'It is approved on creation, because the money came first',
-    made.json?.data?.status === 'approved' && made.json?.data?.paidNpr === 2900, `status ${made.json?.data?.status}, paid ${made.json?.data?.paidNpr}`);
+    made.json?.data?.status === 'approved' && made.json?.data?.paidNpr === A_TOTAL, `status ${made.json?.data?.status}, paid ${made.json?.data?.paidNpr}`);
   t('C-4c', 'A handover passcode was GENERATED, not typed, and returned once in its own field',
     typeof A.handover === 'string' && A.handover.length >= 8 && !('passcode' in (made.json?.data ?? {})),
     `handover present, no raw passcode field`);
@@ -151,7 +158,7 @@ const strip = (html) => html.replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>]+>/g,
     couponsA.every((c) => /^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/.test(c.code)) && new Set(couponsA.map((c) => c.code)).size === 7,
     couponsA.slice(0, 2).map((c) => c.code).join(', '));
 
-  const dup = await platformCall({ action: 'createConsultancy', name: A.name, slug: A.slug, coupons: { prep: 1 }, paidNpr: 300 });
+  const dup = await platformCall({ action: 'createConsultancy', name: A.name, slug: A.slug, coupons: { prep: 1 }, paidNpr: PREP_WHOLESALE });
   t('C-6', 'The same short name twice is refused', dup.code === 409, `${dup.code}`);
 
   console.log('\n=== THE HANDOVER CODE: IN ONCE, THEN NOTHING UNTIL REPLACED ===\n');
@@ -176,7 +183,7 @@ const strip = (html) => html.replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>]+>/g,
   const rowAfter = (dirAfter.json?.data?.consultancies ?? []).find((c) => c.id === A.id);
   t('C-10b', 'And the super admin now sees them as ACTIVE', rowAfter?.active === true, `active=${rowAfter?.active}`);
   t('C-10c', 'The super admin sees the same 7 coupons, by pack, with wholesale prices',
-    rowAfter?.couponsTotal === 7 && rowAfter?.couponsLeft === 7 && (rowAfter?.coupons ?? []).every((c) => (c.packCode === 'prep' ? c.wholesaleNpr === 300 : c.wholesaleNpr === 700)),
+    rowAfter?.couponsTotal === 7 && rowAfter?.couponsLeft === 7 && (rowAfter?.coupons ?? []).every((c) => (c.packCode === 'prep' ? c.wholesaleNpr === PREP_WHOLESALE : c.wholesaleNpr === SERIOUS_WHOLESALE)),
     `${rowAfter?.couponsTotal} total, byPack ${JSON.stringify(rowAfter?.couponsByPack ?? [])}`);
 
   const prepCode = (inA.json?.data?.coupons ?? []).find((c) => c.packCode === 'prep')?.code;
@@ -269,13 +276,13 @@ const strip = (html) => html.replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>]+>/g,
 
   const ov = await superCall({ action: 'overview' });
   const ovAnita = (ov.json?.data?.students ?? []).find((x) => x.name === 'Anita Coupon');
-  t('C-21', 'Revenue is split: the consultancy channel carries the NPR 2,900 and the coupon counts are right',
-    ov.json?.data?.revenueFromConsultancies >= 2900 && ov.json?.data?.counts?.couponsIssued >= 7 && ov.json?.data?.counts?.couponsRedeemed >= 2 && ovAnita?.consultancyName === A.name,
+  t('C-21', `Revenue is split: the consultancy channel carries the NPR ${A_TOTAL.toLocaleString('en-US')} and the coupon counts are right`,
+    ov.json?.data?.revenueFromConsultancies >= A_TOTAL && ov.json?.data?.counts?.couponsIssued >= 7 && ov.json?.data?.counts?.couponsRedeemed >= 2 && ovAnita?.consultancyName === A.name,
     `fromConsultancies ${ov.json?.data?.revenueFromConsultancies}, issued ${ov.json?.data?.counts?.couponsIssued}, redeemed ${ov.json?.data?.counts?.couponsRedeemed}`);
 
   console.log('\n=== ISOLATION: NO CONSULTANCY SEES ANOTHER ===\n');
 
-  const madeB = await platformCall({ action: 'createConsultancy', name: B.name, slug: B.slug, coupons: { serious: 1 }, paidNpr: 700 });
+  const madeB = await platformCall({ action: 'createConsultancy', name: B.name, slug: B.slug, coupons: { serious: 1 }, paidNpr: SERIOUS_WHOLESALE });
   B.id = madeB.json?.data?.id;
   await adminCall(B.slug, madeB.json?.data?.handoverPasscode, { action: 'changePasscode', newPasscode: B.chosen });
   const inB = await adminCall(B.slug, B.chosen, { action: 'login' });
@@ -292,12 +299,12 @@ const strip = (html) => html.replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>]+>/g,
 
   const addBad = await platformCall({ action: 'addCoupons', consultancyId: A.id, coupons: { serious: 1 }, paidNpr: 500 });
   t('C-18', 'Adding coupons with the wrong amount is refused the same way', addBad.code === 400 && addBad.json?.error?.code === 'PRICE_MISMATCH', `${addBad.code}`);
-  const addOk = await platformCall({ action: 'addCoupons', consultancyId: A.id, coupons: { serious: 1 }, paidNpr: 700 });
+  const addOk = await platformCall({ action: 'addCoupons', consultancyId: A.id, coupons: { serious: 1 }, paidNpr: SERIOUS_WHOLESALE });
   const inA4 = await adminCall(A.slug, A.chosen, { action: 'login' });
   const dir2 = await superCall({ action: 'directory' });
   const dRow2 = (dir2.json?.data?.consultancies ?? []).find((c) => c.id === A.id);
-  t('C-18b', 'The right amount adds the coupon: 8 in the portal, NPR 3,600 paid so far',
-    addOk.code === 200 && inA4.json?.data?.stats?.couponsTotal === 8 && dRow2?.paidNpr === 3600, `total ${inA4.json?.data?.stats?.couponsTotal}, paid ${dRow2?.paidNpr}`);
+  t('C-18b', `The right amount adds the coupon: 8 in the portal, NPR ${A_PAID.toLocaleString('en-US')} paid so far`,
+    addOk.code === 200 && inA4.json?.data?.stats?.couponsTotal === 8 && dRow2?.paidNpr === A_PAID, `total ${inA4.json?.data?.stats?.couponsTotal}, paid ${dRow2?.paidNpr}`);
 
   const reset = await platformCall({ action: 'resetConsultancyPasscode', consultancyId: A.id });
   const newHandover = reset.json?.data?.handoverPasscode;
@@ -344,16 +351,25 @@ const strip = (html) => html.replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>]+>/g,
 
   const delWrong = await platformCall({ action: 'deleteConsultancy', consultancyId: B.id, confirmSlug: 'wrong-name' });
   t('C-28', 'Delete needs the short name typed back', delWrong.code === 400 && delWrong.json?.error?.code === 'CONFIRM_MISMATCH', `${delWrong.code}`);
+  // 8 Sep 2026: the owner's trial consultancies get coupons used and a student
+  // attached before they are thrown away, so a used consultancy is deleted
+  // too. Its student stays, unbound; its money leaves revenue.
+  const revBeforeA = (await superCall({ action: 'overview' })).json?.data?.revenueFromConsultancies;
   const delUsed = await platformCall({ action: 'deleteConsultancy', consultancyId: A.id, confirmSlug: A.slug });
-  t('C-28b', 'A consultancy whose coupons were used is REFUSED deletion, and told to suspend instead',
-    delUsed.code === 409 && delUsed.json?.error?.code === 'HAS_STUDENTS' && /Suspend/.test(delUsed.json?.error?.userMessage ?? ''), `${delUsed.code} ${delUsed.json?.error?.code}`);
+  const dirA = await superCall({ action: 'directory' });
+  const ovA = await superCall({ action: 'overview' });
+  const aGone = !(dirA.json?.data?.consultancies ?? []).some((c) => c.id === A.id);
+  const anita = (dirA.json?.data?.students ?? []).find((x) => x.name === 'Anita Coupon');
+  t('C-28b', 'A trial consultancy whose coupons were used is deleted too: coupons gone, its student kept but unbound, its money out of revenue',
+    delUsed.code === 200 && aGone && !!anita && anita.consultancyId === null && anita.couponCode === null && ovA.json?.data?.revenueFromConsultancies === revBeforeA - A_PAID,
+    `${delUsed.code} gone=${aGone} student consultancy=${anita?.consultancyId} coupon=${anita?.couponCode} revenue ${revBeforeA} -> ${ovA.json?.data?.revenueFromConsultancies} (expected -${A_PAID})`);
   const revBefore = (await superCall({ action: 'overview' })).json?.data?.revenueFromConsultancies;
   const delOk = await platformCall({ action: 'deleteConsultancy', consultancyId: B.id, confirmSlug: B.slug });
   const dirDel = await superCall({ action: 'directory' });
   const ovDel = await superCall({ action: 'overview' });
   const goneFromList = !(dirDel.json?.data?.consultancies ?? []).some((c) => c.id === B.id);
-  t('C-28c', 'A test consultancy with nothing used is deleted, with its coupon and its NPR 700',
-    delOk.code === 200 && goneFromList && ovDel.json?.data?.revenueFromConsultancies === revBefore - 700,
+  t('C-28c', 'A test consultancy with nothing used is deleted, with its coupon and its money',
+    delOk.code === 200 && goneFromList && ovDel.json?.data?.revenueFromConsultancies === revBefore - SERIOUS_WHOLESALE,
     `${delOk.code} gone=${goneFromList} revenue ${revBefore} -> ${ovDel.json?.data?.revenueFromConsultancies}`);
   const bLogin = await adminCall(B.slug, B.chosen, { action: 'login' });
   // A FRESH student: stuE was deliberately throttled in C-25, so reusing them
@@ -381,12 +397,12 @@ const strip = (html) => html.replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>]+>/g,
   const partner = await req('GET', '/consultancy', null, { ip: nextIp() });
   const partnerText = strip(partner.body).replace(/\s+/g, ' ');
   t('C-26', '/consultancy sells coupons at the wholesale prices, and shows the retail price beside them',
-    partner.code === 200 && /NPR 300/.test(partnerText) && /NPR 700/.test(partnerText) && PREP_RE.test(partnerText) && /NPR 799/.test(partnerText) && !/per mock/i.test(partnerText),
+    partner.code === 200 && new RegExp(`NPR ${PREP_WHOLESALE}`).test(partnerText) && new RegExp(`NPR ${SERIOUS_WHOLESALE}`).test(partnerText) && PREP_RE.test(partnerText) && /NPR 799/.test(partnerText) && !/per mock/i.test(partnerText),
     `${partner.code}`);
   const pricing = await req('GET', '/pricing', null, { ip: nextIp() });
   const pricingText = strip(pricing.body).replace(/\s+/g, ' ');
   t('C-26b', '/pricing offers the coupon as the second way to pay, and never the wholesale price',
-    pricing.code === 200 && /coupon/i.test(pricingText) && PREP_RE.test(pricingText) && !/NPR 300/.test(pricingText) && !/NPR 700/.test(pricingText),
+    pricing.code === 200 && /coupon/i.test(pricingText) && PREP_RE.test(pricingText) && !new RegExp(`NPR ${PREP_WHOLESALE}`).test(pricingText) && !new RegExp(`NPR ${SERIOUS_WHOLESALE}`).test(pricingText),
     `${pricing.code}`);
   t('C-27', 'The footer names the company', /WI Education/.test(pricingText), '');
 

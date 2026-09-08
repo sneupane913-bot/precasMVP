@@ -594,14 +594,15 @@ export default function SuperAdminPage() {
   }
 
   /**
-   * Delete a test consultancy. The server refuses if a coupon has been used
-   * or a student is attached; here the super admin types the short name back.
+   * Delete a consultancy, trial or otherwise (CP-16). Everything about it
+   * goes: coupons used or not, and the money recorded against it. Students
+   * who came through it are kept but unbound. The short name is typed back.
    */
   async function deleteConsultancy(c: DirectoryConsultancy) {
     const typed = window.prompt(
       `Delete ${c.name}?\n\n` +
-        'This removes the consultancy, its unused coupons, and the amount recorded against it. ' +
-        'It is refused if any coupon has been used or any student is attached.\n\n' +
+        'This removes the consultancy, EVERY coupon it holds (used or not), and the amount recorded against it. ' +
+        `Coupons used: ${c.couponsUsed}. Students attached: ${c.studentsFromLink}; they are kept as direct students.\n\n` +
         `Type its short name, ${c.slug}, to confirm.`
     );
     if (typed === null) return;
@@ -1551,14 +1552,12 @@ export default function SuperAdminPage() {
                               >
                                 Reset passcode
                               </Button>
-                              {k.couponsUsed === 0 && k.studentsFromLink === 0 && (
-                                <Button variant="danger" size="sm"
-                                  onClick={() => deleteConsultancy(k)}
-                                  disabled={busy}
-                                >
-                                  Delete
-                                </Button>
-                              )}
+                              <Button variant="danger" size="sm"
+                                onClick={() => deleteConsultancy(k)}
+                                disabled={busy}
+                              >
+                                Delete
+                              </Button>
                               {k.status !== 'approved' && (
                                 <Button variant="primary" size="sm"
                                   onClick={() => setConsultancyStatus(k, 'approved')}

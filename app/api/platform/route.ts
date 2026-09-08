@@ -517,31 +517,41 @@ async function superAdminAction(body: SuperBody): Promise<NextResponse> {
       r.listCoupons({ consultancyId: c.id }),
       r.listStudents({ consultancyId: c.id }),
     ]);
+    /**
+     * CP-16, 8 September 2026. The owner runs TRIAL consultancies to show the
+     * product to people, and a trial gets its coupons used and a student
+     * attached before it is thrown away. It still has to go entirely: the
+     * consultancy, every coupon used or not, and the money recorded against
+     * it, so nothing about it is left in revenue or the directory. A student
+     * who came in through it is NOT deleted (that record is theirs) but is
+     * unbound from it, so they carry on as a direct student.
+     */
     const used = coupons.filter((cp) => cp.redeemedAt).length;
-    if (used > 0 || bound.length > 0) {
-      return NextResponse.json(
-        apiError(
-          'HAS_STUDENTS',
-          `${used} used coupons, ${bound.length} students`,
-          `${c.name} cannot be deleted: ${used} of its coupons ${used === 1 ? 'has' : 'have'} been used and ${bound.length} student${bound.length === 1 ? ' is' : 's are'} attached to it. Those records belong to real people. Suspend it instead.`
-        ),
-        { status: 409 }
-      );
+    const touched = new Map<string, { id: string }>();
+    for (const st of bound) touched.set(st.id, st);
+    for (const cp of coupons) {
+      if (cp.redeemedByStudentId && !touched.has(cp.redeemedByStudentId)) {
+        const st = await r.getStudent(cp.redeemedByStudentId);
+        if (st) touched.set(st.id, st);
+      }
+    }
+    for (const st of touched.values()) {
+      await r.updateStudent(st.id, { consultancyId: null, source: 'direct' });
     }
     const removed = await r.deleteCoupons(c.id);
     await platform.deleteConsultancy(c.id);
     await auditPlatform(
       'delete_consultancy',
       c.id,
-      `${coupons.length} coupons, NPR ${c.paidNpr} recorded`,
+      `${coupons.length} coupons (${used} used), ${touched.size} students, NPR ${c.paidNpr} recorded`,
       'deleted',
-      `${c.name} (${c.slug}) deleted by the super admin with ${removed} unused coupon(s). No student was attached.`
+      `${c.name} (${c.slug}) deleted by the super admin: ${removed} coupon(s) removed (${used} used), ${touched.size} student(s) unbound from it.`
     );
     return NextResponse.json({
       ok: true,
       data: {
         deleted: true,
-        message: `${c.name} deleted, with ${removed} unused coupon(s). Its NPR ${c.paidNpr.toLocaleString()} no longer counts in revenue.`,
+        message: `${c.name} deleted: ${removed} coupon(s) removed (${used} used), ${touched.size} student(s) unbound. Its NPR ${c.paidNpr.toLocaleString()} no longer counts in revenue.`,
       },
     });
   }
