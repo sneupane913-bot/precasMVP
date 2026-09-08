@@ -205,9 +205,7 @@ export interface ApprovalAudit {
      * used and that has no students, which in practice means a test entry or
      * a mistake; anything with real students is suspended, never deleted.
      */
-    | 'delete_consultancy'
-    | 'approve_debrief'
-    | 'reject_debrief';
+    | 'delete_consultancy';
   subjectId: string;
   before: string | null;
   after: string | null;

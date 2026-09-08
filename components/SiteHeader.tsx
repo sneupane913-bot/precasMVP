@@ -24,7 +24,6 @@ export function SiteHeader({ session }: { session?: SessionSnapshot } = {}) {
     { label: 'Universities', href: '/universities' },
     { label: 'Practise one question', href: '/practice' },
     { label: 'Pricing', href: '/pricing' },
-    { label: 'Get a free mock', href: '/free-mock' },
   ];
 
   return (

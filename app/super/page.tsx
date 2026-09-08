@@ -7,7 +7,6 @@ import { PasscodeChangeForm } from '@/components/PasscodeChangeForm';
 import { Card, Button, Banner, Status, Pill, type Tone } from '@/components/ui';
 import { BRAND_NAME } from '@/lib/branding';
 import { couponPacks, couponOrderTotal } from '@/lib/data/plans';
-import { DEBRIEF_RULES } from '@/lib/debrief-rules';
 
 /**
  * Super admin, rebuilt to docs/design-reference/super_admin_dashboard.
@@ -209,7 +208,7 @@ interface AuditRow {
   createdAt: string;
 }
 
-type Tab = 'dashboard' | 'students' | 'payments' | 'flagged' | 'consultancies' | 'questions' | 'debriefs' | 'audit' | 'settings';
+type Tab = 'dashboard' | 'students' | 'payments' | 'flagged' | 'consultancies' | 'questions' | 'audit' | 'settings';
 
 /**
  * D-32. THE STATUS DOTS, GIVEN WORDS.
@@ -861,7 +860,6 @@ export default function SuperAdminPage() {
       label: `Consultancies${pendingConsultancies ? ` (${pendingConsultancies})` : ''}`,
     },
     { id: 'questions', label: 'Questions' },
-    { id: 'debriefs', label: 'Debriefs' },
     { id: 'audit', label: 'Audit' },
     { id: 'settings', label: 'Payment details' },
   ];
@@ -1777,8 +1775,6 @@ export default function SuperAdminPage() {
             it. The action existed and nothing displayed it, so the paper trail
             that justifies letting consultancies approve payments was invisible
             to the one person it protects. */}
-        {tab === 'debriefs' && <DebriefQueue call={call} />}
-
         {tab === 'audit' && (
           <section className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
             <div className="border-b border-line p-5">
@@ -2329,122 +2325,5 @@ function Field({
       />
       {hint && <p className="mt-1 text-micro text-ink-quiet">{hint}</p>}
     </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// THE DEBRIEF QUEUE (8 September 2026).
-//
-// A student who sat the real interview tells us what was asked and earns a
-// free mock, but only after a person has read it. This is that person's
-// screen. Approve grants the mock and records it; reject sends a reason the
-// student sees on /free-mock. The questions themselves become research
-// (qa/export-debriefs.mjs), never a public page.
-// ---------------------------------------------------------------------------
-
-type DebriefRow = {
-  id: string;
-  studentId: string;
-  studentName: string | null;
-  whatsapp: string | null;
-  institutionName: string | null;
-  universityName: string;
-  interviewDate: string;
-  format: string;
-  questionCount: number | null;
-  minutes: number | null;
-  questions: string[];
-  outcome: string;
-  notes: string;
-  status: 'pending' | 'approved' | 'rejected';
-  reviewNote: string | null;
-  createdAt: string;
-};
-
-function DebriefQueue({ call }: { call: (body: Record<string, unknown>) => Promise<unknown> }) {
-  const [rows, setRows] = useState<DebriefRow[] | null>(null);
-  const [notes, setNotes] = useState<Record<string, string>>({});
-  const [busy, setBusy] = useState<string | null>(null);
-
-  const load = useCallback(async () => {
-    const d = (await call({ action: 'debriefs' })) as { debriefs: DebriefRow[] } | null;
-    if (d) setRows(d.debriefs);
-  }, [call]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
-
-  const pending = (rows ?? []).filter((d) => d.status === 'pending');
-  const done = (rows ?? []).filter((d) => d.status !== 'pending');
-
-  async function review(id: string, approve: boolean) {
-    setBusy(id);
-    await call({ action: 'reviewDebrief', id, approve, note: notes[id] ?? '' });
-    setBusy(null);
-    await load();
-  }
-
-  const one = (d: DebriefRow, reviewable: boolean) => (
-    <li key={d.id} className="rounded-control border border-line bg-surface-sunk p-4">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <p className="font-semibold text-ink">
-          {d.universityName}
-          {d.institutionName && d.institutionName !== d.universityName ? ` (${d.institutionName})` : ''}
-          {!d.institutionName && <span className="ml-2 text-micro uppercase text-warn">not in catalogue</span>}
-        </p>
-        <p className="text-sm text-ink-quiet">
-          {d.interviewDate} · {d.format.replace(/_/g, ' ')} · {d.questionCount ?? '?'} questions · {d.minutes ?? '?'} min · {d.outcome}
-        </p>
-      </div>
-      <p className="mt-1 text-sm text-ink-soft">
-        {d.studentName ?? 'unnamed'}{d.whatsapp ? `, ${d.whatsapp}` : ''} · sent {d.createdAt.slice(0, 10)}
-      </p>
-      <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-ink">
-        {d.questions.map((q, i) => (
-          <li key={i}>{q}</li>
-        ))}
-      </ol>
-      {d.notes && <p className="mt-2 text-sm text-ink-soft">Notes: {d.notes}</p>}
-      {reviewable ? (
-        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
-          <input
-            value={notes[d.id] ?? ''}
-            onChange={(e) => setNotes((n) => ({ ...n, [d.id]: e.target.value }))}
-            placeholder="Reason, shown to the student (needed for a reject)"
-            className="flex-1 rounded-control border border-line bg-surface px-3 py-2 text-sm"
-          />
-          <Button type="button" disabled={busy === d.id} onClick={() => review(d.id, true)}>
-            Approve, add {DEBRIEF_RULES.rewardMocks} {DEBRIEF_RULES.rewardMocks === 1 ? 'mock' : 'mocks'}
-          </Button>
-          <Button type="button" variant="tertiary" disabled={busy === d.id || !(notes[d.id] ?? '').trim()} onClick={() => review(d.id, false)}>
-            Reject
-          </Button>
-        </div>
-      ) : (
-        <p className="mt-2 text-sm font-semibold text-ink">
-          {d.status === 'approved' ? 'Approved, mock added' : 'Rejected'}{d.reviewNote ? `: ${d.reviewNote}` : ''}
-        </p>
-      )}
-    </li>
-  );
-
-  return (
-    <section className="rounded-card border border-line bg-surface p-5 shadow-card">
-      <h2 className="mb-1 font-serif text-lg font-bold text-ink">Debriefs: what real interviews asked</h2>
-      <p className="mb-4 text-sm leading-relaxed text-ink-soft">
-        Read each one. Approve only when the questions are specific and read like a real interviewer; the student
-        gets one free mock. Reject with a reason they can act on. Approved debriefs are exported into the research.
-      </p>
-      {!rows && <p className="text-sm text-ink-quiet">Loading...</p>}
-      {rows && pending.length === 0 && <p className="text-sm text-ink-quiet">Nothing waiting.</p>}
-      <ul className="space-y-3">{pending.map((d) => one(d, true))}</ul>
-      {done.length > 0 && (
-        <details className="mt-5">
-          <summary className="cursor-pointer text-sm font-semibold text-ink">Reviewed ({done.length})</summary>
-          <ul className="mt-3 space-y-3">{done.map((d) => one(d, false))}</ul>
-        </details>
-      )}
-    </section>
   );
 }

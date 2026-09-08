@@ -152,16 +152,6 @@ process, the reason is stated on the line.
 | Q-14b | The research is PRIVATE. Nothing in the product, public or back office, shows a likelihood, a source or a count; the engine uses the evidence to order each university's paper and that is all. The client reads the evidence in the repo (`docs/research/evidence/`) and in conversation with the assistant. Client decision 8 September 2026: any page showing sources hands the work to competitors | **BUILT + SOURCE-CHECKED** | paper Q-14b, Q-14g to Q-14k |
 | Q-3b | The bank holds at least 120 root questions and 50 follow-ups, ten identity openers, and is append-only (ids are positional and stored on sessions) | **BUILT + SOURCE-CHECKED** | paper Q-3b, Q-11a, Q-11b (157 roots, 53 follow-ups, 10 openers as of 7 September 2026) |
 
-### 1g. Earning a free mock (added 8 September 2026)
-
-| # | Rule | Status | Evidence |
-|---|---|---|---|
-| F-1 | `/free-mock` offers exactly two ways: refer a friend who buys any pack (the referrer gets a mock on payment approval), or a debrief of the student's real interview | **BUILT, NOT PROVEN** | page built; referral reward is the existing `rewardReferral` path proven by pilot CS-11. Browser pass required |
-| F-2 | A debrief is refused by rule before a person sees it when it is vague: fewer than 5 questions, a line too short to be a question, duplicates, mostly topics not questions, a date in the future or over a year old | **BUILT + PROVEN** | debrief walk (session 9): a five-topic list refused with the reason, a six-question list accepted |
-| F-3 | A debrief never earns the mock by itself. A person approves it on `/super` > Debriefs; approval grants exactly one mock, once; rejection needs a reason the student can read on `/free-mock` | **BUILT + PROVEN** | debrief walk: a trial student had 1 mock before approval and 2 after, second approval refused as already reviewed |
-| F-4 | One pending debrief per student, at most three approved, never the same interview twice | **BUILT + PROVEN** | debrief walk: second submission while one is pending refused with the reason |
-| F-5 | Approved debriefs become the strongest evidence tier for that university; nothing about them is ever shown publicly | **NOT BUILT** | export script `qa/export-debriefs.mjs` still to write |
-
 ## Part 2. The consultancy admin
 
 | # | Rule | Status | Evidence |
