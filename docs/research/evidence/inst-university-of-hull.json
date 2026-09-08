@@ -2,7 +2,7 @@
   "institutionId": "inst-university-of-hull",
   "name": "University of Hull",
   "checkedOn": "2026-09-07",
-  "usesCasShield": null,
+  "usesCasShield": true,
   "facts": [
     {
       "text": "The University of Hull's campus is at Cottingham Road, Hull, HU6 7RX, and the university has been teaching since 1927.",
@@ -128,6 +128,18 @@
       "questionIds": [],
       "unmapped": [],
       "notes": "Title only; questions not readable in snippet."
+    },
+    {
+      "url": "https://hull.cas-shield.com/",
+      "title": "University of Hull: live CAS Shield tenant (hull.cas-shield.com)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Probed 8 September 2026: the subdomain answers HTTP 200 with the Enroly CAS Shield sign-in page (random subdomains answer nothing), so the university runs its CAS process through Enroly. CAS Shield interviews follow the themes in Brunel's published policy; whether this university switches the interview on for every Nepali applicant is not stated here."
     }
   ],
   "searchesRun": [

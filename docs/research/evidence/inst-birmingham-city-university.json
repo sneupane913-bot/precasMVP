@@ -4,11 +4,31 @@
   "checkedOn": "2026-09-07",
   "usesCasShield": true,
   "facts": [
-    { "text": "BCU's City Centre Campus is made up of eight buildings including the Curzon Building, Millennium Point, the Parkside Building, the Benjamin Zephaniah Building, the Royal Birmingham Conservatoire and STEAMhouse.", "sourceUrl": "https://www.bcu.ac.uk/about-us/maps-and-campuses/city-centre-campus", "sourceTitle": "City Centre Campus | Birmingham City University (search snippet; page not fetched)" },
-    { "text": "Birmingham New Street and Birmingham Moor Street stations are less than a mile from the City Centre Campus; the Curzon Building on Cardigan Street is at its heart.", "sourceUrl": "https://www.bcu.ac.uk/about-us/maps-and-campuses/city-centre-campus/map-and-directions", "sourceTitle": "City Centre Campus - Map and Directions | Birmingham City University (search snippet; page not fetched)" },
-    { "text": "City South Campus in Edgbaston is a short walk from Five Ways station (one stop from Birmingham New Street); the nearest Metro stop is Edgbaston Village, about half a mile away.", "sourceUrl": "https://www.bcu.ac.uk/about-us/maps-and-campuses/city-south-campus/map-and-directions", "sourceTitle": "City South Campus - Map and Directions | Birmingham City University (search snippet; page not fetched)" },
-    { "text": "BCU describes itself as a large and diverse university set in the heart of Birmingham with a focus on practice-based learning, with two main campuses plus other sites across the city.", "sourceUrl": "https://www.bcu.ac.uk/about-us/maps-and-campuses", "sourceTitle": "Locations and maps | Birmingham City University (search snippet; page not fetched)" },
-    { "text": "After an unconditional offer and payment of GBP 1,000 of the deposit, BCU emails an invite to the Enroly CAS Shield platform within three to five working days; any required interview is recorded on CAS Shield, self-booked, and must be completed within seven working days.", "sourceUrl": "https://www.bcu.ac.uk/international/preparing-for-the-uk/get-your-cas/cas-shield", "sourceTitle": "CAS Shield - a step-by-step guide for international offer holders | Birmingham City University" }
+    {
+      "text": "BCU's City Centre Campus is made up of eight buildings including the Curzon Building, Millennium Point, the Parkside Building, the Benjamin Zephaniah Building, the Royal Birmingham Conservatoire and STEAMhouse.",
+      "sourceUrl": "https://www.bcu.ac.uk/about-us/maps-and-campuses/city-centre-campus",
+      "sourceTitle": "City Centre Campus | Birmingham City University (search snippet; page not fetched)"
+    },
+    {
+      "text": "Birmingham New Street and Birmingham Moor Street stations are less than a mile from the City Centre Campus; the Curzon Building on Cardigan Street is at its heart.",
+      "sourceUrl": "https://www.bcu.ac.uk/about-us/maps-and-campuses/city-centre-campus/map-and-directions",
+      "sourceTitle": "City Centre Campus - Map and Directions | Birmingham City University (search snippet; page not fetched)"
+    },
+    {
+      "text": "City South Campus in Edgbaston is a short walk from Five Ways station (one stop from Birmingham New Street); the nearest Metro stop is Edgbaston Village, about half a mile away.",
+      "sourceUrl": "https://www.bcu.ac.uk/about-us/maps-and-campuses/city-south-campus/map-and-directions",
+      "sourceTitle": "City South Campus - Map and Directions | Birmingham City University (search snippet; page not fetched)"
+    },
+    {
+      "text": "BCU describes itself as a large and diverse university set in the heart of Birmingham with a focus on practice-based learning, with two main campuses plus other sites across the city.",
+      "sourceUrl": "https://www.bcu.ac.uk/about-us/maps-and-campuses",
+      "sourceTitle": "Locations and maps | Birmingham City University (search snippet; page not fetched)"
+    },
+    {
+      "text": "After an unconditional offer and payment of GBP 1,000 of the deposit, BCU emails an invite to the Enroly CAS Shield platform within three to five working days; any required interview is recorded on CAS Shield, self-booked, and must be completed within seven working days.",
+      "sourceUrl": "https://www.bcu.ac.uk/international/preparing-for-the-uk/get-your-cas/cas-shield",
+      "sourceTitle": "CAS Shield - a step-by-step guide for international offer holders | Birmingham City University"
+    }
   ],
   "sources": [
     {
@@ -17,7 +37,16 @@
       "tier": "official",
       "fetched": true,
       "fromSnippet": false,
-      "topics": ["your course", "where you want to study", "your reasons for studying in the UK", "Research specific modules", "examine other countries/universities and explain differences between options", "review the university website", "discuss five-year plans", "connect prior experience to your course"],
+      "topics": [
+        "your course",
+        "where you want to study",
+        "your reasons for studying in the UK",
+        "Research specific modules",
+        "examine other countries/universities and explain differences between options",
+        "review the university website",
+        "discuss five-year plans",
+        "connect prior experience to your course"
+      ],
       "quotes": [
         "Why did you choose Birmingham City University (BCU)?",
         "Where will you live in the UK?",
@@ -30,7 +59,23 @@
         "Do you plan to work in the UK?",
         "How will you fund your studies?"
       ],
-      "questionIds": ["q-09", "q-17", "q-201", "q-12", "q-19", "q-30", "q-111", "q-140", "q-54", "q-14", "q-11", "q-08", "q-100", "q-68", "q-04"],
+      "questionIds": [
+        "q-09",
+        "q-17",
+        "q-201",
+        "q-12",
+        "q-19",
+        "q-30",
+        "q-111",
+        "q-140",
+        "q-54",
+        "q-14",
+        "q-11",
+        "q-08",
+        "q-100",
+        "q-68",
+        "q-04"
+      ],
       "unmapped": [],
       "notes": "Fetched. Framed as the Home Office (UKVI) credibility interview: 'The Home Office interviews a selection of Student visa applicants before granting them immigration permission to come to the UK.' 'Interviews are conducted in English and possibly via video link.' 'A Home Office staff member will ask you about your course, where you want to study and your reasons for studying in the UK.' 'Your application is likely to be refused if you are asked to attend an interview and do not do so without a reasonable explanation.' Video tips - don'ts: hold ID too far from camera, reflective backgrounds, sounding scripted, excessive hand gestures, lengthy answers. Ids q-11, q-08, q-100, q-68, q-04 come from the tips list (modules, compare countries/universities, five-year plan, prior experience)."
     },
@@ -64,9 +109,21 @@
       "tier": "student_report",
       "fetched": true,
       "fromSnippet": false,
-      "topics": ["why the applicant chose Birmingham City University and the UK", "the course details", "work experience and salary", "future career prospects after completing the MSc in Management and International Business"],
+      "topics": [
+        "why the applicant chose Birmingham City University and the UK",
+        "the course details",
+        "work experience and salary",
+        "future career prospects after completing the MSc in Management and International Business"
+      ],
       "quotes": [],
-      "questionIds": ["q-09", "q-07", "q-11", "q-130", "q-110", "q-19"],
+      "questionIds": [
+        "q-09",
+        "q-07",
+        "q-11",
+        "q-130",
+        "q-110",
+        "q-19"
+      ],
       "unmapped": [],
       "notes": "Fetched; only the listing rendered (10-page PDF body not readable). A filled-in student questionnaire for an MSc applicant; ids mapped from the description's topic list only."
     },
@@ -76,9 +133,25 @@
       "tier": "student_report",
       "fetched": false,
       "fromSnippet": true,
-      "topics": ["course", "tuition fees", "reasons for choosing BCU", "current job and career goals", "course modules", "accommodation preferences", "past visa refusals"],
+      "topics": [
+        "course",
+        "tuition fees",
+        "reasons for choosing BCU",
+        "current job and career goals",
+        "course modules",
+        "accommodation preferences",
+        "past visa refusals"
+      ],
       "quotes": [],
-      "questionIds": ["q-47", "q-09", "q-130", "q-19", "q-11", "q-57", "q-18"],
+      "questionIds": [
+        "q-47",
+        "q-09",
+        "q-130",
+        "q-19",
+        "q-11",
+        "q-57",
+        "q-18"
+      ],
       "unmapped": [],
       "notes": "Snippet only (search summary listed these topics for the BCU student-shared documents). Not fetched."
     },
@@ -93,6 +166,18 @@
       "questionIds": [],
       "unmapped": [],
       "notes": "Title only. Other BCU-named videos: https://www.youtube.com/watch?v=TDZEQukRKTo, https://www.youtube.com/watch?v=q7RGn0dNYq4, https://www.youtube.com/watch?v=3oTN2mp_DfQ; also https://unimock.ai/birmingham-city-university-pre-cas-interview (consultancy, title only)."
+    },
+    {
+      "url": "https://bcu.cas-shield.com/",
+      "title": "Birmingham City University: live CAS Shield tenant (bcu.cas-shield.com)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Probed 8 September 2026: the subdomain answers HTTP 200 with the Enroly CAS Shield sign-in page (random subdomains answer nothing), so the university runs its CAS process through Enroly. CAS Shield interviews follow the themes in Brunel's published policy; whether this university switches the interview on for every Nepali applicant is not stated here."
     }
   ],
   "searchesRun": [

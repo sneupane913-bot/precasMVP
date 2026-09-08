@@ -2,12 +2,28 @@
   "institutionId": "inst-university-of-chester",
   "name": "University of Chester",
   "checkedOn": "2026-09-07",
-  "usesCasShield": null,
+  "usesCasShield": true,
   "facts": [
-    { "text": "The University of Chester traces its history to 1839 and its main address is Parkgate Road, Chester, CH1 4BJ; it describes itself as 'a forward-thinking Modern University at the heart of a Historic City'.", "sourceUrl": "https://www.chester.ac.uk/about/", "sourceTitle": "About | University of Chester" },
-    { "text": "Exton Park, the original Parkgate Road site that opened in 1839, is a 10-minute walk from Chester city centre and sits in the Garden Quarter, a student area with pubs, cafes and shops.", "sourceUrl": "https://www.chester.ac.uk/about/our-locations/exton-park-chester/", "sourceTitle": "Exton Park, Chester | University of Chester" },
-    { "text": "Exton Park houses the Students' Union, catering outlets, the recently refurbished Seaborne Library with 24-hour access computer labs, fitness facilities and the university's central support services such as the Wellbeing and Mental Health team and the Careers team.", "sourceUrl": "https://www.chester.ac.uk/about/our-locations/exton-park-chester/", "sourceTitle": "Exton Park, Chester | University of Chester" },
-    { "text": "Besides Chester, the university also has a site in Warrington (Remond House).", "sourceUrl": "https://www.chester.ac.uk/about/", "sourceTitle": "About | University of Chester" }
+    {
+      "text": "The University of Chester traces its history to 1839 and its main address is Parkgate Road, Chester, CH1 4BJ; it describes itself as 'a forward-thinking Modern University at the heart of a Historic City'.",
+      "sourceUrl": "https://www.chester.ac.uk/about/",
+      "sourceTitle": "About | University of Chester"
+    },
+    {
+      "text": "Exton Park, the original Parkgate Road site that opened in 1839, is a 10-minute walk from Chester city centre and sits in the Garden Quarter, a student area with pubs, cafes and shops.",
+      "sourceUrl": "https://www.chester.ac.uk/about/our-locations/exton-park-chester/",
+      "sourceTitle": "Exton Park, Chester | University of Chester"
+    },
+    {
+      "text": "Exton Park houses the Students' Union, catering outlets, the recently refurbished Seaborne Library with 24-hour access computer labs, fitness facilities and the university's central support services such as the Wellbeing and Mental Health team and the Careers team.",
+      "sourceUrl": "https://www.chester.ac.uk/about/our-locations/exton-park-chester/",
+      "sourceTitle": "Exton Park, Chester | University of Chester"
+    },
+    {
+      "text": "Besides Chester, the university also has a site in Warrington (Remond House).",
+      "sourceUrl": "https://www.chester.ac.uk/about/",
+      "sourceTitle": "About | University of Chester"
+    }
   ],
   "sources": [
     {
@@ -16,7 +32,14 @@
       "tier": "official",
       "fetched": true,
       "fromSnippet": false,
-      "topics": ["their decision to study overseas", "their choice of university and course", "the research undertaken before applying", "their academic background", "their understanding of the course", "their future career plans"],
+      "topics": [
+        "their decision to study overseas",
+        "their choice of university and course",
+        "the research undertaken before applying",
+        "their academic background",
+        "their understanding of the course",
+        "their future career plans"
+      ],
       "quotes": [],
       "questionIds": [],
       "unmapped": [],
@@ -28,7 +51,23 @@
       "tier": "official",
       "fetched": true,
       "fromSnippet": false,
-      "topics": ["Study Destination Research", "University and Course Selection", "Research Undertaken Before Applying", "Academic Background and Progression", "Course Knowledge and Understanding", "Assessment and Learning Methods", "Campus and Learning Environment", "Career Planning", "Relationship Between the Course and Future Career Plans", "Personal Circumstances", "Funding and Financial Arrangements", "Accommodation and Living Arrangements", "Understanding of Student Visa Conditions", "Previous Immigration History", "Future Plans"],
+      "topics": [
+        "Study Destination Research",
+        "University and Course Selection",
+        "Research Undertaken Before Applying",
+        "Academic Background and Progression",
+        "Course Knowledge and Understanding",
+        "Assessment and Learning Methods",
+        "Campus and Learning Environment",
+        "Career Planning",
+        "Relationship Between the Course and Future Career Plans",
+        "Personal Circumstances",
+        "Funding and Financial Arrangements",
+        "Accommodation and Living Arrangements",
+        "Understanding of Student Visa Conditions",
+        "Previous Immigration History",
+        "Future Plans"
+      ],
       "quotes": [
         "do you have anything to add?",
         "Alternative countries considered for study.",
@@ -54,7 +93,32 @@
         "Previous study in the UK or overseas.",
         "Their plans after graduation."
       ],
-      "questionIds": ["q-22", "q-99", "q-08", "q-07", "q-100", "q-42", "q-149", "q-46", "q-11", "q-77", "q-12", "q-78", "q-101", "q-19", "q-14", "q-49", "q-17", "q-16", "q-107", "q-61", "q-54", "q-18", "q-26", "q-66"],
+      "questionIds": [
+        "q-22",
+        "q-99",
+        "q-08",
+        "q-07",
+        "q-100",
+        "q-42",
+        "q-149",
+        "q-46",
+        "q-11",
+        "q-77",
+        "q-12",
+        "q-78",
+        "q-101",
+        "q-19",
+        "q-14",
+        "q-49",
+        "q-17",
+        "q-16",
+        "q-107",
+        "q-61",
+        "q-54",
+        "q-18",
+        "q-26",
+        "q-66"
+      ],
       "unmapped": [],
       "notes": "PDF extracted with pypdf. The guide lists topic areas and 'Students should be prepared to discuss' bullets plus examples of strong/weak answers rather than verbatim questions; questionIds above are mapped from those bullets. The only verbatim question is the closing 'do you have anything to add?'. FAQ section: conducted by an Entry Clearance Officer after biometrics, in English, 'approximately 30 - 60 minutes', usually by video call; the interviewer's written record goes to the ECO who decides the visa; a second interview may be requested; the guide recommends requesting a transcript. Flags weak answers such as 'the UK has a good education system', 'good reputation', 'nice campus', 'I want a good job', and 'Relying solely on an agent'."
     },
@@ -64,12 +128,33 @@
       "tier": "student_report",
       "fetched": true,
       "fromSnippet": false,
-      "topics": ["Why applicant wishes to study in the UK rather than home country", "Benefits of UK qualification", "Chosen course and university", "Funding sources", "Research conducted on the university"],
+      "topics": [
+        "Why applicant wishes to study in the UK rather than home country",
+        "Benefits of UK qualification",
+        "Chosen course and university",
+        "Funding sources",
+        "Research conducted on the university"
+      ],
       "quotes": [],
       "questionIds": [],
       "unmapped": [],
       "notes": "Fetch returned only the Scribd description (8-page PDF uploaded by a user); body not readable. Appears to be an earlier upload of the university's own guide."
+    },
+    {
+      "url": "https://chester.cas-shield.com/",
+      "title": "University of Chester: live CAS Shield tenant (chester.cas-shield.com)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Probed 8 September 2026: the subdomain answers HTTP 200 with the Enroly CAS Shield sign-in page (random subdomains answer nothing), so the university runs its CAS process through Enroly. CAS Shield interviews follow the themes in Brunel's published policy; whether this university switches the interview on for every Nepali applicant is not stated here."
     }
   ],
-  "searchesRun": ["\"University of Chester\" pre-CAS credibility interview questions", "\"University of Chester\" Parkgate Road campus facilities railway station about university"]
+  "searchesRun": [
+    "\"University of Chester\" pre-CAS credibility interview questions",
+    "\"University of Chester\" Parkgate Road campus facilities railway station about university"
+  ]
 }

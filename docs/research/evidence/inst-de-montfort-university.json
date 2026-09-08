@@ -2,12 +2,28 @@
   "institutionId": "inst-de-montfort-university",
   "name": "De Montfort University",
   "checkedOn": "2026-09-07",
-  "usesCasShield": null,
+  "usesCasShield": true,
   "facts": [
-    { "text": "DMU's address is The Gateway, Leicester, LE1 9BH.", "sourceUrl": "https://www.dmu.ac.uk/international/en/visa/credibility-interview.aspx", "sourceTitle": "Credibility assessment | De Montfort University" },
-    { "text": "Leicester railway station on London Road is about a 15-minute walk from the DMU campus.", "sourceUrl": "https://www.dmu.ac.uk/dmu-students/your-dmu-experience/student-travel/student-public-transport.aspx", "sourceTitle": "Student public transport | DMU (from search snippet, page not fetched)" },
-    { "text": "The Campus Centre Building at The Gateway (built 2003) houses De Montfort Students' Union, Library and Student Services and Registry Services.", "sourceUrl": "https://www.dmu.ac.uk/about-dmu/estates-facilities/buildings-on-dmu-campus/campus-centre-building.aspx", "sourceTitle": "Campus Centre Building - Leicester | DMU (from search snippet, page not fetched)" },
-    { "text": "Gateway House (built 1960) at The Gateway is home to the Library and Learning Services and the Faculty of Technology, Arts and Culture, among other directorates.", "sourceUrl": "https://www.dmu.ac.uk/about-dmu/estates-facilities/buildings-on-dmu-campus/gateway-house.aspx", "sourceTitle": "Gateway House - Leicester | DMU (from search snippet, page not fetched)" }
+    {
+      "text": "DMU's address is The Gateway, Leicester, LE1 9BH.",
+      "sourceUrl": "https://www.dmu.ac.uk/international/en/visa/credibility-interview.aspx",
+      "sourceTitle": "Credibility assessment | De Montfort University"
+    },
+    {
+      "text": "Leicester railway station on London Road is about a 15-minute walk from the DMU campus.",
+      "sourceUrl": "https://www.dmu.ac.uk/dmu-students/your-dmu-experience/student-travel/student-public-transport.aspx",
+      "sourceTitle": "Student public transport | DMU (from search snippet, page not fetched)"
+    },
+    {
+      "text": "The Campus Centre Building at The Gateway (built 2003) houses De Montfort Students' Union, Library and Student Services and Registry Services.",
+      "sourceUrl": "https://www.dmu.ac.uk/about-dmu/estates-facilities/buildings-on-dmu-campus/campus-centre-building.aspx",
+      "sourceTitle": "Campus Centre Building - Leicester | DMU (from search snippet, page not fetched)"
+    },
+    {
+      "text": "Gateway House (built 1960) at The Gateway is home to the Library and Learning Services and the Faculty of Technology, Arts and Culture, among other directorates.",
+      "sourceUrl": "https://www.dmu.ac.uk/about-dmu/estates-facilities/buildings-on-dmu-campus/gateway-house.aspx",
+      "sourceTitle": "Gateway House - Leicester | DMU (from search snippet, page not fetched)"
+    }
   ],
   "sources": [
     {
@@ -24,7 +40,17 @@
         "Are able to provide detailed information on your financial status"
       ],
       "quotes": [],
-      "questionIds": ["q-11", "q-201", "q-09", "q-36", "q-29", "q-17", "q-56", "q-14", "q-15"],
+      "questionIds": [
+        "q-11",
+        "q-201",
+        "q-09",
+        "q-36",
+        "q-29",
+        "q-17",
+        "q-56",
+        "q-14",
+        "q-15"
+      ],
       "unmapped": [],
       "notes": "Applies to 'applicants looking to study at our Leicester campus'. Format: 'The credibility assessment will take place on Microsoft Teams' and 'will take between 20-30 minutes' (live interviewer, not CAS Shield video). Outcome 'will be sent within 5 working days from the date of your assessment (not including weekends or UK bank holidays)'. Search snippet for the same page adds: required 'unless their country of domicile is included on the gov.uk Differential Evidence Requirement list'; arrive promptly with good Wi-Fi, in a private room, no camera filters, and bring your passport. No verbatim example questions; no stated attempt limit or fail consequences."
     },
@@ -34,9 +60,18 @@
       "tier": "student_report",
       "fetched": true,
       "fromSnippet": false,
-      "topics": ["why study in the UK", "why DMU (teaching quality, affordable costs, specialised faculties/research centres)", "course duration and fees (BA Business and Marketing, 3 years from October 2022, £11,195 per year)"],
+      "topics": [
+        "why study in the UK",
+        "why DMU (teaching quality, affordable costs, specialised faculties/research centres)",
+        "course duration and fees (BA Business and Marketing, 3 years from October 2022, £11,195 per year)"
+      ],
       "quotes": [],
-      "questionIds": ["q-07", "q-09", "q-40", "q-47"],
+      "questionIds": [
+        "q-07",
+        "q-09",
+        "q-40",
+        "q-47"
+      ],
       "unmapped": [],
       "notes": "Fetch returned only Scribd's summary of the document ('responses to credibility interview questions for a student applying to study a BA in Business and Marketing at De Montfort University'); the question list itself was not readable. Topics above are inferred from the summary text, not verbatim questions."
     },
@@ -51,6 +86,18 @@
       "questionIds": [],
       "unmapped": [],
       "notes": "Seen in search results only; title claims a CAS Shield interview at DMU, which conflicts with DMU's own page describing a Microsoft Teams assessment. Not fetched (budget)."
+    },
+    {
+      "url": "https://dmu.cas-shield.com/",
+      "title": "De Montfort University: live CAS Shield tenant (dmu.cas-shield.com)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Probed 8 September 2026: the subdomain answers HTTP 200 with the Enroly CAS Shield sign-in page (random subdomains answer nothing), so the university runs its CAS process through Enroly. CAS Shield interviews follow the themes in Brunel's published policy; whether this university switches the interview on for every Nepali applicant is not stated here."
     }
   ],
   "searchesRun": [

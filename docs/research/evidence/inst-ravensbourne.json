@@ -10,7 +10,10 @@
       "tier": "official",
       "fetched": false,
       "fromSnippet": true,
-      "topics": ["the CAS platform (CAS Shield) guides applicants through the necessary documentation and questions", "CAS deposit"],
+      "topics": [
+        "the CAS platform (CAS Shield) guides applicants through the necessary documentation and questions",
+        "CAS deposit"
+      ],
       "quotes": [],
       "questionIds": [],
       "unmapped": [],
@@ -22,7 +25,9 @@
       "tier": "official",
       "fetched": false,
       "fromSnippet": true,
-      "topics": ["an interview for the majority of courses, in person or by telephone, Teams or Zoom"],
+      "topics": [
+        "an interview for the majority of courses, in person or by telephone, Teams or Zoom"
+      ],
       "quotes": [],
       "questionIds": [],
       "unmapped": [],
@@ -34,12 +39,35 @@
       "tier": "student_report",
       "fetched": false,
       "fromSnippet": true,
-      "topics": ["why Ravensbourne", "academic background"],
-      "quotes": ["Why did you choose Ravensbourne University?", "Tell us about your academic background"],
-      "questionIds": ["q-09", "q-03"],
+      "topics": [
+        "why Ravensbourne",
+        "academic background"
+      ],
+      "quotes": [
+        "Why did you choose Ravensbourne University?",
+        "Tell us about your academic background"
+      ],
+      "questionIds": [
+        "q-09",
+        "q-03"
+      ],
       "unmapped": [],
       "notes": "A practice video named for Ravensbourne; the two questions above appeared in the search-result snippet. The video page body was not readable."
+    },
+    {
+      "url": "https://ravensbourne.cas-shield.com/",
+      "title": "Ravensbourne University London: live CAS Shield tenant (ravensbourne.cas-shield.com)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Probed 8 September 2026: the subdomain answers HTTP 200 with the Enroly CAS Shield sign-in page (random subdomains answer nothing), so the university runs its CAS process through Enroly. CAS Shield interviews follow the themes in Brunel's published policy; whether this university switches the interview on for every Nepali applicant is not stated here."
     }
   ],
-  "searchesRun": ["Ravensbourne University London pre-CAS interview questions credibility interview international students"]
+  "searchesRun": [
+    "Ravensbourne University London pre-CAS interview questions credibility interview international students"
+  ]
 }

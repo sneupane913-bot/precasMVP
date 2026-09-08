@@ -4,11 +4,31 @@
   "checkedOn": "2026-09-07",
   "usesCasShield": true,
   "facts": [
-    { "text": "Bournemouth University's main Talbot Campus is at Fern Barrow, Poole (BH12 5BB), in neighbouring Poole rather than Bournemouth itself.", "sourceUrl": "https://www.bournemouth.ac.uk/about/contact-us/directions-maps/directions-our-talbot-campus", "sourceTitle": "Directions to our Talbot Campus | Bournemouth University (search snippet; page not fetched)" },
-    { "text": "Talbot Campus is a compact campus housing most facilities, including the BU Business School, the Faculty of Media & Communication, the Faculty of Science & Technology, the Doctoral College and SportBU.", "sourceUrl": "https://www.bournemouth.ac.uk/why-bu/facilities-campuses/talbot-campus", "sourceTitle": "Talbot Campus | Bournemouth University (search snippet; fetch returned 403)" },
-    { "text": "Lansdowne Campus, just outside Bournemouth town centre and close to Bournemouth station, hosts most Faculty of Health & Social Sciences teaching and the Business School's postgraduate programmes, with the Bournemouth Gateway Building's healthcare simulation suites and the Weston Library.", "sourceUrl": "https://www.bournemouth.ac.uk/why-bu/facilities-campuses", "sourceTitle": "Facilities and campuses | Bournemouth University (search snippet; page not fetched)" },
-    { "text": "Travelling between Talbot Campus and Lansdowne Campus takes about 10-15 minutes by car or regular bus.", "sourceUrl": "https://www.bournemouth.ac.uk/why-bu/facilities-campuses", "sourceTitle": "Facilities and campuses | Bournemouth University (search snippet; page not fetched)" },
-    { "text": "Bournemouth University uses CAS Shield for international offer holders; some may be asked to complete a pre-CAS recorded interview about their decision to study at BU, with instructions given on CAS Shield.", "sourceUrl": "https://www.bournemouth.ac.uk/study/postgraduate/how-apply/cas-shield-step-step-guide-international-offer-holders", "sourceTitle": "CAS Shield - a step-by-step guide for international offer holders | Bournemouth University (search snippet; fetch returned 403)" }
+    {
+      "text": "Bournemouth University's main Talbot Campus is at Fern Barrow, Poole (BH12 5BB), in neighbouring Poole rather than Bournemouth itself.",
+      "sourceUrl": "https://www.bournemouth.ac.uk/about/contact-us/directions-maps/directions-our-talbot-campus",
+      "sourceTitle": "Directions to our Talbot Campus | Bournemouth University (search snippet; page not fetched)"
+    },
+    {
+      "text": "Talbot Campus is a compact campus housing most facilities, including the BU Business School, the Faculty of Media & Communication, the Faculty of Science & Technology, the Doctoral College and SportBU.",
+      "sourceUrl": "https://www.bournemouth.ac.uk/why-bu/facilities-campuses/talbot-campus",
+      "sourceTitle": "Talbot Campus | Bournemouth University (search snippet; fetch returned 403)"
+    },
+    {
+      "text": "Lansdowne Campus, just outside Bournemouth town centre and close to Bournemouth station, hosts most Faculty of Health & Social Sciences teaching and the Business School's postgraduate programmes, with the Bournemouth Gateway Building's healthcare simulation suites and the Weston Library.",
+      "sourceUrl": "https://www.bournemouth.ac.uk/why-bu/facilities-campuses",
+      "sourceTitle": "Facilities and campuses | Bournemouth University (search snippet; page not fetched)"
+    },
+    {
+      "text": "Travelling between Talbot Campus and Lansdowne Campus takes about 10-15 minutes by car or regular bus.",
+      "sourceUrl": "https://www.bournemouth.ac.uk/why-bu/facilities-campuses",
+      "sourceTitle": "Facilities and campuses | Bournemouth University (search snippet; page not fetched)"
+    },
+    {
+      "text": "Bournemouth University uses CAS Shield for international offer holders; some may be asked to complete a pre-CAS recorded interview about their decision to study at BU, with instructions given on CAS Shield.",
+      "sourceUrl": "https://www.bournemouth.ac.uk/study/postgraduate/how-apply/cas-shield-step-step-guide-international-offer-holders",
+      "sourceTitle": "CAS Shield - a step-by-step guide for international offer holders | Bournemouth University (search snippet; fetch returned 403)"
+    }
   ],
   "sources": [
     {
@@ -17,9 +37,13 @@
       "tier": "official",
       "fetched": false,
       "fromSnippet": true,
-      "topics": ["their decision to study at Bournemouth University"],
+      "topics": [
+        "their decision to study at Bournemouth University"
+      ],
       "quotes": [],
-      "questionIds": ["q-09"],
+      "questionIds": [
+        "q-09"
+      ],
       "unmapped": [],
       "notes": "Fetch returned HTTP 403. Snippet: some international offer holders may be required to complete a pre-CAS recorded interview where they will be asked about their decision to study at Bournemouth University; detailed instructions are on CAS Shield if the step applies; applicants may also be asked to complete the Pre-CAS Questionnaire, which is not required for everyone."
     },
@@ -46,6 +70,18 @@
       "questionIds": [],
       "unmapped": [],
       "notes": "Title only; pathway-college page, not fetched. No student-report pages naming Bournemouth University with readable questions were found in the searches run."
+    },
+    {
+      "url": "https://bournemouth.cas-shield.com/",
+      "title": "Bournemouth University: live CAS Shield tenant (bournemouth.cas-shield.com)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Probed 8 September 2026: the subdomain answers HTTP 200 with the Enroly CAS Shield sign-in page (random subdomains answer nothing), so the university runs its CAS process through Enroly. CAS Shield interviews follow the themes in Brunel's published policy; whether this university switches the interview on for every Nepali applicant is not stated here."
     }
   ],
   "searchesRun": [

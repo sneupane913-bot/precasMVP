@@ -4,11 +4,31 @@
   "checkedOn": "2026-09-07",
   "usesCasShield": true,
   "facts": [
-    { "text": "The University of Exeter traces its history to 1855 and received its full University Charter in 1955; it is a Russell Group university.", "sourceUrl": "https://www.exeter.ac.uk/about/", "sourceTitle": "About the University of Exeter" },
-    { "text": "Exeter has three main campuses: Streatham and St Luke's in Exeter and Penryn in Cornwall, plus a Truro site.", "sourceUrl": "https://www.exeter.ac.uk/about/", "sourceTitle": "About the University of Exeter" },
-    { "text": "Exeter has 29,700 students from 150 countries, 7,360 staff and 195,000 alumni from 183 countries.", "sourceUrl": "https://www.exeter.ac.uk/about/", "sourceTitle": "About the University of Exeter" },
-    { "text": "Exeter is ranked 136th in the 2027 QS World University Rankings and is one of only four Russell Group universities to hold Triple Gold in the 2023 TEF.", "sourceUrl": "https://www.exeter.ac.uk/about/", "sourceTitle": "About the University of Exeter" },
-    { "text": "Exeter was ranked 4th in the 2024/25 BUCS Sport Rankings and describes its campuses as carbon-neutral.", "sourceUrl": "https://www.exeter.ac.uk/about/", "sourceTitle": "About the University of Exeter" }
+    {
+      "text": "The University of Exeter traces its history to 1855 and received its full University Charter in 1955; it is a Russell Group university.",
+      "sourceUrl": "https://www.exeter.ac.uk/about/",
+      "sourceTitle": "About the University of Exeter"
+    },
+    {
+      "text": "Exeter has three main campuses: Streatham and St Luke's in Exeter and Penryn in Cornwall, plus a Truro site.",
+      "sourceUrl": "https://www.exeter.ac.uk/about/",
+      "sourceTitle": "About the University of Exeter"
+    },
+    {
+      "text": "Exeter has 29,700 students from 150 countries, 7,360 staff and 195,000 alumni from 183 countries.",
+      "sourceUrl": "https://www.exeter.ac.uk/about/",
+      "sourceTitle": "About the University of Exeter"
+    },
+    {
+      "text": "Exeter is ranked 136th in the 2027 QS World University Rankings and is one of only four Russell Group universities to hold Triple Gold in the 2023 TEF.",
+      "sourceUrl": "https://www.exeter.ac.uk/about/",
+      "sourceTitle": "About the University of Exeter"
+    },
+    {
+      "text": "Exeter was ranked 4th in the 2024/25 BUCS Sport Rankings and describes its campuses as carbon-neutral.",
+      "sourceUrl": "https://www.exeter.ac.uk/about/",
+      "sourceTitle": "About the University of Exeter"
+    }
   ],
   "sources": [
     {
@@ -46,6 +66,18 @@
       "questionIds": [],
       "unmapped": [],
       "notes": "Search result only (not fetched); no questions readable from the snippet."
+    },
+    {
+      "url": "https://exeter.cas-shield.com/",
+      "title": "University of Exeter: live CAS Shield tenant (exeter.cas-shield.com)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Probed 8 September 2026: the subdomain answers HTTP 200 with the Enroly CAS Shield sign-in page (random subdomains answer nothing), so the university runs its CAS process through Enroly. CAS Shield interviews follow the themes in Brunel's published policy; whether this university switches the interview on for every Nepali applicant is not stated here."
     }
   ],
   "searchesRun": [

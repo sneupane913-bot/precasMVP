@@ -2,12 +2,28 @@
   "institutionId": "inst-canterbury-christ-church-university",
   "name": "Canterbury Christ Church University",
   "checkedOn": "2026-09-07",
-  "usesCasShield": null,
+  "usesCasShield": true,
   "facts": [
-    { "text": "Canterbury Christ Church University started out as a teacher training college in the 1960s in response to a national shortage of teachers.", "sourceUrl": "https://www.canterbury.ac.uk/about-us", "sourceTitle": "About us | Canterbury Christ Church University" },
-    { "text": "The university's Chancellor is the Archbishop of Canterbury.", "sourceUrl": "https://www.canterbury.ac.uk/about-us", "sourceTitle": "About us | Canterbury Christ Church University" },
-    { "text": "The university describes itself as 'deeply rooted in Kent and Medway', with strong connections across the region.", "sourceUrl": "https://www.canterbury.ac.uk/about-us", "sourceTitle": "About us | Canterbury Christ Church University" },
-    { "text": "Professor Claire Ozanne is the Vice-Chancellor (academic lead and Chief Executive) of Canterbury Christ Church University.", "sourceUrl": "https://www.canterbury.ac.uk/about-us", "sourceTitle": "About us | Canterbury Christ Church University" }
+    {
+      "text": "Canterbury Christ Church University started out as a teacher training college in the 1960s in response to a national shortage of teachers.",
+      "sourceUrl": "https://www.canterbury.ac.uk/about-us",
+      "sourceTitle": "About us | Canterbury Christ Church University"
+    },
+    {
+      "text": "The university's Chancellor is the Archbishop of Canterbury.",
+      "sourceUrl": "https://www.canterbury.ac.uk/about-us",
+      "sourceTitle": "About us | Canterbury Christ Church University"
+    },
+    {
+      "text": "The university describes itself as 'deeply rooted in Kent and Medway', with strong connections across the region.",
+      "sourceUrl": "https://www.canterbury.ac.uk/about-us",
+      "sourceTitle": "About us | Canterbury Christ Church University"
+    },
+    {
+      "text": "Professor Claire Ozanne is the Vice-Chancellor (academic lead and Chief Executive) of Canterbury Christ Church University.",
+      "sourceUrl": "https://www.canterbury.ac.uk/about-us",
+      "sourceTitle": "About us | Canterbury Christ Church University"
+    }
   ],
   "sources": [
     {
@@ -16,9 +32,16 @@
       "tier": "official",
       "fetched": true,
       "fromSnippet": true,
-      "topics": ["why you have applied to study with CCCU"],
-      "quotes": ["Why would you like to study in the UK and, more specifically, here at Canterbury Christ Church University?"],
-      "questionIds": ["q-07", "q-09"],
+      "topics": [
+        "why you have applied to study with CCCU"
+      ],
+      "quotes": [
+        "Why would you like to study in the UK and, more specifically, here at Canterbury Christ Church University?"
+      ],
+      "questionIds": [
+        "q-07",
+        "q-09"
+      ],
       "unmapped": [],
       "notes": "WebFetch returned only navigation/headers (page is JS-rendered; a curl of the page yielded 108 characters of text), so the quote and process description come from the search-result summary, which said: 'If your application requires a pre-CAS interview, you will be invited by the Admissions team, with your email invitation containing all the instructions you need to access your interview and prepare'; 'The interview is the university's opportunity to get to know you and why you have applied to study with them'; 'Once complete, the Admissions team will contact you to let you know if you have been successful and send you further information on your CAS and the VISA application process.' Attribution of the quote to this exact URL (rather than https://www.canterbury.ac.uk/study-here/applying/how-to-prepare-for-an-interview) is inferred from the search summary and should be re-verified in a browser."
     },
@@ -28,9 +51,20 @@
       "tier": "student_report",
       "fetched": true,
       "fromSnippet": false,
-      "topics": ["personal details", "reasons for choosing the UK and CCCU", "course benefits", "financial sponsorship information"],
+      "topics": [
+        "personal details",
+        "reasons for choosing the UK and CCCU",
+        "course benefits",
+        "financial sponsorship information"
+      ],
       "quotes": [],
-      "questionIds": ["q-01", "q-07", "q-09", "q-201", "q-15"],
+      "questionIds": [
+        "q-01",
+        "q-07",
+        "q-09",
+        "q-201",
+        "q-15"
+      ],
       "unmapped": [],
       "notes": "Only Scribd's summary was readable: 'an interview questionnaire for a prospective student named Abiah applying for an MSc in International Business at Canterbury Christ Church University (CCCU)' outlining 'key interview tips, personal details, reasons for choosing the UK and CCCU, course benefits, and financial sponsorship information'. Question list not readable."
     },
@@ -45,7 +79,21 @@
       "questionIds": [],
       "unmapped": [],
       "notes": "Seen in search results only; mock interview video naming CCCU. Not fetched. A second similar video exists at https://www.youtube.com/watch?v=SMLhn1LsOXc."
+    },
+    {
+      "url": "https://canterbury.cas-shield.com/",
+      "title": "Canterbury Christ Church University: live CAS Shield tenant (canterbury.cas-shield.com)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Probed 8 September 2026: the subdomain answers HTTP 200 with the Enroly CAS Shield sign-in page (random subdomains answer nothing), so the university runs its CAS process through Enroly. CAS Shield interviews follow the themes in Brunel's published policy; whether this university switches the interview on for every Nepali applicant is not stated here."
     }
   ],
-  "searchesRun": ["Canterbury Christ Church University credibility interview pre-CAS questions international students"]
+  "searchesRun": [
+    "Canterbury Christ Church University credibility interview pre-CAS questions international students"
+  ]
 }

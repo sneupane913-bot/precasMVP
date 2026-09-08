@@ -4,11 +4,31 @@
   "checkedOn": "2026-09-07",
   "usesCasShield": true,
   "facts": [
-    { "text": "The University of Derby's main campus is in Derby (Kedleston Road site) and it also has a campus in Buxton.", "sourceUrl": "https://www.derby.ac.uk/about/", "sourceTitle": "About us - Organisation - University of Derby" },
-    { "text": "Derby works with industry partners including Rolls-Royce, Toyota and the NHS.", "sourceUrl": "https://www.derby.ac.uk/about/", "sourceTitle": "About us - Organisation - University of Derby" },
-    { "text": "The university holds a TEF Gold award (2023).", "sourceUrl": "https://www.derby.ac.uk/about/", "sourceTitle": "About us - Organisation - University of Derby" },
-    { "text": "Derby owns Derby Theatre (a 535-seat main auditorium and 110-seat studio) and an Aquatic Research Facility, and runs an Undergraduate Research Scholarship Scheme.", "sourceUrl": "https://www.derby.ac.uk/about/", "sourceTitle": "About us - Organisation - University of Derby" },
-    { "text": "Derby is described by a student ambassador as 'a compact but versatile city' in the Midlands, 'in the heart of the UK', and the university estimates students spend a minimum of £1,015 a month.", "sourceUrl": "https://www.derby.ac.uk/life/international-students/applicants/visas-and-immigration-for-students/", "sourceTitle": "Visas and immigration for students - International applicants - University of Derby" }
+    {
+      "text": "The University of Derby's main campus is in Derby (Kedleston Road site) and it also has a campus in Buxton.",
+      "sourceUrl": "https://www.derby.ac.uk/about/",
+      "sourceTitle": "About us - Organisation - University of Derby"
+    },
+    {
+      "text": "Derby works with industry partners including Rolls-Royce, Toyota and the NHS.",
+      "sourceUrl": "https://www.derby.ac.uk/about/",
+      "sourceTitle": "About us - Organisation - University of Derby"
+    },
+    {
+      "text": "The university holds a TEF Gold award (2023).",
+      "sourceUrl": "https://www.derby.ac.uk/about/",
+      "sourceTitle": "About us - Organisation - University of Derby"
+    },
+    {
+      "text": "Derby owns Derby Theatre (a 535-seat main auditorium and 110-seat studio) and an Aquatic Research Facility, and runs an Undergraduate Research Scholarship Scheme.",
+      "sourceUrl": "https://www.derby.ac.uk/about/",
+      "sourceTitle": "About us - Organisation - University of Derby"
+    },
+    {
+      "text": "Derby is described by a student ambassador as 'a compact but versatile city' in the Midlands, 'in the heart of the UK', and the university estimates students spend a minimum of £1,015 a month.",
+      "sourceUrl": "https://www.derby.ac.uk/life/international-students/applicants/visas-and-immigration-for-students/",
+      "sourceTitle": "Visas and immigration for students - International applicants - University of Derby"
+    }
   ],
   "sources": [
     {
@@ -17,7 +37,13 @@
       "tier": "official",
       "fetched": true,
       "fromSnippet": false,
-      "topics": ["Course selection", "University choice", "UK selection", "Work plans", "Financing"],
+      "topics": [
+        "Course selection",
+        "University choice",
+        "UK selection",
+        "Work plans",
+        "Financing"
+      ],
       "quotes": [
         "Why have you chosen this particular course? Did you consider any other courses?",
         "What is it about Derby that makes you want to study here?",
@@ -25,7 +51,15 @@
         "Do you plan to work in the UK?",
         "If you are funding yourself, or it is a parent/legal guardian, where has this money come from?"
       ],
-      "questionIds": ["q-201", "q-42", "q-09", "q-08", "q-98", "q-54", "q-104"],
+      "questionIds": [
+        "q-201",
+        "q-42",
+        "q-09",
+        "q-08",
+        "q-98",
+        "q-54",
+        "q-104"
+      ],
       "unmapped": [],
       "notes": "Pre-CAS Interview is completed through CAS Shield, the university's online self-service platform (usesCasShield = true). Quote: 'The Pre-CAS Interview that you will complete during the CAS request mirrors this interview and will help you prepare for your final interview with the UKVI during your visa application.' Responses are recorded; 'Once completed, your interview will be reviewed, and you will receive an outcome within a few days.' Links a Vimeo guidance video 'Recording your Credibility Interview via CAS Shield'. No pass/fail or retake rules stated."
     },
@@ -35,14 +69,35 @@
       "tier": "official",
       "fetched": false,
       "fromSnippet": true,
-      "topics": ["your course", "why you want to study in the UK and specifically at the University of Derby"],
+      "topics": [
+        "your course",
+        "why you want to study in the UK and specifically at the University of Derby"
+      ],
       "quotes": [
         "Why have you chosen to study at the University of Derby? What is it about Derby that makes you want to study here? Did you research Derby's facilities and industry links?"
       ],
-      "questionIds": ["q-09", "q-202", "q-101"],
+      "questionIds": [
+        "q-09",
+        "q-202",
+        "q-101"
+      ],
       "unmapped": [],
       "notes": "Both WebFetch and curl of this URL redirected to the general 'Visas and immigration for students' landing page, so the page body could not be read; the quote above is from the search snippet only. Snippet also says: 'This is not an exclusive list and more, similar questions may be asked' and gives visa@derby.ac.uk as the contact."
+    },
+    {
+      "url": "https://derby.cas-shield.com/",
+      "title": "University of Derby: live CAS Shield tenant (derby.cas-shield.com)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Probed 8 September 2026: the subdomain answers HTTP 200 with the Enroly CAS Shield sign-in page (random subdomains answer nothing), so the university runs its CAS process through Enroly. CAS Shield interviews follow the themes in Brunel's published policy; whether this university switches the interview on for every Nepali applicant is not stated here."
     }
   ],
-  "searchesRun": ["\"University of Derby\" credibility interview pre-CAS questions international"]
+  "searchesRun": [
+    "\"University of Derby\" credibility interview pre-CAS questions international"
+  ]
 }

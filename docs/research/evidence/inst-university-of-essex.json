@@ -4,10 +4,26 @@
   "checkedOn": "2026-09-07",
   "usesCasShield": true,
   "facts": [
-    { "text": "The University of Essex's main campus is Colchester Campus at Wivenhoe Park, Colchester CO4 3SQ, and it also has a Loughton Campus.", "sourceUrl": "https://www.essex.ac.uk/about", "sourceTitle": "About us | University of Essex" },
-    { "text": "Essex is top 30 in the UK in the Complete University Guide 2027 and 14th for international outlook in the THE World University Rankings 2026.", "sourceUrl": "https://www.essex.ac.uk/about", "sourceTitle": "About us | University of Essex" },
-    { "text": "Essex is number one in the UK for the number of Innovate UK funded Knowledge Transfer Partnerships and is UK top 10 for research quality in four subjects (REF2021).", "sourceUrl": "https://www.essex.ac.uk/about", "sourceTitle": "About us | University of Essex" },
-    { "text": "Colchester Campus facilities include the Essex Sport Arena, an Innovation Centre, the Lakeside Theatre and the Wivenhoe House Hotel.", "sourceUrl": "https://www.essex.ac.uk/about", "sourceTitle": "About us | University of Essex" }
+    {
+      "text": "The University of Essex's main campus is Colchester Campus at Wivenhoe Park, Colchester CO4 3SQ, and it also has a Loughton Campus.",
+      "sourceUrl": "https://www.essex.ac.uk/about",
+      "sourceTitle": "About us | University of Essex"
+    },
+    {
+      "text": "Essex is top 30 in the UK in the Complete University Guide 2027 and 14th for international outlook in the THE World University Rankings 2026.",
+      "sourceUrl": "https://www.essex.ac.uk/about",
+      "sourceTitle": "About us | University of Essex"
+    },
+    {
+      "text": "Essex is number one in the UK for the number of Innovate UK funded Knowledge Transfer Partnerships and is UK top 10 for research quality in four subjects (REF2021).",
+      "sourceUrl": "https://www.essex.ac.uk/about",
+      "sourceTitle": "About us | University of Essex"
+    },
+    {
+      "text": "Colchester Campus facilities include the Essex Sport Arena, an Innovation Centre, the Lakeside Theatre and the Wivenhoe House Hotel.",
+      "sourceUrl": "https://www.essex.ac.uk/about",
+      "sourceTitle": "About us | University of Essex"
+    }
   ],
   "sources": [
     {
@@ -16,17 +32,43 @@
       "tier": "official",
       "fetched": true,
       "fromSnippet": false,
-      "topics": ["Your knowledge of the course you have applied for, and of the University of Essex", "Your reasons for choosing the UK and the University of Essex as a study destination", "Your career plans", "Your finances", "You travel and accommodation plans"],
+      "topics": [
+        "Your knowledge of the course you have applied for, and of the University of Essex",
+        "Your reasons for choosing the UK and the University of Essex as a study destination",
+        "Your career plans",
+        "Your finances",
+        "You travel and accommodation plans"
+      ],
       "quotes": [
         "How much are your tuition fees, and how will you pay them?",
         "Where will you live while studying?",
         "Why did you choose not to study this course in your home country?",
         "What jobs could you do after finishing this course?"
       ],
-      "questionIds": ["q-47", "q-14", "q-17", "q-98", "q-112"],
+      "questionIds": [
+        "q-47",
+        "q-14",
+        "q-17",
+        "q-98",
+        "q-112"
+      ],
       "unmapped": [],
       "notes": "University credibility interview is automated on CAS Shield (usesCasShield = true), completed at a time that suits the applicant. 'Identity checks will be carried out, along with a number of fraud detection methods.' 'If someone else appears to be helping you in your interview or is present in your place, you will be considered to not be a genuine or credible student' and no CAS will be issued. 'You must not read your answers out – you must be able to respond naturally to questions being asked.' Three outcomes: proceed with CAS if 'You have answered all the questions well, demonstrated an acceptable level of English and present as genuine'; be 'invited to record a second interview or to attend an in-person interview'; or 'an unsuccessful decision will be made on your application'. The four verbatim questions are listed in the page's UKVI-interview section; the five topic areas are for the university's CAS Shield interview."
+    },
+    {
+      "url": "https://essex.cas-shield.com/",
+      "title": "University of Essex: live CAS Shield tenant (essex.cas-shield.com)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Probed 8 September 2026: the subdomain answers HTTP 200 with the Enroly CAS Shield sign-in page (random subdomains answer nothing), so the university runs its CAS process through Enroly. CAS Shield interviews follow the themes in Brunel's published policy; whether this university switches the interview on for every Nepali applicant is not stated here."
     }
   ],
-  "searchesRun": ["\"University of Essex\" credibility interview pre-CAS questions international students"]
+  "searchesRun": [
+    "\"University of Essex\" credibility interview pre-CAS questions international students"
+  ]
 }

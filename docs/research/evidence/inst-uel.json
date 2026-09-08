@@ -2,12 +2,28 @@
   "institutionId": "inst-uel",
   "name": "University of East London",
   "checkedOn": "2026-09-07",
-  "usesCasShield": null,
+  "usesCasShield": true,
   "facts": [
-    { "text": "UEL has three campuses: Docklands, Stratford and University Square Stratford (USS).", "sourceUrl": "https://www.uel.ac.uk/about/finding-us", "sourceTitle": "Finding us | University of East London (search snippet; page not fetched)" },
-    { "text": "The Docklands campus sits on the Royal Docks waterfront and is served by the DLR from Cyprus station, with trains every 5-10 minutes; you can also take the Elizabeth line and change at Custom House.", "sourceUrl": "https://www.uel.ac.uk/about/finding-us", "sourceTitle": "Finding us | University of East London (search snippet; page not fetched)" },
-    { "text": "The Stratford campus is next to the Olympic Park, a short walk from Stratford, Stratford International and Maryland stations, and is served by the Jubilee, Central and Elizabeth lines and the DLR.", "sourceUrl": "https://www.uel.ac.uk/about/location", "sourceTitle": "Location | University of East London (search snippet; page not fetched)" },
-    { "text": "A free university bus service runs between the UEL campuses.", "sourceUrl": "https://www.uel.ac.uk/about/finding-us", "sourceTitle": "Finding us | University of East London (search snippet; page not fetched)" }
+    {
+      "text": "UEL has three campuses: Docklands, Stratford and University Square Stratford (USS).",
+      "sourceUrl": "https://www.uel.ac.uk/about/finding-us",
+      "sourceTitle": "Finding us | University of East London (search snippet; page not fetched)"
+    },
+    {
+      "text": "The Docklands campus sits on the Royal Docks waterfront and is served by the DLR from Cyprus station, with trains every 5-10 minutes; you can also take the Elizabeth line and change at Custom House.",
+      "sourceUrl": "https://www.uel.ac.uk/about/finding-us",
+      "sourceTitle": "Finding us | University of East London (search snippet; page not fetched)"
+    },
+    {
+      "text": "The Stratford campus is next to the Olympic Park, a short walk from Stratford, Stratford International and Maryland stations, and is served by the Jubilee, Central and Elizabeth lines and the DLR.",
+      "sourceUrl": "https://www.uel.ac.uk/about/location",
+      "sourceTitle": "Location | University of East London (search snippet; page not fetched)"
+    },
+    {
+      "text": "A free university bus service runs between the UEL campuses.",
+      "sourceUrl": "https://www.uel.ac.uk/about/finding-us",
+      "sourceTitle": "Finding us | University of East London (search snippet; page not fetched)"
+    }
   ],
   "sources": [
     {
@@ -16,9 +32,21 @@
       "tier": "official",
       "fetched": false,
       "fromSnippet": true,
-      "topics": ["Your previous studies", "Your reasons for choosing to study at the University of East London", "Your reasons for choosing to study your course", "Your reasons for wanting to study in the UK", "Your future and how your course will help you achieve your plans"],
+      "topics": [
+        "Your previous studies",
+        "Your reasons for choosing to study at the University of East London",
+        "Your reasons for choosing to study your course",
+        "Your reasons for wanting to study in the UK",
+        "Your future and how your course will help you achieve your plans"
+      ],
       "quotes": [],
-      "questionIds": ["q-03", "q-09", "q-201", "q-07", "q-19"],
+      "questionIds": [
+        "q-03",
+        "q-09",
+        "q-201",
+        "q-07",
+        "q-19"
+      ],
       "unmapped": [],
       "notes": "Fetch returned HTTP 403; content taken from the search-result snippet. Snippet says: a pre-CAS interview is a supportive assessment that helps understand your reasons for studying in the UK and at UEL, and to help prepare you for the UKVI credibility interview; UKVI may invite you to a credibility interview via Skype, Microsoft Teams or at a visa application centre; if you do not pass the interview your visa application could be refused. The five topic areas above are listed as what to prepare. No mention of CAS Shield seen in the snippet."
     },
@@ -28,9 +56,19 @@
       "tier": "consultancy",
       "fetched": false,
       "fromSnippet": true,
-      "topics": ["course choice", "career plans", "financial stability", "motivation for studying at UEL"],
+      "topics": [
+        "course choice",
+        "career plans",
+        "financial stability",
+        "motivation for studying at UEL"
+      ],
       "quotes": [],
-      "questionIds": ["q-201", "q-19", "q-14", "q-09"],
+      "questionIds": [
+        "q-201",
+        "q-19",
+        "q-14",
+        "q-09"
+      ],
       "unmapped": [],
       "notes": "Fetch returned HTTP 403. Search snippet says the UEL pre-CAS interview may be by video call or in person, typically lasts around 20-30 minutes, verifies academic intention, financial readiness, English proficiency and genuine motivation, and is a step before the CAS is issued."
     },
@@ -57,6 +95,18 @@
       "questionIds": [],
       "unmapped": [],
       "notes": "Title only from search results; not fetched."
+    },
+    {
+      "url": "https://uel.cas-shield.com/",
+      "title": "University of East London: live CAS Shield tenant (uel.cas-shield.com)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Probed 8 September 2026: the subdomain answers HTTP 200 with the Enroly CAS Shield sign-in page (random subdomains answer nothing), so the university runs its CAS process through Enroly. CAS Shield interviews follow the themes in Brunel's published policy; whether this university switches the interview on for every Nepali applicant is not stated here."
     }
   ],
   "searchesRun": [

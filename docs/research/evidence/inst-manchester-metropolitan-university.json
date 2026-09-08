@@ -215,6 +215,18 @@
       ],
       "unmapped": [],
       "notes": "PDF downloaded and text extracted locally. Same structure as the other help sheet with an added finance question about genuine source of funds / loans / bank verification."
+    },
+    {
+      "url": "https://mmu.cas-shield.com/",
+      "title": "Manchester Metropolitan University: live CAS Shield tenant (mmu.cas-shield.com)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Probed 8 September 2026: the subdomain answers HTTP 200 with the Enroly CAS Shield sign-in page (random subdomains answer nothing), so the university runs its CAS process through Enroly. CAS Shield interviews follow the themes in Brunel's published policy; whether this university switches the interview on for every Nepali applicant is not stated here."
     }
   ],
   "searchesRun": [

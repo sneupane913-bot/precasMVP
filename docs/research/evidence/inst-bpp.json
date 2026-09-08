@@ -2,13 +2,33 @@
   "institutionId": "inst-bpp",
   "name": "BPP University",
   "checkedOn": "2026-09-07",
-  "usesCasShield": null,
+  "usesCasShield": true,
   "facts": [
-    { "text": "BPP University has over 33,000 students and is organised into four schools: the School of Law, the Business School, the School of Technology and the School of Healthcare and Nursing.", "sourceUrl": "https://www.bpp.com/about-bpp/bpp-university", "sourceTitle": "About BPP University - BPP" },
-    { "text": "BPP University Law School teaches from two London centres, Holborn and Waterloo, and from centres in Birmingham, Bristol, Cambridge, Leeds and Manchester.", "sourceUrl": "https://www.bpp.com/about-bpp/bpp-university", "sourceTitle": "About BPP University - BPP" },
-    { "text": "BPP reports that 96% of its UK-domiciled graduates are in highly skilled employment 15 months after graduating, and 90% satisfaction in teaching and learning in the Postgraduate Taught Experience Survey 2025.", "sourceUrl": "https://www.bpp.com/about-bpp/bpp-university", "sourceTitle": "About BPP University - BPP" },
-    { "text": "BPP University is registered with the Office for Students, holds its own degree-awarding powers, and designs its curriculum with law firms, banks and businesses.", "sourceUrl": "https://www.bpp.com/about-bpp/bpp-university", "sourceTitle": "About BPP University - BPP" },
-    { "text": "BPP's London West study centre at Shepherd's Bush is the home of its Business School programmes; it also has London centres at Holborn, Waterloo and King's Cross.", "sourceUrl": "https://www.bpp.com/about-bpp/locations", "sourceTitle": "Study locations - London - BPP (search snippet; page not fetched)" }
+    {
+      "text": "BPP University has over 33,000 students and is organised into four schools: the School of Law, the Business School, the School of Technology and the School of Healthcare and Nursing.",
+      "sourceUrl": "https://www.bpp.com/about-bpp/bpp-university",
+      "sourceTitle": "About BPP University - BPP"
+    },
+    {
+      "text": "BPP University Law School teaches from two London centres, Holborn and Waterloo, and from centres in Birmingham, Bristol, Cambridge, Leeds and Manchester.",
+      "sourceUrl": "https://www.bpp.com/about-bpp/bpp-university",
+      "sourceTitle": "About BPP University - BPP"
+    },
+    {
+      "text": "BPP reports that 96% of its UK-domiciled graduates are in highly skilled employment 15 months after graduating, and 90% satisfaction in teaching and learning in the Postgraduate Taught Experience Survey 2025.",
+      "sourceUrl": "https://www.bpp.com/about-bpp/bpp-university",
+      "sourceTitle": "About BPP University - BPP"
+    },
+    {
+      "text": "BPP University is registered with the Office for Students, holds its own degree-awarding powers, and designs its curriculum with law firms, banks and businesses.",
+      "sourceUrl": "https://www.bpp.com/about-bpp/bpp-university",
+      "sourceTitle": "About BPP University - BPP"
+    },
+    {
+      "text": "BPP's London West study centre at Shepherd's Bush is the home of its Business School programmes; it also has London centres at Holborn, Waterloo and King's Cross.",
+      "sourceUrl": "https://www.bpp.com/about-bpp/locations",
+      "sourceTitle": "Study locations - London - BPP (search snippet; page not fetched)"
+    }
   ],
   "sources": [
     {
@@ -17,9 +37,17 @@
       "tier": "official",
       "fetched": true,
       "fromSnippet": false,
-      "topics": ["Why you chose BPP University", "Your academic and career aspirations", "Your readiness to study in the UK (if you are applying from abroad)"],
+      "topics": [
+        "Why you chose BPP University",
+        "Your academic and career aspirations",
+        "Your readiness to study in the UK (if you are applying from abroad)"
+      ],
       "quotes": [],
-      "questionIds": ["q-09", "q-19", "q-32"],
+      "questionIds": [
+        "q-09",
+        "q-19",
+        "q-32"
+      ],
       "unmapped": [],
       "notes": "Fetched. BPP calls it the Admissions Credibility Interview. Verbatim: 'This will take place with a BPP staff member and helps us understand why you want to study your chosen programme, and to confirm you are a genuine student.' 'This call will take place via Microsoft Teams. Please note, you will be required to have your camera on for this call. The call will be recorded for training and monitoring purposes.' 'Attending your interview at the scheduled time is essential to ensure your application can be reviewed for your intended cohort start date.' Applicants need their passport accessible during the call, a stable internet connection and a quiet space. No mention of CAS Shield or Enroly on the page."
     },
@@ -41,9 +69,18 @@
       "tier": "student_report",
       "fetched": false,
       "fromSnippet": true,
-      "topics": ["gap in study and what the applicant was doing during it", "where the applicant will stay in the UK and how they will commute to university"],
-      "quotes": ["What were you doing during your gap (if any)?", "Where will you stay in the UK and how will you commute to university?"],
-      "questionIds": ["q-05", "q-17"],
+      "topics": [
+        "gap in study and what the applicant was doing during it",
+        "where the applicant will stay in the UK and how they will commute to university"
+      ],
+      "quotes": [
+        "What were you doing during your gap (if any)?",
+        "Where will you stay in the UK and how will you commute to university?"
+      ],
+      "questionIds": [
+        "q-05",
+        "q-17"
+      ],
       "unmapped": [],
       "notes": "Not fetched. The two questions appeared in the search-engine summary of the BPP question-guide results (Scribd/Studocu); attributed to this Scribd guide, the top-listed BPP guide. The summary also said BPP preparation material highlights BPP's academic rankings, state-of-the-art facilities, diverse learning environment and strong employability rates, and reasons for choosing the UK such as academic excellence, shorter course durations and cultural diversity."
     },
@@ -94,6 +131,18 @@
       "questionIds": [],
       "unmapped": [],
       "notes": "Title only; not fetched. Other BPP-named videos in results: https://www.youtube.com/watch?v=cc0-JdnQ-8c, https://www.youtube.com/watch?v=JPloTRBJFx8, https://www.youtube.com/watch?v=cw4N3_gZwEs."
+    },
+    {
+      "url": "https://bpp.cas-shield.com/",
+      "title": "BPP University: live CAS Shield tenant (bpp.cas-shield.com)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Probed 8 September 2026: the subdomain answers HTTP 200 with the Enroly CAS Shield sign-in page (random subdomains answer nothing), so the university runs its CAS process through Enroly. CAS Shield interviews follow the themes in Brunel's published policy; whether this university switches the interview on for every Nepali applicant is not stated here."
     }
   ],
   "searchesRun": [

@@ -4,10 +4,26 @@
   "checkedOn": "2026-09-07",
   "usesCasShield": true,
   "facts": [
-    { "text": "The University of Brighton has been part of the city of Brighton & Hove since 1859, when it started as a school of art in the kitchens of the Royal Pavilion.", "sourceUrl": "https://www.brighton.ac.uk/about-us/index.aspx", "sourceTitle": "About us | University of Brighton" },
-    { "text": "The university's head office is Mithras House, Lewes Road, Brighton, BN2 4AT, and its sites include Moulsecoomb and Grand Parade.", "sourceUrl": "https://www.brighton.ac.uk/about-us/index.aspx", "sourceTitle": "About us | University of Brighton" },
-    { "text": "Brighton holds a TEF 2023 Silver award and is placed in the top 4.3% of institutions globally by the Center for World University Rankings 2025.", "sourceUrl": "https://www.brighton.ac.uk/about-us/index.aspx", "sourceTitle": "About us | University of Brighton" },
-    { "text": "The university holds Race Equality Charter Silver, Athena Swan Silver and EcoCampus Platinum accreditations and is a Disability Confident Employer.", "sourceUrl": "https://www.brighton.ac.uk/about-us/index.aspx", "sourceTitle": "About us | University of Brighton" }
+    {
+      "text": "The University of Brighton has been part of the city of Brighton & Hove since 1859, when it started as a school of art in the kitchens of the Royal Pavilion.",
+      "sourceUrl": "https://www.brighton.ac.uk/about-us/index.aspx",
+      "sourceTitle": "About us | University of Brighton"
+    },
+    {
+      "text": "The university's head office is Mithras House, Lewes Road, Brighton, BN2 4AT, and its sites include Moulsecoomb and Grand Parade.",
+      "sourceUrl": "https://www.brighton.ac.uk/about-us/index.aspx",
+      "sourceTitle": "About us | University of Brighton"
+    },
+    {
+      "text": "Brighton holds a TEF 2023 Silver award and is placed in the top 4.3% of institutions globally by the Center for World University Rankings 2025.",
+      "sourceUrl": "https://www.brighton.ac.uk/about-us/index.aspx",
+      "sourceTitle": "About us | University of Brighton"
+    },
+    {
+      "text": "The university holds Race Equality Charter Silver, Athena Swan Silver and EcoCampus Platinum accreditations and is a Disability Confident Employer.",
+      "sourceUrl": "https://www.brighton.ac.uk/about-us/index.aspx",
+      "sourceTitle": "About us | University of Brighton"
+    }
   ],
   "sources": [
     {
@@ -28,11 +44,29 @@
       "tier": "official",
       "fetched": true,
       "fromSnippet": false,
-      "topics": ["why you want to study your course", "the reasons why you chose to study at the university"],
+      "topics": [
+        "why you want to study your course",
+        "the reasons why you chose to study at the university"
+      ],
       "quotes": [],
-      "questionIds": ["q-201", "q-09"],
+      "questionIds": [
+        "q-201",
+        "q-09"
+      ],
       "unmapped": [],
       "notes": "About the UKVI interview: 'In a small number of cases UKVI will request an applicant attends a substantive interview, sometimes referred to as a \"credibility\" interview.' 'At the interview you will be asked about why you want to study your course and the reasons why you chose to study at the university.' Applicants 'must attend as otherwise your application will be rejected'; the university suggests asking for a transcript of the conversation. questionIds are mapped from the two topics named, not verbatim questions."
+    },
+    {
+      "url": "https://brighton.cas-shield.com/",
+      "title": "University of Brighton: live CAS Shield tenant (brighton.cas-shield.com)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Probed 8 September 2026: the subdomain answers HTTP 200 with the Enroly CAS Shield sign-in page (random subdomains answer nothing), so the university runs its CAS process through Enroly. CAS Shield interviews follow the themes in Brunel's published policy; whether this university switches the interview on for every Nepali applicant is not stated here."
     }
   ],
   "searchesRun": [

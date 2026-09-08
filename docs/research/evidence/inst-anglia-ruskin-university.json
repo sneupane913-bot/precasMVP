@@ -4,11 +4,31 @@
   "checkedOn": "2026-09-07",
   "usesCasShield": true,
   "facts": [
-    { "text": "ARU has campuses in Cambridge, Chelmsford, Peterborough and Writtle; the Cambridge campus is a stone's throw from the centre of Cambridge, and the Chelmsford campus is in the city's University and Innovation Quarter.", "sourceUrl": "https://www.aru.ac.uk/student-life/life-on-campus", "sourceTitle": "Our campuses - ARU" },
-    { "text": "ARU Peterborough is its newest campus, a short walk from Peterborough's historic city centre; Writtle is a rural campus in the Essex countryside.", "sourceUrl": "https://www.aru.ac.uk/student-life/life-on-campus", "sourceTitle": "Our campuses - ARU" },
-    { "text": "ARU's campuses offer a Students' Union with 120 student societies, and ARU has partner institutions including ARU London and University Centre West Anglia.", "sourceUrl": "https://www.aru.ac.uk/student-life/life-on-campus", "sourceTitle": "Our campuses - ARU" },
-    { "text": "The Cambridge campus address is East Road, Cambridge CB1 1PT, about a 20-minute walk from Cambridge railway station; the Chelmsford campus is at Bishop Hall Lane, CM1 1SQ, a 10-minute walk from the town centre by the River Chelmer.", "sourceUrl": "https://www.aru.ac.uk/contact-us/postal-addresses", "sourceTitle": "Anglia Ruskin University postal addresses - ARU (search snippet; page not fetched)" },
-    { "text": "ARU issues the CAS through the CAS Shield portal; the CAS is a unique 14-digit reference number, and CAS issuing for September starters begins in June.", "sourceUrl": "https://www.aru.ac.uk/blogs/what-is-cas-shield", "sourceTitle": "What is CAS Shield and as an International Student, Do I Need it? - ARU" }
+    {
+      "text": "ARU has campuses in Cambridge, Chelmsford, Peterborough and Writtle; the Cambridge campus is a stone's throw from the centre of Cambridge, and the Chelmsford campus is in the city's University and Innovation Quarter.",
+      "sourceUrl": "https://www.aru.ac.uk/student-life/life-on-campus",
+      "sourceTitle": "Our campuses - ARU"
+    },
+    {
+      "text": "ARU Peterborough is its newest campus, a short walk from Peterborough's historic city centre; Writtle is a rural campus in the Essex countryside.",
+      "sourceUrl": "https://www.aru.ac.uk/student-life/life-on-campus",
+      "sourceTitle": "Our campuses - ARU"
+    },
+    {
+      "text": "ARU's campuses offer a Students' Union with 120 student societies, and ARU has partner institutions including ARU London and University Centre West Anglia.",
+      "sourceUrl": "https://www.aru.ac.uk/student-life/life-on-campus",
+      "sourceTitle": "Our campuses - ARU"
+    },
+    {
+      "text": "The Cambridge campus address is East Road, Cambridge CB1 1PT, about a 20-minute walk from Cambridge railway station; the Chelmsford campus is at Bishop Hall Lane, CM1 1SQ, a 10-minute walk from the town centre by the River Chelmer.",
+      "sourceUrl": "https://www.aru.ac.uk/contact-us/postal-addresses",
+      "sourceTitle": "Anglia Ruskin University postal addresses - ARU (search snippet; page not fetched)"
+    },
+    {
+      "text": "ARU issues the CAS through the CAS Shield portal; the CAS is a unique 14-digit reference number, and CAS issuing for September starters begins in June.",
+      "sourceUrl": "https://www.aru.ac.uk/blogs/what-is-cas-shield",
+      "sourceTitle": "What is CAS Shield and as an International Student, Do I Need it? - ARU"
+    }
   ],
   "sources": [
     {
@@ -58,6 +78,18 @@
       "questionIds": [],
       "unmapped": [],
       "notes": "Title only. Other ARU-named videos: https://www.youtube.com/watch?v=6R6DcGUqz7U (ARU London CAS interview session), https://www.youtube.com/watch?v=btjE2_npDOo; consultancy pages https://unimock.ai/anglia-ruskin-university-pre-cas-interview and https://unimock.ai/anglia-ruskin-universityaru (titles only)."
+    },
+    {
+      "url": "https://aru.cas-shield.com/",
+      "title": "Anglia Ruskin University: live CAS Shield tenant (aru.cas-shield.com)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Probed 8 September 2026: the subdomain answers HTTP 200 with the Enroly CAS Shield sign-in page (random subdomains answer nothing), so the university runs its CAS process through Enroly. CAS Shield interviews follow the themes in Brunel's published policy; whether this university switches the interview on for every Nepali applicant is not stated here."
     }
   ],
   "searchesRun": [

@@ -2,7 +2,7 @@
   "institutionId": "inst-university-of-lincoln",
   "name": "University of Lincoln",
   "checkedOn": "2026-09-07",
-  "usesCasShield": false,
+  "usesCasShield": true,
   "facts": [
     {
       "text": "The University of Lincoln sits on the Brayford Pool waterfront in the heart of the historic city of Lincoln; the main campus address is Brayford Pool Campus, Lincoln, LN6 7TS.",
@@ -112,6 +112,18 @@
         "What research did you undertake?"
       ],
       "notes": "Interview is part of the assessment of the CAS request form. 'The interview usually lasts between 30 to 40 minutes and will take place on Zoom (or a similar platform).' Outcome 'usually' notified within 5 working days. 'A CAS will only be issued if your pre-CAS interview is successful, you have paid your CAS deposit and all other CAS checks are complete.' Search snippet adds that for the September 2026 intake students from Nigeria will also be asked to take part. No mention of Enroly CAS Shield; platform stated as Zoom, so usesCasShield set false."
+    },
+    {
+      "url": "https://lincoln.cas-shield.com/",
+      "title": "University of Lincoln: live CAS Shield tenant (lincoln.cas-shield.com)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Probed 8 September 2026: the subdomain answers HTTP 200 with the Enroly CAS Shield sign-in page (random subdomains answer nothing), so the university runs its CAS process through Enroly. CAS Shield interviews follow the themes in Brunel's published policy; whether this university switches the interview on for every Nepali applicant is not stated here."
     }
   ],
   "searchesRun": [

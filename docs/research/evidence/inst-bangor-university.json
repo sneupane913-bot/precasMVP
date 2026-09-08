@@ -4,11 +4,31 @@
   "checkedOn": "2026-09-07",
   "usesCasShield": true,
   "facts": [
-    { "text": "Bangor University opened on 18 October 1884 as the University College of North Wales, funded by quarrymen and farmers, in a converted coaching inn called the Penrhyn Arms with 58 students and ten staff.", "sourceUrl": "https://www.bangor.ac.uk/about/university-history", "sourceTitle": "University History | Bangor University" },
-    { "text": "The university is in Bangor, Gwynedd (LL57 2DG), North Wales; in 1903 the city donated a 10-acre site overlooking the city at Penrallt, where the Main Building opened in 1911.", "sourceUrl": "https://www.bangor.ac.uk/about/university-history", "sourceTitle": "University History | Bangor University" },
-    { "text": "Bangor has over 10,000 students and around 2,000 staff.", "sourceUrl": "https://www.bangor.ac.uk/about/university-history", "sourceTitle": "University History | Bangor University" },
-    { "text": "Bangor was one of the three original constituent colleges of the University of Wales from 1893; before that its students received University of London degrees.", "sourceUrl": "https://www.bangor.ac.uk/about/university-history", "sourceTitle": "University History | Bangor University" },
-    { "text": "Bangor runs CAS Shield Credibility Guidance webinars and Credibility Interview Guidance webinars for all international applicants.", "sourceUrl": "https://www.bangor.ac.uk/international/webinars", "sourceTitle": "Webinars for International Students | Bangor University (search snippet; page not fetched)" }
+    {
+      "text": "Bangor University opened on 18 October 1884 as the University College of North Wales, funded by quarrymen and farmers, in a converted coaching inn called the Penrhyn Arms with 58 students and ten staff.",
+      "sourceUrl": "https://www.bangor.ac.uk/about/university-history",
+      "sourceTitle": "University History | Bangor University"
+    },
+    {
+      "text": "The university is in Bangor, Gwynedd (LL57 2DG), North Wales; in 1903 the city donated a 10-acre site overlooking the city at Penrallt, where the Main Building opened in 1911.",
+      "sourceUrl": "https://www.bangor.ac.uk/about/university-history",
+      "sourceTitle": "University History | Bangor University"
+    },
+    {
+      "text": "Bangor has over 10,000 students and around 2,000 staff.",
+      "sourceUrl": "https://www.bangor.ac.uk/about/university-history",
+      "sourceTitle": "University History | Bangor University"
+    },
+    {
+      "text": "Bangor was one of the three original constituent colleges of the University of Wales from 1893; before that its students received University of London degrees.",
+      "sourceUrl": "https://www.bangor.ac.uk/about/university-history",
+      "sourceTitle": "University History | Bangor University"
+    },
+    {
+      "text": "Bangor runs CAS Shield Credibility Guidance webinars and Credibility Interview Guidance webinars for all international applicants.",
+      "sourceUrl": "https://www.bangor.ac.uk/international/webinars",
+      "sourceTitle": "Webinars for International Students | Bangor University (search snippet; page not fetched)"
+    }
   ],
   "sources": [
     {
@@ -17,7 +37,16 @@
       "tier": "official",
       "fetched": true,
       "fromSnippet": false,
-      "topics": ["Studying in the UK", "Bangor University", "Questions about your course", "Life in Bangor", "About your finances", "Working during your studies", "Your future plans and career", "Other questions"],
+      "topics": [
+        "Studying in the UK",
+        "Bangor University",
+        "Questions about your course",
+        "Life in Bangor",
+        "About your finances",
+        "Working during your studies",
+        "Your future plans and career",
+        "Other questions"
+      ],
       "quotes": [
         "Why do you want to study in the UK?",
         "What have you heard about the education system in the UK?",
@@ -71,8 +100,58 @@
         "Do you work in your home country? How does your study relate to your job?",
         "What will you do during the holidays?"
       ],
-      "questionIds": ["q-07", "q-29", "q-30", "q-143", "q-08", "q-09", "q-149", "q-33", "q-36", "q-206", "q-100", "q-35", "q-147", "q-42", "q-40", "q-41", "q-77", "q-103", "q-20", "q-04", "q-12", "q-98", "q-145", "q-02", "q-112", "q-56", "q-57", "q-202", "q-47", "q-14", "q-15", "q-159", "q-16", "q-108", "q-54", "q-162", "q-114", "q-19", "q-66", "q-69", "q-113", "q-169", "q-109", "q-140", "q-23", "q-06", "q-176"],
-      "unmapped": ["Is there a dissertation? Fieldwork? Lab work?"],
+      "questionIds": [
+        "q-07",
+        "q-29",
+        "q-30",
+        "q-143",
+        "q-08",
+        "q-09",
+        "q-149",
+        "q-33",
+        "q-36",
+        "q-206",
+        "q-100",
+        "q-35",
+        "q-147",
+        "q-42",
+        "q-40",
+        "q-41",
+        "q-77",
+        "q-103",
+        "q-20",
+        "q-04",
+        "q-12",
+        "q-98",
+        "q-145",
+        "q-02",
+        "q-112",
+        "q-56",
+        "q-57",
+        "q-202",
+        "q-47",
+        "q-14",
+        "q-15",
+        "q-159",
+        "q-16",
+        "q-108",
+        "q-54",
+        "q-162",
+        "q-114",
+        "q-19",
+        "q-66",
+        "q-69",
+        "q-113",
+        "q-169",
+        "q-109",
+        "q-140",
+        "q-23",
+        "q-06",
+        "q-176"
+      ],
+      "unmapped": [
+        "Is there a dissertation? Fieldwork? Lab work?"
+      ],
       "notes": "Fetched (PDF text extracted). This is Bangor's guide to the UKVI (Home Office) credibility interview, not a university-run pre-CAS interview: 'The interview will be carried out by Home Office UK Visas and Immigration (UKVI) service staff and is usually done via video link. The interview will take place at the visa application centre when you go to give your biometric information.' 'The interview will be in English, via video link with a UKVI member of staff based in the UK. It usually takes around 15-20 mins.' 'If you are asked to attend an interview but do not go, then your visa application will be refused.' 'Most of the questions will be about your new course, Bangor University and your past and future education and career plans.' The question list is 'based on previous student experience'. Also warns: answer truthfully; the interviewer checks that English ability matches qualifications; do not rely on a job to fund fees. Document dates from 2020 (refers to Tier 4). The 'Already Applied' page snippet says the interview 'will normally last up to an hour' and is designed to let applicants explain their reason for studying in the UK and for choosing Bangor."
     },
     {
@@ -81,9 +160,17 @@
       "tier": "official",
       "fetched": true,
       "fromSnippet": false,
-      "topics": ["your course selection", "study motivations", "career plans"],
+      "topics": [
+        "your course selection",
+        "study motivations",
+        "career plans"
+      ],
       "quotes": [],
-      "questionIds": ["q-201", "q-07", "q-19"],
+      "questionIds": [
+        "q-201",
+        "q-07",
+        "q-19"
+      ],
       "unmapped": [],
       "notes": "Fetched. Says applicants applying from outside the UK 'probably will be interviewed' by UKVI when giving biometrics, about course choice, motivation and career plans, to check they are genuine students; applicants inside the UK probably will not be interviewed. No mention of CAS Shield, Enroly or a university pre-CAS interview on this page."
     },
@@ -110,6 +197,18 @@
       "questionIds": [],
       "unmapped": [],
       "notes": "Title only; not fetched. Also https://www.youtube.com/watch?v=7IiGubxqzyo (Bangor University Pre Cas Interview Questions), two Facebook group posts asking for Bangor pre-CAS/CAS questions, and https://unimock.ai/bangor-university (consultancy, title only)."
+    },
+    {
+      "url": "https://bangor.cas-shield.com/",
+      "title": "Bangor University: live CAS Shield tenant (bangor.cas-shield.com)",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Probed 8 September 2026: the subdomain answers HTTP 200 with the Enroly CAS Shield sign-in page (random subdomains answer nothing), so the university runs its CAS process through Enroly. CAS Shield interviews follow the themes in Brunel's published policy; whether this university switches the interview on for every Nepali applicant is not stated here."
     }
   ],
   "searchesRun": [
