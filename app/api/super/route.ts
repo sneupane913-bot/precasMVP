@@ -40,6 +40,19 @@ const Body = z.discriminatedUnion('action', [
     orderId: z.string().min(1),
     reason: z.string().min(3).max(500),
   }),
+  /**
+   * 8 Sep 2026. Two students paid NPR 499 in cash while the site still said
+   * 399, so their approved orders carry the wrong number and the dashboard
+   * under-reports revenue. Only an APPROVED order can be corrected, the
+   * reason is mandatory, and the old and new amounts go to the audit trail.
+   */
+  z.object({
+    action: z.literal('setOrderAmount'),
+    superKey: z.string().min(1),
+    orderId: z.string().min(1),
+    amountNpr: z.number().int().min(1).max(100_000),
+    reason: z.string().min(3).max(200),
+  }),
   z.object({ action: z.literal('flaggedTrials'), superKey: z.string().min(1) }),
   z.object({
     action: z.literal('resolveTrialFlag'),
@@ -502,6 +515,15 @@ export async function POST(req: Request) {
     );
     const studentById = new Map(students.map((st) => [st.id, st]));
 
+    // What each student has actually paid us, from APPROVED orders only. The
+    // students screen groups direct students by this, so the client can see
+    // paying students apart from the ones who only took the free mock.
+    const paidByStudent = new Map<string, number>();
+    for (const o of orders) {
+      if (o.state === 'verified' && o.studentId) {
+        paidByStudent.set(o.studentId, (paidByStudent.get(o.studentId) ?? 0) + o.amountNpr);
+      }
+    }
     const studentRows = students.map((st) => {
       const t = tally.get(st.id) ?? EMPTY_TALLY;
       const cp = couponByStudent.get(st.id);
@@ -529,6 +551,7 @@ export async function POST(req: Request) {
         mocksUsed: t.mocksUsed,
         practiceLeft: t.practiceLeft,
         practiceUsed: t.practiceUsed,
+        paidNpr: paidByStudent.get(st.id) ?? 0,
         // NEVER a transcript, at any level. G-8 has no exceptions.
       };
     });
@@ -799,6 +822,31 @@ export async function POST(req: Request) {
   //
   // The work itself lives in lib/payments.ts, shared with the consultancy
   // route (E9). Two places that can release credits must run the same code.
+  if (body.action === 'setOrderAmount') {
+    const o = await r.getOrder(body.orderId);
+    if (!o) {
+      return NextResponse.json(apiError('NOT_FOUND', 'no order', 'That payment no longer exists.'), { status: 404 });
+    }
+    if (o.state !== 'verified') {
+      return NextResponse.json(
+        apiError('NOT_APPROVED', `state ${o.state}`, 'Only an approved payment can have its amount corrected. Approve or reject it first.'),
+        { status: 409 }
+      );
+    }
+    const before = o.amountNpr;
+    await r.updateOrder(o.id, { amountNpr: body.amountNpr });
+    await audit({
+      actorRole: 'super_admin',
+      actorId: 'super_admin',
+      action: 'correct_amount',
+      subjectId: o.id,
+      before: String(before),
+      after: String(body.amountNpr),
+      note: body.reason.trim().slice(0, 160),
+    });
+    return NextResponse.json({ ok: true, data: { id: o.id, before, after: body.amountNpr } });
+  }
+
   if (body.action === 'verifyPayment') {
     const order = await r.getOrder(body.orderId);
     if (!order) {

@@ -6,7 +6,7 @@ import { PaySettingsForm, type PaySettings } from '@/components/PaySettingsForm'
 import { PasscodeChangeForm } from '@/components/PasscodeChangeForm';
 import { Card, Button, Banner, Status, Pill, type Tone } from '@/components/ui';
 import { BRAND_NAME } from '@/lib/branding';
-import { couponPacks, couponOrderTotal } from '@/lib/data/plans';
+import { couponPacks, couponOrderTotal, getPlan } from '@/lib/data/plans';
 
 /**
  * Super admin, rebuilt to docs/design-reference/super_admin_dashboard.
@@ -135,6 +135,8 @@ interface DirectoryStudent {
   mocksUsed: number;
   practiceLeft: number;
   practiceUsed: number;
+  /** Approved payments only, in NPR. 0 for a student who never paid. */
+  paidNpr: number;
 }
 
 interface DirectoryCoupon {
@@ -270,6 +272,39 @@ function rowTint(hue: number | null | undefined): React.CSSProperties | undefine
 }
 function swatch(hue: number): React.CSSProperties {
   return { backgroundColor: `hsl(${hue} 60% 45%)` };
+}
+
+/**
+ * One titled section of a tab. The client's words about the old single
+ * tables: "everything is just jumbled up in one". Payments and students are
+ * now several small tables, each answering one question, and this is the
+ * frame each of them sits in.
+ */
+function Block({
+  title,
+  hint,
+  count,
+  children,
+}: {
+  title: string;
+  hint?: string;
+  count?: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-line px-5 py-4">
+        <h2 className="font-serif text-lg font-bold text-ink">
+          {title}
+          {typeof count === 'number' && (
+            <span className="ml-2 text-sm font-normal text-ink-quiet">{count}</span>
+          )}
+        </h2>
+        {hint && <p className="text-sm text-ink-soft">{hint}</p>}
+      </div>
+      {children}
+    </section>
+  );
 }
 
 const dateTime = (iso: string) =>
@@ -736,6 +771,40 @@ export default function SuperAdminPage() {
     }
   }
 
+  /**
+   * The recorded amount was the list price at checkout, and twice the list
+   * price on the site was wrong while the student paid the real one in cash.
+   * Only approved orders; the reason goes to the audit trail.
+   */
+  async function correctAmount(o: Order, suggested: number) {
+    const typed = window.prompt(
+      `Correct the recorded amount for ${o.studentName || 'this student'}?\n\n` +
+        `Recorded: NPR ${o.amountNpr}. Type the amount they actually paid.`,
+      String(suggested)
+    );
+    if (typed === null) return;
+    const amount = Number(typed.replace(/[^\d]/g, ''));
+    if (!amount) {
+      setNotice('Nothing changed: that is not an amount.');
+      return;
+    }
+    const reason = window.prompt(
+      'Why? One line, kept in the audit trail.',
+      `Paid NPR ${amount}; the site recorded the old list price of NPR ${o.amountNpr}.`
+    );
+    if (reason === null) return;
+    const ok = (await call({
+      action: 'setOrderAmount',
+      orderId: o.id,
+      amountNpr: amount,
+      reason: reason.trim(),
+    })) as { before?: number; after?: number } | null;
+    if (ok) {
+      await loadAll();
+      setNotice(`Amount corrected from NPR ${ok.before} to NPR ${ok.after}.`);
+    }
+  }
+
   async function reject(orderId: string) {
     const reason = window.prompt('Why are you rejecting this payment?');
     if (!reason || reason.trim().length < 3) return;
@@ -847,6 +916,267 @@ export default function SuperAdminPage() {
   // rather than only what is still waiting.
   const approvedCount = orders.filter((o) => o.state === 'verified').length;
   const rejectedCount = orders.filter((o) => o.state === 'rejected').length;
+
+  /**
+   * PAYMENTS AND STUDENTS AS SMALL TABLES (client, 8 Sep 2026): "it's very
+   * hard for me to see which is a genuine payment and which is not". One
+   * table per question. The row markup is shared; the grouping is above it.
+   */
+  const dirById = new Map((directory?.students ?? []).map((d) => [d.id, d]));
+  const renderOrders = (list: Order[], listPrice?: number) =>
+    list.length === 0 ? (
+      <p className="p-6 text-center text-sm text-ink-quiet">None.</p>
+    ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-surface-sunk text-micro font-bold uppercase tracking-[0.08em] text-ink-quiet">
+                    <tr>
+                      <th className="px-5 py-3 font-semibold">When</th>
+                      <th className="px-3 py-3 font-semibold">Student</th>
+                      <th className="px-3 py-3 font-semibold">Pack</th>
+                      <th className="px-3 py-3 font-semibold">Amount</th>
+                      <th className="px-3 py-3 font-semibold">Transaction id</th>
+                      <th className="px-3 py-3 font-semibold">Phone</th>
+                      <th className="px-3 py-3 font-semibold">State</th>
+                      <th className="px-5 py-3 font-semibold">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-line">
+                    {list.map((o) => (
+                      <tr key={o.id}>
+                        {/* Newest first, with the date on every row: who
+                            paid today, yesterday, this month, at a glance. */}
+                        <td className="whitespace-nowrap px-5 py-3 text-micro text-ink-soft">
+                          {dateTime(o.createdAt)}
+                        </td>
+                        <td className="px-3 py-3">
+                          <p className="font-semibold text-ink">{o.studentName || 'Unnamed'}</p>
+                          <p className="text-micro text-ink-quiet">{o.payerName || o.studentEmail || ''}</p>
+                        </td>
+                        <td className="px-3 py-3 uppercase text-ink-soft">{o.packCode}</td>
+                        <td className="px-3 py-3 tabular-nums">
+                          NPR {o.amountNpr.toLocaleString()}
+                          {/* The list price moved (399 to 499 on 7 Sep) after
+                              some students had paid the real price in cash, so
+                              an approved row can disagree with the pack's price.
+                              Say so, and offer the one-click correction. */}
+                          {o.state === 'verified' && listPrice !== undefined && o.amountNpr !== listPrice && (
+                            <span className="mt-1 block text-micro">
+                              <span className="font-semibold text-warn">list price is NPR {listPrice}</span>
+                              <button
+                                type="button"
+                                onClick={() => correctAmount(o, listPrice)}
+                                disabled={busy}
+                                className="ml-2 rounded-md border border-line px-2 py-0.5 font-semibold text-ink hover:bg-surface-sunk"
+                              >
+                                Set to {listPrice}
+                              </button>
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-3 py-3 font-mono text-micro text-ink-soft">
+                          {o.walletTxnId || '—'}
+                        </td>
+                        {/* N-13. When money has not landed, the only useful next
+                            step is to ring them. Making the approver look the
+                            number up elsewhere is how a payment sits overnight
+                            while a student assumes they were robbed. The last 4
+                            they typed sits underneath, because that is what you
+                            check against the wallet ledger. */}
+                        <td className="px-3 py-3 text-micro">
+                          {o.payerPhone ? (
+                            <>
+                              <a href={`tel:${o.payerPhone}`} className="font-semibold text-ink underline underline-offset-2">
+                                {o.payerPhone}
+                              </a>
+                              {/* D-19. One tap to the student's own WhatsApp
+                                  thread, because that is where "I have paid"
+                                  was actually sent. At twenty payments a day,
+                                  hunting for the right chat by hand is the
+                                  whole job; this makes it one click, with the
+                                  transaction number already in the message so
+                                  it can be compared against their receipt
+                                  without typing anything. */}
+                              <a
+                                href={`https://wa.me/${o.payerPhone.replace(/\D/g, '')}?text=${encodeURIComponent(
+                                  `Hello, this is about your ${BRAND_NAME} payment of NPR ${o.amountNpr}. We are checking transaction number ${o.walletTxnId ?? ''}. Could you confirm this is yours?`
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="ml-2 rounded-md bg-go-tint px-2 py-0.5 font-semibold text-go-dark"
+                              >
+                                WhatsApp
+                              </a>
+                            </>
+                          ) : (
+                            <span className="text-ink-quiet">not given</span>
+                          )}
+                          {o.payerPhoneSuffix && (
+                            <span className="block text-micro text-ink-quiet">
+                              paid from ...{o.payerPhoneSuffix}
+                            </span>
+                          )}
+                          {/* Knowing the number is not the same as knowing it
+                              will reach them. If they told us it is not on
+                              WhatsApp, a message will vanish and the payment
+                              sits unapproved while they wait. Ring it. */}
+                          {o.payerPhone && o.payerPhoneWhatsappConfirmed === false && (
+                            <span className="block text-micro font-semibold text-warn">
+                              not on WhatsApp, call instead
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-3 py-3">
+                          <Status tone={stateOf(ORDER_STATE, o.state).tone}>
+                            {stateOf(ORDER_STATE, o.state).label}
+                          </Status>
+                        </td>
+                        <td className="px-5 py-3">
+                          {o.state === 'submitted' ? (
+                            <div className="flex gap-2">
+                              <Button variant="primary" size="sm"
+                                onClick={() => verify(o.id, o)}
+                                disabled={busy}
+                              >
+                                Approve
+                              </Button>
+                              <Button variant="danger" size="sm"
+                                onClick={() => reject(o.id)}
+                                disabled={busy}
+                              >
+                                Reject
+                              </Button>
+                            </div>
+                          ) : (
+                            <span className="text-micro text-ink-quiet">done</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+    );
+  const renderStudents = (list: Overview['students']) =>
+    list.length === 0 ? (
+      <p className="p-6 text-center text-sm text-ink-quiet">None.</p>
+    ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-surface-sunk text-micro font-bold uppercase tracking-[0.08em] text-ink-quiet">
+                    <tr>
+                      <th className="px-5 py-3 font-semibold">Student</th>
+                      <th className="px-3 py-3 font-semibold">Signed up</th>
+                      <th className="px-3 py-3 font-semibold">Phone</th>
+                      <th className="px-3 py-3 font-semibold">University</th>
+                      <th className="px-3 py-3 font-semibold">From</th>
+                      <th className="px-3 py-3 font-semibold">Coupon</th>
+                      <th className="px-3 py-3 font-semibold">Mocks</th>
+                      <th className="px-3 py-3 font-semibold">Paid</th>
+                      <th className="px-3 py-3 font-semibold">Status</th>
+                      <th className="px-5 py-3 font-semibold">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-line">
+                    {list.map((s) => {
+                      const d = dirById.get(s.id);
+                      return (
+                      <tr key={s.id} style={rowTint(d?.hue)}>
+                        <td className="px-5 py-3">
+                          <p className="font-semibold text-ink">{s.name || 'Unnamed'}</p>
+                          <p className="text-micro text-ink-quiet">{s.email || 'no email'}</p>
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-3 text-micro text-ink-soft">
+                          {dateTime(s.createdAt)}
+                        </td>
+                        {/* Tappable. If the only way to act on a row is to
+                            copy a number out by hand, the row is a list entry
+                            and not a tool. */}
+                        <td className="px-3 py-3 text-ink-soft">
+                          {s.phone ? (
+                            <a href={`tel:${s.phone}`} className="font-medium text-ink underline underline-offset-2">
+                              {s.phone}
+                            </a>
+                          ) : (
+                            <span className="text-ink-quiet">not given</span>
+                          )}
+                          {s.phone && s.whatsappConfirmed === false && (
+                            <span className="ml-1 block text-micro font-semibold text-ink-quiet">
+                              not checked yet
+                            </span>
+                          )}
+                          {/* N-30. THE ANTI-ABUSE SIGNAL, AND IT IS A COUNT, NOT
+                              A VERDICT. Shown, never enforced. */}
+                          {(s.accountsOnThisNumber ?? 0) > 1 && (
+                            <span className="ml-1 mt-1 inline-block rounded-full bg-warn-tint px-2 py-0.5 text-micro font-bold text-warn">
+                              {s.accountsOnThisNumber} accounts on this number
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-3 py-3 text-ink-soft">
+                          {s.targetUniversity || <span className="text-ink-quiet">not said</span>}
+                          {s.level && <span className="block text-micro capitalize text-ink-quiet">{s.level}</span>}
+                        </td>
+                        <td className="px-3 py-3 text-ink-soft">
+                          {s.consultancyId ? (
+                            <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
+                              {d?.hue !== null && d?.hue !== undefined && (
+                                <span className="inline-block h-2.5 w-2.5 rounded-full" style={swatch(d.hue)} aria-hidden />
+                              )}
+                              {s.consultancyName ?? 'Consultancy'}
+                            </span>
+                          ) : (
+                            'Direct'
+                          )}
+                          {s.attributionConsultancy && (
+                            <span className="block text-micro capitalize text-ink-quiet">
+                              named {s.attributionConsultancy}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-3 py-3 font-mono text-micro text-ink-soft">
+                          {s.couponCode ?? <span className="font-sans text-ink-quiet">none</span>}
+                        </td>
+                        {/* Used and left, from the ledger, in one glance. */}
+                        <td className="px-3 py-3 tabular-nums text-ink-soft">
+                          {d ? `${d.mocksUsed} done, ${d.mocksLeft} left` : '-'}
+                        </td>
+                        <td className="px-3 py-3 tabular-nums">
+                          {d && d.paidNpr > 0 ? (
+                            <span className="font-semibold text-go-dark">NPR {d.paidNpr.toLocaleString()}</span>
+                          ) : (
+                            <span className="text-ink-quiet">nothing</span>
+                          )}
+                        </td>
+                        <td className="px-3 py-3">
+                          <Status tone={stateOf(STUDENT_STATE, s.status).tone}>
+                            {stateOf(STUDENT_STATE, s.status).label}
+                          </Status>
+                        </td>
+                        <td className="px-5 py-3">
+                          <div className="flex flex-wrap gap-1.5">
+                            <Button variant="primary" size="sm"
+                              onClick={() => grantCredit(s.id, s.name || s.email || 'this student')}
+                              disabled={busy}
+                            >
+                              Give credit
+                            </Button>
+                            <Button variant="tertiary" size="sm"
+                              onClick={() =>
+                                setStudentStatus(s.id, s.status === 'active' ? 'disabled' : 'active')
+                              }
+                            >
+                              {s.status === 'active' ? 'Disable' : 'Enable'}
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+    );
   const pendingConsultancies = (directory?.consultancies ?? []).filter(
     (c) => c.status === 'pending'
   ).length;
@@ -1095,275 +1425,167 @@ export default function SuperAdminPage() {
             and a consultancy's rows carry that consultancy's own colour, so a
             direct student and a coupon student can never be mistaken for one
             another (the client's request of 3 Sep 2026). */}
-        {tab === 'students' && (
-          <section className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
-            <div className="border-b border-line p-5">
-              <h2 className="font-serif text-lg font-bold text-ink">Students</h2>
-              <p className="text-sm text-ink-soft">
-                Newest first. Engagement and entitlement only. Answers are never shown here.
-              </p>
-              {(directory?.consultancies ?? []).length > 0 && (
-                <div className="mt-3 flex flex-wrap items-center gap-3 text-micro text-ink-soft">
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className="inline-block h-3 w-3 rounded-sm border border-line bg-surface" aria-hidden />
-                    Direct student
-                  </span>
-                  {(directory?.consultancies ?? []).map((k) => (
-                    <span key={k.id} className="inline-flex items-center gap-1.5">
-                      <span className="inline-block h-3 w-3 rounded-sm" style={swatch(k.hue)} aria-hidden />
-                      {k.name}
-                    </span>
-                  ))}
+        {tab === 'students' && (() => {
+          const via = data.students
+            .filter((x) => x.consultancyId)
+            .slice()
+            .sort((a, b) => (a.consultancyName ?? '').localeCompare(b.consultancyName ?? ''));
+          const direct = data.students.filter((x) => !x.consultancyId);
+          const paidOf = (x: { id: string }) => dirById.get(x.id)?.paidNpr ?? 0;
+          const usedOf = (x: { id: string }) => dirById.get(x.id)?.mocksUsed ?? 0;
+          const directPaid = direct.filter((x) => paidOf(x) > 0);
+          const directTried = direct.filter((x) => paidOf(x) === 0 && usedOf(x) > 0);
+          const directIdle = direct.filter((x) => paidOf(x) === 0 && usedOf(x) === 0);
+          return (
+            <div className="space-y-6">
+              <div className="rounded-card border border-line bg-surface p-5 shadow-card">
+                <h2 className="font-serif text-lg font-bold text-ink">Students</h2>
+                <p className="text-sm text-ink-soft">
+                  Newest first in every table. Engagement and entitlement only. Answers are never shown
+                  here.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-4 text-sm">
+                  <Status tone="go">{directPaid.length} paid</Status>
+                  <Status tone="neutral">{directTried.length} took the free mock</Status>
+                  <Status tone="neutral">{directIdle.length} signed in only</Status>
+                  <Status tone="neutral">{via.length} through a consultancy</Status>
                 </div>
+              </div>
+
+              {data.students.length === 0 ? (
+                <p className="rounded-card border border-line bg-surface p-10 text-center text-ink-quiet shadow-card">
+                  No students yet. They appear the moment somebody signs in.
+                </p>
+              ) : (
+                <>
+                  <h3 className="pt-2 font-serif text-base font-bold uppercase tracking-wide text-ink-quiet">
+                    Direct students
+                  </h3>
+                  <Block title="Paid" count={directPaid.length} hint="Approved payments by QR. These are the customers.">
+                    {renderStudents(directPaid)}
+                  </Block>
+                  <Block
+                    title="Took the free mock"
+                    count={directTried.length}
+                    hint="Practised at least once and have not paid. The people to follow up."
+                  >
+                    {renderStudents(directTried)}
+                  </Block>
+                  <Block
+                    title="Signed in, nothing yet"
+                    count={directIdle.length}
+                    hint="An account and no sitting. Most never come back; some just need a nudge."
+                  >
+                    {renderStudents(directIdle)}
+                  </Block>
+
+                  <h3 className="pt-2 font-serif text-base font-bold uppercase tracking-wide text-ink-quiet">
+                    Through a consultancy
+                  </h3>
+                  <Block
+                    title="Consultancy students"
+                    count={via.length}
+                    hint="Each row is tinted in its consultancy's colour and names it."
+                  >
+                    {(directory?.consultancies ?? []).length > 0 && (
+                      <div className="flex flex-wrap items-center gap-3 border-b border-line px-5 py-3 text-micro text-ink-soft">
+                        {(directory?.consultancies ?? []).map((k) => (
+                          <span key={k.id} className="inline-flex items-center gap-1.5">
+                            <span className="inline-block h-3 w-3 rounded-sm" style={swatch(k.hue)} aria-hidden />
+                            {k.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {renderStudents(via)}
+                  </Block>
+                </>
               )}
             </div>
-            {data.students.length === 0 ? (
-              <p className="p-10 text-center text-ink-quiet">
-                No students yet. They appear the moment somebody signs in.
-              </p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead className="bg-surface-sunk text-micro font-bold uppercase tracking-[0.08em] text-ink-quiet">
-                    <tr>
-                      <th className="px-5 py-3 font-semibold">Student</th>
-                      <th className="px-3 py-3 font-semibold">Signed up</th>
-                      <th className="px-3 py-3 font-semibold">Phone</th>
-                      <th className="px-3 py-3 font-semibold">University</th>
-                      <th className="px-3 py-3 font-semibold">From</th>
-                      <th className="px-3 py-3 font-semibold">Coupon</th>
-                      <th className="px-3 py-3 font-semibold">Mocks</th>
-                      <th className="px-3 py-3 font-semibold">Status</th>
-                      <th className="px-5 py-3 font-semibold">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-line">
-                    {data.students.map((s) => {
-                      const d = directory?.students.find((x) => x.id === s.id);
-                      return (
-                      <tr key={s.id} style={rowTint(d?.hue)}>
-                        <td className="px-5 py-3">
-                          <p className="font-semibold text-ink">{s.name || 'Unnamed'}</p>
-                          <p className="text-micro text-ink-quiet">{s.email || 'no email'}</p>
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-3 text-micro text-ink-soft">
-                          {dateTime(s.createdAt)}
-                        </td>
-                        {/* Tappable. If the only way to act on a row is to
-                            copy a number out by hand, the row is a list entry
-                            and not a tool. */}
-                        <td className="px-3 py-3 text-ink-soft">
-                          {s.phone ? (
-                            <a href={`tel:${s.phone}`} className="font-medium text-ink underline underline-offset-2">
-                              {s.phone}
-                            </a>
-                          ) : (
-                            <span className="text-ink-quiet">not given</span>
-                          )}
-                          {s.phone && s.whatsappConfirmed === false && (
-                            <span className="ml-1 block text-micro font-semibold text-ink-quiet">
-                              not checked yet
-                            </span>
-                          )}
-                          {/* N-30. THE ANTI-ABUSE SIGNAL, AND IT IS A COUNT, NOT
-                              A VERDICT. Shown, never enforced. */}
-                          {(s.accountsOnThisNumber ?? 0) > 1 && (
-                            <span className="ml-1 mt-1 inline-block rounded-full bg-warn-tint px-2 py-0.5 text-micro font-bold text-warn">
-                              {s.accountsOnThisNumber} accounts on this number
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-3 py-3 text-ink-soft">
-                          {s.targetUniversity || <span className="text-ink-quiet">not said</span>}
-                          {s.level && <span className="block text-micro capitalize text-ink-quiet">{s.level}</span>}
-                        </td>
-                        <td className="px-3 py-3 text-ink-soft">
-                          {s.consultancyId ? (
-                            <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
-                              {d?.hue !== null && d?.hue !== undefined && (
-                                <span className="inline-block h-2.5 w-2.5 rounded-full" style={swatch(d.hue)} aria-hidden />
-                              )}
-                              {s.consultancyName ?? 'Consultancy'}
-                            </span>
-                          ) : (
-                            'Direct'
-                          )}
-                          {s.attributionConsultancy && (
-                            <span className="block text-micro capitalize text-ink-quiet">
-                              named {s.attributionConsultancy}
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-3 py-3 font-mono text-micro text-ink-soft">
-                          {s.couponCode ?? <span className="font-sans text-ink-quiet">none</span>}
-                        </td>
-                        {/* Used and left, from the ledger, in one glance. */}
-                        <td className="px-3 py-3 tabular-nums text-ink-soft">
-                          {d ? `${d.mocksUsed} done, ${d.mocksLeft} left` : '-'}
-                        </td>
-                        <td className="px-3 py-3">
-                          <Status tone={stateOf(STUDENT_STATE, s.status).tone}>
-                            {stateOf(STUDENT_STATE, s.status).label}
-                          </Status>
-                        </td>
-                        <td className="px-5 py-3">
-                          <div className="flex flex-wrap gap-1.5">
-                            <Button variant="primary" size="sm"
-                              onClick={() => grantCredit(s.id, s.name || s.email || 'this student')}
-                              disabled={busy}
-                            >
-                              Give credit
-                            </Button>
-                            <Button variant="tertiary" size="sm"
-                              onClick={() =>
-                                setStudentStatus(s.id, s.status === 'active' ? 'disabled' : 'active')
-                              }
-                            >
-                              {s.status === 'active' ? 'Disable' : 'Enable'}
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
-        )}
+          );
+        })()}
 
         {/* -------------------------------------------------- payments --- */}
-        {tab === 'payments' && (
-          <section className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
-            <div className="border-b border-line p-5">
-              <h2 className="font-serif text-lg font-bold text-ink">Payments</h2>
-              <p className="mb-3 text-sm text-ink-soft">
-                Check the transaction id in the receiver&apos;s own wallet ledger before approving. A
-                screenshot is evidence, never proof.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Status tone="warn">{awaiting.length} waiting for you</Status>
-                <Status tone="go">{approvedCount} approved</Status>
-                <Status tone="stop">{rejectedCount} not matched</Status>
+        {tab === 'payments' && (() => {
+          const paid = orders.filter((o) => o.state === 'verified');
+          const rejected = orders.filter((o) => o.state === 'rejected' || o.state === 'expired');
+          const unpaid = orders.filter((o) => o.state === 'created');
+          const packs = couponPacks();
+          const knownPacks = new Set(packs.map((k) => k.code));
+          const paidOther = paid.filter((o) => !knownPacks.has(o.packCode));
+          return (
+            <div className="space-y-6">
+              <div className="rounded-card border border-line bg-surface p-5 shadow-card">
+                <h2 className="font-serif text-lg font-bold text-ink">Payments</h2>
+                <p className="mb-3 text-sm text-ink-soft">
+                  Check the transaction id in the receiver&apos;s own wallet ledger before approving. A
+                  screenshot is evidence, never proof.
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  <Status tone="warn">{awaiting.length} waiting for you</Status>
+                  <Status tone="go">{approvedCount} approved</Status>
+                  <Status tone="stop">{rejectedCount} not matched</Status>
+                </div>
               </div>
+
+              {orders.length === 0 ? (
+                <p className="rounded-card border border-line bg-surface p-10 text-center text-ink-quiet shadow-card">
+                  No payments yet.
+                </p>
+              ) : (
+                <>
+                  {awaiting.length > 0 && (
+                    <Block title="Waiting for you" count={awaiting.length} hint="A screenshot has been sent. Check the ledger, then approve or reject.">
+                      {renderOrders(awaiting)}
+                    </Block>
+                  )}
+
+                  <h3 className="pt-2 font-serif text-base font-bold uppercase tracking-wide text-ink-quiet">
+                    Paid
+                  </h3>
+                  {packs.map((k) => (
+                    <Block
+                      key={k.code}
+                      title={`${k.name}, NPR ${k.retailNpr.toLocaleString()}`}
+                      count={paid.filter((o) => o.packCode === k.code).length}
+                      hint="Approved. Genuine, checked payments only."
+                    >
+                      {renderOrders(paid.filter((o) => o.packCode === k.code), getPlan(k.code)?.priceNpr)}
+                    </Block>
+                  ))}
+                  {paidOther.length > 0 && (
+                    <Block title="Other packs" count={paidOther.length}>
+                      {renderOrders(paidOther)}
+                    </Block>
+                  )}
+
+                  <h3 className="pt-2 font-serif text-base font-bold uppercase tracking-wide text-ink-quiet">
+                    Not genuine
+                  </h3>
+                  <Block
+                    title="Rejected or expired"
+                    count={rejected.length}
+                    hint="Kept for the record. Nothing here needs you."
+                  >
+                    {renderOrders(rejected)}
+                  </Block>
+
+                  <details className="rounded-card border border-line bg-surface shadow-card">
+                    <summary className="cursor-pointer px-5 py-4 font-serif text-lg font-bold text-ink">
+                      Started checkout, never paid
+                      <span className="ml-2 text-sm font-normal text-ink-quiet">{unpaid.length}</span>
+                    </summary>
+                    <p className="border-t border-line px-5 py-3 text-sm text-ink-soft">
+                      They reached the payment page and sent nothing. Not a payment, only interest; the
+                      phone number is why this list exists.
+                    </p>
+                    {renderOrders(unpaid)}
+                  </details>
+                </>
+              )}
             </div>
-            {orders.length === 0 ? (
-              <p className="p-10 text-center text-ink-quiet">No payments yet.</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead className="bg-surface-sunk text-micro font-bold uppercase tracking-[0.08em] text-ink-quiet">
-                    <tr>
-                      <th className="px-5 py-3 font-semibold">When</th>
-                      <th className="px-3 py-3 font-semibold">Student</th>
-                      <th className="px-3 py-3 font-semibold">Pack</th>
-                      <th className="px-3 py-3 font-semibold">Amount</th>
-                      <th className="px-3 py-3 font-semibold">Transaction id</th>
-                      <th className="px-3 py-3 font-semibold">Phone</th>
-                      <th className="px-3 py-3 font-semibold">State</th>
-                      <th className="px-5 py-3 font-semibold">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-line">
-                    {orders.map((o) => (
-                      <tr key={o.id}>
-                        {/* Newest first, with the date on every row: who
-                            paid today, yesterday, this month, at a glance. */}
-                        <td className="whitespace-nowrap px-5 py-3 text-micro text-ink-soft">
-                          {dateTime(o.createdAt)}
-                        </td>
-                        <td className="px-3 py-3">
-                          <p className="font-semibold text-ink">{o.studentName || 'Unnamed'}</p>
-                          <p className="text-micro text-ink-quiet">{o.payerName || o.studentEmail || ''}</p>
-                        </td>
-                        <td className="px-3 py-3 uppercase text-ink-soft">{o.packCode}</td>
-                        <td className="px-3 py-3 tabular-nums">NPR {o.amountNpr.toLocaleString()}</td>
-                        <td className="px-3 py-3 font-mono text-micro text-ink-soft">
-                          {o.walletTxnId || '—'}
-                        </td>
-                        {/* N-13. When money has not landed, the only useful next
-                            step is to ring them. Making the approver look the
-                            number up elsewhere is how a payment sits overnight
-                            while a student assumes they were robbed. The last 4
-                            they typed sits underneath, because that is what you
-                            check against the wallet ledger. */}
-                        <td className="px-3 py-3 text-micro">
-                          {o.payerPhone ? (
-                            <>
-                              <a href={`tel:${o.payerPhone}`} className="font-semibold text-ink underline underline-offset-2">
-                                {o.payerPhone}
-                              </a>
-                              {/* D-19. One tap to the student's own WhatsApp
-                                  thread, because that is where "I have paid"
-                                  was actually sent. At twenty payments a day,
-                                  hunting for the right chat by hand is the
-                                  whole job; this makes it one click, with the
-                                  transaction number already in the message so
-                                  it can be compared against their receipt
-                                  without typing anything. */}
-                              <a
-                                href={`https://wa.me/${o.payerPhone.replace(/\D/g, '')}?text=${encodeURIComponent(
-                                  `Hello, this is about your ${BRAND_NAME} payment of NPR ${o.amountNpr}. We are checking transaction number ${o.walletTxnId ?? ''}. Could you confirm this is yours?`
-                                )}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="ml-2 rounded-md bg-go-tint px-2 py-0.5 font-semibold text-go-dark"
-                              >
-                                WhatsApp
-                              </a>
-                            </>
-                          ) : (
-                            <span className="text-ink-quiet">not given</span>
-                          )}
-                          {o.payerPhoneSuffix && (
-                            <span className="block text-micro text-ink-quiet">
-                              paid from ...{o.payerPhoneSuffix}
-                            </span>
-                          )}
-                          {/* Knowing the number is not the same as knowing it
-                              will reach them. If they told us it is not on
-                              WhatsApp, a message will vanish and the payment
-                              sits unapproved while they wait. Ring it. */}
-                          {o.payerPhone && o.payerPhoneWhatsappConfirmed === false && (
-                            <span className="block text-micro font-semibold text-warn">
-                              not on WhatsApp, call instead
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-3 py-3">
-                          <Status tone={stateOf(ORDER_STATE, o.state).tone}>
-                            {stateOf(ORDER_STATE, o.state).label}
-                          </Status>
-                        </td>
-                        <td className="px-5 py-3">
-                          {o.state === 'submitted' ? (
-                            <div className="flex gap-2">
-                              <Button variant="primary" size="sm"
-                                onClick={() => verify(o.id, o)}
-                                disabled={busy}
-                              >
-                                Approve
-                              </Button>
-                              <Button variant="danger" size="sm"
-                                onClick={() => reject(o.id)}
-                                disabled={busy}
-                              >
-                                Reject
-                              </Button>
-                            </div>
-                          ) : (
-                            <span className="text-micro text-ink-quiet">done</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
-        )}
+          );
+        })()}
 
         {/* -------------------------------------------- consultancies ---
             THE COUPON MODEL (3 Sep 2026). The super admin enters who, how many

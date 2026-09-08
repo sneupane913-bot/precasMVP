@@ -163,6 +163,7 @@ export interface ApprovalAudit {
   action:
     | 'approve_payment'
     | 'reject_payment'
+    | 'correct_amount'
     | 'create_consultancy'
     | 'set_allowlisted_ips'
     | 'approve_consultancy'

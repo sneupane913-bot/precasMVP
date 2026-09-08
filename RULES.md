@@ -200,6 +200,7 @@ pricing page. Every row below is driven end to end by `qa/coupon-check.js`.
 | CP-14 | Every field on `Student` and `Coupon` has a Postgres column and is read and written by the Supabase mapping. Broken if the live site accepts a value and silently loses it | **BUILT + PROVEN** | schema-check |
 | CP-15 | Students, payments and coupons are listed newest first, with the date on the row | **BUILT + PROVEN** | coupon C-16b, C-16c, C-21b |
 | CP-16 | Any consultancy can be deleted by the super admin after typing its short name back: the consultancy, every coupon (used or not) and its recorded money go, so nothing of it remains in revenue or the directory. A student who came through it is kept, unbound, as a direct student. Built for the owner's trial consultancies (client decision, 8 Sep 2026; before that a used consultancy was refused) | **BUILT + PROVEN** | coupon C-28 to C-28e |
+| CP-17 | The super admin can correct the recorded amount of an APPROVED payment (list price moved after the student paid the real price in cash). Reason mandatory; old and new amounts in the audit trail as `correct_amount`. Never on a pending or rejected order | **BUILT + PROVEN** | reachable-check (setOrderAmount called from /super), backoffice-ui-check |
 | CP-17 | A university is picked from the catalogue or, if typed, must look like a word a person wrote. "shdjkas" is refused; "Glyndwr University" is not. Blank is still allowed | **BUILT + PROVEN** | coupon C-29 to C-29c |
 
 ---
