@@ -20,6 +20,9 @@ import { sttIsMocked } from '@/lib/ai/stt';
 import { evaluatorIsMocked } from '@/lib/ai/evaluate';
 import { spendState, maxPaidCallsPerMonth } from '@/lib/rate-limit';
 import { BUILD_INFO } from '@/lib/build-info';
+import { debriefs } from '@/lib/debriefs';
+import { DEBRIEF_RULES } from '@/lib/debrief-rules';
+import { getInstitution } from '@/lib/data/institutions';
 
 export const runtime = 'nodejs';
 
@@ -69,6 +72,15 @@ const Body = z.discriminatedUnion('action', [
    * answers the phone about it. No deploy, and no consultancy involvement.
    */
   /** N-25. Add a question to the live bank, no deploy. */
+  /** The debrief queue (lib/debriefs.ts): read, then approve with a grant or reject with a reason. */
+  z.object({ action: z.literal('debriefs'), superKey: z.string().min(1) }),
+  z.object({
+    action: z.literal('reviewDebrief'),
+    superKey: z.string().min(1),
+    id: z.string().min(1),
+    approve: z.boolean(),
+    note: z.string().trim().max(300).optional().default(''),
+  }),
   z.object({
     action: z.literal('addQuestion'),
     superKey: z.string().min(1),
@@ -620,6 +632,49 @@ export async function POST(req: Request) {
         couponPacks: couponPacks(),
       },
     });
+  }
+
+  if (body.action === 'debriefs') {
+    const all = await debriefs.listAll();
+    const students = await r.listStudents();
+    const byId = new Map(students.map((x) => [x.id, x]));
+    return NextResponse.json({
+      ok: true,
+      data: {
+        debriefs: all.map((d) => {
+          const st = byId.get(d.studentId);
+          return {
+            ...d,
+            studentName: st?.name ?? null,
+            whatsapp: st?.whatsappNumber ?? null,
+            institutionName: d.institutionId ? getInstitution(d.institutionId)?.name ?? null : null,
+          };
+        }),
+      },
+    });
+  }
+
+  if (body.action === 'reviewDebrief') {
+    const d = await debriefs.get(body.id);
+    if (!d) return NextResponse.json(apiError('NOT_FOUND', 'no such debrief', 'That debrief no longer exists.'), { status: 404 });
+    if (d.status !== 'pending') {
+      return NextResponse.json(apiError('ALREADY_REVIEWED', 'reviewed', 'This debrief was already reviewed.'), { status: 409 });
+    }
+    const status = body.approve ? 'approved' : 'rejected';
+    await debriefs.update(d.id, { status, reviewNote: body.note || null, reviewedAt: new Date().toISOString() });
+    if (body.approve) {
+      await adminGrant(d.studentId, 'mock', DEBRIEF_RULES.rewardMocks, `debrief:${d.id}`);
+    }
+    await audit({
+      actorRole: 'super_admin',
+      actorId: 'super_admin',
+      action: body.approve ? 'approve_debrief' : 'reject_debrief',
+      subjectId: d.studentId,
+      before: 'pending',
+      after: status,
+      note: `${d.universityName} ${d.interviewDate}${body.note ? `: ${body.note}` : ''}`.slice(0, 120),
+    });
+    return NextResponse.json({ ok: true, data: { id: d.id, status } });
   }
 
   if (body.action === 'addQuestion') {

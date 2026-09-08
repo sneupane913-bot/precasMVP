@@ -41,6 +41,7 @@ export function SiteFooterView({ whatsappDigits = '' }: { whatsappDigits?: strin
         { label: 'Choose your university', href: '/universities' },
         { label: 'Practise one question', href: '/practice' },
         { label: 'Pricing', href: '/pricing' },
+        { label: 'Get a free mock', href: '/free-mock' },
         { label: 'Start free', href: '/start' },
         // WALK 1.16. On a shared consultancy machine this is the most important
         // link on the page, and it is here rather than only in the header
