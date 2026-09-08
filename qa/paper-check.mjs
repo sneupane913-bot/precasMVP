@@ -174,17 +174,17 @@ console.log('\n=== LIKELIHOOD, WITH ITS EVIDENCE ===\n');
     const evidenced = new Set(q.eligiblePoolFor(i.id).map((x) => x.id));
     const plan = q.buildQuestionPlan(FULL, { institutionId: i.id });
     for (const id of plan) {
-      const pq = q.publicQuestion(q.getQuestion(id), i);
-      if (!pq.likelihood) { missing = missing ?? `${i.name}: ${id} has no likelihood`; continue; }
-      if (!/^https?:\/\//.test(pq.likelihood.sourceUrl) || !pq.likelihood.reason) badUrl = badUrl ?? `${i.name}: ${id} likelihood without a URL or reason`;
+      const lk = evidence.likelihoodFor(q.getQuestion(id), i);
+      if (!lk) { missing = missing ?? `${i.name}: ${id} has no likelihood`; continue; }
+      if (!/^https?:\/\//.test(lk.sourceUrl) || !lk.reason) badUrl = badUrl ?? `${i.name}: ${id} likelihood without a URL or reason`;
       // A first sitting must not reach for general evidence while the
       // university's own evidenced pool is deep enough to fill it.
       const cat = q.getQuestion(id).category;
       const evidencedInCat = [...evidenced].filter((x) => q.getQuestion(x).category === cat && Boolean(q.getQuestion(x).isProbe) === Boolean(q.getQuestion(id).isProbe)).length;
-      if (pq.likelihood.level === 'general' && evidencedInCat >= 3) tooEarly = tooEarly ?? `${i.name}: ${id} (${cat}) is general although ${evidencedInCat} evidenced ${cat} questions exist`;
+      if (lk.level === 'general' && evidencedInCat >= 3) tooEarly = tooEarly ?? `${i.name}: ${id} (${cat}) is general although ${evidencedInCat} evidenced ${cat} questions exist`;
     }
   }
-  t('Q-14', 'Every question in every university\'s paper carries a likelihood level, a reason and a source URL',
+  t('Q-14', 'Every question in every university\'s paper has, on the server, a likelihood level, a reason and a source URL',
     missing === null && badUrl === null, missing ?? badUrl ?? `${ALL.length} papers checked`);
   t('Q-14b', 'A first sitting never uses general UK evidence while questions with evidence naming the university remain in that theme',
     tooEarly === null, tooEarly ?? 'evidenced questions are always drawn first');
@@ -210,17 +210,26 @@ console.log('\n=== LIKELIHOOD, WITH ITS EVIDENCE ===\n');
     /Coventry/.test(summary.line) && summary.official >= 1, summary.line);
 }
 
-console.log('\n=== SURFACES ===\n');
+console.log('\n=== SURFACES: PRIVATE, NOT PUBLIC (Q-14b, client decision 8 Sep 2026) ===\n');
 {
   const room = readFileSync(join(root, 'components/InterviewRoom.tsx'), 'utf8');
   const results = readFileSync(join(root, 'app/(student)/results/[sessionId]/page.tsx'), 'utf8');
   const unis = readFileSync(join(root, 'app/(student)/universities/page.tsx'), 'utf8');
-  const evPage = join(root, 'app/(student)/universities/[slug]/evidence/page.tsx');
-  t('Q-14g', 'The interview room shows the likelihood under the question', /question\.likelihood/.test(room) && /LIKELIHOOD_LABEL/.test(room), 'InterviewRoom reads question.likelihood');
-  t('Q-14h', 'The report shows it per question with a link to the source', /likelihoodFor\(base, institution\)/.test(results) && /sourceUrl/.test(results), 'results page links each question to its source');
-  t('Q-14i', 'Every university card states its evidence and links to the evidence page',
-    /evidenceSummary\(i\)\.line/.test(unis) && /\/universities\/\$\{i\.slug\}\/evidence/.test(unis), 'card line and link present');
-  t('Q-14j', 'The evidence page exists', (() => { try { readFileSync(evPage); return true; } catch { return false; } })(), evPage.replace(root, ''));
+  const superPage = readFileSync(join(root, 'app/super/page.tsx'), 'utf8');
+  const superApi = readFileSync(join(root, 'app/api/super/route.ts'), 'utf8');
+  const cov = inst.getInstitution('inst-coventry');
+  const pq = q.publicQuestion(q.getQuestion('q-09'), cov);
+  t('Q-14b', 'Nothing the browser receives for a question carries a likelihood, a reason or a source',
+    !('likelihood' in pq) && !JSON.stringify(pq).includes('sourceUrl'), 'publicQuestion() has no likelihood field');
+  t('Q-14g', 'The interview room shows no likelihood or source', !/likelihood|LIKELIHOOD/.test(room), 'InterviewRoom has no evidence surface');
+  t('Q-14h', 'The report shows no likelihood or source', !/likelihoodFor|sourceUrl|LIKELIHOOD/.test(results), 'results page has no evidence surface');
+  t('Q-14i', 'University cards carry no evidence line or link', !/evidenceSummary|\/evidence/.test(unis), 'no card line, no link');
+  let publicRoute = false;
+  try { readFileSync(join(root, 'app/(student)/universities/[slug]/evidence/page.tsx')); publicRoute = true; } catch {}
+  t('Q-14j', 'There is no public evidence page', !publicRoute, 'route removed');
+  t('Q-14k', 'The evidence is not readable anywhere in the product, back office included',
+    !/action === 'evidence'/.test(superApi) && !/EvidencePanel|tab === 'evidence'/.test(superPage),
+    'no /api/super action, no /super tab; the research lives in docs/research and lib/data only');
 }
 
 console.log(`\n${pass} passed, ${fail} failed\n`);

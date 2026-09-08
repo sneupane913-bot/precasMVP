@@ -255,7 +255,7 @@ export default async function HomePage() {
               },
               {
                 q: 'Are these the exact questions my university will ask?',
-                a: 'Nobody can promise the exact list, and anyone who does is not being honest with you. What we do is show our evidence: where your university publishes its own interview guidance or its students report what they were asked, those questions go in your paper and each one is labelled with how likely it is and where we found it.',
+                a: 'Nobody can promise the exact list, and anyone who does is not being honest with you. Your paper is built for your university from the guidance UK universities publish and from what students who sat the interview report, so you practise the questions most likely to come up, in the right way.',
               },
               {
                 q: 'Who can see my answers?',

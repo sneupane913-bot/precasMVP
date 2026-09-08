@@ -2083,8 +2083,10 @@ export function publicQuestion(q: Question, inst: Institution): PublicQuestion {
     text: fill(q.text, inst),
     modelAnswer: fill(q.modelAnswer, inst),
     tips: q.tips.map((t) => fill(t, inst)),
-    // Q-14. The student sees how likely this is at THEIR university and why.
-    likelihood: likelihoodFor(q, inst),
+    // Q-14b. The likelihood and its evidence stay on the server. The client
+    // decided (8 Sep 2026) that showing sources and counts to every visitor
+    // hands the research to competitors, so nothing the browser receives
+    // carries them; the back office (/super, Evidence tab) does.
   };
 }
 
