@@ -1,6 +1,7 @@
 import { repo, type PaymentOrder, type ApprovalAudit } from '@/lib/db';
 import { grantPack, rewardReferral } from '@/lib/entitlement';
 import { activeOfferFor, consumeOffer } from '@/lib/rewards';
+import { getPlan } from '@/lib/data/plans';
 
 /**
  * Approving and rejecting a payment, in ONE place.
@@ -157,4 +158,139 @@ export async function rejectPayment(
   }
 
   return { ok: true };
+}
+
+/**
+ * A PAYMENT THAT NEVER TOUCHED THE CHECKOUT (11 September 2026).
+ *
+ * Two students paid by a QR code sent on WhatsApp, never opened the pricing
+ * page, and never answered a call. Real money, and the dashboard said four
+ * paying students while the client knew it was six. The only tool he had was
+ * "Give credit", which writes a ledger line and nothing else, so the credits
+ * would have arrived and the revenue would still have been wrong, and the
+ * audit trail would have called a paying customer a free grant.
+ *
+ * So this writes the payment where every payment lives: an order, already
+ * verified, with the amount actually received, the date it was received, and
+ * a transaction id that says on its face that a person typed it in
+ * ("manual-20260911-3f2a9c1b"). The pack is granted through grantPack(), the
+ * same path an approval uses, so the ledger, the referral reward and the
+ * consultancy notification all behave exactly as they would for a QR payment
+ * approved in the queue. Revenue, the paid list and the student's "Paid"
+ * column read orders, so all three move at once.
+ *
+ * What it does NOT do: it does not invent a student. The student must exist,
+ * because an order belongs to a student (the Postgres schema enforces it) and
+ * because a payment with nobody to give the pack to is a note, not a payment.
+ *
+ * Double-submit guard: the same student, pack, amount and date recorded twice
+ * within a few minutes is one payment clicked twice, not two payments. The
+ * second call returns the first order and says so, and grants nothing.
+ */
+export interface RecordPaymentInput {
+  studentId: string;
+  packCode: string;
+  amountNpr: number;
+  /** YYYY-MM-DD, the day the money arrived. Defaults to today. */
+  paidOn?: string | null;
+  note: string;
+}
+
+const DUPLICATE_WINDOW_MS = 5 * 60_000;
+
+export async function recordOfflinePayment(
+  input: RecordPaymentInput,
+  actor: Actor
+): Promise<
+  | { ok: true; orderId: string; duplicate: boolean; granted: { mocks: number; practice: number } }
+  | { ok: false; code: string; userMessage: string }
+> {
+  const r = repo();
+  const student = await r.getStudent(input.studentId);
+  if (!student) {
+    return { ok: false, code: 'NOT_FOUND', userMessage: 'That student is not in the directory.' };
+  }
+  const plan = getPlan(input.packCode);
+  if (!plan || plan.priceNpr <= 0) {
+    return { ok: false, code: 'BAD_PACK', userMessage: 'Pick a pack that is actually sold.' };
+  }
+  const amount = Math.round(input.amountNpr);
+  if (!Number.isFinite(amount) || amount < 1) {
+    return { ok: false, code: 'BAD_AMOUNT', userMessage: 'Type the amount that was actually received.' };
+  }
+  const day = /^\d{4}-\d{2}-\d{2}$/.test(input.paidOn ?? '')
+    ? (input.paidOn as string)
+    : new Date().toISOString().slice(0, 10);
+  const paidAt = new Date(`${day}T12:00:00.000Z`);
+  if (Number.isNaN(paidAt.getTime()) || paidAt.getTime() > Date.now() + 24 * 3_600_000) {
+    return { ok: false, code: 'BAD_DATE', userMessage: 'That date is not a day the money could have arrived.' };
+  }
+
+  // One payment clicked twice is still one payment.
+  const recent = (await r.listOrders({ studentId: student.id })).find(
+    (o) =>
+      o.state === 'verified' &&
+      (o.walletTxnId ?? '').startsWith('manual-') &&
+      o.packCode === plan.code &&
+      o.amountNpr === amount &&
+      o.createdAt.slice(0, 10) === day &&
+      o.verifiedAt !== null &&
+      Date.now() - new Date(o.verifiedAt).getTime() < DUPLICATE_WINDOW_MS
+  );
+  if (recent) {
+    return { ok: true, orderId: recent.id, duplicate: true, granted: { mocks: 0, practice: 0 } };
+  }
+
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+  const order: PaymentOrder = {
+    id,
+    studentId: student.id,
+    consultancyId: student.consultancyId ?? null,
+    packCode: plan.code,
+    amountNpr: amount,
+    walletTxnId: `manual-${day.replace(/-/g, '')}-${id.slice(0, 8)}`,
+    payerName: student.name ?? null,
+    payerPhoneSuffix: student.whatsappNumber ? student.whatsappNumber.replace(/\D/g, '').slice(-4) || null : null,
+    screenshotUrl: null,
+    state: 'verified',
+    verifiedBy: actor.id,
+    verifiedAt: now,
+    rejectedReason: null,
+    allocatedAt: null,
+    createdAt: paidAt.toISOString(),
+    expiresAt: paidAt.toISOString(),
+  };
+  await r.createOrder(order);
+
+  const granted = await grantPack(student.id, plan.code, order.id);
+  await r.updateOrder(order.id, { allocatedAt: new Date().toISOString() });
+
+  let referral: unknown = { rewarded: false, why: 'no referrer' };
+  if (student.referredByCode) {
+    const referrer = await r.getStudentByReferralCode(student.referredByCode);
+    if (referrer) referral = await rewardReferral(referrer.id, student.id);
+  }
+
+  await audit({
+    actorRole: actor.role,
+    actorId: actor.id,
+    action: 'record_payment',
+    subjectId: order.id,
+    before: null,
+    after: 'verified',
+    note: `Recorded by hand, outside the checkout: NPR ${amount} for ${plan.name}, received ${day}. ${input.note.trim()} (by ${actor.label}, ${order.walletTxnId})`,
+  });
+
+  if (order.consultancyId) {
+    await r.addNotification({
+      id: crypto.randomUUID(),
+      consultancyId: order.consultancyId,
+      message: `We recorded a payment of NPR ${amount.toLocaleString()} for one of your students. Their credits have been added.`,
+      createdAt: now,
+      readAt: null,
+    });
+  }
+  void referral;
+  return { ok: true, orderId: order.id, duplicate: false, granted: { mocks: granted.mocks, practice: granted.practice } };
 }

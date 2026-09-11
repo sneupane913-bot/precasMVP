@@ -172,6 +172,13 @@ export interface ApprovalAudit {
     /** A super admin adding credit by hand. Its own act, its own name. */
     | 'grant_credit'
     /**
+     * A payment that never went through the checkout (QR sent on WhatsApp,
+     * cash in the office), written into the payment system by the super admin
+     * so revenue counts it. The pack is granted through the same path an
+     * approval uses. 11 September 2026.
+     */
+    | 'record_payment'
+    /**
      * Somebody chose their own passcode. The passcode itself is NEVER written
      * here, only that it changed and who changed it. An audit trail that
      * records secrets is a second copy of the secret.

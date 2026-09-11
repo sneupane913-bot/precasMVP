@@ -13,7 +13,7 @@ import {
   clientIp,
   LIMITS as RL,
 } from '@/lib/rate-limit';
-import { approvePayment, rejectPayment } from '@/lib/payments';
+import { approvePayment, rejectPayment, recordOfflinePayment } from '@/lib/payments';
 import { apiError } from '@/lib/types';
 import { setPostTrialRule, rulesOrDefaults } from '@/lib/rewards';
 import { sttIsMocked } from '@/lib/ai/stt';
@@ -66,6 +66,17 @@ const Body = z.discriminatedUnion('action', [
     superKey: z.string().min(1),
     studentId: z.string().min(1),
     status: z.enum(['active', 'disabled']),
+  }),
+  z.object({
+    action: z.literal('recordPayment'),
+    superKey: z.string().min(1),
+    studentId: z.string().min(1),
+    packCode: z.string().min(1),
+    amountNpr: z.number().int().min(1).max(100_000),
+    paidOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+    note: z.string().trim().min(3, 'Say how the money arrived, in a few words.').max(200),
+    /** The person asserts they have SEEN the money, same as an approval. */
+    confirmedReceived: z.literal(true),
   }),
   z.object({
     action: z.literal('grantCredit'),
@@ -968,6 +979,37 @@ export async function POST(req: Request) {
       note: null,
     });
     return NextResponse.json({ ok: true, data: { status: body.status } });
+  }
+
+  // A payment made outside the checkout (QR on WhatsApp, cash). Written as a
+  // verified order so revenue and the paid list count it; see lib/payments.ts.
+  if (body.action === 'recordPayment') {
+    const res = await recordOfflinePayment(
+      {
+        studentId: body.studentId,
+        packCode: body.packCode,
+        amountNpr: body.amountNpr,
+        paidOn: body.paidOn ?? null,
+        note: body.note,
+      },
+      { role: 'super_admin', id: 'super_admin', label: 'super admin' }
+    );
+    if (!res.ok) {
+      return NextResponse.json(apiError(res.code, res.code, res.userMessage), {
+        status: res.code === 'NOT_FOUND' ? 404 : 400,
+      });
+    }
+    return NextResponse.json({
+      ok: true,
+      data: {
+        orderId: res.orderId,
+        duplicate: res.duplicate,
+        granted: res.granted,
+        message: res.duplicate
+          ? 'That payment was already recorded a moment ago. Nothing was added twice.'
+          : 'Payment recorded and the pack was added to that student.',
+      },
+    });
   }
 
   if (body.action === 'grantCredit') {

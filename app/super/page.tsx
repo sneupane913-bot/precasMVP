@@ -4,9 +4,9 @@ import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { PasscodeInput } from '@/components/PasscodeInput';
 import { PaySettingsForm, type PaySettings } from '@/components/PaySettingsForm';
 import { PasscodeChangeForm } from '@/components/PasscodeChangeForm';
-import { Card, Button, Banner, Status, Pill, type Tone } from '@/components/ui';
+import { Card, Button, Banner, Status, Pill, SearchField, Field as LabelledField, Input, Select, type Tone } from '@/components/ui';
 import { BRAND_NAME } from '@/lib/branding';
-import { couponPacks, couponOrderTotal, getPlan } from '@/lib/data/plans';
+import { couponPacks, couponOrderTotal, getPlan, publicPlans } from '@/lib/data/plans';
 
 /**
  * Super admin, rebuilt to docs/design-reference/super_admin_dashboard.
@@ -280,6 +280,30 @@ function swatch(hue: number): React.CSSProperties {
  * now several small tables, each answering one question, and this is the
  * frame each of them sits in.
  */
+/**
+ * ONE SEARCH BOX OVER PEOPLE AND PAYMENTS (11 September 2026).
+ *
+ * The client's ask: "search the name of the student or the phone number".
+ * Words match anywhere in a name, email, university or consultancy; digits
+ * match anywhere in a phone number, so "9841" finds a number typed with or
+ * without +977 and spaces. Case and punctuation do not matter. Empty shows
+ * everything.
+ */
+function textMatches(query: string, ...fields: (string | null | undefined)[]): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  const digits = q.replace(/\D/g, '');
+  return fields.some((f) => {
+    if (!f) return false;
+    const v = f.toLowerCase();
+    if (v.includes(q)) return true;
+    return digits.length >= 3 && v.replace(/\D/g, '').includes(digits);
+  });
+}
+
+const PAID_PLANS = publicPlans();
+const todayIso = () => new Date().toISOString().slice(0, 10);
+
 function Block({
   title,
   hint,
@@ -412,6 +436,18 @@ export default function SuperAdminPage() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  /** The search boxes on Students and Payments; the row links set them. */
+  const [studentQuery, setStudentQuery] = useState('');
+  const [paymentQuery, setPaymentQuery] = useState('');
+  /** The "Record a payment" form: a payment that never went through checkout. */
+  const [rec, setRec] = useState({
+    studentQuery: '',
+    studentId: '',
+    packCode: PAID_PLANS[0]?.code ?? 'prep',
+    amount: String(PAID_PLANS[0]?.priceNpr ?? ''),
+    paidOn: todayIso(),
+    note: 'Paid by QR sent on WhatsApp',
+  });
 
   const call = useCallback(
     async (body: Record<string, unknown>): Promise<unknown | null> => {
@@ -708,6 +744,68 @@ export default function SuperAdminPage() {
     }
   }
 
+  /**
+   * A payment made outside the checkout, written into the payment system.
+   * Same standard as Approve: the person asserts they have SEEN the money.
+   */
+  async function recordPayment() {
+    const student = dirById.get(rec.studentId);
+    const plan = getPlan(rec.packCode);
+    if (!student) {
+      setError('Pick the student first. Type a name or phone number to find them.');
+      return;
+    }
+    if (!plan) {
+      setError('Pick a pack.');
+      return;
+    }
+    const amount = Number(rec.amount.replace(/[^\d]/g, ''));
+    if (!amount) {
+      setError('Type the amount that was actually received.');
+      return;
+    }
+    if (rec.note.trim().length < 3) {
+      setError('Say how the money arrived, in a few words. It goes in the audit trail.');
+      return;
+    }
+    const who = student.name || student.email || student.whatsappNumber || 'this student';
+    if (
+      !window.confirm(
+        `Record NPR ${amount.toLocaleString()} from ${who} for ${plan.name}, received ${rec.paidOn}?\n\n` +
+          'This adds the pack to the student immediately and counts in revenue. ' +
+          'Only do this if you have SEEN the money arrive in our wallet.'
+      )
+    )
+      return;
+    const res = (await call({
+      action: 'recordPayment',
+      studentId: student.id,
+      packCode: plan.code,
+      amountNpr: amount,
+      paidOn: rec.paidOn,
+      note: rec.note.trim(),
+      confirmedReceived: true,
+    })) as { message: string; duplicate: boolean } | null;
+    if (res) {
+      await loadAll();
+      setNotice(res.message);
+      setRec((r) => ({ ...r, studentId: '', studentQuery: '' }));
+      setPaymentQuery(student.whatsappNumber || student.name || student.email || '');
+    }
+  }
+
+  /** From a payment row to that student's full details, and back. */
+  function showStudent(o: Order) {
+    setStudentQuery(o.payerPhone || o.studentName || o.studentEmail || o.studentId);
+    setTab('students');
+    window.scrollTo({ top: 0 });
+  }
+  function showPayments(s: { phone: string | null; name: string | null; email: string | null }) {
+    setPaymentQuery(s.phone || s.name || s.email || '');
+    setTab('payments');
+    window.scrollTo({ top: 0 });
+  }
+
   async function grantCredit(studentId: string, name: string) {
     const kind = window.prompt(`Give ${name} credit.\n\nType "mock" or "practice".`, 'mock');
     if (!kind || (kind !== 'mock' && kind !== 'practice')) return;
@@ -950,8 +1048,31 @@ export default function SuperAdminPage() {
                           {dateTime(o.createdAt)}
                         </td>
                         <td className="px-3 py-3">
-                          <p className="font-semibold text-ink">{o.studentName || 'Unnamed'}</p>
+                          {/* The payment and the person are one record to the
+                              client: "if a student pays, I just want to check
+                              what are the details of the student". So the
+                              name opens their row, and the two facts he
+                              checks first sit right here. */}
+                          <button
+                            type="button"
+                            onClick={() => showStudent(o)}
+                            className="text-left font-semibold text-ink underline decoration-line underline-offset-4 hover:decoration-ink"
+                            title="Open this student's details"
+                          >
+                            {o.studentName || 'Unnamed'}
+                          </button>
                           <p className="text-micro text-ink-quiet">{o.payerName || o.studentEmail || ''}</p>
+                          {(() => {
+                            const d = dirById.get(o.studentId);
+                            if (!d) return null;
+                            return (
+                              <p className="mt-0.5 text-micro text-ink-soft">
+                                {d.targetUniversity || 'university not said'}
+                                {d.level ? <span className="capitalize"> · {d.level}</span> : null}
+                                {d.consultancyName ? <span> · via {d.consultancyName}</span> : null}
+                              </p>
+                            );
+                          })()}
                         </td>
                         <td className="px-3 py-3 uppercase text-ink-soft">{o.packCode}</td>
                         <td className="px-3 py-3 tabular-nums">
@@ -960,7 +1081,13 @@ export default function SuperAdminPage() {
                               some students had paid the real price in cash, so
                               an approved row can disagree with the pack's price.
                               Say so, and offer the one-click correction. */}
-                          {o.state === 'verified' && listPrice !== undefined && o.amountNpr !== listPrice && (
+                          {/* Not for a hand-recorded payment: the amount typed
+                              there IS what arrived, and "Set to 499" on a
+                              genuine NPR 300 would invent revenue. */}
+                          {o.state === 'verified' &&
+                            listPrice !== undefined &&
+                            o.amountNpr !== listPrice &&
+                            !(o.walletTxnId ?? '').startsWith('manual-') && (
                             <span className="mt-1 block text-micro">
                               <span className="font-semibold text-warn">list price is NPR {listPrice}</span>
                               <button
@@ -976,6 +1103,9 @@ export default function SuperAdminPage() {
                         </td>
                         <td className="px-3 py-3 font-mono text-micro text-ink-soft">
                           {o.walletTxnId || '—'}
+                          {(o.walletTxnId ?? '').startsWith('manual-') && (
+                            <span className="block font-sans text-ink-quiet">recorded by hand, outside the checkout</span>
+                          )}
                         </td>
                         {/* N-13. When money has not landed, the only useful next
                             step is to ring them. Making the approver look the
@@ -1143,7 +1273,14 @@ export default function SuperAdminPage() {
                         </td>
                         <td className="px-3 py-3 tabular-nums">
                           {d && d.paidNpr > 0 ? (
-                            <span className="font-semibold text-go-dark">NPR {d.paidNpr.toLocaleString()}</span>
+                            <button
+                              type="button"
+                              onClick={() => showPayments(s)}
+                              className="font-semibold text-go-dark underline decoration-line underline-offset-4 hover:decoration-go-dark"
+                              title="See this student's payments"
+                            >
+                              NPR {d.paidNpr.toLocaleString()}
+                            </button>
                           ) : (
                             <span className="text-ink-quiet">nothing</span>
                           )}
@@ -1426,11 +1563,24 @@ export default function SuperAdminPage() {
             direct student and a coupon student can never be mistaken for one
             another (the client's request of 3 Sep 2026). */}
         {tab === 'students' && (() => {
-          const via = data.students
+          const shown = data.students.filter((x) =>
+            textMatches(
+              studentQuery,
+              x.name,
+              x.email,
+              x.phone,
+              x.targetUniversity,
+              x.consultancyName,
+              x.attributionConsultancy,
+              x.city,
+              x.id
+            )
+          );
+          const via = shown
             .filter((x) => x.consultancyId)
             .slice()
             .sort((a, b) => (a.consultancyName ?? '').localeCompare(b.consultancyName ?? ''));
-          const direct = data.students.filter((x) => !x.consultancyId);
+          const direct = shown.filter((x) => !x.consultancyId);
           const paidOf = (x: { id: string }) => dirById.get(x.id)?.paidNpr ?? 0;
           const usedOf = (x: { id: string }) => dirById.get(x.id)?.mocksUsed ?? 0;
           const directPaid = direct.filter((x) => paidOf(x) > 0);
@@ -1444,6 +1594,21 @@ export default function SuperAdminPage() {
                   Newest first in every table. Engagement and entitlement only. Answers are never shown
                   here.
                 </p>
+                <SearchField
+                  className="mt-4"
+                  value={studentQuery}
+                  onChange={setStudentQuery}
+                  label="Search students"
+                  placeholder="Name, phone number, email or university"
+                />
+                {studentQuery && (
+                  <p className="mt-2 text-sm text-ink-soft">
+                    {shown.length} of {data.students.length} students match.{' '}
+                    <button type="button" className="font-semibold underline" onClick={() => setStudentQuery('')}>
+                      Show all
+                    </button>
+                  </p>
+                )}
                 <div className="mt-3 flex flex-wrap gap-4 text-sm">
                   <Status tone="go">{directPaid.length} paid</Status>
                   <Status tone="neutral">{directTried.length} took the free mock</Status>
@@ -1507,9 +1672,26 @@ export default function SuperAdminPage() {
 
         {/* -------------------------------------------------- payments --- */}
         {tab === 'payments' && (() => {
-          const paid = orders.filter((o) => o.state === 'verified');
-          const rejected = orders.filter((o) => o.state === 'rejected' || o.state === 'expired');
-          const unpaid = orders.filter((o) => o.state === 'created');
+          const matchO = (o: Order) =>
+            textMatches(
+              paymentQuery,
+              o.studentName,
+              o.studentEmail,
+              o.payerName,
+              o.payerPhone,
+              o.walletTxnId,
+              o.packCode,
+              o.studentId
+            );
+          const shownOrders = orders.filter(matchO);
+          const waiting = awaiting.filter(matchO);
+          const paid = shownOrders.filter((o) => o.state === 'verified');
+          const rejected = shownOrders.filter((o) => o.state === 'rejected' || o.state === 'expired');
+          const unpaid = shownOrders.filter((o) => o.state === 'created');
+          const candidates = (directory?.students ?? [])
+            .filter((d) => textMatches(rec.studentQuery, d.name, d.email, d.whatsappNumber, d.targetUniversity))
+            .slice(0, 40);
+          const recPlan = getPlan(rec.packCode);
           const packs = couponPacks();
           const knownPacks = new Set(packs.map((k) => k.code));
           const paidOther = paid.filter((o) => !knownPacks.has(o.packCode));
@@ -1526,7 +1708,132 @@ export default function SuperAdminPage() {
                   <Status tone="go">{approvedCount} approved</Status>
                   <Status tone="stop">{rejectedCount} not matched</Status>
                 </div>
+                <SearchField
+                  className="mt-4"
+                  value={paymentQuery}
+                  onChange={setPaymentQuery}
+                  label="Search payments"
+                  placeholder="Student name, phone number, email or transaction id"
+                />
+                {paymentQuery && (
+                  <p className="mt-2 text-sm text-ink-soft">
+                    {shownOrders.length} of {orders.length} payments match.{' '}
+                    <button type="button" className="font-semibold underline" onClick={() => setPaymentQuery('')}>
+                      Show all
+                    </button>
+                  </p>
+                )}
               </div>
+
+              {/* A payment that never went through the checkout: QR sent on
+                  WhatsApp, cash in the office. Recorded here so revenue and
+                  the paid list count it, and the pack is added through the
+                  same path as an approval. Never a substitute for checking
+                  the wallet: the confirm dialog asks the same question
+                  Approve does. */}
+              <Block
+                title="Record a payment made outside the checkout"
+                hint="For a student who paid by a QR sent on WhatsApp or in cash. Counts in revenue and adds the pack. The student must have signed in at least once."
+              >
+                <div className="grid gap-4 px-5 py-5 md:grid-cols-2">
+                  <LabelledField
+                    label="Who paid?"
+                    id="rec-student-q"
+                    hint={
+                      rec.studentId
+                        ? undefined
+                        : candidates.length === 0
+                          ? 'Nobody matches. If they have never signed in, they are not here yet: ask them to sign in once with Google, then record it.'
+                          : 'Type a name or phone number, then pick them.'
+                    }
+                  >
+                    <Input
+                      id="rec-student-q"
+                      value={rec.studentQuery}
+                      onChange={(e) => setRec((r) => ({ ...r, studentQuery: e.target.value, studentId: '' }))}
+                      placeholder="Name or phone number"
+                      autoComplete="off"
+                    />
+                    <Select
+                      aria-label="Pick the student"
+                      value={rec.studentId}
+                      onChange={(e) => setRec((r) => ({ ...r, studentId: e.target.value }))}
+                      size={Math.min(6, Math.max(2, candidates.length))}
+                    >
+                      {candidates.map((d) => (
+                        <option key={d.id} value={d.id}>
+                          {(d.name || 'Unnamed') +
+                            ' · ' +
+                            (d.whatsappNumber || 'no phone') +
+                            ' · ' +
+                            (d.targetUniversity || 'no university') +
+                            (d.level ? ` (${d.level})` : '') +
+                            (d.paidNpr > 0 ? ` · paid NPR ${d.paidNpr.toLocaleString()} before` : '')}
+                        </option>
+                      ))}
+                    </Select>
+                  </LabelledField>
+                  <div className="grid gap-4">
+                    <LabelledField label="Which pack?" id="rec-pack">
+                      <Select
+                        id="rec-pack"
+                        value={rec.packCode}
+                        onChange={(e) => {
+                          const code = e.target.value;
+                          const pl = getPlan(code);
+                          setRec((r) => ({ ...r, packCode: code, amount: String(pl?.priceNpr ?? r.amount) }));
+                        }}
+                      >
+                        {PAID_PLANS.map((pl) => (
+                          <option key={pl.code} value={pl.code}>
+                            {pl.name}: {pl.mockInterviews} mocks, list price NPR {pl.priceNpr.toLocaleString()}
+                          </option>
+                        ))}
+                      </Select>
+                    </LabelledField>
+                    <div className="grid grid-cols-2 gap-4">
+                      <LabelledField
+                        label="Amount received (NPR)"
+                        id="rec-amount"
+                        hint={
+                          recPlan && Number(rec.amount) && Number(rec.amount) !== recPlan.priceNpr
+                            ? `List price is NPR ${recPlan.priceNpr.toLocaleString()}. The amount you type is what is counted.`
+                            : undefined
+                        }
+                      >
+                        <Input
+                          id="rec-amount"
+                          inputMode="numeric"
+                          value={rec.amount}
+                          onChange={(e) => setRec((r) => ({ ...r, amount: e.target.value.replace(/[^\d]/g, '') }))}
+                        />
+                      </LabelledField>
+                      <LabelledField label="Received on" id="rec-date">
+                        <Input
+                          id="rec-date"
+                          type="date"
+                          max={todayIso()}
+                          value={rec.paidOn}
+                          onChange={(e) => setRec((r) => ({ ...r, paidOn: e.target.value || todayIso() }))}
+                        />
+                      </LabelledField>
+                    </div>
+                    <LabelledField label="How did it arrive?" id="rec-note" hint="One line, kept in the audit trail.">
+                      <Input
+                        id="rec-note"
+                        value={rec.note}
+                        onChange={(e) => setRec((r) => ({ ...r, note: e.target.value }))}
+                        maxLength={200}
+                      />
+                    </LabelledField>
+                    <div>
+                      <Button variant="primary" onClick={() => void recordPayment()} disabled={busy || !rec.studentId}>
+                        Record this payment
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </Block>
 
               {orders.length === 0 ? (
                 <p className="rounded-card border border-line bg-surface p-10 text-center text-ink-quiet shadow-card">
@@ -1534,9 +1841,9 @@ export default function SuperAdminPage() {
                 </p>
               ) : (
                 <>
-                  {awaiting.length > 0 && (
-                    <Block title="Waiting for you" count={awaiting.length} hint="A screenshot has been sent. Check the ledger, then approve or reject.">
-                      {renderOrders(awaiting)}
+                  {waiting.length > 0 && (
+                    <Block title="Waiting for you" count={waiting.length} hint="A screenshot has been sent. Check the ledger, then approve or reject.">
+                      {renderOrders(waiting)}
                     </Block>
                   )}
 
