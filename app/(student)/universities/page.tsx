@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { publicInstitutions } from '@/lib/data/institutions';
+import { matchesUniversity } from '@/lib/university-search';
 import type { Institution } from '@/lib/types';
 import { SiteHeader } from '@/components/SiteHeader';
 import { Page, Card, Banner, Button, ButtonLink, Chip, Monogram, EmptyState, SectionTitle } from '@/components/ui';
@@ -100,13 +101,9 @@ function UniversityBrowser() {
   }, [searchParams, signedIn, resumed]);
 
   const results = useMemo(() => {
-    const needle = q.trim().toLowerCase();
+    // Tolerant of typos and filler ("ardin", "arden uni"): lib/university-search.ts.
     return publicInstitutions().filter((i) => {
-      const matchQ =
-        !needle ||
-        i.name.toLowerCase().includes(needle) ||
-        i.shortName.toLowerCase().includes(needle) ||
-        i.city.toLowerCase().includes(needle);
+      const matchQ = matchesUniversity(i, q);
       const matchType = type === 'all' || i.interviewType === type;
       return matchQ && matchType;
     });

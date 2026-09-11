@@ -66,7 +66,8 @@ export interface MaintenanceBand {
  * Which band a campus city is in. Every "London" city in the catalogue is a
  * London borough campus (UEL Stratford, UWL Ealing, Ravensbourne Greenwich,
  * Brunel Uxbridge in Hillingdon, Kingston, Middlesex Hendon, Greenwich,
- * Roehampton, Westminster, Goldsmiths, QMUL, City, London Met, LSBU). BPP
+ * Roehampton, Westminster, Goldsmiths, QMUL, City, London Met, LSBU,
+ * Arden Stratford in Newham). BPP
  * also teaches in Manchester, Birmingham and Leeds; a BPP student who names a
  * non-London centre should quote the outside-London figure, and the rubric
  * says so.
@@ -454,6 +455,11 @@ export function institutionFactBlock(inst: Institution): string {
   if (inst.id === 'inst-bpp') {
     lines.push(
       'BPP also teaches in Manchester, Birmingham and Leeds. If the student names a centre outside London, the outside-London figure (£1,171 a month) is the correct one.'
+    );
+  }
+  if (inst.id.startsWith('inst-arden-university')) {
+    lines.push(
+      `Arden teaches international on-campus students at London (Stratford) and Manchester only; this paper is for the ${inst.city} campus. Arden's own visa page says no work is permitted while sponsored by Arden, so any plan that relies on part-time earnings is a fix to name.`
     );
   }
   const g = PUBLISHED_GUIDANCE[inst.id];

@@ -160,10 +160,16 @@ export const INSTITUTIONS: Institution[] = [
  * university specific claim here without a dated primary source, because that
  * is exactly the false specificity QA flagged as AUDIT-003.
  *
- * Adding more is a data change: append a name and a city, nothing else.
+ * Adding more is a data change: append a name and a city, nothing else. A
+ * university that teaches international students at more than one campus is
+ * one row PER CAMPUS (Arden: Stratford and Manchester), because the city
+ * decides the UKVI living-cost band and the city questions; the optional
+ * third field is the short name shared by those rows.
  */
-const WIDER_UK: [name: string, city: string][] = [
+const WIDER_UK: [name: string, city: string, shortName?: string][] = [
   ['Anglia Ruskin University', 'Cambridge'],
+  ['Arden University, London', 'London', 'Arden'],
+  ['Arden University, Manchester', 'Manchester', 'Arden'],
   ['Aston University', 'Birmingham'],
   ['Bangor University', 'Bangor'],
   ['Birmingham City University', 'Birmingham'],
@@ -268,12 +274,12 @@ function monogramOf(name: string): string {
 const GENERIC_BLURB =
   'Practise the credibility themes UK universities publish: your course and why you chose it, how you are paying, your study history, and your plans after you finish.';
 
-const WIDER_INSTITUTIONS: Institution[] = WIDER_UK.map(([name, city]) => ({
+const WIDER_INSTITUTIONS: Institution[] = WIDER_UK.map(([name, city, short]) => ({
   id: `inst-${slugify(name)}`,
   vertical: 'uk-precas' as const,
   slug: slugify(name),
   name,
-  shortName: name.replace(/^University of /i, '').replace(/ University$/i, ''),
+  shortName: short ?? name.replace(/^University of /i, '').replace(/ University$/i, ''),
   country: 'United Kingdom',
   city,
   interviewType: 'Pre-CAS' as const,

@@ -9,7 +9,7 @@
  *   node qa/build-evidence.mjs
  *
  * It refuses, loudly, anything that would let a wrong claim reach a student:
- *   - an institution id that is not in the catalogue
+ *   - an institution id that is not in the catalogue (also in alsoAppliesTo)
  *   - a question id that is not in the bank
  *   - a source with no URL, or a URL that is not http(s)
  *   - a tier that is not official / student_report / consultancy
@@ -118,6 +118,16 @@ for (const f of files) {
     usesCasShield: typeof j.usesCasShield === 'boolean' ? j.usesCasShield : null,
     sources: clean,
   };
+  // One university, several campus rows (Arden: Stratford and Manchester).
+  // The research is about the university, so each campus row gets a copy.
+  for (const extra of j.alsoAppliesTo ?? []) {
+    if (!institutions.has(extra)) {
+      warnings.push(`${f}: alsoAppliesTo unknown institution id "${extra}", dropped`);
+      continue;
+    }
+    result[extra] = { ...result[id], institutionId: extra };
+    if (cleanFacts.length) factsOut[extra] = cleanFacts;
+  }
 }
 
 const header = `/**
