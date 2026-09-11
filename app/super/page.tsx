@@ -748,8 +748,16 @@ export default function SuperAdminPage() {
    * A payment made outside the checkout, written into the payment system.
    * Same standard as Approve: the person asserts they have SEEN the money.
    */
+  // Who the record-payment form could mean. One match is picked for you:
+  // the client typed a phone number, saw the one name, and the button stayed
+  // grey because the row still had to be clicked.
+  const candidates = (directory?.students ?? [])
+    .filter((d) => textMatches(rec.studentQuery, d.name, d.email, d.whatsappNumber, d.targetUniversity))
+    .slice(0, 40);
+  const pickedStudentId = rec.studentId || (candidates.length === 1 ? candidates[0]!.id : '');
+
   async function recordPayment() {
-    const student = dirById.get(rec.studentId);
+    const student = dirById.get(pickedStudentId);
     const plan = getPlan(rec.packCode);
     if (!student) {
       setError('Pick the student first. Type a name or phone number to find them.');
@@ -791,6 +799,48 @@ export default function SuperAdminPage() {
       setNotice(res.message);
       setRec((r) => ({ ...r, studentId: '', studentQuery: '' }));
       setPaymentQuery(student.whatsappNumber || student.name || student.email || '');
+    }
+  }
+
+  /**
+   * "PAID" ON THE STUDENT ROW. The client's words: "I want to make the
+   * student a paying student. They have paid it." Three prompts, same as Give
+   * credit, and the same record as the form on the Payments tab.
+   */
+  async function markPaid(s: { id: string; name: string | null; email: string | null; phone: string | null }) {
+    const who = s.name || s.email || s.phone || 'this student';
+    const prep = PAID_PLANS[0];
+    const typed = window.prompt(`How much did ${who} pay, in NPR?`, String(prep?.priceNpr ?? 499));
+    if (typed === null) return;
+    const amount = Number(typed.replace(/[^\d]/g, ''));
+    if (!amount) {
+      setError('That is not an amount. Nothing recorded.');
+      return;
+    }
+    // The pack follows the money: the biggest pack whose list price the
+    // amount covers, else the smallest pack (399 or 400 is a Prep coupon price).
+    const plan =
+      [...PAID_PLANS].sort((x, y) => y.priceNpr - x.priceNpr).find((pl) => amount >= pl.priceNpr) ?? prep;
+    if (!plan) return;
+    if (
+      !window.confirm(
+        `Mark ${who} as paid: NPR ${amount.toLocaleString()}, ${plan.name} (${plan.mockInterviews} mocks), received today?\n\n` +
+          'Only if you have SEEN the money arrive.'
+      )
+    )
+      return;
+    const res = (await call({
+      action: 'recordPayment',
+      studentId: s.id,
+      packCode: plan.code,
+      amountNpr: amount,
+      paidOn: todayIso(),
+      note: 'Marked as paid on the student row',
+      confirmedReceived: true,
+    })) as { message: string } | null;
+    if (res) {
+      await loadAll();
+      setNotice(`${who} is now a paying student: NPR ${amount.toLocaleString()} recorded, ${plan.name} added.`);
     }
   }
 
@@ -1292,7 +1342,12 @@ export default function SuperAdminPage() {
                         </td>
                         <td className="px-5 py-3">
                           <div className="flex flex-wrap gap-1.5">
-                            <Button variant="primary" size="sm"
+                            {/* They paid us outside the checkout. One button,
+                                here, on the person: no other tab, no form. */}
+                            <Button variant="primary" size="sm" onClick={() => void markPaid(s)} disabled={busy}>
+                              Paid
+                            </Button>
+                            <Button variant="tertiary" size="sm"
                               onClick={() => grantCredit(s.id, s.name || s.email || 'this student')}
                               disabled={busy}
                             >
@@ -1688,9 +1743,6 @@ export default function SuperAdminPage() {
           const paid = shownOrders.filter((o) => o.state === 'verified');
           const rejected = shownOrders.filter((o) => o.state === 'rejected' || o.state === 'expired');
           const unpaid = shownOrders.filter((o) => o.state === 'created');
-          const candidates = (directory?.students ?? [])
-            .filter((d) => textMatches(rec.studentQuery, d.name, d.email, d.whatsappNumber, d.targetUniversity))
-            .slice(0, 40);
           const recPlan = getPlan(rec.packCode);
           const packs = couponPacks();
           const knownPacks = new Set(packs.map((k) => k.code));
@@ -1725,22 +1777,79 @@ export default function SuperAdminPage() {
                 )}
               </div>
 
+              {orders.length === 0 ? (
+                <p className="rounded-card border border-line bg-surface p-10 text-center text-ink-quiet shadow-card">
+                  No payments yet.
+                </p>
+              ) : (
+                <>
+                  {waiting.length > 0 && (
+                    <Block title="Waiting for you" count={waiting.length} hint="A screenshot has been sent. Check the ledger, then approve or reject.">
+                      {renderOrders(waiting)}
+                    </Block>
+                  )}
+
+                  <h3 className="pt-2 font-serif text-base font-bold uppercase tracking-wide text-ink-quiet">
+                    Paid
+                  </h3>
+                  {packs.map((k) => (
+                    <Block
+                      key={k.code}
+                      title={`${k.name}, NPR ${k.retailNpr.toLocaleString()}`}
+                      count={paid.filter((o) => o.packCode === k.code).length}
+                      hint="Approved. Genuine, checked payments only."
+                    >
+                      {renderOrders(paid.filter((o) => o.packCode === k.code), getPlan(k.code)?.priceNpr)}
+                    </Block>
+                  ))}
+                  {paidOther.length > 0 && (
+                    <Block title="Other packs" count={paidOther.length}>
+                      {renderOrders(paidOther)}
+                    </Block>
+                  )}
+
+                  <h3 className="pt-2 font-serif text-base font-bold uppercase tracking-wide text-ink-quiet">
+                    Not genuine
+                  </h3>
+                  <Block
+                    title="Rejected or expired"
+                    count={rejected.length}
+                    hint="Kept for the record. Nothing here needs you."
+                  >
+                    {renderOrders(rejected)}
+                  </Block>
+
+                  <details className="rounded-card border border-line bg-surface shadow-card">
+                    <summary className="cursor-pointer px-5 py-4 font-serif text-lg font-bold text-ink">
+                      Started checkout, never paid
+                      <span className="ml-2 text-sm font-normal text-ink-quiet">{unpaid.length}</span>
+                    </summary>
+                    <p className="border-t border-line px-5 py-3 text-sm text-ink-soft">
+                      They reached the payment page and sent nothing. Not a payment, only interest; the
+                      phone number is why this list exists.
+                    </p>
+                    {renderOrders(unpaid)}
+                  </details>
+
               {/* A payment that never went through the checkout: QR sent on
                   WhatsApp, cash in the office. Recorded here so revenue and
                   the paid list count it, and the pack is added through the
                   same path as an approval. Never a substitute for checking
                   the wallet: the confirm dialog asks the same question
                   Approve does. */}
-              <Block
-                title="Record a payment made outside the checkout"
-                hint="For a student who paid by a QR sent on WhatsApp or in cash. Counts in revenue and adds the pack. The student must have signed in at least once."
-              >
+              <details className="rounded-card border border-line bg-surface shadow-card">
+                <summary className="cursor-pointer px-5 py-4 font-serif text-lg font-bold text-ink">
+                  Record a payment made outside the checkout
+                </summary>
+                <p className="border-t border-line px-5 py-3 text-sm text-ink-soft">
+                  For a student who paid by a QR sent on WhatsApp or in cash. Counts in revenue and adds the pack. The student must have signed in at least once. Quicker: the Paid button on the student&apos;s row.
+                </p>
                 <div className="grid gap-4 px-5 py-5 md:grid-cols-2">
                   <LabelledField
                     label="Who paid?"
                     id="rec-student-q"
                     hint={
-                      rec.studentId
+                      pickedStudentId
                         ? undefined
                         : candidates.length === 0
                           ? 'Nobody matches. If they have never signed in, they are not here yet: ask them to sign in once with Google, then record it.'
@@ -1756,7 +1865,7 @@ export default function SuperAdminPage() {
                     />
                     <Select
                       aria-label="Pick the student"
-                      value={rec.studentId}
+                      value={pickedStudentId}
                       onChange={(e) => setRec((r) => ({ ...r, studentId: e.target.value }))}
                       size={Math.min(6, Math.max(2, candidates.length))}
                     >
@@ -1827,67 +1936,14 @@ export default function SuperAdminPage() {
                       />
                     </LabelledField>
                     <div>
-                      <Button variant="primary" onClick={() => void recordPayment()} disabled={busy || !rec.studentId}>
+                      <Button variant="primary" onClick={() => void recordPayment()} disabled={busy || !pickedStudentId}>
                         Record this payment
                       </Button>
                     </div>
                   </div>
                 </div>
-              </Block>
+              </details>
 
-              {orders.length === 0 ? (
-                <p className="rounded-card border border-line bg-surface p-10 text-center text-ink-quiet shadow-card">
-                  No payments yet.
-                </p>
-              ) : (
-                <>
-                  {waiting.length > 0 && (
-                    <Block title="Waiting for you" count={waiting.length} hint="A screenshot has been sent. Check the ledger, then approve or reject.">
-                      {renderOrders(waiting)}
-                    </Block>
-                  )}
-
-                  <h3 className="pt-2 font-serif text-base font-bold uppercase tracking-wide text-ink-quiet">
-                    Paid
-                  </h3>
-                  {packs.map((k) => (
-                    <Block
-                      key={k.code}
-                      title={`${k.name}, NPR ${k.retailNpr.toLocaleString()}`}
-                      count={paid.filter((o) => o.packCode === k.code).length}
-                      hint="Approved. Genuine, checked payments only."
-                    >
-                      {renderOrders(paid.filter((o) => o.packCode === k.code), getPlan(k.code)?.priceNpr)}
-                    </Block>
-                  ))}
-                  {paidOther.length > 0 && (
-                    <Block title="Other packs" count={paidOther.length}>
-                      {renderOrders(paidOther)}
-                    </Block>
-                  )}
-
-                  <h3 className="pt-2 font-serif text-base font-bold uppercase tracking-wide text-ink-quiet">
-                    Not genuine
-                  </h3>
-                  <Block
-                    title="Rejected or expired"
-                    count={rejected.length}
-                    hint="Kept for the record. Nothing here needs you."
-                  >
-                    {renderOrders(rejected)}
-                  </Block>
-
-                  <details className="rounded-card border border-line bg-surface shadow-card">
-                    <summary className="cursor-pointer px-5 py-4 font-serif text-lg font-bold text-ink">
-                      Started checkout, never paid
-                      <span className="ml-2 text-sm font-normal text-ink-quiet">{unpaid.length}</span>
-                    </summary>
-                    <p className="border-t border-line px-5 py-3 text-sm text-ink-soft">
-                      They reached the payment page and sent nothing. Not a payment, only interest; the
-                      phone number is why this list exists.
-                    </p>
-                    {renderOrders(unpaid)}
-                  </details>
                 </>
               )}
             </div>
