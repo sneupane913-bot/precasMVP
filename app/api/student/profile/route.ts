@@ -6,8 +6,27 @@ import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
 import { apiError, type ApiResult } from '@/lib/types';
 import { zodMessage } from '@/lib/zod-message';
 import { looksLikeUniversity, UNIVERSITY_HINT } from '@/lib/university-check';
+import { BRAND_NAME } from '@/lib/branding';
 
 export const runtime = 'nodejs';
+
+/**
+ * Enough of the address for its owner to recognise it, not enough for a
+ * stranger to learn it. `phillipkhatri@gmail.com` becomes `p*********i@gmail.com`.
+ *
+ * Shown because the alternative is worse: "this number is taken", full stop,
+ * to a student who has simply forgotten which of their two Gmails they used,
+ * and who then has no way forward except to give up or ring somebody.
+ */
+function maskEmail(email: string | null): string | null {
+  if (!email) return null;
+  const at = email.indexOf('@');
+  if (at < 1) return null;
+  const name = email.slice(0, at);
+  const domain = email.slice(at);
+  if (name.length <= 2) return name[0] + '*' + domain;
+  return name[0] + '*'.repeat(Math.min(9, name.length - 2)) + name[name.length - 1] + domain;
+}
 
 /**
  * N-30. THE ONE THING WE ASK FOR BEFORE THE FREE TRIAL STARTS.
@@ -20,10 +39,28 @@ export const runtime = 'nodejs';
  * addresses is thirty free questions we pay for and never sell.
  *
  * An email address is free and unlimited. A Nepali mobile number is neither.
- * That asymmetry is the whole mechanism. We do not block anything here, and we
- * never turn a student away at this screen: we simply RECORD the number, so
- * that `/super` can show the owner three accounts sharing one number and let
- * them decide. Judgement stays with a person.
+ * That asymmetry is the whole mechanism.
+ *
+ * ONE NUMBER, ONE ACCOUNT (12 September 2026)
+ * -------------------------------------------
+ * This screen used to only RECORD the number and let `/super` show the owner
+ * three accounts sharing one, so judgement stayed with a person. It stopped
+ * being enough. A student signed in on a second Gmail with the same number,
+ * took a second free mock with it, and was then credited a paid pack TWICE —
+ * once by hand onto the account he had abandoned, once through the checkout on
+ * the account he was actually using. The owner could not even tell the two
+ * apart on screen, and the count that was supposed to warn him sat one tab
+ * away on a page he had no reason to open that day.
+ *
+ * So the number is now UNIQUE, and it is enforced here, at the one place every
+ * account must pass through before it can practise.
+ *
+ * The refusal is deliberately not a dead end. A genuine student who signed in
+ * with the wrong Gmail is the commonest case by far, so they are told their
+ * number already has an account, given a masked hint of which one, and pointed
+ * at support. We do not silently merge accounts and we do not take a number
+ * away from the account already holding it: the older account keeps it, and a
+ * person decides anything else.
  *
  * WHY IT IS NOT ONLY A PHONE NUMBER
  * ---------------------------------
@@ -110,6 +147,36 @@ export async function POST(req: Request) {
   // Store one canonical shape so two students who typed 977 and 0 differently
   // are still recognised as the same number by the duplicate check in /super.
   const digits = body.whatsappNumber.replace(/^977/, '');
+
+  /**
+   * ONE NUMBER, ONE ACCOUNT.
+   *
+   * Checked against EVERY account, active or disabled. Excluding disabled ones
+   * would hand the number straight back to a third Gmail the moment the owner
+   * disabled the second, which is the same hole with an extra step.
+   *
+   * Honest limitation, written down because it is the sort of thing QA should
+   * test rather than discover: this is a read followed by a write, so two
+   * requests landing in the same handful of milliseconds could both pass. That
+   * is not the threat here — the threat is one person signing in again on
+   * another day — and the duplicate report in `/super` still catches anything
+   * that slips through. Postgres closes it properly with a unique index, which
+   * supabase/schema.sql now declares.
+   */
+  const holders = await repo().listStudentsByWhatsapp(digits);
+  const other = holders.find((h) => h.id !== student.id);
+  if (other) {
+    return NextResponse.json(
+      apiError(
+        'NUMBER_IN_USE',
+        `whatsapp number already held by ${other.id}`,
+        `This number already has an ${BRAND_NAME} account${
+          maskEmail(other.email) ? ` (${maskEmail(other.email)})` : ''
+        }. Please sign in with that Google account instead. If you think this is a mistake, message us on WhatsApp and a person will sort it out.`
+      ),
+      { status: 409 }
+    );
+  }
 
   const updated = await repo().updateStudent(student.id, {
     name: body.fullName,

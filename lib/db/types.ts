@@ -10,6 +10,23 @@
  */
 
 export type StudentStatus = 'active' | 'disabled';
+
+/**
+ * ONE canonical shape for a Nepali mobile number, used everywhere it is
+ * compared.
+ *
+ * `9864835552`, `+9779864835552` and `09864835552` are one number and one
+ * person. Comparing them as typed is what let the same phone sit on two
+ * accounts while the duplicate check looked straight at them and saw two
+ * different strings. Returns null when there is nothing worth comparing, so a
+ * missing number never matches another missing number.
+ */
+export function normaliseWhatsapp(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const digits = String(raw).replace(/\D/g, '').replace(/^0+/, '');
+  const local = digits.replace(/^977/, '');
+  return local.length >= 9 ? local : null;
+}
 export type StudentSource = 'direct' | 'consultancy';
 
 export interface Student {
@@ -65,6 +82,16 @@ export interface Student {
   status: StudentStatus;
   disabledAt: string | null;
   disabledBy: string | null;
+  /**
+   * WHY it was disabled, in words the student themselves will read.
+   *
+   * A disabled account used to be a silent dead end: sign in with Google,
+   * succeed, and then find every page refusing you with no reason given. The
+   * commonest reason by far is a second account on a phone number that already
+   * has one, and that student is not a fraudster to be stonewalled — they are
+   * one sentence away from understanding they should use their other Gmail.
+   */
+  disabledReason?: string | null;
 
   /** Their own code, which they give to friends. */
   referralCode: string;
@@ -121,14 +148,36 @@ export interface LedgerEntry {
      * bought. Recorded as its own line so the ledger says why the trial
      * credit went, rather than silently netting it off.
      */
-    | 'trial_superseded';
+    | 'trial_superseded'
+    /**
+     * The credits a verified payment granted, handed back because that payment
+     * was voided. Always carries the `orderId` it reverses, so the pair can be
+     * read as one event years later.
+     */
+    | 'payment_voided';
   sessionId: string | null;
   orderId: string | null;
   note: string | null;
   createdAt: string;
 }
 
-export type OrderState = 'created' | 'submitted' | 'verified' | 'rejected' | 'expired';
+/**
+ * 'voided' is a VERIFIED payment taken back (12 September 2026).
+ *
+ * Until now an approved payment was final: `rejectPayment` refuses to touch a
+ * verified order on purpose, because un-granting credits as a side effect of
+ * clicking reject is how a ledger and a money record start disagreeing. That
+ * was right, and it left the owner with no way at all to undo a payment
+ * recorded against the wrong account — which is exactly what happened when one
+ * student held two Google accounts on one phone number and was credited twice.
+ *
+ * So the undo is its own state and its own deliberate act: the order stops
+ * counting as revenue, and the credits it granted are handed back through
+ * matching NEGATIVE ledger lines rather than by deleting anything. The ledger
+ * stays append-only, so the history still says a pack was granted and then
+ * taken back, and why.
+ */
+export type OrderState = 'created' | 'submitted' | 'verified' | 'rejected' | 'expired' | 'voided';
 
 export interface PaymentOrder {
   id: string;
@@ -164,6 +213,8 @@ export interface ApprovalAudit {
     | 'approve_payment'
     | 'reject_payment'
     | 'correct_amount'
+    /** A verified payment taken back out of the books. See voidPayment(). */
+    | 'void_payment'
     | 'create_consultancy'
     | 'set_allowlisted_ips'
     | 'approve_consultancy'

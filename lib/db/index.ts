@@ -41,6 +41,18 @@ export interface Repo {
   getStudent(id: string): Promise<Student | null>;
   getStudentByAuthId(authProviderId: string): Promise<Student | null>;
   getStudentByReferralCode(code: string): Promise<Student | null>;
+  /**
+   * Every account holding this WhatsApp number, newest first.
+   *
+   * A LIST, not a single record, and that is the point. There are already
+   * numbers in the store with two accounts on them, written before the number
+   * was unique, and a lookup that returned only the first would quietly hide
+   * the second from the very screen built to find it.
+   *
+   * The number must arrive in the canonical shape the profile route stores:
+   * digits only, no 977, no leading zero.
+   */
+  listStudentsByWhatsapp(number: string): Promise<Student[]>;
   updateStudent(id: string, patch: Partial<Student>): Promise<Student | null>;
   listStudents(filter?: { consultancyId?: string | null }): Promise<Student[]>;
 

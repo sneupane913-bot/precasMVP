@@ -161,6 +161,137 @@ export async function rejectPayment(
 }
 
 /**
+ * TAKE BACK A PAYMENT THAT SHOULD NEVER HAVE COUNTED (12 September 2026).
+ *
+ * One student held two Google accounts on one phone number. He was credited by
+ * hand onto the account he had stopped using, saw nothing, said so, was asked
+ * to pay through the checkout instead, and was credited again on the account he
+ * really uses. One payment, two verified orders, two packs, and revenue saying
+ * NPR 1,598 where NPR 799 had actually arrived.
+ *
+ * There was no way to undo either one. `rejectPayment` refuses a verified order
+ * on purpose — un-granting credits as a side effect of clicking reject is how a
+ * money record and a ledger start disagreeing — and that refusal was right. It
+ * just left the owner with nothing at all for the case where a verified payment
+ * is genuinely wrong.
+ *
+ * So this is the deliberate act that was missing, and it is built to the same
+ * standard as approval:
+ *
+ *   - NOTHING IS DELETED. The order keeps its id, its amount and its history
+ *     and changes state to 'voided'. The ledger is append-only, so the pack is
+ *     handed back as matching NEGATIVE lines rather than by removing the grant.
+ *     Read later, the story is "granted, then taken back, and here is why".
+ *
+ *   - CREDITS ALREADY SPENT ARE NOT CLAWED BACK. A mock that has been sat has
+ *     cost us a real provider call and cannot be un-sat. So the reversal takes
+ *     back what is still THERE, never more, and reports what it could not take
+ *     so the audit trail says it out loud instead of quietly going negative. A
+ *     balance below zero would be a lie about a student who did nothing wrong.
+ *
+ *   - IDEMPOTENT. Voiding twice takes one pack back, not two.
+ *
+ * Revenue, the paying count and the student's Paid column all filter on
+ * `state === 'verified'`, so a voided order drops out of every one of them the
+ * moment this returns.
+ */
+export async function voidPayment(
+  order: PaymentOrder,
+  actor: Actor,
+  reason: string
+): Promise<
+  | { ok: true; alreadyVoided: boolean; reversed: { mocks: number; practice: number }; keptBecauseUsed: { mocks: number; practice: number } }
+  | { ok: false; code: string; userMessage: string }
+> {
+  const r = repo();
+
+  if (order.state === 'voided') {
+    return { ok: true, alreadyVoided: true, reversed: { mocks: 0, practice: 0 }, keptBecauseUsed: { mocks: 0, practice: 0 } };
+  }
+  if (order.state !== 'verified') {
+    return {
+      ok: false,
+      code: 'NOT_VERIFIED',
+      userMessage: 'Only an approved payment can be taken back. This one was never approved.',
+    };
+  }
+  const why = reason.trim();
+  if (why.length < 3) {
+    return {
+      ok: false,
+      code: 'NO_REASON',
+      userMessage: 'Say why this payment is being taken back. It goes in the audit trail.',
+    };
+  }
+
+  // What THIS order granted, and what the student still holds. Both are read
+  // from the same ledger, so the two numbers cannot disagree.
+  const ledger = await r.listLedger(order.studentId);
+  const granted = ledger.filter((e) => e.orderId === order.id && e.reason === 'pack_purchase');
+
+  const reversed = { mocks: 0, practice: 0 };
+  const keptBecauseUsed = { mocks: 0, practice: 0 };
+
+  for (const kind of ['mock', 'practice'] as const) {
+    const gave = granted.filter((e) => e.kind === kind).reduce((n, e) => n + e.delta, 0);
+    if (gave <= 0) continue;
+    const balance = ledger.filter((e) => e.kind === kind).reduce((n, e) => n + e.delta, 0);
+    const take = Math.max(0, Math.min(gave, balance));
+    const key = kind === 'mock' ? 'mocks' : 'practice';
+    reversed[key] = take;
+    keptBecauseUsed[key] = gave - take;
+    if (take > 0) {
+      await r.appendLedger({
+        id: crypto.randomUUID(),
+        studentId: order.studentId,
+        kind,
+        delta: -take,
+        reason: 'payment_voided',
+        sessionId: null,
+        orderId: order.id,
+        note: gave === take ? why : `${why} (${gave - take} already used, not taken back)`,
+        createdAt: new Date().toISOString(),
+      });
+    }
+  }
+
+  await r.updateOrder(order.id, {
+    state: 'voided',
+    // The one free-text field on an order, and it already means "why this
+    // payment does not count". A void is that, for a different reason.
+    rejectedReason: why,
+  });
+
+  await audit({
+    actorRole: actor.role,
+    actorId: actor.id,
+    action: 'void_payment',
+    subjectId: order.id,
+    before: 'verified',
+    after: 'voided',
+    note:
+      `Taken back: NPR ${order.amountNpr}, ${order.packCode}, txn ${order.walletTxnId ?? 'none'}. ` +
+      `Returned ${reversed.mocks} mocks and ${reversed.practice} practice` +
+      (keptBecauseUsed.mocks || keptBecauseUsed.practice
+        ? `; ${keptBecauseUsed.mocks} mocks and ${keptBecauseUsed.practice} practice had already been used and were left alone`
+        : '') +
+      `. ${why} (by ${actor.label})`,
+  });
+
+  if (order.consultancyId) {
+    await r.addNotification({
+      id: crypto.randomUUID(),
+      consultancyId: order.consultancyId,
+      message: `We have taken back a payment of NPR ${order.amountNpr.toLocaleString()} recorded for one of your students. ${why}`,
+      createdAt: new Date().toISOString(),
+      readAt: null,
+    });
+  }
+
+  return { ok: true, alreadyVoided: false, reversed, keptBecauseUsed };
+}
+
+/**
  * A PAYMENT THAT NEVER TOUCHED THE CHECKOUT (11 September 2026).
  *
  * Two students paid by a QR code sent on WhatsApp, never opened the pricing

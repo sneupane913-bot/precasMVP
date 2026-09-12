@@ -11,6 +11,7 @@ import type {
   StudentOffer,
   TrialClaim,
 } from './types';
+import { normaliseWhatsapp } from './types';
 
 /**
  * Per-key storage.
@@ -186,6 +187,24 @@ export class BlobRepo implements Repo {
   async getStudentByReferralCode(code: string): Promise<Student | null> {
     const id = await this.get<string>(`idx/ref/${code.toUpperCase()}`);
     return id ? this.getStudent(id) : null;
+  }
+
+  /**
+   * Scanned, not indexed, and deliberately so.
+   *
+   * An index key would be faster, but it would also have to be BACKFILLED for
+   * every account written before numbers were unique, and a uniqueness index
+   * that is missing half its history is worse than no index: it reports "this
+   * number is free" about a number that is not. A scan is always right, and at
+   * this size it is one listing.
+   */
+  async listStudentsByWhatsapp(number: string): Promise<Student[]> {
+    const want = normaliseWhatsapp(number);
+    if (!want) return [];
+    const all = await this.listStudents();
+    return all
+      .filter((s) => normaliseWhatsapp(s.whatsappNumber ?? s.phoneE164 ?? null) === want)
+      .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
   }
 
   async updateStudent(id: string, patch: Partial<Student>): Promise<Student | null> {

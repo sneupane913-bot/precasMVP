@@ -149,6 +149,35 @@ export async function POST(req: Request) {
     student = (await r.updateStudent(student.id, patch)) ?? student;
   }
 
+  /**
+   * A DISABLED ACCOUNT IS TURNED AWAY HERE, WITH THE REASON.
+   *
+   * It used to sign in perfectly: Google succeeded, a session cookie was
+   * issued, and only the next page refused them — with no explanation, because
+   * `currentStudent()` returns null for a disabled account and every screen
+   * downstream reads that as "not signed in". So the student signed in again,
+   * and again, and the product never once said what was wrong.
+   *
+   * The commonest reason is a second account on a phone number that already
+   * has one. That student is not being caught doing something clever; they are
+   * one sentence away from realising they should use their other Gmail. So say
+   * the sentence, and hand them somebody to talk to.
+   *
+   * No session is issued and no trial is claimed: a refused sign-in must not
+   * leave a half-signed-in browser behind.
+   */
+  if (student.status === 'disabled') {
+    return NextResponse.json(
+      apiError(
+        'ACCOUNT_DISABLED',
+        `disabled account ${student.id}`,
+        student.disabledReason?.trim() ||
+          'This account has been closed because you already have an ExamTestAI account on this phone number. Please sign in with the Google account you used the first time. If you think this is a mistake, message us on WhatsApp and a person will sort it out.'
+      ),
+      { status: 403 }
+    );
+  }
+
   // --- Trial decision -----------------------------------------------------
   const decision = await evaluateTrial({
     authProviderId: identity.uid,

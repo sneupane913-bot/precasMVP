@@ -73,6 +73,15 @@ SERVER=(
   backoffice-ui-check
   coupon-check
   ai-check
+  # Added to the gate on 12 September 2026, and the omission is the point.
+  #
+  # `record-payment-check` was written on 11 September with the hand-recorded
+  # payment feature and never registered here, so the gate never once ran it.
+  # The next day that same feature put a paid pack on the wrong one of a
+  # student's two accounts, and the first anybody knew was the student saying
+  # he had nothing. A suite that is not in this list does not exist.
+  record-payment-check
+  duplicate-account-check
 )
 
 line() { printf '%s\n' "-------------------------------------------------------------"; }

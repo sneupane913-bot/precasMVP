@@ -1,6 +1,7 @@
 'use client';
 
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import { normaliseWhatsapp } from '@/lib/db/types';
 import { PasscodeInput } from '@/components/PasscodeInput';
 import { PaySettingsForm, type PaySettings } from '@/components/PaySettingsForm';
 import { PasscodeChangeForm } from '@/components/PasscodeChangeForm';
@@ -86,6 +87,8 @@ interface Order {
   studentEmail: string | null;
   packCode: string;
   amountNpr: number;
+  /** Why this payment does not count: the reject reason, or the void reason. */
+  rejectedReason?: string | null;
   walletTxnId: string | null;
   payerName: string | null;
   /** The student's own number, so an approver can ring them. N-13. */
@@ -237,10 +240,12 @@ const ORDER_STATE: Record<string, { label: string; tone: Tone }> = {
   rejected: { label: 'Not matched', tone: 'stop' },
   created: { label: 'Not paid yet', tone: 'neutral' },
   expired: { label: 'Expired', tone: 'neutral' },
+  voided: { label: 'Taken back', tone: 'stop' },
 };
 
 const STUDENT_STATE: Record<string, { label: string; tone: Tone }> = {
   active: { label: 'Active', tone: 'go' },
+  disabled: { label: 'Closed', tone: 'stop' },
   blocked: { label: 'Blocked', tone: 'stop' },
   suspended: { label: 'Suspended', tone: 'stop' },
 };
@@ -971,11 +976,71 @@ export default function SuperAdminPage() {
     }
   }
 
+  const DUPLICATE_ACCOUNT_REASON =
+    'This account has been closed because you already have an ExamTestAI account on this phone number. Please sign in with the Google account you used the first time. If you think this is a mistake, message us on WhatsApp and a person will sort it out.';
+
+  /**
+   * Closing an account now asks WHY, because the student reads it.
+   *
+   * Until today a closed account was a silent dead end: Google sign-in
+   * succeeded and every page afterwards refused them with no reason. The
+   * default offered here is the commonest true reason by a distance — a second
+   * Gmail on a number that already has an account.
+   */
   async function setStudentStatus(studentId: string, status: 'active' | 'disabled') {
-    const ok = await call({ action: 'setStudentStatus', studentId, status });
+    let reason: string | undefined;
+    if (status === 'disabled') {
+      const typed = window.prompt(
+        'Why is this account being closed?\n\nThe student reads this sentence when they try to sign in.',
+        DUPLICATE_ACCOUNT_REASON
+      );
+      if (typed === null) return;
+      reason = typed.trim() || DUPLICATE_ACCOUNT_REASON;
+    }
+    const ok = await call({ action: 'setStudentStatus', studentId, status, reason });
     if (ok) {
-      setNotice(status === 'disabled' ? 'Student disabled.' : 'Student enabled.');
+      setNotice(
+        status === 'disabled'
+          ? 'Account closed. They will be told why the next time they try to sign in.'
+          : 'Account reopened.'
+      );
       await loadAll();
+    }
+  }
+
+  /**
+   * Take an approved payment back out of the books. See voidPayment() in
+   * lib/payments.ts: nothing is deleted, and a mock already sat is never
+   * clawed back.
+   */
+  async function voidOrder(o: Order) {
+    const who = o.studentEmail || o.studentName || 'this student';
+    const typed = window.prompt(
+      `Take back NPR ${o.amountNpr.toLocaleString()} from ${who}?\n\n` +
+        'Why? This is kept in the audit trail.',
+      'Duplicate: the same payment was recorded twice, on two accounts.'
+    );
+    if (typed === null) return;
+    if (typed.trim().length < 3) {
+      setError('Say why this payment is being taken back.');
+      return;
+    }
+    if (
+      !window.confirm(
+        `This removes NPR ${o.amountNpr.toLocaleString()} from revenue and takes the pack back from ${who}.\n\n` +
+          'Anything they have already used is left alone. Nothing is deleted.'
+      )
+    )
+      return;
+    const res = (await call({
+      action: 'voidPayment',
+      orderId: o.id,
+      reason: typed.trim(),
+      confirmed: true,
+    })) as { message: string } | null;
+    if (res) {
+      await loadAll();
+      setNotice(res.message);
     }
   }
 
@@ -1111,7 +1176,20 @@ export default function SuperAdminPage() {
                           >
                             {o.studentName || 'Unnamed'}
                           </button>
-                          <p className="text-micro text-ink-quiet">{o.payerName || o.studentEmail || ''}</p>
+                          {/* THE ACCOUNT, ALWAYS, NOT THE NAME AGAIN.
+                              This used to read `payerName || studentEmail`, and
+                              payerName is always set, so the email never once
+                              appeared. On 11 September the same person held two
+                              Google accounts on one phone number and both
+                              payments rendered as the identical line "Nirajan
+                              Kc" — there was nothing on this screen that could
+                              tell them apart, and the owner had no way to know
+                              which account he had credited. The email is the
+                              account. It shows. */}
+                          <p className="text-micro text-ink-quiet">{o.studentEmail || 'no email'}</p>
+                          {o.payerName && o.payerName !== o.studentName && (
+                            <p className="text-micro text-ink-quiet">paid as {o.payerName}</p>
+                          )}
                           {(() => {
                             const d = dirById.get(o.studentId);
                             if (!d) return null;
@@ -1227,8 +1305,15 @@ export default function SuperAdminPage() {
                                 Reject
                               </Button>
                             </div>
+                          ) : o.state === 'verified' ? (
+                            <Button variant="danger" size="sm" onClick={() => void voidOrder(o)} disabled={busy}>
+                              Take back
+                            </Button>
                           ) : (
                             <span className="text-micro text-ink-quiet">done</span>
+                          )}
+                          {o.state === 'voided' && o.rejectedReason && (
+                            <p className="mt-1 text-micro text-ink-quiet">{o.rejectedReason}</p>
                           )}
                         </td>
                       </tr>
@@ -1671,6 +1756,130 @@ export default function SuperAdminPage() {
                   <Status tone="neutral">{via.length} through a consultancy</Status>
                 </div>
               </div>
+
+              {/* ---------------------------------------------------------------
+                  ONE NUMBER, MORE THAN ONE ACCOUNT.
+
+                  This is the screen that did not exist on 11 September, and its
+                  absence cost a whole afternoon. The count "2 accounts on this
+                  number" was already on each student row, but a count sitting on
+                  a row you have no reason to open tells nobody anything. The
+                  same person held two Google accounts on one number, took a free
+                  mock on each, and was credited a paid pack twice.
+
+                  New accounts can no longer do this — the number is unique from
+                  today — so what is listed here is HISTORY: the duplicates
+                  written before the rule existed. It should empty out and stay
+                  empty. If it ever grows, the rule has a hole in it.
+                  --------------------------------------------------------------- */}
+              {(() => {
+                const groups = new Map<string, typeof data.students>();
+                for (const st of data.students) {
+                  const key = normaliseWhatsapp(st.phone);
+                  if (!key) continue;
+                  const bucket = groups.get(key);
+                  if (bucket) bucket.push(st);
+                  else groups.set(key, [st]);
+                }
+                const dupes = [...groups.entries()]
+                  .filter(([, accounts]) => accounts.length > 1)
+                  .map(([number, accounts]) => ({
+                    number,
+                    // Oldest first: the first account is the one that keeps the
+                    // number, and the ones after it are the ones to look at.
+                    accounts: accounts.slice().sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1)),
+                  }))
+                  .sort((a, b) => b.accounts.length - a.accounts.length);
+                if (dupes.length === 0) return null;
+                return (
+                  <Block
+                    title="One number, more than one account"
+                    count={dupes.length}
+                    hint="Written before a phone number had to be unique. The oldest account keeps the number. Check which one they actually use before closing anything: the live one is usually the one seen most recently."
+                  >
+                    <div className="divide-y divide-line">
+                      {dupes.map(({ number, accounts }) => {
+                        const liveliest = accounts
+                          .slice()
+                          .sort((a, b) => (a.lastSeenAt < b.lastSeenAt ? 1 : -1))[0];
+                        return (
+                          <div key={number} className="px-5 py-4">
+                            <p className="font-semibold text-ink">
+                              {number}
+                              <span className="ml-2 text-micro font-normal text-ink-quiet">
+                                {accounts.length} accounts
+                              </span>
+                            </p>
+                            <div className="mt-3 overflow-x-auto">
+                              <table className="w-full text-left text-sm">
+                                <thead className="text-micro font-bold uppercase tracking-[0.08em] text-ink-quiet">
+                                  <tr>
+                                    <th className="py-2 pr-3 font-semibold">Account</th>
+                                    <th className="py-2 pr-3 font-semibold">Signed up</th>
+                                    <th className="py-2 pr-3 font-semibold">Last seen</th>
+                                    <th className="py-2 pr-3 font-semibold">Mocks</th>
+                                    <th className="py-2 pr-3 font-semibold">Paid</th>
+                                    <th className="py-2 pr-3 font-semibold">Status</th>
+                                    <th className="py-2 font-semibold">Action</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-line">
+                                  {accounts.map((a) => {
+                                    const d = dirById.get(a.id);
+                                    return (
+                                      <tr key={a.id}>
+                                        <td className="py-2.5 pr-3">
+                                          <p className="font-semibold text-ink">{a.name || 'Unnamed'}</p>
+                                          {/* The email is the account. Two rows
+                                              with the same name are told apart
+                                              by nothing else. */}
+                                          <p className="text-micro text-ink-quiet">{a.email || 'no email'}</p>
+                                        </td>
+                                        <td className="whitespace-nowrap py-2.5 pr-3 text-micro text-ink-soft">
+                                          {dateTime(a.createdAt)}
+                                        </td>
+                                        <td className="whitespace-nowrap py-2.5 pr-3 text-micro text-ink-soft">
+                                          {dateTime(a.lastSeenAt)}
+                                          {a.id === liveliest?.id && accounts.length > 1 && (
+                                            <span className="ml-1 font-semibold text-go-dark">most recent</span>
+                                          )}
+                                        </td>
+                                        <td className="py-2.5 pr-3 tabular-nums text-ink-soft">
+                                          {d ? `${d.mocksUsed} done, ${d.mocksLeft} left` : '-'}
+                                        </td>
+                                        <td className="py-2.5 pr-3 tabular-nums text-ink-soft">
+                                          {d && d.paidNpr > 0 ? `NPR ${d.paidNpr.toLocaleString()}` : 'nothing'}
+                                        </td>
+                                        <td className="py-2.5 pr-3">
+                                          <Status tone={stateOf(STUDENT_STATE, a.status).tone}>
+                                            {stateOf(STUDENT_STATE, a.status).label}
+                                          </Status>
+                                        </td>
+                                        <td className="py-2.5">
+                                          <Button
+                                            variant={a.status === 'active' ? 'danger' : 'tertiary'}
+                                            size="sm"
+                                            onClick={() =>
+                                              setStudentStatus(a.id, a.status === 'active' ? 'disabled' : 'active')
+                                            }
+                                            disabled={busy}
+                                          >
+                                            {a.status === 'active' ? 'Close' : 'Reopen'}
+                                          </Button>
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </Block>
+                );
+              })()}
 
               {data.students.length === 0 ? (
                 <p className="rounded-card border border-line bg-surface p-10 text-center text-ink-quiet shadow-card">

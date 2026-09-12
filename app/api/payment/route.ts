@@ -3,6 +3,7 @@ import { z, type ZodError } from 'zod';
 import { zodMessage } from '@/lib/zod-message';
 import { currentStudent } from '@/lib/auth/session';
 import { repo, type PaymentOrder } from '@/lib/db';
+import { normaliseWhatsapp } from '@/lib/db/types';
 import { getPlan, publicPlans } from '@/lib/data/plans';
 import { rateLimit, clientIp, LIMITS as RL } from '@/lib/rate-limit';
 import { platformDown, platform } from '@/lib/platform';
@@ -319,6 +320,35 @@ export async function POST(req: Request) {
       );
     }
 
+    /**
+     * ONE NUMBER, ONE ACCOUNT — enforced here too, and BEFORE the transaction
+     * id is claimed so a refusal never burns the student's transaction number.
+     *
+     * The profile screen is where the rule really lives, but this route also
+     * writes `whatsappNumber`, and it did so with no uniqueness check and no
+     * normalisation at all: whatever the browser sent, up to thirty characters,
+     * straight onto the student. That is a second door into the exact state the
+     * rule exists to prevent, and a `977`-prefixed spelling written here would
+     * not even have matched the duplicate report looking for it.
+     */
+    if (body.whatsappNumber) {
+      const want = normaliseWhatsapp(body.whatsappNumber);
+      const mine = normaliseWhatsapp(student.whatsappNumber ?? null);
+      if (want && want !== mine) {
+        const holders = await r.listStudentsByWhatsapp(want);
+        if (holders.some((h) => h.id !== student.id)) {
+          return NextResponse.json(
+            apiError(
+              'NUMBER_IN_USE',
+              'whatsapp number already held by another account',
+              `That number already has an ${BRAND_NAME} account. Please sign in with the Google account you used the first time, or use the number that belongs to this account. If you think this is a mistake, message us on WhatsApp and a person will sort it out.`
+            ),
+            { status: 409 }
+          );
+        }
+      }
+    }
+
     // THE anti-double-claim control. One wallet transaction, one order, ever.
     // A screenshot forwarded between friends is worthless because the second
     // claim on the same transaction id is refused here.
@@ -336,7 +366,12 @@ export async function POST(req: Request) {
 
     // N-22, N-23. Store what they volunteered, and nothing they did not.
     const profile: Record<string, unknown> = {};
-    if (body.whatsappNumber) profile.whatsappNumber = body.whatsappNumber;
+    // Canonical shape only, the same one the profile route writes, so two
+    // spellings of one number can never read as two different numbers.
+    if (body.whatsappNumber) {
+      const digits = normaliseWhatsapp(body.whatsappNumber);
+      if (digits) profile.whatsappNumber = digits;
+    }
     if (body.whatsappConfirmed !== undefined) profile.whatsappConfirmed = body.whatsappConfirmed;
     if (body.city) profile.city = body.city;
     if (body.level) profile.level = body.level;

@@ -13,7 +13,7 @@ import {
   clientIp,
   LIMITS as RL,
 } from '@/lib/rate-limit';
-import { approvePayment, rejectPayment, recordOfflinePayment } from '@/lib/payments';
+import { approvePayment, rejectPayment, recordOfflinePayment, voidPayment } from '@/lib/payments';
 import { apiError } from '@/lib/types';
 import { setPostTrialRule, rulesOrDefaults } from '@/lib/rewards';
 import { sttIsMocked } from '@/lib/ai/stt';
@@ -66,6 +66,20 @@ const Body = z.discriminatedUnion('action', [
     superKey: z.string().min(1),
     studentId: z.string().min(1),
     status: z.enum(['active', 'disabled']),
+    /**
+     * Shown to the STUDENT at sign-in, not just filed in the audit trail. A
+     * closed account with no explanation is the one refusal in this product
+     * that used to have no reason and no way out.
+     */
+    reason: z.string().trim().max(300).optional(),
+  }),
+  z.object({
+    action: z.literal('voidPayment'),
+    superKey: z.string().min(1),
+    orderId: z.string().min(1),
+    reason: z.string().trim().min(3, 'Say why this payment is being taken back.').max(200),
+    /** The same deliberate assertion Approve and Record ask for. */
+    confirmed: z.literal(true),
   }),
   z.object({
     action: z.literal('recordPayment'),
@@ -964,10 +978,16 @@ export async function POST(req: Request) {
     if (!s) {
       return NextResponse.json(apiError('NOT_FOUND', 'no student', 'Not found.'), { status: 404 });
     }
+    const disabledReason =
+      body.status === 'disabled'
+        ? body.reason?.trim() ||
+          'This account has been closed because you already have an ExamTestAI account on this phone number. Please sign in with the Google account you used the first time. If you think this is a mistake, message us on WhatsApp and a person will sort it out.'
+        : null;
     await r.updateStudent(s.id, {
       status: body.status,
       disabledAt: body.status === 'disabled' ? new Date().toISOString() : null,
       disabledBy: body.status === 'disabled' ? 'super_admin' : null,
+      disabledReason,
     });
     await audit({
       actorRole: 'super_admin',
@@ -976,9 +996,41 @@ export async function POST(req: Request) {
       subjectId: s.id,
       before: s.status,
       after: body.status,
-      note: null,
+      note: disabledReason,
     });
     return NextResponse.json({ ok: true, data: { status: body.status } });
+  }
+
+  /**
+   * Take back an approved payment. See voidPayment() in lib/payments.ts for
+   * why nothing is deleted and why credits already spent are left alone.
+   */
+  if (body.action === 'voidPayment') {
+    const order = await r.getOrder(body.orderId);
+    if (!order) {
+      return NextResponse.json(apiError('NOT_FOUND', 'no order', 'That payment no longer exists.'), { status: 404 });
+    }
+    const res = await voidPayment(
+      order,
+      { role: 'super_admin', id: 'super_admin', label: 'super admin' },
+      body.reason
+    );
+    if (!res.ok) {
+      return NextResponse.json(apiError(res.code, res.code, res.userMessage), { status: 409 });
+    }
+    return NextResponse.json({
+      ok: true,
+      data: {
+        reversed: res.reversed,
+        keptBecauseUsed: res.keptBecauseUsed,
+        message: res.alreadyVoided
+          ? 'That payment had already been taken back. Nothing changed.'
+          : `Taken back. NPR ${order.amountNpr.toLocaleString()} is out of revenue and ${res.reversed.mocks} mocks were returned` +
+            (res.keptBecauseUsed.mocks
+              ? `, but ${res.keptBecauseUsed.mocks} had already been used and were left alone.`
+              : '.'),
+      },
+    });
   }
 
   // A payment made outside the checkout (QR on WhatsApp, cash). Written as a

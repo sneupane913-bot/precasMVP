@@ -30,6 +30,8 @@ create table if not exists students (
   status text not null default 'active',
   disabled_at timestamptz,
   disabled_by text,
+  -- Shown to the STUDENT at sign-in, not just filed in the audit trail.
+  disabled_reason text,
   referral_code text not null unique,
   referred_by_code text,
   consent_version text,
@@ -47,6 +49,21 @@ create table if not exists students (
 );
 create index if not exists students_consultancy_idx on students (consultancy_id);
 create index if not exists students_whatsapp_idx on students (whatsapp_number);
+-- ONE NUMBER, ONE ACCOUNT (12 September 2026).
+--
+-- The application refuses a number that another account already holds, but that
+-- check is a read followed by a write and so has a race. This closes it: two
+-- requests landing in the same millisecond produce one winner and one error,
+-- which is the same guarantee seat allocation already has.
+--
+-- NOT created concurrently and NOT retro-applied blindly: duplicates written
+-- before this rule existed will make it fail until they are resolved in /super
+-- (Students -> "One number, more than one account"). That failure is the point.
+-- A unique index that was quietly skipped is worse than none, because the
+-- application would then trust a guarantee the database is not keeping.
+create unique index if not exists students_whatsapp_unique
+  on students (whatsapp_number)
+  where whatsapp_number is not null;
 create index if not exists students_referred_by_idx on students (referred_by_code);
 
 -- ------------------------------------------------------------ trial claims --

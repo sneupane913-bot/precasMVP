@@ -12,6 +12,7 @@ import type {
   RewardRule,
   StudentOffer,
 } from './index';
+import { normaliseWhatsapp } from './types';
 
 /**
  * Postgres-backed repository (J2).
@@ -265,6 +266,7 @@ const toStudent = (r: Row): Student => ({
   status: r.status as Student['status'],
   disabledAt: (r.disabled_at as string) ?? null,
   disabledBy: (r.disabled_by as string) ?? null,
+  disabledReason: (r.disabled_reason as string) ?? null,
   referralCode: r.referral_code as string,
   referredByCode: (r.referred_by_code as string) ?? null,
   consentVersion: (r.consent_version as string) ?? null,
@@ -312,6 +314,7 @@ const fromStudent = (s: Partial<Student>): Row => {
   if (s.status !== undefined) r.status = s.status;
   if (s.disabledAt !== undefined) r.disabled_at = s.disabledAt;
   if (s.disabledBy !== undefined) r.disabled_by = s.disabledBy;
+  if (s.disabledReason !== undefined) r.disabled_reason = s.disabledReason;
   if (s.referralCode !== undefined) r.referral_code = s.referralCode;
   if (s.referredByCode !== undefined) r.referred_by_code = s.referredByCode;
   if (s.consentVersion !== undefined) r.consent_version = s.consentVersion;
@@ -465,6 +468,16 @@ export class SupabaseRepo implements Repo {
   async getStudentByReferralCode(code: string) {
     const r = await selectOne(`students?referral_code=eq.${encodeURIComponent(code)}&limit=1`);
     return r ? toStudent(r) : null;
+  }
+  async listStudentsByWhatsapp(number: string) {
+    const want = normaliseWhatsapp(number);
+    if (!want) return [];
+    // Postgres holds the number in the same canonical shape the profile route
+    // writes, so this is an indexed equality read (students_whatsapp_idx).
+    const rows = await selectRows(
+      `students?select=*&whatsapp_number=eq.${encodeURIComponent(want)}&order=created_at.desc`
+    );
+    return rows.map(toStudent);
   }
   async updateStudent(id: string, p: Partial<Student>) {
     const r = await patch('students', `id=eq.${id}`, fromStudent(p));
