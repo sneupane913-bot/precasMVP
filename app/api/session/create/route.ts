@@ -37,6 +37,49 @@ const Body = z.object({
   category: z.string().max(40).optional(),
 });
 
+/**
+ * HAND BACK A SITTING THIS BROWSER CAN ACTUALLY OPEN.
+ *
+ * 13 September 2026. A student picked Arden University, London, tapped start,
+ * and got "We could not open this interview". She pressed "Start a new
+ * interview", which returns to the catalogue, tapped Arden again, and got the
+ * same page. Every time. There was no way out of it from inside the product.
+ *
+ * The two branches below hand back a sitting the student already has open,
+ * which is right: making a second one would spend a second credit for
+ * questions they have already paid to answer. They check that the sitting
+ * belongs to her STUDENT id.
+ *
+ * But `GET /api/session/{id}` does not read the student id. It guards on the
+ * anonymous `precas_uid` owner cookie (LIVE-002, so a stranger holding a
+ * guessed id cannot read a transcript full of family finances and visa
+ * history). That cookie belongs to a BROWSER, not to a person. Sign in on a
+ * second device, or clear your browsing data, and the two disagree — so
+ * create kept returning an id that GET was always going to refuse, and
+ * "start a new interview" could not break the loop because create never made
+ * a new one.
+ *
+ * The rule, and it is worth stating plainly: IF THE SERVER HANDS A STUDENT A
+ * SESSION ID, THE STUDENT MUST BE ABLE TO OPEN IT. A resume that cannot be
+ * opened is worse than a refusal, because a refusal can be recovered from.
+ *
+ * So the sitting is re-bound to the browser that is asking. This is not a
+ * weakening of LIVE-002. Both callers have already proved something stronger
+ * than the cookie: they are SIGNED IN as the student who owns this sitting.
+ * A stranger holding the id proves nothing and is still refused, which
+ * qa/resume-owner-check.js asserts.
+ *
+ * Re-binding to the caller's id, rather than adopting the sitting's old one,
+ * is deliberate: it leaves any other sittings this browser holds readable.
+ */
+async function claimForThisBrowser(session: InterviewSession): Promise<string> {
+  const ownerId = await ensureOwnerId();
+  if (session.ownerId !== ownerId) {
+    await store.update(session.id, { ownerId });
+  }
+  return ownerId;
+}
+
 export async function POST(req: Request) {
   // D-24. Questions added with no deploy join the pool before it is used.
   await primeExtraQuestions();
@@ -210,11 +253,12 @@ export async function POST(req: Request) {
     const open = await store.get(ent.inProgress.sessionId);
     const openInst = open ? getInstitution(open.institutionId) : undefined;
     if (open && openInst && open.studentId === student.id) {
+      const ownerId = await claimForThisBrowser(open);
       const openQuestions = open.questionIds
         .map((id) => getQuestion(id))
         .filter((q): q is NonNullable<typeof q> => Boolean(q))
         .map((q) => publicQuestion(q, openInst));
-      return NextResponse.json({
+      return withOwnerId(NextResponse.json({
         ok: true,
         data: {
           sessionId: open.id,
@@ -228,7 +272,7 @@ export async function POST(req: Request) {
           institutionId: open.institutionId,
           institutionName: openInst.name,
         },
-      });
+      }), ownerId);
     }
   }
 
@@ -259,11 +303,12 @@ export async function POST(req: Request) {
         x.status !== 'abandoned'
     );
     if (untouched) {
+      const ownerId = await claimForThisBrowser(untouched);
       const uq = untouched.questionIds
         .map((id) => getQuestion(id))
         .filter((q): q is NonNullable<typeof q> => Boolean(q))
         .map((q) => publicQuestion(q, institution));
-      return NextResponse.json({
+      return withOwnerId(NextResponse.json({
         ok: true,
         data: {
           sessionId: untouched.id,
@@ -277,7 +322,7 @@ export async function POST(req: Request) {
           institutionId: untouched.institutionId,
           institutionName: institution.name,
         },
-      });
+      }), ownerId);
     }
   }
 
