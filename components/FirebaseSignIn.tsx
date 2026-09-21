@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * Sign in with Google, through Firebase Auth.
@@ -26,22 +26,53 @@ export interface FirebaseWebConfig {
   projectId: string;
 }
 
-/** Codes that mean "this browser will not allow the popup". */
 /**
- * V-9. iOS Safari, and every in-app browser (Facebook, Instagram, TikTok),
- * either block the popup or lose the storage it depends on. Our students reach
- * us from exactly those places, so on those browsers we do not attempt a popup
- * at all — we go straight to redirect, which always works.
+ * V-9 said iOS blocks the popup, so iOS was sent straight to redirect. That was
+ * backwards, and it is what broke sign-in on every iPhone.
  *
- * Trying the popup first there produces the worst outcome: a button that looks
- * like it did nothing.
+ * `signInWithRedirect` finishes by reading the credential out of a cross-origin
+ * iframe on <project>.firebaseapp.com. Safari's tracking prevention — which is
+ * every browser on iOS, Chrome included, because they are all WebKit — blocks
+ * that read. The student picks their Google account, lands back on our page,
+ * and `getRedirectResult` hands us null with no error at all: a button that
+ * looks like it did nothing. Exactly the report.
+ *
+ * Google's documented remedy is `signInWithPopup`, which carries the credential
+ * back through postMessage between the two windows and never touches
+ * third-party storage. So the popup is now tried first everywhere.
+ *
+ * Only real in-app webviews (Facebook, Instagram, TikTok) still go straight to
+ * redirect: they cannot open a second window at all.
  */
-function popupIsUnreliable(): boolean {
+function mustUseRedirect(): boolean {
   if (typeof navigator === 'undefined') return false;
-  const ua = navigator.userAgent;
-  const iOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  const inApp = /FBAN|FBAV|Instagram|Line|Twitter|TikTok|WebView|wv\)/i.test(ua);
-  return iOS || inApp;
+  return /FBAN|FBAV|Instagram|Line|Twitter|TikTok|; wv\)/i.test(navigator.userAgent);
+}
+
+/**
+ * Set just before we hand the page to Google, cleared when we come back with a
+ * student. If it survives the round trip, the redirect was swallowed and we owe
+ * them a message instead of silence.
+ */
+const PENDING_REDIRECT = 'etai.google.redirect';
+
+function markPendingRedirect() {
+  try {
+    sessionStorage.setItem(PENDING_REDIRECT, String(Date.now()));
+  } catch {
+    /* private mode; the worst case is the old silent failure */
+  }
+}
+
+function takePendingRedirect(): boolean {
+  try {
+    const at = sessionStorage.getItem(PENDING_REDIRECT);
+    sessionStorage.removeItem(PENDING_REDIRECT);
+    // Ten minutes. Older than that and this is a new visit, not a return trip.
+    return at !== null && Date.now() - Number(at) < 10 * 60 * 1000;
+  } catch {
+    return false;
+  }
 }
 
 const REDIRECT_FALLBACK_CODES = new Set([
@@ -81,6 +112,29 @@ async function loadFirebase(config: FirebaseWebConfig) {
   return { authMod, auth };
 }
 
+type Firebase = Awaited<ReturnType<typeof loadFirebase>>;
+
+/**
+ * After a redirect, the SDK sometimes restores the session a beat after
+ * `getRedirectResult` has already answered null. Give it that beat before
+ * declaring the round trip lost.
+ */
+function firstUser({ authMod, auth }: Firebase, ms: number) {
+  return new Promise<{ getIdToken(): Promise<string> } | null>((resolve) => {
+    if (auth.currentUser) return resolve(auth.currentUser);
+    const timer = setTimeout(() => {
+      stop();
+      resolve(null);
+    }, ms);
+    const stop = authMod.onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      clearTimeout(timer);
+      stop();
+      resolve(user);
+    });
+  });
+}
+
 export function FirebaseSignIn({
   config,
   referralCode,
@@ -105,6 +159,7 @@ export function FirebaseSignIn({
   const [detail, setDetail] = useState<string | null>(null);
   const [devHandle, setDevHandle] = useState('');
   const [ready, setReady] = useState(false);
+  const firebase = useRef<Firebase | null>(null);
 
   const exchange = useCallback(
     async (idToken: string) => {
@@ -145,6 +200,11 @@ export function FirebaseSignIn({
   );
 
   // A redirect sign-in finishes here, on the way back.
+  //
+  // This also warms the SDK up. The popup has to be opened inside the click
+  // that asked for it — Safari blocks a window that opens after an await on a
+  // module still downloading — so by the time the button is pressed, Firebase
+  // is already loaded and `signInWithPopup` is reached in the same tick.
   useEffect(() => {
     setReady(true);
     if (!config) return;
@@ -152,11 +212,27 @@ export function FirebaseSignIn({
     let cancelled = false;
     (async () => {
       try {
-        const { authMod, auth } = await loadFirebase(config);
-        const result = await authMod.getRedirectResult(auth);
-        if (!cancelled && result?.user) {
-          const idToken = await result.user.getIdToken();
-          await exchange(idToken);
+        const fb = await loadFirebase(config);
+        if (cancelled) return;
+        firebase.current = fb;
+
+        const result = await fb.authMod.getRedirectResult(fb.auth);
+        if (cancelled) return;
+
+        const returning = takePendingRedirect();
+        const user = result?.user ?? (returning ? await firstUser(fb, 2500) : null);
+        if (cancelled) return;
+
+        if (user) {
+          await exchange(await user.getIdToken());
+          return;
+        }
+
+        // We sent them to Google and got them back empty-handed. Say so. Before
+        // this, the page just sat there looking untouched.
+        if (returning) {
+          setError('Google sent you back without finishing. Please tap the button once more.');
+          setDetail('redirect returned no credential (browser blocked cross-site storage)');
         }
       } catch (e) {
         if (cancelled) return;
@@ -196,16 +272,20 @@ export function FirebaseSignIn({
     setDetail(null);
 
     try {
-      const { authMod, auth } = await loadFirebase(config);
+      // Already warmed by the effect above on every real visit, so this resolves
+      // without leaving the click's turn and the popup is allowed to open.
+      const fb = firebase.current ?? (firebase.current = await loadFirebase(config));
+      const { authMod, auth } = fb;
       const provider = new authMod.GoogleAuthProvider();
       // Always offer the chooser. On a shared consultancy machine, silently
       // reusing the previous student's Google session would drop student B
       // inside student A's account.
       provider.setCustomParameters({ prompt: 'select_account' });
 
-      // Straight to redirect where popups are known to fail.
-      if (popupIsUnreliable()) {
-        setDetail('this browser blocks sign-in popups, using redirect');
+      // In-app webviews cannot open a second window, so they get the redirect.
+      if (mustUseRedirect()) {
+        setDetail('in-app browser, using redirect');
+        markPendingRedirect();
         await authMod.signInWithRedirect(auth, provider);
         return;
       }
@@ -229,6 +309,7 @@ export function FirebaseSignIn({
         if (REDIRECT_FALLBACK_CODES.has(code)) {
           setError('Opening Google in this window instead...');
           setDetail(`popup blocked by browser (${code}), switching to redirect`);
+          markPendingRedirect();
           await authMod.signInWithRedirect(auth, provider);
           return; // the page navigates away
         }
@@ -242,6 +323,7 @@ export function FirebaseSignIn({
         try {
           setError('Opening Google in this window instead...');
           setDetail(`popup failed (${code}), trying redirect`);
+          markPendingRedirect();
           await authMod.signInWithRedirect(auth, provider);
           return;
         } catch {
