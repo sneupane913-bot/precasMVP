@@ -96,6 +96,16 @@ line
 echo " Static suites (no server needed)"
 line
 
+printf '  %-24s ' "abertay-check"
+if OUT=$(node --experimental-strip-types --no-warnings --import ./qa/_alias-register.mjs qa/abertay-check.mjs 2>&1); then
+  echo "passed"
+  PASSED_SUITES=$((PASSED_SUITES + 1))
+else
+  echo "FAILED"
+  echo "$OUT" | tail -5
+  FAILED=$((FAILED + 1))
+fi
+
 # The AI contract suite runs the rules rather than reading them, so it comes
 # first: if the contract is broken there is no point going further.
 printf '  %-24s ' "contract-check"

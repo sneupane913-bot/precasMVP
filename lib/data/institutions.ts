@@ -16,6 +16,26 @@ import type { Institution } from '@/lib/types';
 
 export const INSTITUTIONS: Institution[] = [
   {
+    id: 'inst-abertay-university',
+    vertical: 'uk-precas',
+    slug: 'abertay-university',
+    name: 'Abertay University',
+    shortName: 'Abertay',
+    country: 'United Kingdom',
+    city: 'Dundee',
+    interviewType: 'Pre-CAS',
+    questionCount: 17,
+    durationMinutes: 30,
+    blurb: 'Prepare for Abertay’s CAS Shield credibility assessment: explain your decision to study, know your application and funding, and research living in Dundee. An interview may be required.',
+    monogram: 'AB',
+    accent: '#b51b63',
+    logoUrl: null,
+    logoApproved: false,
+    logoNeedsDarkBackground: false,
+    pilotOnly: false,
+    featured: false,
+  },
+  {
     id: 'inst-bpp',
     vertical: 'uk-precas',
     slug: 'bpp-university',

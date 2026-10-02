@@ -1,0 +1,143 @@
+{
+  "institutionId": "inst-abertay-university",
+  "name": "Abertay University",
+  "checkedOn": "2026-10-02",
+  "usesCasShield": true,
+  "facts": [
+    {
+      "text": "Abertay University is on Bell Street in Dundee, Scotland, DD1 1HG. It is a separate institution from the University of Dundee.",
+      "sourceUrl": "https://www.abertay.ac.uk/international/how-to-apply/",
+      "sourceTitle": "Abertay: How to Apply as an International Student"
+    },
+    {
+      "text": "The Dundee city-centre campus has the Bernard King Library, study and social spaces, and specialist teaching and research labs; applicants should check facilities for their own programme.",
+      "sourceUrl": "https://www.abertay.ac.uk/visit/campus-tours/",
+      "sourceTitle": "Abertay: Campus Tours"
+    },
+    {
+      "text": "Abertay uses CAS Shield; a recorded Pre-CAS credibility interview may be requested about the applicant’s decision to study there. It is not stated to be compulsory for every applicant.",
+      "sourceUrl": "https://www.abertay.ac.uk/international/how-to-apply/",
+      "sourceTitle": "Abertay: How to Apply as an International Student"
+    },
+    {
+      "text": "Credibility assessment includes submitted documents, personal information, funding evidence and the questionnaire. Abertay may request further information before issuing a CAS.",
+      "sourceUrl": "https://www.abertay.ac.uk/media/44aobwbg/cas-shield-credibility-check-list.pdf",
+      "sourceTitle": "Abertay: CAS Shield Credibility Assessment Information"
+    },
+    {
+      "text": "The applicant must complete the Pre-CAS questionnaire honestly and independently; an agent must not complete it for them.",
+      "sourceUrl": "https://www.abertay.ac.uk/media/fkpjymmg/a4-cas-shield-guide_final.pdf",
+      "sourceTitle": "Abertay: How to Complete Your CAS Shield Profile"
+    },
+    {
+      "text": "Interview invitations go to the student, not the agent. The checklist says instructions specify preparation and answer times, with one answer per question and no resits; follow the actual invitation for current arrangements.",
+      "sourceUrl": "https://www.abertay.ac.uk/media/44aobwbg/cas-shield-credibility-check-list.pdf",
+      "sourceTitle": "Abertay: CAS Shield Credibility Assessment Information"
+    },
+    {
+      "text": "CAS Shield funding details include scholarship amounts, balances and sources. Use the current offer and receipts for fees/deposit; do not use historic webinar figures. Official loan/sponsorship evidence routes may differ from bank-fund evidence.",
+      "sourceUrl": "https://www.abertay.ac.uk/media/fkpjymmg/a4-cas-shield-guide_final.pdf",
+      "sourceTitle": "Abertay: How to Complete Your CAS Shield Profile"
+    },
+    {
+      "text": "Parker House is managed by iQ on Parker Street, around five minutes’ walk from campus. Limited reduced-rate rooms for Abertay students are first come, first served; standard-rate and other Dundee options may be available.",
+      "sourceUrl": "https://www.abertay.ac.uk/accommodation/student-rooms-halls/",
+      "sourceTitle": "Abertay: Rooms and Halls of Residence"
+    },
+    {
+      "text": "Parker House rooms include bills and wifi; laundry is pay-as-you-go. Confirm the current provider quote, availability, contract length and inclusions rather than assuming a fixed rent.",
+      "sourceUrl": "https://www.abertay.ac.uk/accommodation/student-rooms-halls/",
+      "sourceTitle": "Abertay: Rooms and Halls of Residence"
+    },
+    {
+      "text": "Only for MSc Ethical Hacking and Cybersecurity: the on-campus full-time route is 12 months and the 24-month distance route is for UK applicants. Its NCSC certification and curriculum must not be attributed to every Abertay degree.",
+      "sourceUrl": "https://www.abertay.ac.uk/course-search/postgraduate-taught/ethical-hacking-and-cybersecurity/",
+      "sourceTitle": "Abertay: MSc Ethical Hacking and Cybersecurity"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.abertay.ac.uk/international/how-to-apply/",
+      "title": "Abertay: How to Apply as an International Student",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "decision to study at Abertay University"
+      ],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Read 2 October 2026. Published applicant information; no verbatim pre-CAS interview question list. Dedicated a- questions are authored practice adaptations, not published or student-reported wording."
+    },
+    {
+      "url": "https://www.abertay.ac.uk/media/fkpjymmg/a4-cas-shield-guide_final.pdf",
+      "title": "Abertay: How to Complete Your CAS Shield Profile",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "how you will be funding your studies at Abertay"
+      ],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Read 2 October 2026. Published applicant information; no verbatim pre-CAS interview question list. Dedicated a- questions are authored practice adaptations, not published or student-reported wording."
+    },
+    {
+      "url": "https://www.abertay.ac.uk/media/44aobwbg/cas-shield-credibility-check-list.pdf",
+      "title": "Abertay: CAS Shield Credibility Assessment Information",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [
+        "documents, personal information, financial evidence, and pre-CAS questionnaire"
+      ],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Read 2 October 2026. Published applicant information; no verbatim pre-CAS interview question list. Dedicated a- questions are authored practice adaptations, not published or student-reported wording."
+    },
+    {
+      "url": "https://www.abertay.ac.uk/accommodation/student-rooms-halls/",
+      "title": "Abertay: Rooms and Halls of Residence",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Read 2 October 2026. Published applicant information; no verbatim pre-CAS interview question list. Dedicated a- questions are authored practice adaptations, not published or student-reported wording."
+    },
+    {
+      "url": "https://www.abertay.ac.uk/visit/campus-tours/",
+      "title": "Abertay: Campus Tours",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Read 2 October 2026. Published applicant information; no verbatim pre-CAS interview question list. Dedicated a- questions are authored practice adaptations, not published or student-reported wording."
+    },
+    {
+      "url": "https://www.abertay.ac.uk/course-search/postgraduate-taught/ethical-hacking-and-cybersecurity/",
+      "title": "Abertay: MSc Ethical Hacking and Cybersecurity",
+      "tier": "official",
+      "fetched": true,
+      "fromSnippet": false,
+      "topics": [],
+      "quotes": [],
+      "questionIds": [],
+      "unmapped": [],
+      "notes": "Read 2 October 2026. Published applicant information; no verbatim pre-CAS interview question list. Dedicated a- questions are authored practice adaptations, not published or student-reported wording."
+    }
+  ],
+  "searchesRun": [
+    "site:abertay.ac.uk credibility interview CAS questions",
+    "site:abertay.ac.uk pre-CAS questions",
+    "Abertay University interview questions student credibility experience"
+  ]
+}

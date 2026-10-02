@@ -50,6 +50,7 @@
 import type { Institution, Question, PublicQuestion } from '@/lib/types';
 import { answerSecondsFor, readSecondsFor } from '@/lib/data/timing';
 import type { Draft } from '@/lib/data/question-draft';
+import { ABERTAY_ID, ABERTAY_PRACTICE } from '@/lib/data/questions-abertay';
 import { BATCH3 } from '@/lib/data/questions-batch3';
 import {
   aboutSentence,
@@ -2009,7 +2010,7 @@ const RAW: Draft[] = [
  * two facts and a conclusion in 45 seconds, so the product was training
  * students to under-answer the real interview.
  */
-export const QUESTIONS: Question[] = [...RAW, ...BATCH3].map((q, i) => {
+const UK_BANK: Question[] = [...RAW, ...BATCH3].map((q, i) => {
   const { publishedBy: _own, ...rest } = q;
   return {
     ...rest,
@@ -2020,6 +2021,17 @@ export const QUESTIONS: Question[] = [...RAW, ...BATCH3].map((q, i) => {
     readSeconds: readSecondsFor(q.answerKind),
   };
 });
+
+const ABERTAY_BANK: Question[] = ABERTAY_PRACTICE.map(({ id, draft }) => ({
+  ...draft,
+  id,
+  vertical: 'uk-precas',
+  institutionId: ABERTAY_ID,
+  timeLimitSeconds: answerSecondsFor(draft.answerKind),
+  readSeconds: readSecondsFor(draft.answerKind),
+}));
+
+export const QUESTIONS: Question[] = [...UK_BANK, ...ABERTAY_BANK];
 
 /**
  * Which universities' OWN published guidance asks a given question (Q-12).
@@ -2325,6 +2337,8 @@ function rank(q: Question, seen: Set<string>, seenFamilies: Set<string>, institu
       // any repeat; the stronger the evidence, the earlier the question.
       if (level === 'general') score += 50;
       else score -= LIKELIHOOD_RANK[level];
+      // Own practice comes first within a theme, after unseen/family checks.
+      if (q.institutionId === institutionId) score -= 4;
     }
   }
   return score;
@@ -2348,15 +2362,15 @@ function orderFor(list: Question[], seen: Set<string>, seenFamilies: Set<string>
  * sees the label either way; nothing is ever claimed that the research does
  * not hold.
  */
-function poolFor(_institutionId?: string): Question[] {
-  return pool();
+function poolFor(institutionId?: string): Question[] {
+  return pool().filter((q) => q.institutionId === null || q.institutionId === institutionId);
 }
 
 /** The questions with evidence naming this university (not merely general). */
 export function eligiblePoolFor(institutionId: string): Question[] {
   const inst = getInstitution(institutionId);
   if (!inst) return pool();
-  return pool().filter((q) => likelihoodFor(q, inst).level !== 'general');
+  return poolFor(institutionId).filter((q) => likelihoodFor(q, inst).level !== 'general');
 }
 
 export function buildQuestionPlan(limit: number, opts: PlanOptions = {}): string[] {

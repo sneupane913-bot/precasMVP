@@ -209,3 +209,19 @@ q-207	future_plans	root	What is your biggest dream in life, and how does this co
 q-208	conversational	root	How will you balance your studies, your social life and any part-time work in the UK?
 q-209	conversational	root	Imagine it is your first week at {{university}}. What is the first thing you will do after your classes finish?
 q-210	conversational	root	How will you deal with loneliness, homesickness or stress during your time in the UK?
+a-01	why_university	root	Why have you chosen Abertay University for your studies, rather than another university offering your subject?
+a-02	why_university	root	Which facilities at Abertay’s Dundee campus are relevant to your course, and how would you use them?
+a-03	why_course	root	What is the exact Abertay course on your offer, how will you study it, and when does it start?
+a-04	why_course	root	Which two modules from your Abertay programme interest you most, and what will you learn from them?
+a-05	education	root	How does the academic background you submitted to Abertay prepare you for your chosen programme?
+a-06	progression	root	What new knowledge will your Abertay course give you that you have not already covered in your previous studies?
+a-07	finance	root	What tuition fee, scholarship and deposit figures have you entered in Abertay’s CAS Shield, and how much remains to be paid?
+a-08	finance	root	Who is funding your Abertay studies, and what evidence supports that funding in CAS Shield?
+a-09	finance	root	For your studies in Dundee, how much living-cost evidence do you need in addition to your remaining tuition, and how have you prepared it?
+a-10	accommodation	root	Which accommodation have you researched in Dundee for Abertay, and how would you get to the Bell Street campus?
+a-11	accommodation	root	If Abertay’s preferential-rate rooms at Parker House are full, what is your accommodation plan?
+a-12	future_plans	root	How does your chosen Abertay programme fit the work you plan to do after graduation?
+a-13	why_university	root	What research did you personally do before choosing Abertay, even if a consultancy helped with your application?
+a-14	why_course	root	How will the teaching and assessment on your Abertay course help you develop the skills you need?
+a-15	finance	probe	You mentioned a scholarship or deposit. How did that change the remaining balance in your Abertay funding plan?
+a-16	accommodation	probe	Does your Dundee rent quote include bills, and what costs are outside that accommodation contract?

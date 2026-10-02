@@ -1,5 +1,6 @@
 import type { Institution, Question, QuestionCategory } from '@/lib/types';
 import { PUBLISHED_GUIDANCE, UKVI_MAINTENANCE } from '@/lib/data/institution-facts';
+import { ABERTAY_ID, ABERTAY_PRACTICE } from '@/lib/data/questions-abertay';
 import { GENERATED_EVIDENCE } from '@/lib/data/university-evidence.generated';
 
 /**
@@ -135,7 +136,7 @@ const BRUNEL = 'inst-brunel-university-london';
 /** Every source we hold for one university: hand-checked guidance first, then the sweep. */
 export function evidenceFor(institutionId: string): EvidenceSource[] {
   const out: EvidenceSource[] = [];
-  if (institutionId === BRUNEL || GENERATED_EVIDENCE[institutionId]?.usesCasShield === true) {
+  if (institutionId === BRUNEL || (institutionId !== ABERTAY_ID && GENERATED_EVIDENCE[institutionId]?.usesCasShield === true)) {
     out.push(CAS_SHIELD_SOURCE);
   }
   const g = PUBLISHED_GUIDANCE[institutionId];
@@ -245,6 +246,16 @@ function shortName(inst: Institution): string {
 export function likelihoodFor(q: Question, inst: Institution): QuestionLikelihood {
   const sources = evidenceFor(inst.id);
   const name = shortName(inst);
+  const practice = inst.id === ABERTAY_ID && ABERTAY_PRACTICE.find((p) => p.id === q.id);
+  if (practice) {
+    const source = sources.find((s) => s.url === practice.sourceUrl);
+    return {
+      level: 'possible',
+      reason: "Practice adapted from Abertay’s published information; this wording is not a confirmed interview question.",
+      sourceUrl: practice.sourceUrl,
+      sourceTitle: source?.title ?? 'Abertay University: published applicant information',
+    };
+  }
 
   // 1. The university's own page lists it.
   const official = sources.find((s) => s.tier === 'official' && s.questionIds.includes(q.id));
