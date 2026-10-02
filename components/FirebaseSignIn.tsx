@@ -356,6 +356,19 @@ export function FirebaseSignIn({
     );
   }
 
+  // Development sign-in must never be offered on the live site, even when
+  // the config service successfully responds without a Firebase project.
+  if (!config && process.env.NODE_ENV === 'production') {
+    return (
+      <div role="alert" className="rounded-card border border-line bg-surface p-5">
+        <p className="mb-4 text-sm text-ink-soft">Sign-in is temporarily unavailable. Please try again shortly.</p>
+        <button onClick={() => window.location.reload()} className="rounded-control bg-ink px-5 py-2.5 font-bold text-white">
+          Try again
+        </button>
+      </div>
+    );
+  }
+
   // ---- Development: no Firebase project configured yet -------------------
   if (!config) {
     return (

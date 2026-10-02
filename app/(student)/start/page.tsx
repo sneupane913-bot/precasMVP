@@ -40,6 +40,8 @@ function StartInner() {
   const params = useSearchParams();
   const [config, setConfig] = useState<FirebaseWebConfig | null>(null);
   const [loading, setLoading] = useState(true);
+  const [configError, setConfigError] = useState(false);
+  const [retry, setRetry] = useState(0);
   const [softDenied, setSoftDenied] = useState<string | null>(null);
 
   const ref = params.get('ref') ?? undefined;
@@ -75,6 +77,8 @@ function StartInner() {
    */
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setConfigError(false);
 
     /**
      * V-9. Every fetch here is on a timeout, and `loading` is cleared in a
@@ -96,7 +100,10 @@ function StartInner() {
       const timer = setTimeout(() => ac.abort(), ms);
       try {
         const r = await fetch(url, { signal: ac.signal });
-        return await r.json();
+        if (!r.ok) throw new Error(`Request failed: ${r.status}`);
+        const body = await r.json();
+        if (body?.ok !== true) throw new Error("Invalid response");
+        return body;
       } finally {
         clearTimeout(timer);
       }
@@ -134,9 +141,11 @@ function StartInner() {
       if (cancelled) return;
       try {
         const j = await withTimeout('/api/auth/config');
-        if (!cancelled) setConfig(j.data?.firebase ?? null);
+        if (!j.data || !('firebase' in j.data)) throw new Error('Missing sign-in configuration');
+        if (!cancelled) setConfig(j.data.firebase ?? null);
       } catch {
-        if (!cancelled) setConfig(null);
+        // A timeout or server failure is not evidence that Firebase is unconfigured.
+        if (!cancelled) setConfigError(true);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -144,7 +153,7 @@ function StartInner() {
     return () => {
       cancelled = true;
     };
-  }, [next, router]);
+  }, [next, router, retry]);
 
   return (
     <main className="grid min-h-screen lg:grid-cols-2">
@@ -229,6 +238,11 @@ function StartInner() {
             /* D-7. The placeholder is exactly the height of the button that
                replaces it, so nothing moves under a thumb already travelling. */
             <div className="h-14 animate-pulse rounded-control bg-surface-sunk" />
+          ) : configError ? (
+            <div role="alert" className="rounded-card border border-line bg-surface p-5">
+              <p className="mb-4 text-sm text-ink-soft">We couldn’t load sign-in. Please check your connection and try again.</p>
+              <Button onClick={() => setRetry((value) => value + 1)}>Try again</Button>
+            </div>
           ) : (
             <FirebaseSignIn
               config={config}
